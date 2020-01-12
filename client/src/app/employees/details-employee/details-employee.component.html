@@ -1,0 +1,26 @@
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">
+        <h3>{{ allowEdit ? 'My Profile' : 'Employee Details' }}</h3>
+      <p>email: {{ employee.email }}</p>
+      <p>first name: {{ employee.firstName || "------" }}</p>
+      <p>last name: {{ employee.lastName || "------" }}</p>
+      <div class="row" *ngIf="allowEdit">
+        <a class="btn btn-primary btn-sm" routerLink='edit'>Edit Info</a>
+      </div>
+    </div>
+    <div class="col-md-6" *ngIf='allowEdit'>
+      <h3>My Companies</h3>
+      <app-list-companies></app-list-companies>
+    </div>
+  </div>
+  <hr>
+</div>
+
+<router-outlet></router-outlet>
+
+
+
+
+

@@ -1,0 +1,30 @@
+
+
+
+
+
+<div class="container">
+  <app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (close)="onClose()"></app-alert>
+  <div class="col-md-12">
+    <div class="row">
+      <h3>Compenies</h3>
+      <a class="btn btn-primary btn-sm" routerLink='register'>register company</a>
+      <hr>
+    </div>
+  </div>  
+  <div class="row">
+    <div class="col-md-5">
+      <app-list-companies></app-list-companies>
+    </div>
+    <div class="col-md-7">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+

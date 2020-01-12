@@ -1,0 +1,86 @@
+
+<app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (close)="onClose()"></app-alert>
+<div class="container">
+  <h4>Edit</h4>
+  <form (ngSubmit)="onSubmit(employeeForm)" #employeeForm="ngForm">
+    <div class="row">
+        <label for="email">email:  </label>
+        <input 
+          type="email" 
+          name="email" 
+          id="email"
+          required
+          email
+          ngModel
+          #email="ngModel"
+        >
+        <span class="help-block" *ngIf="!email.valid && email.touched">
+          please enter a valid email address
+        </span>
+      </div>
+    <div class="row">
+      <div class="col">
+        <label for="firstName">first name:  </label>
+        <input 
+        type="text" 
+        name="firstName" 
+        id="firstName"
+        ngModel
+        #firstName="ngModel"
+        minlength="2"
+        >
+        <span *ngIf="firstName.touched && !firstName.valid">
+          <span class="help-block" *ngIf="firstName.errors.minlength">
+            first name must be of at least 2 characters long 
+          </span>
+        </span>
+      </div>
+      <div class="col">
+        <label for="lastName">last name:  </label>
+        <input 
+          type="text" 
+          name="lastName" 
+          id="lastName"
+          ngModel
+          #lastName="ngModel"
+          minlength="2"
+        >
+        <span *ngIf="lastName.touched && !lastName.valid">
+          <span class="help-block" *ngIf="lastName.errors.minlength">
+            last name must be of at least 2 characters long 
+          </span>
+        </span>
+      </div>
+    </div>
+    <hr>
+    <input 
+      type="hidden" 
+      name="_id" 
+      id="_id"
+      required
+      ngModel
+    >
+    <button 
+      type="submit" 
+      class="btn btn-success"
+      [disabled]="!employeeForm.form.valid"
+      >
+      Edit
+    </button>
+    <button 
+      type="button" 
+      class="btn btn-danger"
+      (click)="onCancel()"
+      >
+      Cancel
+    </button>
+    <!-- <button 
+      type="button" 
+      class="btn btn-danger"
+      *ngIf="edit"
+      (click)="onDelete()"
+      >
+      Delete
+    </button> -->
+  </form>
+</div>

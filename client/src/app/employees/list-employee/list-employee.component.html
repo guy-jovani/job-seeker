@@ -1,0 +1,14 @@
+
+
+
+<ul class="list-group" *ngIf="employees.length">
+  <li 
+    class="list-group-item" 
+    *ngFor="let employee of employees; let i=index">
+    <a routerLink='{{i}}'>
+      <p>Employee Email: {{ employee.email }}</p>
+    </a>
+    
+  </li>
+</ul>
+<p *ngIf="!employees.length">There are no registers employees</p>
