@@ -1,4 +1,4 @@
-import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
+import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Company } from './company.model';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
@@ -13,8 +13,7 @@ import { of } from 'rxjs';
 export class CompanyResolverService implements Resolve<Company[]> {
 
   constructor(private store: Store<fromApp.AppState>, 
-              private actions$: Actions,
-              private router: Router){}
+              private actions$: Actions){}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot){ 
     return this.store.select('company').pipe(
@@ -23,15 +22,15 @@ export class CompanyResolverService implements Resolve<Company[]> {
         return companyState.companies;
       }),
       switchMap(companies => {
-       if(!companies.length){
-        this.store.dispatch(new CompanyActions.FetchAllCompanies());
-        return this.actions$.pipe(
-          ofType(CompanyActions.SET_ALL_COMPANIES),
-          take(1)
-        );
-       } else {
-         return of(companies); 
-       }
+        if(!companies.length){
+          this.store.dispatch(new CompanyActions.FetchAllCompanies());
+          return this.actions$.pipe(
+            ofType(CompanyActions.SET_ALL_COMPANIES),
+            take(1)
+          );
+        } else {
+          return of(companies); 
+        }
       })
     )
   }

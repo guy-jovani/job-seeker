@@ -10,10 +10,8 @@ const errorHandling = require('../utils/errorHandling')
 
 exports.getCompany = async (req, res, next) => {
   try {
-    // const company = await Company.findOne({_id: req.query._id}).select('-__v -createdAt -updatedAt');
     const company = await Company.aggregate([
                 { "$match": { '_id':  mongoose.Types.ObjectId(req.query._id) } },
-                { "$addFields": { "creatorId": "$creator" } },
                 { "$project": { 'creator': 0, 'createdAt': 0, 'updatedAt': 0, '__v': 0 } }
               ]);
     res.status(200).json({
@@ -27,11 +25,9 @@ exports.getCompany = async (req, res, next) => {
 
 exports.getCompanies = async (req, res, next) => {
   try {
-    // const companies = await Company.find().select('name description creator');
     const companies = await Company.aggregate([
-                    { "$addFields": { "creatorId": "$creator" } },
-                    { "$project": { 'creator': 0, 'createdAt': 0, 'updatedAt': 0, '__v': 0 } }
-                  ]);
+                { "$project": { 'creator': 0, 'createdAt': 0, 'updatedAt': 0, '__v': 0 } }
+              ]);
     res.status(200).json({
       type: 'success',
       companies
@@ -63,11 +59,12 @@ exports.register = async (req, res, next) => {
       company.imagePath = imagePath;
       await company.save();
     }
-    // get a company object without the fields that shouldn't return         
+    // gets a company object without the fields that shouldn't return         
     company = getFilteredCompany(company);
     company.creator = req.body.creatorId;
     creator.companiesCreated.push(company);
     await creator.save();
+    
     res.status(201).json({
       message: 'company created successfully!',
       type: 'success',
@@ -113,10 +110,9 @@ exports.updateCompany = async (req, res, next) => {
       throw new Error("trying to update a non exisitng company");
     }
     const updatedCompany = await Company.aggregate([
-                              { "$match": { '_id':  mongoose.Types.ObjectId(req.body._id) } },
-                              { "$addFields": { "creatorId": "$creator" } },
-                              { "$project": { 'creator': 0, 'createdAt': 0, 'updatedAt': 0, '__v': 0 } }
-                            ]);
+                { "$match": { '_id':  mongoose.Types.ObjectId(req.body._id) } },
+                { "$project": { 'creator': 0, 'createdAt': 0, 'updatedAt': 0, '__v': 0 } }
+              ]);
     res.status(201).json({
       message: 'company updated successfully!',
       type: 'success',

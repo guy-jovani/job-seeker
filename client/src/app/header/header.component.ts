@@ -20,7 +20,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   collapsed = true;
   isAuthenticated = false;
   checkAuthSub: Subscription;
-  loggedEmployeeInd: Employee = null;
+  loggedEmployee: Employee = null;
 
   constructor(private store: Store<fromApp.AppState>) { }
 
@@ -31,7 +31,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       })).subscribe(employee => {
         this.isAuthenticated = !!employee;
         if(this.isAuthenticated){
-          this.loggedEmployeeInd;
+          this.loggedEmployee = employee;
         }
       });
   }

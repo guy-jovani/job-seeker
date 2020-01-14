@@ -16,16 +16,16 @@ export class DetailsCompanyGuard implements CanActivate {
 
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): 
     Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    return this.store.select('company').pipe(
-      take(1),
-      map(companyState => {
-        const re = /\d+/;
-        const index = re.exec(next.url[0].path);
-        if(index && index[0] && +index < companyState.companies.length){
-          return true;
-        }
-        return this.router.createUrlTree([state.url.split('/')[1]]);
-      })
+      return this.store.select('company').pipe(
+        take(1),
+        map(companyState => {
+          const re = /\d+/;
+          const index = re.exec(next.url[0].path);
+          if(index && index[0]){ //  && +index < companyState.companies.length
+            return true;
+          }
+          return this.router.createUrlTree([state.url.split('/')[1]]);
+        })
     );
   }
   

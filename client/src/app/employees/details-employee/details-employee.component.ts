@@ -3,10 +3,10 @@ import { Store } from '@ngrx/store';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { map, switchMap } from 'rxjs/operators';
 
-import * as fromApp from '../../store/app.reducer';
-import { Employee } from '../employee.model';
 import { Subscription } from 'rxjs';
 import { Company } from 'app/company/company.model';
+import * as fromApp from '../../store/app.reducer';
+import { Employee } from '../employee.model';
 
 @Component({
   selector: 'app-details-employee',
@@ -17,6 +17,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   index: number;
   employee: Employee;
   storeSub: Subscription;
+  routeSub: Subscription;
   allowEdit: boolean; // only allow to edit if the current employee is the one logged in
   companies: Company[];
 
@@ -26,7 +27,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
     private router: Router) { }
 
   ngOnInit() {
-    this.route.params
+    this.routeSub = this.route.params
       .pipe(
         map((params: Params) => {
           this.index = +params['index'];
@@ -34,15 +35,18 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
         switchMap(() => {
           return this.store.select('employee');
         }),
-        switchMap(employees => {          
-          if(this.index >= 0){
-            this.employee = employees.employees[this.index];
+        switchMap(employeesState => { 
+          if(this.index && (this.index >= employeesState.employees.length || this.index < 0)){
+            this.router.navigate(['employees']);
+          }      
+          if(this.index >= 0){ 
+            this.employee = employeesState.employees[this.index];
             this.allowEdit = false;
           }          
           return this.store.select('auth');
         }),
         switchMap(authState => {
-          if(!this.employee || (authState.employee && this.employee._id === authState.employee._id)){
+          if(isNaN(this.index)){
             this.employee = authState.employee;
             this.allowEdit = true;
           }
@@ -50,8 +54,10 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
         })
       )     
       .subscribe(companyState => {  
-        this.companies = 
+        if(this.employee){
+          this.companies = 
           companyState.companies.filter(company => company.creatorId === this.employee._id);
+        }
       });
   }
 
@@ -59,6 +65,9 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   ngOnDestroy(){
     if(this.storeSub){
       this.storeSub.unsubscribe();
+    }
+    if(this.routeSub){
+      this.routeSub.unsubscribe();
     }
   }
 }

@@ -33,22 +33,19 @@ const routes: Routes = [
     path: '', component: HomeComponent, 
   },
   {
-    path: 'signup', component: SignupComponent, 
-  },
-  {
     path: 'companies', component: CompaniesComponent, canActivate: [AuthGuard], 
     resolve: [CompanyResolverService],
     children: [
       {
-        path: 'register', component: EditCompanyComponent
-      },
-      {
         path: ':index/company', component: DetailsCompanyComponent, canActivate: [DetailsCompanyGuard]
       },
       {
-        path: ':index/company/:edit', component: EditCompanyComponent, canActivate: [DetailsCompanyGuard],
+        path: ':index/company/edit', component: EditCompanyComponent, canActivate: [DetailsCompanyGuard],
       }
     ]  
+  },
+  {
+    path: 'signup', component: SignupComponent, 
   },
   {
     path: 'my-details', component: DetailsEmployeeComponent, canActivate: [AuthGuard],  
@@ -58,10 +55,13 @@ const routes: Routes = [
         path: 'edit', component: EditEmployeeComponent
       },
       {
+        path: 'register', component: EditCompanyComponent
+      },
+      {
         path: ':index/company', component: DetailsCompanyComponent, canActivate: [DetailsCompanyGuard]
       },
       {
-        path: ':index/company/:edit', component: EditCompanyComponent, canActivate: [DetailsCompanyGuard],
+        path: ':index/company/edit', component: EditCompanyComponent, canActivate: [DetailsCompanyGuard],
       }
     ]   
   },

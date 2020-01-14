@@ -6,7 +6,7 @@ import * as CompanyActions from './company.actions';
 import { environment } from '../../../environments/environment';
 import { of } from 'rxjs';
 import { switchMap, map, catchError, tap } from 'rxjs/operators';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import * as fromApp from '../../store/app.reducer';
@@ -32,6 +32,7 @@ export class CompanyEffects {
 
   constructor(private actions$: Actions,
               private router: Router,
+              private route: ActivatedRoute,
               private http: HttpClient,
               private store: Store<fromApp.AppState>){}
 
@@ -89,7 +90,8 @@ export class CompanyEffects {
     ofType(CompanyActions.SET_SINGLE_COMPANY, CompanyActions.UPDATE_SINGLE_COMPANY),
     tap((actionData: CompanyActions.SetSingleCompany | CompanyActions.UpdateSingleCompany) => { 
       if(actionData.payload.redirect){
-        this.router.navigate(['/companies'])
+        const currUrl = this.route.snapshot['_routerState'].url.substring(1).split("/");
+        this.router.navigate([currUrl[0]]);
       }
     })
   )

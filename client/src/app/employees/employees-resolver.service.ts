@@ -1,4 +1,4 @@
-import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
+import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Actions, ofType } from '@ngrx/effects';
 import { take, switchMap, map } from 'rxjs/operators';
@@ -16,8 +16,7 @@ import * as EmployeesActions from './store/employee.actions';
 export class EmployeesResolverService implements Resolve<Employee[]> {
 
   constructor(private store: Store<fromApp.AppState>, 
-              private actions$: Actions,
-              private router: Router){}
+              private actions$: Actions){}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot){
     return this.store.select('employee').pipe(

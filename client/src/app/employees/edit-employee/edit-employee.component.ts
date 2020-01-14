@@ -53,12 +53,14 @@ export class EditEmployeeComponent implements OnInit, OnDestroy{
           map(authState => authState.employee )
         )
         .subscribe(employee => {
-          this.employeeForm.form.setValue({
-            email: employee.email,
-            _id: employee._id,
-            firstName: employee.firstName || "",
-            lastName: employee.lastName || "",
-          });
+          if(employee){
+            this.employeeForm.form.setValue({
+              email: employee.email,
+              _id: employee._id,
+              firstName: employee.firstName || "",
+              lastName: employee.lastName || "",
+            });
+          }
         });        
     }, 0); 
   }

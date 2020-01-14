@@ -20,7 +20,7 @@ const companySchema = new Schema(
       type: String,
       required: false
     },
-    creator: {
+    creatorId: {
       type: Schema.Types.ObjectId,
       ref: 'Employee'
     }

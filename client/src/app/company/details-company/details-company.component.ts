@@ -20,7 +20,8 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy {
   allowEdit: boolean;
   activeEmp: Employee;
   constructor(private store: Store<fromApp.AppState>,
-              private route: ActivatedRoute) { }
+              private route: ActivatedRoute,
+              private router: Router) { }
 
   ngOnInit() {
     this.authSub = this.store.select('auth').subscribe(authState => {
@@ -35,6 +36,9 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy {
             this.company = companyState.companies
               .filter(company => company.creatorId === this.activeEmp._id)[currUrl[1]];
           } else {
+            if(currUrl[1] >= companyState.companies.length || currUrl[1] < 0){
+              return this.router.navigate(['companies']);
+            } 
             this.company = companyState.companies[currUrl[1]];
           }
           this.allowEdit = this.activeEmp._id === this.company.creatorId;

@@ -60,9 +60,9 @@ export class EditCompanyComponent implements OnInit {
           this.nameInput.nativeElement.blur();
           const currUrl = this.route.snapshot['_routerState'].url.substring(1).split('/');
           if(currUrl[1] !== 'register'){
-            if(currUrl[0] === 'my-details'){
+            if(currUrl[0] === 'my-details' && this.employee){
               this.company = companyState.companies
-              .filter(comp => comp.creatorId === this.employee._id)[currUrl[1]];
+                  .filter(comp => comp.creatorId === this.employee._id)[currUrl[1]];
             } else {
               this.company = companyState.companies[currUrl[1]];
             }
