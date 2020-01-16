@@ -29,6 +29,7 @@ import { ListCompaniesComponent } from './company/list-companies/list-companies.
 import { EditCompanyComponent } from './company/edit-company/edit-company.component';
 import { CompanyEffects } from './company/store/company.effects';
 import { DetailsCompanyComponent } from './company/details-company/details-company.component';
+import { CompanySignupComponent } from './auth/company-signup/company-signup.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { DetailsCompanyComponent } from './company/details-company/details-compa
     ErrorsComponent,
     Page404Component,
     HomeComponent,
+    CompanySignupComponent,
     DropdownDirective,
     AutoFocusDirective,
     DetailsEmployeeComponent,

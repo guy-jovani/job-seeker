@@ -21,7 +21,7 @@ export class EditCompanyComponent implements OnInit {
   index: number;
   errorMessages: string[];
   authState: Subscription;
-  employee: Employee;
+  user: Employee | Company;
   company: Company;
   imagePreview: string;
   companyForm: FormGroup;
@@ -42,10 +42,11 @@ export class EditCompanyComponent implements OnInit {
       'website': new FormControl(null),
       'image': new FormControl(null, { asyncValidators : [mimeType]}),
     });
+
     this.authState = this.store.select('auth')
       .pipe(
         switchMap(authState => {
-          this.employee = authState.employee;
+          this.user = authState.user;
           return this.store.select('company');
         })).
         subscribe(companyState => {
@@ -60,14 +61,14 @@ export class EditCompanyComponent implements OnInit {
           this.nameInput.nativeElement.blur();
           const currUrl = this.route.snapshot['_routerState'].url.substring(1).split('/');
           if(currUrl[1] !== 'register'){
-            if(currUrl[0] === 'my-details' && this.employee){
-              this.company = companyState.companies
-                  .filter(comp => comp.creatorId === this.employee._id)[currUrl[1]];
-            } else {
+            // if(currUrl[0] === 'my-details' && this.employee){
+            //   this.company = companyState.companies
+            //       .filter(comp => comp.creatorId === this.employee._id)[currUrl[1]];
+            // } else {
               this.company = companyState.companies[currUrl[1]];
             }
             this.initUpdateForm();
-          }
+          // }
         }); 
   }
 
@@ -97,7 +98,7 @@ export class EditCompanyComponent implements OnInit {
     const name = this.companyForm.value.name;
     const description = this.companyForm.value.description ? this.companyForm.value.description : undefined;
     const website = this.companyForm.value.website ? this.companyForm.value.website : undefined;
-    const newCompany = new Company({name, creatorId: this.employee._id});
+    const newCompany = new Company({name});
     if(description) newCompany.description = description;
     if(website) newCompany.website = website;
     if(this.companyForm.value.image){

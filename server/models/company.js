@@ -4,6 +4,10 @@ const Schema = mongoose.Schema;
 
 const companySchema = new Schema(
   {
+    email: {
+      type: String,
+      required: true
+    },
     name: {
       type: String,
       required: true
@@ -11,6 +15,10 @@ const companySchema = new Schema(
     website: {
       type: String,
       required: false
+    },
+    password: {
+      type: String,
+      required: true
     },
     description: {
       type: String,
@@ -20,10 +28,6 @@ const companySchema = new Schema(
       type: String,
       required: false
     },
-    creatorId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Employee'
-    }
   },
   { timestamps: true }
 );

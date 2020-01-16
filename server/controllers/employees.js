@@ -75,7 +75,7 @@ exports.updateEmployee = async (req, res, next) => {
     const employeeSchemaKeys = Object.keys(Employee.schema.paths);
     // remove non editable (via update employee) keys
     employeeSchemaKeys.splice(employeeSchemaKeys.indexOf('password'), 1);
-    employeeSchemaKeys.splice(employeeSchemaKeys.indexOf('companiesCreated'), 1);
+    // employeeSchemaKeys.splice(employeeSchemaKeys.indexOf('companiesCreated'), 1);
     employeeSchemaKeys.splice(employeeSchemaKeys.indexOf('__v'), 1);
 
     // get an object with keys to delete from the employee document (all keys that are null)

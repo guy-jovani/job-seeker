@@ -39,7 +39,7 @@ export class EmployeeEffects {
 
   @Effect({ dispatch: false})
   redirectSuccess = this.actions$.pipe(
-    ofType(AuthActions.UPDATE_ACTIVE_EMPLOYEE),
+    ofType(AuthActions.UPDATE_ACTIVE_USER),
     tap(() => { 
       this.router.navigate(['../my-details']);
     })
@@ -56,8 +56,8 @@ export class EmployeeEffects {
         .pipe(
           map(res => {
             const employee = new Employee({...res['employee']});
-            return new AuthActions.UpdateActiveEmployee({employee}); 
-          }),
+            return new AuthActions.UpdateActiveUser({ user: employee }); 
+          }), 
           catchError(err => {
             return handleError(err);
           })
@@ -72,7 +72,7 @@ export class EmployeeEffects {
     withLatestFrom(this.store.select('auth')),
     switchMap(([actionData, authState]) => {
       return this.http.get<Employee[]>(nodeServer + 'fetchAll', {
-        params: {_id: authState.employee._id}
+        params: { _id: authState.user._id }
       })
         .pipe(
           map(res => {

@@ -23,23 +23,28 @@ export class ListCompaniesComponent implements OnInit {
               
 
   ngOnInit() {
-    this.subscription = this.store.select('auth')
-      .pipe(
-        switchMap(authState => {
-          if(this.route.url['_value'][0].path === 'my-details'){
-            this.activeEmployee = authState.employee;
-          }
-          return this.store.select('company');
-        }),
-        map(companieState => companieState.companies)
-      )
+    this.subscription = this.store.select('company')
+      .pipe(map(companieState => companieState.companies))
       .subscribe(companies => {
-        if(this.activeEmployee){
-          this.companies = companies.filter(company => company.creatorId === this.activeEmployee._id);
-        } else{
-          this.companies = companies;
-        }
+        this.companies = companies;
       });
+    // this.subscription = this.store.select('auth')
+    //   .pipe(
+    //     switchMap(authState => {
+    //       if(this.route.url['_value'][0].path === 'my-details'){
+    //         this.activeEmployee = authState.employee;
+    //       }
+    //       return this.store.select('company');
+    //     }),
+    //     map(companieState => companieState.companies)
+    //   )
+    //   .subscribe(companies => {
+    //     if(this.activeEmployee){
+    //       this.companies = companies.filter(company => company.creatorId === this.activeEmployee._id);
+    //     } else{
+    //       this.companies = companies;
+    //     }
+    //   });
   }
 
   getCompanyinfo(index: number){

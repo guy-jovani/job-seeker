@@ -12,7 +12,7 @@ exports.getCompany = async (req, res, next) => {
   try {
     const company = await Company.aggregate([
                 { "$match": { '_id':  mongoose.Types.ObjectId(req.query._id) } },
-                { "$project": { 'creator': 0, 'createdAt': 0, 'updatedAt': 0, '__v': 0 } }
+                { "$project": { 'createdAt': 0, 'updatedAt': 0, '__v': 0 } }
               ]);
     res.status(200).json({
       type: 'success',
@@ -26,7 +26,7 @@ exports.getCompany = async (req, res, next) => {
 exports.getCompanies = async (req, res, next) => {
   try {
     const companies = await Company.aggregate([
-                { "$project": { 'creator': 0, 'createdAt': 0, 'updatedAt': 0, '__v': 0 } }
+                { "$project": { 'createdAt': 0, 'updatedAt': 0, '__v': 0 } }
               ]);
     res.status(200).json({
       type: 'success',
@@ -40,7 +40,7 @@ exports.getCompanies = async (req, res, next) => {
 
 const getFilteredCompany = company => {
   // filter a company object from fileds that shouldn't return to the client
-  const companyFieldsNotToReturn = ['__v', 'createdAt', 'updatedAt', 'creator'];
+  const companyFieldsNotToReturn = ['__v', 'createdAt', 'updatedAt'];
   return Object.keys(company._doc)
               .filter(key => !companyFieldsNotToReturn.includes(key))
               .reduce((obj, key) => (obj[key] = company._doc[key], obj), {});
@@ -51,8 +51,7 @@ exports.register = async (req, res, next) => {
     if(validation.handleValidationRoutesErrors(req, res)) return;
     const nameExist = await validation.companyNameExistValidation(req.body.name, res);
     if(nameExist) return;
-    const creator = await Employee.findById(req.body.creatorId);
-    let company = await Company.create( { ...req.body, creator } );
+    let company = await Company.create( { ...req.body } );
     if(req.file) {
       const url = req.protocol + '://' + req.get('host');
       const imagePath = url + '/images/' + req.file.filename;
@@ -61,9 +60,6 @@ exports.register = async (req, res, next) => {
     }
     // gets a company object without the fields that shouldn't return         
     company = getFilteredCompany(company);
-    company.creator = req.body.creatorId;
-    creator.companiesCreated.push(company);
-    await creator.save();
     
     res.status(201).json({
       message: 'company created successfully!',
@@ -93,7 +89,6 @@ exports.updateCompany = async (req, res, next) => {
     nullKeys = nullKeys.reduce((obj, key) => (obj[key]='',  obj), {});
     let bulkArr = [];
     if(!nullKeys.imagePath) delete nullKeys.imagePath; // so we don't override an existing image
-    delete req.body.creatorId; // so we don't override the db objectId
     bulkArr.push({ updateOne: {
       filter: { _id: req.body._id },
       update: { $set: { ...req.body } }
@@ -111,7 +106,7 @@ exports.updateCompany = async (req, res, next) => {
     }
     const updatedCompany = await Company.aggregate([
                 { "$match": { '_id':  mongoose.Types.ObjectId(req.body._id) } },
-                { "$project": { 'creator': 0, 'createdAt': 0, 'updatedAt': 0, '__v': 0 } }
+                { "$project": { 'createdAt': 0, 'updatedAt': 0, '__v': 0 } }
               ]);
     res.status(201).json({
       message: 'company updated successfully!',

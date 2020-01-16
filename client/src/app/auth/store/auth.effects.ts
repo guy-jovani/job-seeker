@@ -10,6 +10,7 @@ import { environment } from '../../../environments/environment';
 import * as fromApp from '../../store/app.reducer';
 import * as AuthActions from './auth.actions';
 import { Employee } from 'app/employees/employee.model';
+import { Company } from 'app/company/company.model';
 
 
 
@@ -42,19 +43,18 @@ export class AuthEffects {
       return this.http.put(nodeServer  + 'signup', 
         { 
           email: actionData['payload']['email'], 
+          name: actionData['payload']['name'], 
           password: actionData['payload']['password'], 
           confirmPassword: actionData['payload']['confirmPassword'] 
         })
         .pipe(
           map(res => {
             if(res['type'] === 'success'){
-              const employee = new Employee({
-                ...res['employee'], token: res['token']
-              });
-              localStorage.setItem("employeeData", JSON.stringify(employee));
-              return new AuthActions.AuthSuccess({
-                employee, redirect: true
-              });
+              const user = res['user'].name ? 
+                new Employee({ ...res['user'], token: res['token'] }) :
+                new Company({ ...res['user'], token: res['token'] })
+              localStorage.setItem("userData", JSON.stringify(user));
+              return new AuthActions.AuthSuccess({ user, redirect: true });
             } else {
               const messages: any[] = [];
               for(let err of res['errors']){
@@ -83,13 +83,11 @@ export class AuthEffects {
         .pipe(
           map(res => {
             if(res['type'] === 'success'){
-              const employee = new Employee({
-                ...res['employee'], token: res['token']
-              });
-              localStorage.setItem("employeeData", JSON.stringify(employee));
-              return new AuthActions.AuthSuccess({
-                employee, redirect: true
-              });
+              const user = res['user'].name ? 
+                new Employee({ ...res['user'], token: res['token'] }) :
+                new Company({ ...res['user'], token: res['token'] })
+              localStorage.setItem("userData", JSON.stringify(user));
+              return new AuthActions.AuthSuccess({ user, redirect: true });
             } else {
               const messages: any[] = [];
               for(let err of res['errors']){
@@ -106,14 +104,11 @@ export class AuthEffects {
   );
 
   @Effect({dispatch: false})
-  activeEmployeeChanges = this.actions$.pipe(
-    ofType(AuthActions.AUTH_SUCCESS, AuthActions.ADD_ACTIVE_EMPLOYEE_COMPANY),
+  activeUserChanges = this.actions$.pipe(
+    ofType(AuthActions.AUTH_SUCCESS),
     map((actionData: AuthActions.AuthActions) => {
-      const employee = JSON.parse(localStorage.getItem('employeeData'));
-      if (actionData.type === AuthActions.ADD_ACTIVE_EMPLOYEE_COMPANY) {
-        employee.companiesCreated.push(actionData.payload._id);
-      }
-      localStorage.setItem("employeeData", JSON.stringify(employee));
+      const user = JSON.parse(localStorage.getItem('userData'));
+      localStorage.setItem("userData", JSON.stringify(user));
     })
   );
 
@@ -121,12 +116,12 @@ export class AuthEffects {
   autoLogin = this.actions$.pipe(
     ofType(AuthActions.AUTO_LOGIN),
     map(() => {
-      const employee = JSON.parse(localStorage.getItem('employeeData'));
-      if(!employee){
+      const user = JSON.parse(localStorage.getItem('userData'));
+      if(!user){
         return { type: 'dummy' };
       }
       return new AuthActions.AuthSuccess({
-        employee, redirect: false
+        user, redirect: false
       });
     }),
     catchError(err => {

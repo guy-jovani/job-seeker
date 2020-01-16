@@ -50,15 +50,15 @@ export class EditEmployeeComponent implements OnInit, OnDestroy{
     setTimeout(() => {
       this.subscription = this.store.select('auth')
         .pipe(
-          map(authState => authState.employee )
+          map(authState => authState.user )
         )
-        .subscribe(employee => {
-          if(employee){
+        .subscribe((user: Employee) => {
+          if(user){
             this.employeeForm.form.setValue({
-              email: employee.email,
-              _id: employee._id,
-              firstName: employee.firstName || "",
-              lastName: employee.lastName || "",
+              email: user.email,
+              _id: user._id,
+              firstName: user.firstName || "",
+              lastName: user.lastName || "",
             });
           }
         });        

@@ -16,9 +16,22 @@ import { EditCompanyComponent } from './company/edit-company/edit-company.compon
 import { CompanyResolverService } from './company/company-resolver.service';
 import { DetailsCompanyComponent } from './company/details-company/details-company.component';
 import { DetailsCompanyGuard } from './company/details-company/details-company.guard';
+import { CompanySignupComponent } from './auth/company-signup/company-signup.component';
 
 
 const routes: Routes = [
+  {
+    path: '', component: HomeComponent, 
+  },
+  {
+    path: 'signup', component: SignupComponent
+  },
+  {
+    path: 'signup/company', component: CompanySignupComponent
+  },
+  {
+    path: 'login', component: LoginComponent, 
+  },
   {
     path: 'employees', canActivate: [AuthGuard], 
     component: EmployeesComponent, 
@@ -30,22 +43,16 @@ const routes: Routes = [
     ]  
   },
   {
-    path: '', component: HomeComponent, 
-  },
-  {
     path: 'companies', component: CompaniesComponent, canActivate: [AuthGuard], 
     resolve: [CompanyResolverService],
     children: [
       {
         path: ':index/company', component: DetailsCompanyComponent, canActivate: [DetailsCompanyGuard]
       },
-      {
-        path: ':index/company/edit', component: EditCompanyComponent, canActivate: [DetailsCompanyGuard],
-      }
+      // {
+      //   path: ':index/company/edit', component: EditCompanyComponent, canActivate: [DetailsCompanyGuard],
+      // }
     ]  
-  },
-  {
-    path: 'signup', component: SignupComponent, 
   },
   {
     path: 'my-details', component: DetailsEmployeeComponent, canActivate: [AuthGuard],  
@@ -57,16 +64,13 @@ const routes: Routes = [
       {
         path: 'register', component: EditCompanyComponent
       },
-      {
-        path: ':index/company', component: DetailsCompanyComponent, canActivate: [DetailsCompanyGuard]
-      },
-      {
-        path: ':index/company/edit', component: EditCompanyComponent, canActivate: [DetailsCompanyGuard],
-      }
+      // {
+      //   path: ':index/company', component: DetailsCompanyComponent, canActivate: [DetailsCompanyGuard]
+      // },
+      // {
+      //   path: ':index/company/edit', component: EditCompanyComponent, canActivate: [DetailsCompanyGuard],
+      // }
     ]   
-  },
-  {
-    path: 'login', component: LoginComponent, 
   },
   {
     path: '**', component: ErrorsComponent

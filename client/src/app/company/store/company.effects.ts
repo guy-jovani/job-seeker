@@ -1,14 +1,14 @@
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Injectable } from '@angular/core';
-
-
-import * as CompanyActions from './company.actions';
-import { environment } from '../../../environments/environment';
 import { of } from 'rxjs';
 import { switchMap, map, catchError, tap } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';
+
+
+import * as CompanyActions from './company.actions';
+import { environment } from '../../../environments/environment';
 import * as fromApp from '../../store/app.reducer';
 import * as AuthActions from '../../auth/store/auth.actions';
 import { Company } from '../company.model';
@@ -49,7 +49,7 @@ export class CompanyEffects {
         .pipe(
           map(res => {
             if(res['type'] === 'success'){ 
-              this.store.dispatch(new AuthActions.AddActiveEmployeeCompany(res['company']));
+              // this.store.dispatch(new AuthActions.AddActiveEmployeeCompany(res['company']));
               return new CompanyActions.SetSingleCompany({company: res['company'], redirect: true});
             }          
           }),
@@ -73,7 +73,7 @@ export class CompanyEffects {
         .pipe(
           map(res => {
             if(res['type'] === 'success'){ 
-              this.store.dispatch(new AuthActions.AddActiveEmployeeCompany(res['company']));
+              // this.store.dispatch(new AuthActions.AddActiveEmployeeCompany(res['company']));
               return new CompanyActions.UpdateSingleCompany({company: res['company'], redirect: true});
             }          
           }),

@@ -20,10 +20,6 @@ const employeeSchema = new Schema(
       type: String,
       required: false
     },
-    companiesCreated: [{
-      type: Schema.Types.ObjectId,
-      ref: 'company',
-    }]
   }
 );
 

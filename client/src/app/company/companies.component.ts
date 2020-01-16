@@ -17,8 +17,8 @@ export class CompaniesComponent implements OnInit {
   constructor(private store: Store<fromApp.AppState>) { }
 
   ngOnInit(){
-    this.storeSubscription = this.store.select('employee')
-      .subscribe(
+    // this.storeSubscription = this.store.select('employee')
+      // .subscribe(
         // employeeState => {
         //   if(employeeState.messages){
         //     for(let msg of employeeState.messages){
@@ -28,13 +28,25 @@ export class CompaniesComponent implements OnInit {
         //     this.errorMessages = [];
         //   }
         // }
+      // );
+    this.storeSubscription = this.store.select('company')
+      .subscribe(
+        companyState => {
+          if(companyState.messages){
+            for(let msg of companyState.messages){
+              this.errorMessages.push(msg)
+            }
+          } else {
+            this.errorMessages = [];
+          }
+        }
       );
   }
 
   ngOnDestroy(){
-    if(this.storeSubscription){
-      this.storeSubscription.unsubscribe();
-    }
+    // if(this.storeSubscription){
+    //   this.storeSubscription.unsubscribe();
+    // }
   }
 
   onClose(){

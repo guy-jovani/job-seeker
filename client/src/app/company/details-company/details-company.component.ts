@@ -18,30 +18,30 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy {
   company: Company;
   index: number;
   allowEdit: boolean;
-  activeEmp: Employee;
+  user: Employee | Company;
   constructor(private store: Store<fromApp.AppState>,
               private route: ActivatedRoute,
               private router: Router) { }
 
   ngOnInit() {
     this.authSub = this.store.select('auth').subscribe(authState => {
-      this.activeEmp = authState.employee;
+      this.user = authState.user;
     });
 
     this.companySub = this.store.select('company')
       .subscribe(
         companyState => {
           const currUrl = this.route.snapshot['_routerState'].url.substring(1).split("/");
-          if(currUrl[0] === 'my-details'){
-            this.company = companyState.companies
-              .filter(company => company.creatorId === this.activeEmp._id)[currUrl[1]];
-          } else {
+          // if(currUrl[0] === 'my-details'){
+          //   this.company = companyState.companies
+          //     .filter(company => company.creatorId === this.activeEmp._id)[currUrl[1]];
+          // } else {
             if(currUrl[1] >= companyState.companies.length || currUrl[1] < 0){
               return this.router.navigate(['companies']);
             } 
             this.company = companyState.companies[currUrl[1]];
-          }
-          this.allowEdit = this.activeEmp._id === this.company.creatorId;
+          // }s
+          // this.allowEdit = this.activeEmp._id === this.company.creatorId;
         }
     );
   }

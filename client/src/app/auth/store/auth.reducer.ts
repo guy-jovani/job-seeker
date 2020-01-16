@@ -2,17 +2,18 @@ import { Employee } from 'app/employees/employee.model';
 
 
 import * as AuthActions from './auth.actions';
+import { Company } from 'app/company/company.model';
 
 
 
 export interface State {
-  employee: Employee,
+  user: Employee | Company,
   messages: any[],
   loading: boolean
 }
 
 const initialState: State = {
-  employee: null,
+  user: null,
   messages: null,
   loading: false
 }
@@ -33,23 +34,14 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
         loading: false,
         messages: action.payload,
       };
-    case AuthActions.ADD_ACTIVE_EMPLOYEE_COMPANY:
-      let emp = { ...state.employee };
-      emp.companiesCreated.push(action.payload._id);
-      return {
-        ...state, 
-        loading: false, 
-        messages: null,
-        employee: { ...emp }
-      };
     case AuthActions.AUTH_SUCCESS:
-    case AuthActions.UPDATE_ACTIVE_EMPLOYEE:
-      console.log("auth state after success: ", action.payload.employee) 
+    case AuthActions.UPDATE_ACTIVE_USER:
+      console.log("auth state after success: ", action.payload.user) 
       return {
         ...state, 
         loading: false,
         messages: null,
-        employee: {...action.payload.employee}
+        user: { ...action.payload.user }
       };
     case AuthActions.CLEAR_ERROR:
       return {
@@ -62,7 +54,7 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
         ...state, 
         loading: false,
         messages: null,
-        employee: null
+        user: null
       };
     default:
       return state;

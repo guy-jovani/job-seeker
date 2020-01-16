@@ -15,7 +15,7 @@ import { Employee } from '../employee.model';
 })
 export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   index: number;
-  employee: Employee;
+  employee: Employee | Company;
   storeSub: Subscription;
   routeSub: Subscription;
   allowEdit: boolean; // only allow to edit if the current employee is the one logged in
@@ -44,21 +44,21 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
             this.allowEdit = false;
           }          
           return this.store.select('auth');
-        }),
-        switchMap(authState => {
+        })).
+        subscribe(authState => {
           if(isNaN(this.index)){
-            this.employee = authState.employee;
+            this.employee = authState.user;
             this.allowEdit = true;
           }
-          return this.store.select('company');
-        })
-      )     
-      .subscribe(companyState => {  
-        if(this.employee){
-          this.companies = 
-          companyState.companies.filter(company => company.creatorId === this.employee._id);
-        }
-      });
+          // return this.store.select('company');
+        });
+      // )     
+      // .subscribe(companyState => {  
+        // if(this.employee){
+        //   this.companies = 
+        //     companyState.companies.filter(company => company.creatorId === this.employee._id);
+        // }
+      // });
   }
 
 

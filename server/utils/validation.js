@@ -5,9 +5,10 @@ const Employee = require('../models/employee');
 const Company = require('../models/company');
 
 
-exports.employeeEmailExistValidation = async (email, res, _id = null) => {
+exports.userEmailExistValidation = async (email, res, _id = null) => {
   const employee = await Employee.findOne({ _id: { $ne: _id }, email: email });
-  if(employee){
+  const company = await Company.findOne({ _id: { $ne: _id }, email: email });
+  if(employee || company){
     res.status(422).json({
       errors: [{
         msg: 'You can not use this email address, please provide a different one'
