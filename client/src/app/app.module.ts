@@ -30,6 +30,8 @@ import { EditCompanyComponent } from './company/edit-company/edit-company.compon
 import { CompanyEffects } from './company/store/company.effects';
 import { DetailsCompanyComponent } from './company/details-company/details-company.component';
 import { CompanySignupComponent } from './auth/company-signup/company-signup.component';
+import { DetailsUserComponent } from './shared/details-user/details-user.component';
+import { EditUserComponent } from './shared/edit-user/edit-user.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +53,9 @@ import { CompanySignupComponent } from './auth/company-signup/company-signup.com
     CompaniesComponent,
     ListCompaniesComponent,
     EditCompanyComponent,
-    DetailsCompanyComponent
+    DetailsCompanyComponent,
+    DetailsUserComponent,
+    EditUserComponent
   ],
   imports: [
     BrowserModule,

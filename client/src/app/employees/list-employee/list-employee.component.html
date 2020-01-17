@@ -5,7 +5,7 @@
   <li 
     class="list-group-item" 
     *ngFor="let employee of employees; let i=index">
-    <a routerLink='{{i}}'>
+    <a routerLink='{{i}}' (click)='getEmployeeinfo(i)'>
       <p>Employee Email: {{ employee.email }}</p>
     </a>
     

@@ -7,7 +7,7 @@ const { body } = require('express-validator');
 const employeeController = require('../controllers/employees');
 
 router.get('/fetchAll', employeeController.getEmployees);
-// router.get('/fetchOne', employeeController.getEmployee);
+router.get('/fetchSingle', employeeController.getEmployee);
 // router.post('/store', employeeController.postEmployee);
 // router.post('/delete', employeeController.deleteEmployee);
 router.post('/update', [

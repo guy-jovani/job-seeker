@@ -26,11 +26,13 @@ exports.signup = async (req, res, next) => {
     if(emailExist){ return; }
 
     const password = await bcrypt.hash(req.body.password, 12);
-    let user;
+    let user, kind;
     if(req.body.name){
       user = new Company({ email: req.body.email, password: password, name: req.body.name });
+      kind = "company";
     } else {
       user = new Employee({ email: req.body.email, password: password });
+      kind = "employee";
     }
 
     await user.save();
@@ -41,7 +43,8 @@ exports.signup = async (req, res, next) => {
       message: 'Signed up successfully!',
       type: 'success',
       token: token,
-      user
+      user,
+      kind
     });
   } catch (error) {
     next(handleServerErrors(error, 500, "there was an unexpected error while trying to signup"));
@@ -60,7 +63,11 @@ loginEmailPassIncorrectMessage = (res) => {
 exports.login = async (req, res, next) => {
   try {
     let user = await Employee.findOne({email: req.body.email}).select('-__v');
-    if(!user) user = await Company.findOne({email: req.body.email}).select('-__v -createdAt -updatedAt');
+    let kind = "employee";
+    if(!user) {
+      user = await Company.findOne({email: req.body.email}).select('-__v -createdAt -updatedAt');
+      kind = "company";
+    }
     if(!user){ 
       return loginEmailPassIncorrectMessage(res);
     }
@@ -75,7 +82,8 @@ exports.login = async (req, res, next) => {
       message: 'Logged in successfully!',
       type: 'success',
       token: token,
-      user
+      user,
+      kind
     });
   } catch (error) {
     console.log(error)

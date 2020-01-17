@@ -15,7 +15,7 @@ import { Employee } from '../employee.model';
 })
 export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   index: number;
-  employee: Employee | Company;
+  employee: Employee;
   storeSub: Subscription;
   routeSub: Subscription;
   allowEdit: boolean; // only allow to edit if the current employee is the one logged in
@@ -47,7 +47,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
         })).
         subscribe(authState => {
           if(isNaN(this.index)){
-            this.employee = authState.user;
+            this.employee = <Employee> authState.user;
             this.allowEdit = true;
           }
           // return this.store.select('company');

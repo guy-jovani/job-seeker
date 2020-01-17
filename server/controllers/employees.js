@@ -5,21 +5,6 @@ const validation = require('../utils/validation');
 const errorHandling = require('../utils/errorHandling')
 
 
-
-// exports.getEmployee = async (req, res, next) => {
-//   try {
-//     const employee = await Employee.findOne({_id: req.query._id}).select('-password -__v');
-//     res.status(200).json({
-//       type: 'success',
-//       employee
-//     });
-//   } catch (error) {
-//     next(errorHandling.handleServerErrors(error, 500, "there was an error fetching the employee"));
-//   }
-// };
-
-
-
 // exports.postEmployee = async (req, res, next) => {
 //   try {
 //     const emailExist = await validation.employeeEmailExistValidation(req.body.email, res);
@@ -53,6 +38,18 @@ const errorHandling = require('../utils/errorHandling')
 //   }
 // };
 
+exports.getEmployee = async (req, res, next) => {
+  try {
+    const employee = await Employee.findOne({_id: req.query._id}).select('-password -__v');
+    res.status(200).json({
+      type: 'success',
+      employee
+    });
+  } catch (error) {
+    next(errorHandling.handleServerErrors(error, 500, "there was an error fetching the employee"));
+  }
+};
+
 exports.getEmployees = async (req, res, next) => {
   try {
     const employees = await Employee.find({_id: { $ne: req.query._id }}).select('-password -__v');
@@ -69,13 +66,12 @@ exports.updateEmployee = async (req, res, next) => {
   try {
     if(validation.handleValidationRoutesErrors(req, res)) return;
 
-    const emailExist = await validation.employeeEmailExistValidation(
+    const emailExist = await validation.userEmailExistValidation(
                     req.body.newEmployee.email, res, req.body.newEmployee._id);
     if(emailExist){ return ; }
     const employeeSchemaKeys = Object.keys(Employee.schema.paths);
     // remove non editable (via update employee) keys
     employeeSchemaKeys.splice(employeeSchemaKeys.indexOf('password'), 1);
-    // employeeSchemaKeys.splice(employeeSchemaKeys.indexOf('companiesCreated'), 1);
     employeeSchemaKeys.splice(employeeSchemaKeys.indexOf('__v'), 1);
 
     // get an object with keys to delete from the employee document (all keys that are null)

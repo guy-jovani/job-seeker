@@ -3,8 +3,8 @@
 import { Action } from '@ngrx/store';
 import { Company } from '../company.model';
 
-export const STORE_COMPANY_IN_DB = "[Company] STORE company in db";
-export const SET_SINGLE_COMPANY = "[Company] Set single company";
+// export const STORE_COMPANY_IN_DB = "[Company] STORE company in db";
+// export const SET_SINGLE_COMPANY = "[Company] Set single company";
 export const UPDATE_SINGLE_COMPANY = "[Company] Update single company";
 export const UPDATE_SINGLE_COMPANY_IN_DB = "[Company] Update single company in db";
 export const SET_ALL_COMPANIES = "[Company] Set All Companies";
@@ -18,9 +18,10 @@ export type CompanyActions = FetchAllCompanies
                             | SetAllCompanies
                             | CompanyOpFailure
                             | ClearError
-                            | SetSingleCompany
+                            // | SetSingleCompany
                             | UpdateSingleCompany
-                            | StoreCompanyInDb;
+                            // | StoreCompanyInDb
+                            ;
 
 
 export class FetchAllCompanies implements Action {
@@ -39,20 +40,20 @@ export class SetAllCompanies implements Action {
   constructor(public payload: Company[]){}
 }
 
-export class StoreCompanyInDb implements Action {
-  readonly type = STORE_COMPANY_IN_DB;
+// export class StoreCompanyInDb implements Action {
+//   readonly type = STORE_COMPANY_IN_DB;
 
-  constructor(public payload: Company){}
-}
-export class SetSingleCompany implements Action {
-  readonly type = SET_SINGLE_COMPANY;
+//   constructor(public payload: Company){}
+// }
+// export class SetSingleCompany implements Action {
+//   readonly type = SET_SINGLE_COMPANY;
 
-  constructor(public payload: { company: Company, redirect: boolean }){}
-}
+//   constructor(public payload: { company: Company, redirect: boolean }){}
+// }
 export class UpdateSingleCompany implements Action {
   readonly type = UPDATE_SINGLE_COMPANY;
 
-  constructor(public payload: { company: Company, redirect: boolean }){}
+  constructor(public payload: { company: Company }){}
 }
 
 export class UpdateSingleCompanyInDb implements Action {

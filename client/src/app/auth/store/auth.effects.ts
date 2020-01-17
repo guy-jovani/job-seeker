@@ -50,11 +50,12 @@ export class AuthEffects {
         .pipe(
           map(res => {
             if(res['type'] === 'success'){
-              const user = res['user'].name ? 
-                new Employee({ ...res['user'], token: res['token'] }) :
-                new Company({ ...res['user'], token: res['token'] })
-              localStorage.setItem("userData", JSON.stringify(user));
-              return new AuthActions.AuthSuccess({ user, redirect: true });
+              // const user = res['kind'] === 'company' ? 
+              //   new Company({ ...res['user'], token: res['token'] }) :
+              //   new Employee({ ...res['user'], token: res['token'] })
+              localStorage.setItem("userData", JSON.stringify({...res['user']}));
+              localStorage.setItem("kind", JSON.stringify(res['kind']));
+              return new AuthActions.AuthSuccess({ user: res['user'], redirect: true, kind: res['kind'] });
             } else {
               const messages: any[] = [];
               for(let err of res['errors']){
@@ -83,11 +84,12 @@ export class AuthEffects {
         .pipe(
           map(res => {
             if(res['type'] === 'success'){
-              const user = res['user'].name ? 
-                new Employee({ ...res['user'], token: res['token'] }) :
-                new Company({ ...res['user'], token: res['token'] })
-              localStorage.setItem("userData", JSON.stringify(user));
-              return new AuthActions.AuthSuccess({ user, redirect: true });
+              // const user = res['kind'] === 'company' ? 
+              //   new Company({ ...res['user'], token: res['token'] }) :
+              //   new Employee({ ...res['user'], token: res['token'] });
+                localStorage.setItem("userData", JSON.stringify({...res['user']}));
+                localStorage.setItem("kind", JSON.stringify(res['kind']));
+                return new AuthActions.AuthSuccess({ user: res['user'], redirect: true, kind: res['kind'] });
             } else {
               const messages: any[] = [];
               for(let err of res['errors']){
@@ -105,24 +107,32 @@ export class AuthEffects {
 
   @Effect({dispatch: false})
   activeUserChanges = this.actions$.pipe(
-    ofType(AuthActions.AUTH_SUCCESS),
-    map((actionData: AuthActions.AuthActions) => {
-      const user = JSON.parse(localStorage.getItem('userData'));
-      localStorage.setItem("userData", JSON.stringify(user));
+    ofType(AuthActions.UPDATE_ACTIVE_USER),
+    map((actionData: AuthActions.UpdateActiveUser) => {
+      // const user = JSON.parse(localStorage.getItem('userData'));
+      localStorage.setItem("userData", JSON.stringify(actionData.payload.user));
+      this.router.navigate(['../my-details']);
     })
   );
+
+  // @Effect({ dispatch: false})
+  // redirectSuccess = this.actions$.pipe(
+  //   ofType(AuthActions.UPDATE_ACTIVE_USER),
+  //   tap(() => { 
+  //     this.router.navigate(['../my-details']);
+  //   })
+  // );
 
   @Effect()
   autoLogin = this.actions$.pipe(
     ofType(AuthActions.AUTO_LOGIN),
     map(() => {
       const user = JSON.parse(localStorage.getItem('userData'));
-      if(!user){
+      const kind = JSON.parse(localStorage.getItem('kind'));
+      if(!user || !kind){
         return { type: 'dummy' };
       }
-      return new AuthActions.AuthSuccess({
-        user, redirect: false
-      });
+      return new AuthActions.AuthSuccess({ user, redirect: false, kind });
     }),
     catchError(err => {
       //console.log(err)
@@ -134,10 +144,12 @@ export class AuthEffects {
   logout = this.actions$.pipe(
     ofType(AuthActions.LOGOUT),
     map(() => {
-      localStorage.removeItem('employeeData');
+      localStorage.removeItem('userData');
+      localStorage.removeItem('userKind');
       this.router.navigate(['/login']);
     }),
-    catchError(err => {console.log(err)
+    catchError(err => {
+      console.log(err)
       return handleError(err);
     })
   );

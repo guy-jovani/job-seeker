@@ -5,9 +5,9 @@ import { Employee } from '../employee.model';
 
 // export const ATTEMPT = "[Employee] ATTEMPT";
 // export const FINISHED = "[Employee] FINISHED";
-// export const SET_ONE_EMPLOYEE = "[Employee] Set one Employee";
-// export const UPDATE_EMPLOYEE = "[Employee] Update Employee";
-// export const FETCH_ONE_EMPLOYEE = "[Employee] Fetch One Employee";
+// export const SET_SINGLE_EMPLOYEE = "[Employee] Set single Employee";
+export const UPDATE_SINGLE_EMPLOYEE = "[Employee] Update single Employee";
+export const FETCH_SINGLE_EMPLOYEE = "[Employee] single One Employee";
 // export const STORE_EMPLOYEE_IN_DB = "[Employee] Store Employee in DB";
 // export const DELETE_EMPLOYEE = "[Employee] DELETE Employee";
 // export const DELETE_EMPLOYEE_FROM_DB = "[Employee] DELETE Employee from DB";
@@ -17,9 +17,9 @@ export const SET_ALL_EMPLOYEES = "[Employee] Set All Employees";
 export const EMPLOYEE_OP_FAILURE = "[Employee] Employee operation failed";
 export const CLEAR_ERROR = "[Employee] Clear error";
 
-export type EmployeeActions = //SetOneEmployee 
-                            // | UpdateEmployee
-                            // | FetchOneEmployee
+export type EmployeeActions = // SetSingleEmployee 
+                              UpdateSingleEmployee
+                            | FetchSingleEmployee
                             // | DeleteEmployee
                             | FetchAllEmployees
                             | SetAllEmployees
@@ -52,6 +52,18 @@ export class ClearError implements Action {
   readonly type = CLEAR_ERROR;
 }
 
+export class FetchSingleEmployee implements Action {
+  readonly type = FETCH_SINGLE_EMPLOYEE;
+
+  constructor( public payload: string ){}
+}
+
+export class UpdateSingleEmployee implements Action {
+  readonly type = UPDATE_SINGLE_EMPLOYEE;
+  
+  constructor( public payload: Employee ){}
+}
+
 // export class DeleteEmployee implements Action {
 //   readonly type = DELETE_EMPLOYEE;
   
@@ -64,17 +76,6 @@ export class ClearError implements Action {
 //   constructor(public payload: number){}
 // }
 
-// export class FetchOneEmployee implements Action {
-//   readonly type = FETCH_ONE_EMPLOYEE;
-
-//   constructor( public payload: string ){}
-// }
-
-// export class UpdateEmployee implements Action {
-//   readonly type = UPDATE_EMPLOYEE;
-  
-//   constructor( public payload: Employee ){}
-// }
 // export class SetOneEmployee implements Action {
 //   readonly type = SET_ONE_EMPLOYEE;
 

@@ -12,11 +12,12 @@ import { DetailsEmployeeComponent } from './employees/details-employee/details-e
 import { DetailsEmployeeGuard } from './employees/details-employee/details-employee.guard';
 import { EmployeesResolverService } from './employees/employees-resolver.service';
 import { CompaniesComponent } from './company/companies.component';
-import { EditCompanyComponent } from './company/edit-company/edit-company.component';
 import { CompanyResolverService } from './company/company-resolver.service';
 import { DetailsCompanyComponent } from './company/details-company/details-company.component';
 import { DetailsCompanyGuard } from './company/details-company/details-company.guard';
 import { CompanySignupComponent } from './auth/company-signup/company-signup.component';
+import { DetailsUserComponent } from './shared/details-user/details-user.component';
+import { EditUserComponent } from './shared/edit-user/edit-user.component';
 
 
 const routes: Routes = [
@@ -49,27 +50,14 @@ const routes: Routes = [
       {
         path: ':index/company', component: DetailsCompanyComponent, canActivate: [DetailsCompanyGuard]
       },
-      // {
-      //   path: ':index/company/edit', component: EditCompanyComponent, canActivate: [DetailsCompanyGuard],
-      // }
     ]  
   },
   {
-    path: 'my-details', component: DetailsEmployeeComponent, canActivate: [AuthGuard],  
-    resolve: [CompanyResolverService],
+    path: 'my-details', component: DetailsUserComponent, canActivate: [AuthGuard],  
     children: [
       {
-        path: 'edit', component: EditEmployeeComponent
+        path: 'edit', component: EditUserComponent
       },
-      {
-        path: 'register', component: EditCompanyComponent
-      },
-      // {
-      //   path: ':index/company', component: DetailsCompanyComponent, canActivate: [DetailsCompanyGuard]
-      // },
-      // {
-      //   path: ':index/company/edit', component: EditCompanyComponent, canActivate: [DetailsCompanyGuard],
-      // }
     ]   
   },
   {

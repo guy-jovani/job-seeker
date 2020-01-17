@@ -3,12 +3,12 @@ import { Subscription } from 'rxjs';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
+import {switchMap } from 'rxjs/operators';
 
 import { Company } from '../company.model';
 import * as fromApp from '../../store/app.reducer';
 import * as CompanyActions from '../store/company.actions';
-import {switchMap } from 'rxjs/operators';
-import { Employee } from 'app/employees/employee.model';
+import { Employee } from '../../employees/employee.model';
 import { mimeType } from './mime-type.validator';
 
 @Component({
@@ -21,7 +21,7 @@ export class EditCompanyComponent implements OnInit {
   index: number;
   errorMessages: string[];
   authState: Subscription;
-  user: Employee | Company;
+  // user: Company;
   company: Company;
   imagePreview: string;
   companyForm: FormGroup;
@@ -44,35 +44,51 @@ export class EditCompanyComponent implements OnInit {
     });
 
     this.authState = this.store.select('auth')
-      .pipe(
-        switchMap(authState => {
-          this.user = authState.user;
-          return this.store.select('company');
-        })).
-        subscribe(companyState => {
-          if(companyState.messages){
-            for(let msg of companyState.messages){
-              this.errorMessages.push(msg)
-            }
-          } else {
-            this.errorMessages = [];
+      .subscribe(authState => {
+        if(authState.messages){
+          for(let msg of authState.messages){
+            this.errorMessages.push(msg)
           }
-          this.nameInput.nativeElement.focus();
-          this.nameInput.nativeElement.blur();
-          const currUrl = this.route.snapshot['_routerState'].url.substring(1).split('/');
-          if(currUrl[1] !== 'register'){
-            // if(currUrl[0] === 'my-details' && this.employee){
-            //   this.company = companyState.companies
-            //       .filter(comp => comp.creatorId === this.employee._id)[currUrl[1]];
-            // } else {
-              this.company = companyState.companies[currUrl[1]];
-            }
-            this.initUpdateForm();
-          // }
-        }); 
+        } else {
+          this.errorMessages = [];
+        }
+        this.company = <Company> authState.user;
+        console.log(this.company)
+        this.nameInput.nativeElement.focus();
+        this.nameInput.nativeElement.blur();
+        this.initForm();
+      }); 
+
+    // this.authState = this.store.select('auth')
+    //   .pipe(
+    //     switchMap(authState => {
+    //       this.company = <Company> authState.user;
+    //       return this.store.select('company');
+    //     })).
+    //     subscribe(companyState => {
+    //       if(companyState.messages){
+    //         for(let msg of companyState.messages){
+    //           this.errorMessages.push(msg)
+    //         }
+    //       } else {
+    //         this.errorMessages = [];
+    //       }
+    //       this.nameInput.nativeElement.focus();
+    //       this.nameInput.nativeElement.blur();
+    //       const currUrl = this.route.snapshot['_routerState'].url.substring(1).split('/');
+    //       if(currUrl[1] !== 'register'){
+    //         // if(currUrl[0] === 'my-details' && this.employee){
+    //         //   this.company = companyState.companies
+    //         //       .filter(comp => comp.creatorId === this.employee._id)[currUrl[1]];
+    //         // } else {
+    //           this.company = companyState.companies[currUrl[1]];
+    //         }
+    //         this.initForm();
+    //       // }
+    //     }); 
   }
 
-  initUpdateForm(){
+  initForm(){
     this.companyForm.setValue({
       'name': this.company.name,
       'description': this.company.description || "",
@@ -104,12 +120,8 @@ export class EditCompanyComponent implements OnInit {
     if(this.companyForm.value.image){
       newCompany.image = this.companyForm.value.image;
     }
-    if(this.company){
-      newCompany._id = this.company._id;
-      this.store.dispatch(new CompanyActions.UpdateSingleCompanyInDb(newCompany));
-    } else {
-      this.store.dispatch(new CompanyActions.StoreCompanyInDb(newCompany));
-    }
+    newCompany._id = this.company._id;
+    this.store.dispatch(new CompanyActions.UpdateSingleCompanyInDb(newCompany));
   }
 
   onCancel(){

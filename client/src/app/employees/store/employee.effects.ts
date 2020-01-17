@@ -35,15 +35,6 @@ export class EmployeeEffects {
               private store: Store<fromApp.AppState>,
               private router: Router){}
 
-  
-
-  @Effect({ dispatch: false})
-  redirectSuccess = this.actions$.pipe(
-    ofType(AuthActions.UPDATE_ACTIVE_USER),
-    tap(() => { 
-      this.router.navigate(['../my-details']);
-    })
-  );
 
   @Effect()
   updateActiveEmployee = this.actions$.pipe(
@@ -55,8 +46,8 @@ export class EmployeeEffects {
         })
         .pipe(
           map(res => {
-            const employee = new Employee({...res['employee']});
-            return new AuthActions.UpdateActiveUser({ user: employee }); 
+            // const employee = new Employee({...res['employee']});
+            return new AuthActions.UpdateActiveUser({ user: {...res['employee']}, kind: "employee" }); 
           }), 
           catchError(err => {
             return handleError(err);
@@ -77,6 +68,27 @@ export class EmployeeEffects {
         .pipe(
           map(res => {
             return new EmployeeActions.SetAllEmployees(res['employees']);
+          }),
+          catchError(err => {
+            return handleError(err);
+          })
+        );
+    })
+  );
+
+  @Effect()
+  fetchSingleEmployee = this.actions$.pipe(
+    ofType(EmployeeActions.FETCH_SINGLE_EMPLOYEE),
+    withLatestFrom(this.store.select('employee')),
+    switchMap(([actionData, employeesState]) => {
+      return this.http.get<Employee>(nodeServer + 'fetchSingle', {
+          params: { _id: actionData['payload'] }
+        })
+        .pipe(
+          map(res => {
+            if(res['type'] === 'success'){
+              return new EmployeeActions.UpdateSingleEmployee({...res['employee']});
+            } 
           }),
           catchError(err => {
             return handleError(err);
@@ -133,27 +145,5 @@ export class EmployeeEffects {
   // );
 
 
-  // @Effect()
-  // fetchOneEmployee = this.actions$.pipe(
-  //   ofType(EmployeeActions.FETCH_ONE_EMPLOYEE),
-  //   withLatestFrom(this.store.select('employee')),
-  //   switchMap(([actionData, employeesState]) => {
-  //     return this.http.get<Employee>(nodeServer + 'fetchOne', {
-  //         params: { _id: actionData['payload'] }
-  //       })
-  //       .pipe(
-  //         map(res => {
-  //           if(employeesState.employees.find(emp => emp._id === res['employee']._id)){
-  //             return new EmployeeActions.UpdateEmployee(res['employee']);
-  //           } else {
-  //             return new EmployeeActions.SetOneEmployee(res['employee']);
-  //           }
-  //         }),
-  //         catchError(err => {
-  //           return handleError(err);
-  //         })
-  //       );
-  //   })
-  // );
   
 }

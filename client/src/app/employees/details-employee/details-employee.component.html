@@ -1,4 +1,6 @@
 
+
+
 <div class="container" *ngIf="employee">
   <div class="row">
     <div class="col-md-6">
@@ -6,20 +8,9 @@
       <p>email: {{ employee.email }}</p>
       <p>first name: {{ employee.firstName || "------" }}</p>
       <p>last name: {{ employee.lastName || "------" }}</p>
+      <hr>
       <div class="row" *ngIf="allowEdit">
         <a class="btn btn-primary btn-sm" routerLink='edit'>Edit Info</a>
-      </div>
-    </div>
-    <div class="col-md-6" *ngIf='allowEdit'>
-      <h3>My Companies</h3>
-      <div class="row">
-        <div class="col-md-12">
-            <a class="btn btn-primary btn-sm" routerLink='register'>register company</a>
-            <hr>
-        </div>  
-      </div>
-      <div class="row">
-        <app-list-companies></app-list-companies>
       </div>
     </div>
   </div>

@@ -1,12 +1,13 @@
 import { Component, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { Router, ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
+
 import * as fromApp from '../../store/app.reducer';
 import * as EmployeeActions from '../store/employee.actions';
 import { Employee } from '../employee.model';
-import { Router, ActivatedRoute, Params } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 
 @Component({

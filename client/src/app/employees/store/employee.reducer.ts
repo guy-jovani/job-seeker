@@ -34,6 +34,22 @@ export function employeeReducer(state = initialState, action: EmployeeActions.Em
         ...state,
         messages: null
       }
+    case EmployeeActions.UPDATE_SINGLE_EMPLOYEE:
+      const index = state.employees.findIndex(emp => emp['_id'] === action.payload._id);
+      const updatedEmployees = [...state.employees];
+      const updatedEmployee = 
+        {
+          // ...state.employees[index],
+          ...action.payload
+        };
+      updatedEmployees[index] = updatedEmployee; 
+      return {
+        ...state, 
+        employees: [...updatedEmployees],
+        messages: null
+      };
+    default:
+      return state;
           // case EmployeeActions.SET_ONE_EMPLOYEE:
           //   return {
           //     ...state, 
@@ -47,22 +63,12 @@ export function employeeReducer(state = initialState, action: EmployeeActions.Em
           //     //               emp['_id'] !== action.payload),
           //     messages: null
           //   };
-          // case EmployeeActions.UPDATE_EMPLOYEE:
-          //   const index = state.employees.findIndex(emp => emp['_id'] === action.payload._id);
-          //   const updatedEmployees = [...state.employees];
-          //   const updatedEmployee = 
-          //     {
-                // ...state.employees[index],
-                // ...action.payload
-          //     };
           //   updatedEmployees[index] = updatedEmployee;
-          //   return {
-          //     ...state, 
-          //     employees: [...updatedEmployees],
-          //     messages: null
-          //   };
-    default:
-      return state;
+            // return {
+            //   ...state, 
+            //   employees: [...updatedEmployees],
+            //   messages: null
+            // };
   }
 }
 

@@ -9,13 +9,15 @@ import { Company } from 'app/company/company.model';
 export interface State {
   user: Employee | Company,
   messages: any[],
-  loading: boolean
+  loading: boolean, 
+  kind: string
 }
 
 const initialState: State = {
   user: null,
   messages: null,
-  loading: false
+  loading: false,
+  kind: null
 }
 
 export function authReducer(state = initialState, action: AuthActions.AuthActions){
@@ -26,7 +28,6 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
       return {
         ...state, 
         loading: true,
-        messages: null,
       };
     case AuthActions.AUTH_FAILURE:
       return {
@@ -41,6 +42,7 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
         ...state, 
         loading: false,
         messages: null,
+        kind: action.payload.kind,
         user: { ...action.payload.user }
       };
     case AuthActions.CLEAR_ERROR:

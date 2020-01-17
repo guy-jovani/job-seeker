@@ -9,6 +9,7 @@ import { Employee } from 'app/employees/employee.model';
 export class Company {
   public _id: string;
   public name: string;
+  public email: string;
   public description: string;
   public website: string;
   public image: string;

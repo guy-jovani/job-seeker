@@ -1,7 +1,7 @@
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Injectable } from '@angular/core';
 import { of } from 'rxjs';
-import { switchMap, map, catchError, tap } from 'rxjs/operators';
+import { switchMap, map, catchError, tap, withLatestFrom } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';
@@ -38,30 +38,6 @@ export class CompanyEffects {
 
 
   @Effect()
-  register = this.actions$.pipe(
-    ofType(CompanyActions.STORE_COMPANY_IN_DB),
-    switchMap(actionData => {
-      const companyData = new FormData();
-      Object.keys(actionData['payload']).forEach(key => {
-        companyData.append(key, actionData['payload'][key]);
-      });
-      return this.http.post(nodeServer + 'register', companyData)
-        .pipe(
-          map(res => {
-            if(res['type'] === 'success'){ 
-              // this.store.dispatch(new AuthActions.AddActiveEmployeeCompany(res['company']));
-              return new CompanyActions.SetSingleCompany({company: res['company'], redirect: true});
-            }          
-          }),
-          catchError(err => {
-            return handleError(err);
-          })
-        );
-      }
-    )
-  )
-
-  @Effect()
   updateSingle = this.actions$.pipe(
     ofType(CompanyActions.UPDATE_SINGLE_COMPANY_IN_DB),
     switchMap((actionData: { payload: Company }) => {
@@ -74,7 +50,8 @@ export class CompanyEffects {
           map(res => {
             if(res['type'] === 'success'){ 
               // this.store.dispatch(new AuthActions.AddActiveEmployeeCompany(res['company']));
-              return new CompanyActions.UpdateSingleCompany({company: res['company'], redirect: true});
+              // return new CompanyActions.UpdateSingleCompany({company: res['company'], redirect: true});
+              return new AuthActions.UpdateActiveUser({ user: {...res['company']}, kind: "company" }); 
             }          
           }),
           catchError(err => {
@@ -85,22 +62,14 @@ export class CompanyEffects {
     )
   )
 
-  @Effect({dispatch: false})
-  redirect = this.actions$.pipe(
-    ofType(CompanyActions.SET_SINGLE_COMPANY, CompanyActions.UPDATE_SINGLE_COMPANY),
-    tap((actionData: CompanyActions.SetSingleCompany | CompanyActions.UpdateSingleCompany) => { 
-      if(actionData.payload.redirect){
-        const currUrl = this.route.snapshot['_routerState'].url.substring(1).split("/");
-        this.router.navigate([currUrl[0]]);
-      }
-    })
-  )
-
   @Effect()
   fetchAll = this.actions$.pipe(
     ofType(CompanyActions.FETCH_ALL_COMPANIES),
-    switchMap(() => {
-      return this.http.get(nodeServer + 'fetchAll')
+    withLatestFrom(this.store.select('auth')),
+    switchMap(([actionData, authState]) => {
+      return this.http.get(nodeServer + 'fetchAll', {
+        params: { _id: authState.user._id }
+      })
       .pipe(
         map(res => {
           if(res['type'] === 'success'){
@@ -126,7 +95,7 @@ export class CompanyEffects {
       .pipe(
         map(res => {
           if(res['type'] === 'success'){
-            return new CompanyActions.UpdateSingleCompany({company: res['company'], redirect: false});
+            return new CompanyActions.UpdateSingleCompany({company: res['company']});
           }          
         }),
         catchError(err => {
@@ -143,6 +112,41 @@ export class CompanyEffects {
 
 
 
+
+  // @Effect()
+  // register = this.actions$.pipe(
+  //   ofType(CompanyActions.STORE_COMPANY_IN_DB),
+  //   switchMap(actionData => {
+  //     const companyData = new FormData();
+  //     Object.keys(actionData['payload']).forEach(key => {
+  //       companyData.append(key, actionData['payload'][key]);
+  //     });
+  //     return this.http.post(nodeServer + 'register', companyData)
+  //       .pipe(
+  //         map(res => {
+  //           if(res['type'] === 'success'){ 
+  //             // this.store.dispatch(new AuthActions.AddActiveEmployeeCompany(res['company']));
+  //             return new CompanyActions.SetSingleCompany({company: res['company'], redirect: true});
+  //           }          
+  //         }),
+  //         catchError(err => {
+  //           return handleError(err);
+  //         })
+  //       );
+  //     }
+  //   )
+  // )
+
+    // @Effect({dispatch: false})
+  // redirect = this.actions$.pipe(
+  //   ofType(CompanyActions.UPDATE_SINGLE_COMPANY),
+  //   tap((actionData: CompanyActions.UpdateSingleCompany) => { 
+  //     if(actionData.payload.redirect){
+  //       const currUrl = this.route.snapshot['_routerState'].url.substring(1).split("/");
+  //       this.router.navigate([currUrl[0]]);
+  //     }
+  //   })
+  // )
 
 
 

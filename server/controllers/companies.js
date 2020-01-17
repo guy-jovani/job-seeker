@@ -12,11 +12,11 @@ exports.getCompany = async (req, res, next) => {
   try {
     const company = await Company.aggregate([
                 { "$match": { '_id':  mongoose.Types.ObjectId(req.query._id) } },
-                { "$project": { 'createdAt': 0, 'updatedAt': 0, '__v': 0 } }
+                { "$project": { 'createdAt': 0, 'updatedAt': 0, '__v': 0, 'password': 0 } }
               ]);
     res.status(200).json({
       type: 'success',
-      company
+      company: company[0]
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "there was an error fetching the company"));
@@ -26,7 +26,8 @@ exports.getCompany = async (req, res, next) => {
 exports.getCompanies = async (req, res, next) => {
   try {
     const companies = await Company.aggregate([
-                { "$project": { 'createdAt': 0, 'updatedAt': 0, '__v': 0 } }
+                { "$match": { '_id': { $ne: mongoose.Types.ObjectId(req.query._id) }}},
+                { "$project": { 'createdAt': 0, 'updatedAt': 0, 'website': 0, 'email': 0, '__v': 0, 'password': 0 } }
               ]);
     res.status(200).json({
       type: 'success',

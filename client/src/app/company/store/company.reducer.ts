@@ -6,6 +6,7 @@ import { Company } from '../company.model';
 
 
 
+
 export interface State {
   companies: Company[];
   messages: any[]; 
@@ -29,17 +30,17 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
         ...state,
         messages: action.payload
       }
-    case CompanyActions.SET_SINGLE_COMPANY:
-      return {
-        ...state,
-        companies: [ ...state.companies, action.payload.company ],
-        messages: null
-      }
+    // case CompanyActions.SET_SINGLE_COMPANY:
+    //   return {
+    //     ...state,
+    //     companies: [ ...state.companies, action.payload.company ],
+    //     messages: null
+    //   }
     case CompanyActions.UPDATE_SINGLE_COMPANY:
-      const index = state.companies.findIndex(comp => comp._id === action.payload.company._id);
+      const index = state.companies.findIndex(comp => comp._id === action.payload.company._id );
       const updatedCompanies = [ ...state.companies ]
       const updatedCompany = { 
-        ...state.companies[index],
+        // ...state.companies[index],
         ...action.payload.company
       }
       updatedCompanies[index] = updatedCompany;

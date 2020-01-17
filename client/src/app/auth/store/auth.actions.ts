@@ -44,13 +44,13 @@ export class LoginAttempt implements Action {
 export class AuthSuccess implements Action {
   readonly type = AUTH_SUCCESS;
 
-  constructor(public payload: { user: Employee | Company, redirect: boolean }){}
+  constructor(public payload: { user: Employee | Company, redirect: boolean, kind: string }){}
 }
 
 export class UpdateActiveUser implements Action {
   readonly type = UPDATE_ACTIVE_USER;
 
-  constructor(public payload: { user: Employee | Company }){}
+  constructor(public payload: { user: Employee | Company, kind: string }){}
 }
 
 // export class AddActiveEmployeeCompany implements Action {
