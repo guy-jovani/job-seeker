@@ -145,7 +145,7 @@ export class AuthEffects {
     ofType(AuthActions.LOGOUT),
     map(() => {
       localStorage.removeItem('userData');
-      localStorage.removeItem('userKind');
+      localStorage.removeItem('kind');
       this.router.navigate(['/login']);
     }),
     catchError(err => {
