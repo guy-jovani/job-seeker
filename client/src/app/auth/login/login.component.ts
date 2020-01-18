@@ -16,6 +16,7 @@ export class LoginComponent implements OnInit {
   authForm: FormGroup;
   errorSub: Subscription;
   errorMessages: string[] = [];
+  isLoading = false;
 
   constructor(private store: Store<fromApp.AppState>) { }
 
@@ -23,6 +24,7 @@ export class LoginComponent implements OnInit {
     this.errorSub = this.store.select('auth')
       .subscribe(
         authState => {
+          this.isLoading = authState.loading;
           if(authState.messages){
             for(let msg of authState.messages){
               this.errorMessages.push(msg)

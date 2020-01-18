@@ -12,16 +12,18 @@ export const FETCH_ALL_COMPANIES = "[Company] Fetch All companies";
 export const FETCH_SINGLE_COMPANY = "[Company] Fetch Single company";
 export const COMPANY_OP_FAILURE = "[Company] Company operation failed";
 export const CLEAR_ERROR = "[Company] Clear error";
+export const LOGOUT = "[Company] LOGOUT";
 
 export type CompanyActions = FetchAllCompanies
                             | FetchSingleCompany
                             | SetAllCompanies
                             | CompanyOpFailure
                             | ClearError
+                            | UpdateSingleCompanyInDb
                             // | SetSingleCompany
                             | UpdateSingleCompany
                             // | StoreCompanyInDb
-                            ;
+                            | Logout;
 
 
 export class FetchAllCompanies implements Action {
@@ -40,16 +42,6 @@ export class SetAllCompanies implements Action {
   constructor(public payload: Company[]){}
 }
 
-// export class StoreCompanyInDb implements Action {
-//   readonly type = STORE_COMPANY_IN_DB;
-
-//   constructor(public payload: Company){}
-// }
-// export class SetSingleCompany implements Action {
-//   readonly type = SET_SINGLE_COMPANY;
-
-//   constructor(public payload: { company: Company, redirect: boolean }){}
-// }
 export class UpdateSingleCompany implements Action {
   readonly type = UPDATE_SINGLE_COMPANY;
 
@@ -71,3 +63,20 @@ export class CompanyOpFailure implements Action {
 export class ClearError implements Action {
   readonly type = CLEAR_ERROR;
 }
+
+export class Logout implements Action {
+  readonly type = LOGOUT;
+}
+
+
+
+// export class StoreCompanyInDb implements Action {
+//   readonly type = STORE_COMPANY_IN_DB;
+
+//   constructor(public payload: Company){}
+// }
+// export class SetSingleCompany implements Action {
+//   readonly type = SET_SINGLE_COMPANY;
+
+//   constructor(public payload: { company: Company, redirect: boolean }){}
+// }

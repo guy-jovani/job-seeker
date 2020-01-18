@@ -78,7 +78,7 @@ export class EditEmployeeComponent implements OnInit, OnDestroy{
     if(lastName){
       newEmployee.lastName = lastName;
     }
-    this.store.dispatch(new EmployeeActions.UpdateEmployeeInDB(newEmployee));
+    this.store.dispatch(new EmployeeActions.UpdateSingleEmployeeInDB(newEmployee));
   }
 
   onCancel(){

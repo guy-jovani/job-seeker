@@ -18,6 +18,7 @@ export class SignupComponent implements OnInit, OnDestroy {
   authForm: FormGroup;
   errorSub: Subscription;
   errorMessages: string[] = [];
+  isLoading = false;
 
   constructor(private store: Store<fromApp.AppState>) { }
 
@@ -25,6 +26,7 @@ export class SignupComponent implements OnInit, OnDestroy {
     this.errorSub = this.store.select('auth')
       .subscribe(
         authState => {
+          this.isLoading = authState.loading;
           if(authState.messages){
             for(let msg of authState.messages){
               this.errorMessages.push(msg)

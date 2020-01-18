@@ -38,6 +38,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   onLogout(){
+    this.store.dispatch(new EmployeeActions.Logout());
+    this.store.dispatch(new CompanyActions.Logout());
     this.store.dispatch(new AuthActions.Logout());
   }
 

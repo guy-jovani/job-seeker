@@ -38,13 +38,13 @@ export class EmployeeEffects {
 
   @Effect()
   updateActiveEmployee = this.actions$.pipe(
-    ofType(EmployeeActions.UPDATE_ACTIVE_EMPLOYEE_IN_DB),
+    ofType(EmployeeActions.UPDATE_SINGLE_EMPLOYEE_IN_DB),
     switchMap(actionData => {
       return this.http.post(nodeServer  + 'update', 
         { 
           newEmployee: actionData['payload']
         })
-        .pipe(
+        .pipe( 
           map(res => {
             // const employee = new Employee({...res['employee']});
             return new AuthActions.UpdateActiveUser({ user: {...res['employee']}, kind: "employee" }); 

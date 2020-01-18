@@ -33,7 +33,7 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
       return {
         ...state, 
         loading: false,
-        messages: action.payload,
+        messages: action.payload, 
       };
     case AuthActions.AUTH_SUCCESS:
     case AuthActions.UPDATE_ACTIVE_USER:

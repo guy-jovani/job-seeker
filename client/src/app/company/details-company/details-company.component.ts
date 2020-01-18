@@ -5,8 +5,7 @@ import { Subscription } from 'rxjs';
 import { Company } from '../company.model';
 import * as fromApp from '../../store/app.reducer';
 import { Store } from '@ngrx/store';
-import { Employee } from 'app/employees/employee.model';
-import * as CompanyActions from '../store/company.actions';
+import { switchMap, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-details-company',
@@ -21,30 +20,36 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy {
   // index: number;
   allowEdit: boolean;
   // user: Company;
+  isLoading = false;
 
   constructor(private store: Store<fromApp.AppState>,
               private route: ActivatedRoute,
               private router: Router) { }
 
   ngOnInit() {
-    this.paramSub = this.route.params.subscribe(params => {
-      const currUrl = this.route.snapshot['_routerState'].url.substring(1).split("/");
-      if(currUrl[0] === 'my-details'){
-        this.authSub = this.store.select('auth').subscribe(authState => {
-          this.company = <Company> authState.user;
+    let currUrl;
+    this.paramSub = this.route.params.pipe(
+      switchMap(() => {
+        currUrl = this.route.snapshot['_routerState'].url.substring(1).split("/");
+        if(currUrl[0] === 'my-details'){
+          return this.store.select('auth');
+        } else {
+          return this.store.select('company');
+        }
+      }))
+      .subscribe(currState => {
+        if(currUrl[0] === 'my-details'){
+          this.company = <Company> currState['user'];
           this.allowEdit = true;
-        });
-      } else {
-        this.companySub = this.store.select('company')
-        .subscribe(companyState => {
-          if(currUrl[1] >= companyState.companies.length || currUrl[1] < 0){
+        } else {
+          this.isLoading = currState['loadingSingle'];
+          if(currUrl[1] >= currState['companies'].length || currUrl[1] < 0){
             return this.router.navigate(['companies']);
           } 
-          this.company = companyState.companies[+currUrl[1]];
+          this.company = currState['companies'][+currUrl[1]];
           this.allowEdit = false;
-        })
-      }
-    });
+        }
+      })
   }
 
   ngOnDestroy(){

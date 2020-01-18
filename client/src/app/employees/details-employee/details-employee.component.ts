@@ -20,6 +20,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   routeSub: Subscription;
   allowEdit: boolean; // only allow to edit if the current employee is the one logged in
   companies: Company[];
+  isLoading = false;
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -35,30 +36,24 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
         switchMap(() => {
           return this.store.select('employee');
         }),
-        switchMap(employeesState => { 
-          if(this.index && (this.index >= employeesState.employees.length || this.index < 0)){
+        switchMap(employeeState => { 
+          this.isLoading = employeeState.loadingSingle;
+          if(this.index && (this.index >= employeeState.employees.length || this.index < 0)){
             this.router.navigate(['employees']);
           }      
           if(this.index >= 0){ 
-            this.employee = employeesState.employees[this.index];
+            this.employee = employeeState.employees[this.index];
             this.allowEdit = false;
           }          
           return this.store.select('auth');
-        })).
-        subscribe(authState => {
-          if(isNaN(this.index)){
-            this.employee = <Employee> authState.user;
-            this.allowEdit = true;
-          }
-          // return this.store.select('company');
-        });
-      // )     
-      // .subscribe(companyState => {  
-        // if(this.employee){
-        //   this.companies = 
-        //     companyState.companies.filter(company => company.creatorId === this.employee._id);
-        // }
-      // });
+        })
+      )
+      .subscribe(authState => {
+        if(isNaN(this.index)){
+          this.employee = <Employee> authState.user;
+          this.allowEdit = true;
+        }
+      });
   }
 
 

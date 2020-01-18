@@ -53,7 +53,6 @@ export class EditCompanyComponent implements OnInit {
           this.errorMessages = [];
         }
         this.company = <Company> authState.user;
-        console.log(this.company)
         this.nameInput.nativeElement.focus();
         this.nameInput.nativeElement.blur();
         this.initForm();

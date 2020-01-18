@@ -2,7 +2,10 @@
 <div class="container">
   <h4>Signup</h4>
   <app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (close)="onClose()"></app-alert>
-  <form [formGroup]="authForm" (ngSubmit)="onSubmit()">
+  <div *ngIf="isLoading" style="text-align: center;">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+  <form [formGroup]="authForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
     <div>
       <label for="email">email  </label>
       <input 

@@ -18,19 +18,24 @@ export class ListCompaniesComponent implements OnInit {
   companies: Company[];
   subscription: Subscription;
   activeEmployee: Employee;
+  isLoading = false;
+
   constructor(private store: Store<fromApp.AppState>,
               private route: ActivatedRoute) { }
               
 
   ngOnInit() {
     this.subscription = this.store.select('company')
-      .pipe(map(companieState => companieState.companies))
+      .pipe(map(companieState => {
+        this.isLoading = companieState.loadingAll;
+        return companieState.companies;
+      }))
       .subscribe(companies => {
         this.companies = companies;
       });
   }
 
-  getCompanyinfo(index: number){
+  getCompanyinfo(index: number){ 
     this.store.dispatch(new CompanyActions.FetchSingleCompany(this.companies[index]._id));
   }
 

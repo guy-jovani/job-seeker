@@ -1,18 +1,21 @@
 
 
-
-
-<ul class="list-group" *ngIf="companies.length">
-  <li 
-    class="list-group-item" 
-    *ngFor="let company of companies; let i=index">
-    <a routerLink='{{i}}/company' (click)='getCompanyinfo(i)'>
-      <p>Name: {{ company.name }}</p>
-      <p>Description: {{ company.description ? company.description : '-----'}}</p>
-    </a>
-  </li>
-</ul>
-<p *ngIf="!companies.length">There are no registers companies</p>
+<div *ngIf="isLoading" style="text-align: center;">
+  <app-loading-spinner></app-loading-spinner>
+</div>
+<div *ngIf="!isLoading">
+  <ul class="list-group" *ngIf="companies.length">
+    <li 
+      class="list-group-item" 
+      *ngFor="let company of companies; let i=index">
+      <a routerLink='{{i}}/company' (click)='getCompanyinfo(i)'>
+        <p>Name: {{ company.name }}</p>
+        <p>Description: {{ company.description ? company.description : '-----'}}</p>
+      </a>
+    </li>
+  </ul>
+  <p *ngIf="!companies.length">There are no registers companies</p>
+</div>
 
 
 

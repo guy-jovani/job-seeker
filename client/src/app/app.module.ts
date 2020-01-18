@@ -32,6 +32,7 @@ import { DetailsCompanyComponent } from './company/details-company/details-compa
 import { CompanySignupComponent } from './auth/company-signup/company-signup.component';
 import { DetailsUserComponent } from './shared/details-user/details-user.component';
 import { EditUserComponent } from './shared/edit-user/edit-user.component';
+import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinner.component';
 
 @NgModule({
   declarations: [
@@ -55,7 +56,8 @@ import { EditUserComponent } from './shared/edit-user/edit-user.component';
     EditCompanyComponent,
     DetailsCompanyComponent,
     DetailsUserComponent,
-    EditUserComponent
+    EditUserComponent,
+    LoadingSpinnerComponent
   ],
   imports: [
     BrowserModule,

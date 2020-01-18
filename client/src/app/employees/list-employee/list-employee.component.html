@@ -1,14 +1,17 @@
 
+<div *ngIf="isLoading" style="text-align: center;">
+  <app-loading-spinner></app-loading-spinner>
+</div>
 
-
-<ul class="list-group" *ngIf="employees.length">
-  <li 
-    class="list-group-item" 
-    *ngFor="let employee of employees; let i=index">
-    <a routerLink='{{i}}' (click)='getEmployeeinfo(i)'>
-      <p>Employee Email: {{ employee.email }}</p>
-    </a>
-    
-  </li>
-</ul>
-<p *ngIf="!employees.length">There are no registers employees</p>
+<div *ngIf="!isLoading">
+  <ul class="list-group" *ngIf="employees.length">
+    <li 
+      class="list-group-item" 
+      *ngFor="let employee of employees; let i=index">
+      <a routerLink='{{i}}' (click)='getEmployeeinfo(i)'>
+        <p>Employee Email: {{ employee.email }}</p>
+      </a>
+    </li>
+  </ul>
+  <p *ngIf="!employees.length">There are no registers employees</p>
+</div>

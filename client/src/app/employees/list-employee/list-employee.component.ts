@@ -16,13 +16,17 @@ export class ListEmployeeComponent implements OnInit, OnDestroy {
 
   employees: Employee[];
   subscription: Subscription;
+  isLoading = false;
 
   constructor(private store: Store<fromApp.AppState>) { }
 
   ngOnInit() {
     this.subscription = this.store.select('employee')
       .pipe(
-        map(employeeState => employeeState.employees )
+        map(employeeState => {
+          this.isLoading = employeeState.loadingAll;
+          return employeeState.employees;
+        })
       )
       .subscribe(employees => {
         this.employees = employees;

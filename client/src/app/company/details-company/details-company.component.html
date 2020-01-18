@@ -3,10 +3,14 @@
 
 <div class="container" *ngIf="company">
   <h3>{{ allowEdit ? 'My Profile' : 'Company Details' }}</h3>
-  <div class="row">
+  <div *ngIf="isLoading" >
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+  <div class="row" *ngIf="!isLoading">
     <p>name: {{ company.name }}</p>
     <p>description: {{ company.description || "------" }}</p>
     <p>website: {{ company.website || "------" }}</p>
+    <p>email: {{ company.email || "------" }}</p>
     <p *ngIf="company.imagePath"><img class="image" [src]='company.imagePath'></p>
   </div>
   <hr>

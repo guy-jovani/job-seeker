@@ -158,7 +158,7 @@ export class AuthEffects {
   @Effect({ dispatch: false})
   redirectSuccess = this.actions$.pipe(
     ofType(AuthActions.AUTH_SUCCESS),
-    tap((actionData: AuthActions.AuthSuccess) => { 
+    tap((actionData: AuthActions.AuthSuccess) => {
       if(actionData.payload.redirect){
         this.router.navigate(['/']);
       }

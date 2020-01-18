@@ -16,6 +16,7 @@ export class CompanySignupComponent implements OnInit {
   errorSub: Subscription;
   errorMessages: string[] = [];
   companySignup = true;
+  isLoading = false;
 
   constructor(private store: Store<fromApp.AppState>) {}
 
@@ -23,6 +24,7 @@ export class CompanySignupComponent implements OnInit {
     this.errorSub = this.store.select('auth')
       .subscribe(
         authState => {
+          this.isLoading = authState.loading;
           if(authState.messages){
             for(let msg of authState.messages){
               this.errorMessages.push(msg)
