@@ -89,7 +89,7 @@ exports.updateCompany = async (req, res, next) => {
     let nullKeys = companyEditableKeys.filter(key => !reqBodyKeys.includes(key));
     nullKeys = nullKeys.reduce((obj, key) => (obj[key]='',  obj), {});
     let bulkArr = [];
-    if(!nullKeys.imagePath) delete nullKeys.imagePath; // so we don't override an existing image
+    if(!nullKeys.imagePath && req.query.removeImage == 'false') delete nullKeys.imagePath; // so we don't override an existing image
     bulkArr.push({ updateOne: {
       filter: { _id: req.body._id },
       update: { $set: { ...req.body } }

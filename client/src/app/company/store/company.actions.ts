@@ -51,7 +51,7 @@ export class UpdateSingleCompany implements Action {
 export class UpdateSingleCompanyInDb implements Action {
   readonly type = UPDATE_SINGLE_COMPANY_IN_DB;
 
-  constructor(public payload: Company){}
+  constructor(public payload: { company: Company, removeImage: boolean }){}
 }
 
 export class CompanyOpFailure implements Action {

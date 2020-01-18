@@ -17,14 +17,15 @@ import { mimeType } from './mime-type.validator';
   styleUrls: ['./edit-company.component.css']
 })
 export class EditCompanyComponent implements OnInit {
-  edit: boolean;
-  index: number;
+  // edit: boolean;
+  // index: number;
   errorMessages: string[];
   authState: Subscription;
   // user: Company;
   company: Company;
   imagePreview: string;
   companyForm: FormGroup;
+  isLoading = false;
  
   @ViewChild('name', {static: true, read: ElementRef}) nameInput: ElementRef;
   @ViewChild('image', {static: true, read: ElementRef}) imageInput: ElementRef;
@@ -41,50 +42,42 @@ export class EditCompanyComponent implements OnInit {
       'description': new FormControl(null),
       'website': new FormControl(null),
       'image': new FormControl(null, { asyncValidators : [mimeType]}),
+      'removeImage': new FormControl(false),
     });
 
-    this.authState = this.store.select('auth')
-      .subscribe(authState => {
-        if(authState.messages){
-          for(let msg of authState.messages){
+    this.authState = this.store.select('auth').pipe(
+      switchMap(authState => {
+        this.company = <Company> authState.user;
+        return this.store.select('company');
+      }))
+      .subscribe(companyState => {
+        this.isLoading = companyState.loadingSingle;
+        if(companyState.messages){
+          for(let msg of companyState.messages){
             this.errorMessages.push(msg)
           }
         } else {
           this.errorMessages = [];
         }
-        this.company = <Company> authState.user;
-        this.nameInput.nativeElement.focus();
-        this.nameInput.nativeElement.blur();
+        // this.nameInput.nativeElement.focus();
+        // this.nameInput.nativeElement.blur();
         this.initForm();
       }); 
 
     // this.authState = this.store.select('auth')
-    //   .pipe(
-    //     switchMap(authState => {
-    //       this.company = <Company> authState.user;
-    //       return this.store.select('company');
-    //     })).
-    //     subscribe(companyState => {
-    //       if(companyState.messages){
-    //         for(let msg of companyState.messages){
-    //           this.errorMessages.push(msg)
-    //         }
-    //       } else {
-    //         this.errorMessages = [];
+    //   .subscribe(authState => {
+    //     if(authState.messages){
+    //       for(let msg of authState.messages){
+    //         this.errorMessages.push(msg)
     //       }
-    //       this.nameInput.nativeElement.focus();
-    //       this.nameInput.nativeElement.blur();
-    //       const currUrl = this.route.snapshot['_routerState'].url.substring(1).split('/');
-    //       if(currUrl[1] !== 'register'){
-    //         // if(currUrl[0] === 'my-details' && this.employee){
-    //         //   this.company = companyState.companies
-    //         //       .filter(comp => comp.creatorId === this.employee._id)[currUrl[1]];
-    //         // } else {
-    //           this.company = companyState.companies[currUrl[1]];
-    //         }
-    //         this.initForm();
-    //       // }
-    //     }); 
+    //     } else {
+    //       this.errorMessages = [];
+    //     }
+    //     this.company = <Company> authState.user;
+    //     this.nameInput.nativeElement.focus();
+    //     this.nameInput.nativeElement.blur();
+    //     this.initForm();
+    //   }); 
   }
 
   initForm(){
@@ -93,6 +86,7 @@ export class EditCompanyComponent implements OnInit {
       'description': this.company.description || "",
       'website': this.company.website || "",
       'image': this.company.image || "",
+      'removeImage': false,
     });   
   }
 
@@ -111,6 +105,7 @@ export class EditCompanyComponent implements OnInit {
 
   onSubmit(){
     const name = this.companyForm.value.name;
+    const removeImage = this.companyForm.value.removeImage;
     const description = this.companyForm.value.description ? this.companyForm.value.description : undefined;
     const website = this.companyForm.value.website ? this.companyForm.value.website : undefined;
     const newCompany = new Company({name});
@@ -120,7 +115,7 @@ export class EditCompanyComponent implements OnInit {
       newCompany.image = this.companyForm.value.image;
     }
     newCompany._id = this.company._id;
-    this.store.dispatch(new CompanyActions.UpdateSingleCompanyInDb(newCompany));
+    this.store.dispatch(new CompanyActions.UpdateSingleCompanyInDb({ company: newCompany, removeImage }));
   }
 
   onCancel(){

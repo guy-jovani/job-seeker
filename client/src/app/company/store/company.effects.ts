@@ -40,17 +40,25 @@ export class CompanyEffects {
   @Effect()
   updateSingle = this.actions$.pipe(
     ofType(CompanyActions.UPDATE_SINGLE_COMPANY_IN_DB),
-    switchMap((actionData: { payload: Company }) => {
+    switchMap((actionData) => {
       const companyData = new FormData();
-      Object.keys(actionData.payload).forEach(key => {
-        companyData.append(key, actionData.payload[key]);
+      console.log(actionData['payload']['company'])
+      Object.keys(actionData['payload']['company']).forEach(key => {
+        console.log(key, actionData['payload']['company'][key])
+        companyData.append(key, actionData['payload']['company'][key]);
       });
-      return this.http.post(nodeServer + 'update', companyData)
+      console.log(companyData)
+      return this.http.post(nodeServer + 'update', companyData, {
+          params: {
+            removeImage: actionData['payload']['removeImage']
+          }
+        })
         .pipe(
           map(res => {
             if(res['type'] === 'success'){ 
               // this.store.dispatch(new AuthActions.AddActiveEmployeeCompany(res['company']));
               // return new CompanyActions.UpdateSingleCompany({company: res['company'], redirect: true});
+              this.store.dispatch(new CompanyActions.ClearError());
               return new AuthActions.UpdateActiveUser({ user: {...res['company']}, kind: "company" }); 
             }          
           }),
