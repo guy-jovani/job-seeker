@@ -25,6 +25,8 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
   switch(action.type){
     case AuthActions.SIGNUP_ATTEMPT:
     case AuthActions.LOGIN_ATTEMPT:
+    case AuthActions.RESET_PASS_EMAIL_ATTEMPT:
+    case AuthActions.RESET_PASS_ATTEMPT:
       return {
         ...state, 
         loading: true,
@@ -43,9 +45,11 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
         loading: false,
         messages: null,
         kind: action.payload.kind,
-        user: { ...action.payload.user }
+        user: action.payload.user ? { ...action.payload.user } : null
       };
     case AuthActions.CLEAR_ERROR:
+    case AuthActions.RESET_PASS_EMAIL_SUCCESS:
+    case AuthActions.RESET_PASS_SUCCESS:
       return {
         ...state, 
         loading: false,
@@ -56,30 +60,10 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
         ...state, 
         loading: false,
         messages: null,
-        user: null
+        user: null,
+        kind: null
       };
     default:
       return state;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -9,10 +9,13 @@ export const LOGIN_ATTEMPT = "[Auth] LOGIN_ATTEMPT";
 export const LOGOUT = "[Auth] LOGOUT";
 export const AUTH_SUCCESS = "[Auth] AUTH_SUCCESS";
 export const UPDATE_ACTIVE_USER = "[Auth] UPDATE_ACTIVE_USER";
-// export const ADD_ACTIVE_EMPLOYEE_COMPANY = "[Auth] ADD_ACTIVE_EMPLOYEE_COMPANY";
 export const AUTH_FAILURE = "[Auth] AUTH_FAILURE";
 export const CLEAR_ERROR = "[Auth] CLEAR_ERROR";
 export const AUTO_LOGIN = "[Auth] AUTO_LOGIN";
+export const RESET_PASS_EMAIL_ATTEMPT = "[Auth] RESET_PASS_EMAIL_ATTEMPT";
+export const RESET_PASS_EMAIL_SUCCESS = "[Auth] RESET_PASS_EMAIL_SUCCESS";
+export const RESET_PASS_ATTEMPT = "[Auth] RESET_PASS_ATTEMPT";
+export const RESET_PASS_SUCCESS = "[Auth] RESET_PASS_SUCCESS";
 
 export type AuthActions = SignupAttempt
                         | LoginAttempt
@@ -20,7 +23,10 @@ export type AuthActions = SignupAttempt
                         | AuthSuccess
                         | ClearError
                         | AutoLogin
-                        // | AddActiveEmployeeCompany
+                        | ResetPassEmailSuccess
+                        | ResetPassEmailAttempt
+                        | ResetPassSuccess
+                        | ResetPassAttempt
                         | Logout
                         | UpdateActiveUser;
 
@@ -31,6 +37,18 @@ export class SignupAttempt implements Action {
   constructor(public payload: { 
       email: string,  password: string, confirmPassword: string, name?: string
   }){}
+}
+
+export class ResetPassEmailAttempt implements Action {
+  readonly type = RESET_PASS_EMAIL_ATTEMPT;
+
+  constructor(public payload: string){}
+}
+
+export class ResetPassAttempt implements Action {
+  readonly type = RESET_PASS_ATTEMPT;
+
+  constructor(public payload: { password: string, confirmPassword: string, token: string }){}
 }
 
 export class LoginAttempt implements Action {
@@ -53,12 +71,6 @@ export class UpdateActiveUser implements Action {
   constructor(public payload: { user: Employee | Company, kind: string }){}
 }
 
-// export class AddActiveEmployeeCompany implements Action {
-//   readonly type = ADD_ACTIVE_EMPLOYEE_COMPANY;
-
-//   constructor(public payload: Company){}
-// }
-
 export class AuthFailure implements Action {
   readonly type = AUTH_FAILURE;
 
@@ -75,6 +87,14 @@ export class AutoLogin implements Action {
 
 export class Logout implements Action {
   readonly type = LOGOUT;
+}
+
+export class ResetPassEmailSuccess implements Action {
+  readonly type = RESET_PASS_EMAIL_SUCCESS;
+}
+
+export class ResetPassSuccess implements Action {
+  readonly type = RESET_PASS_SUCCESS;
 }
 
 

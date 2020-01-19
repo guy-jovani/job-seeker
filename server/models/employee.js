@@ -20,39 +20,9 @@ const employeeSchema = new Schema(
       type: String,
       required: false
     },
+    resetPassToken: String,
+    resetPassTokenExpiration: Date,
   }
 );
 
 module.exports = mongoose.model('Employee', employeeSchema);
-
-
-
-
-// const employeeSchema = new Schema(
-//   {
-//     position: {
-//       type: String,
-//       required: true
-//     },
-//     company: {
-//       type: String,
-//       required: true
-//     },
-//     team: [
-//       {
-//         type: Schema.Types.ObjectId,
-//         ref: 'Employee',
-//         required: false
-//       }
-//     ],
-//     directBoss: {
-      // type: Schema.Types.ObjectId,
-      // ref: 'Employee',
-      // required: false
-//     },
-//     profilePicUrl: {
-//       type: String,
-//       required: false
-//     }
-//   }
-// );

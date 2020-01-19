@@ -28,6 +28,8 @@ const companySchema = new Schema(
       type: String,
       required: false
     },
+    resetPassToken: String,
+    resetPassTokenExpiration: Date,
   },
   { timestamps: true }
 );

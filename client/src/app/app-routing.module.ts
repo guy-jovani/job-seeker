@@ -18,6 +18,8 @@ import { DetailsCompanyGuard } from './company/details-company/details-company.g
 import { CompanySignupComponent } from './auth/company-signup/company-signup.component';
 import { DetailsUserComponent } from './shared/details-user/details-user.component';
 import { EditUserComponent } from './shared/edit-user/edit-user.component';
+import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
+import { GetNewPasswordComponent } from './auth/reset-password/get-new-password/get-new-password.component';
 
 
 const routes: Routes = [
@@ -25,7 +27,13 @@ const routes: Routes = [
     path: '', component: HomeComponent, 
   },
   {
+    path: 'reset', component: ResetPasswordComponent, 
+  },
+  {
     path: 'signup', component: SignupComponent
+  },
+  {
+    path: 'reset-password/:token', component: GetNewPasswordComponent
   },
   {
     path: 'signup/company', component: CompanySignupComponent

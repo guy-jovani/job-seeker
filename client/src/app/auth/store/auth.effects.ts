@@ -9,8 +9,6 @@ import { of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import * as fromApp from '../../store/app.reducer';
 import * as AuthActions from './auth.actions';
-import { Employee } from 'app/employees/employee.model';
-import { Company } from 'app/company/company.model';
 
 
 
@@ -50,9 +48,6 @@ export class AuthEffects {
         .pipe(
           map(res => {
             if(res['type'] === 'success'){
-              // const user = res['kind'] === 'company' ? 
-              //   new Company({ ...res['user'], token: res['token'] }) :
-              //   new Employee({ ...res['user'], token: res['token'] })
               localStorage.setItem("userData", JSON.stringify({...res['user']}));
               localStorage.setItem("kind", JSON.stringify(res['kind']));
               return new AuthActions.AuthSuccess({ user: res['user'], redirect: true, kind: res['kind'] });
@@ -65,7 +60,6 @@ export class AuthEffects {
             }
           }),
           catchError(err => {
-            // console.log(err)
             return handleError(err);
           })
         );
@@ -76,7 +70,7 @@ export class AuthEffects {
   login = this.actions$.pipe(
     ofType(AuthActions.LOGIN_ATTEMPT),
     switchMap(actionData => {
-      return this.http.post(nodeServer  + 'login', 
+      return this.http.post(nodeServer + 'login', 
         { 
           email: actionData['payload']['email'], 
           password: actionData['payload']['password']
@@ -84,9 +78,6 @@ export class AuthEffects {
         .pipe(
           map(res => {
             if(res['type'] === 'success'){
-              // const user = res['kind'] === 'company' ? 
-              //   new Company({ ...res['user'], token: res['token'] }) :
-              //   new Employee({ ...res['user'], token: res['token'] });
                 localStorage.setItem("userData", JSON.stringify({...res['user']}));
                 localStorage.setItem("kind", JSON.stringify(res['kind']));
                 return new AuthActions.AuthSuccess({ user: res['user'], redirect: true, kind: res['kind'] });
@@ -109,19 +100,10 @@ export class AuthEffects {
   activeUserChanges = this.actions$.pipe(
     ofType(AuthActions.UPDATE_ACTIVE_USER),
     map((actionData: AuthActions.UpdateActiveUser) => {
-      // const user = JSON.parse(localStorage.getItem('userData'));
       localStorage.setItem("userData", JSON.stringify(actionData.payload.user));
       this.router.navigate(['../my-details']);
     })
   );
-
-  // @Effect({ dispatch: false})
-  // redirectSuccess = this.actions$.pipe(
-  //   ofType(AuthActions.UPDATE_ACTIVE_USER),
-  //   tap(() => { 
-  //     this.router.navigate(['../my-details']);
-  //   })
-  // );
 
   @Effect()
   autoLogin = this.actions$.pipe(
@@ -135,7 +117,6 @@ export class AuthEffects {
       return new AuthActions.AuthSuccess({ user, redirect: false, kind });
     }),
     catchError(err => {
-      //console.log(err)
       return handleError(err);
     })
   );
@@ -156,12 +137,76 @@ export class AuthEffects {
 
 
   @Effect({ dispatch: false})
-  redirectSuccess = this.actions$.pipe(
+  redirectAuthSuccess = this.actions$.pipe(
     ofType(AuthActions.AUTH_SUCCESS),
     tap((actionData: AuthActions.AuthSuccess) => {
       if(actionData.payload.redirect){
         this.router.navigate(['/']);
       }
+    })
+  );
+
+  @Effect({ dispatch: false})
+  redirectResetPassSuccess = this.actions$.pipe(
+    ofType(AuthActions.RESET_PASS_SUCCESS),
+    tap((actionData: AuthActions.ResetPassSuccess) => {
+      this.router.navigate(['/login']);
+    })
+  );
+
+  @Effect()
+  resetPasswordEmail = this.actions$.pipe(
+    ofType(AuthActions.RESET_PASS_EMAIL_ATTEMPT),
+    switchMap(actionData => {
+      return this.http.post(nodeServer + 'resetPasswordEmail', 
+        { 
+          email: actionData['payload']
+        })
+        .pipe(
+          map(res => {
+            if(res['type'] === 'success'){
+              return new AuthActions.ResetPassEmailSuccess();
+            } else {
+              const messages: any[] = [];
+              for(let err of res['errors']){
+                messages.push(err['msg'])
+              }
+              return new AuthActions.AuthFailure(messages);
+            }
+          }),
+          catchError(err => {
+            return handleError(err);
+          })
+        );
+    })
+  );
+
+  @Effect()
+  resetToNewPassword = this.actions$.pipe(
+    ofType(AuthActions.RESET_PASS_ATTEMPT),
+    switchMap(actionData => {
+      return this.http.post(nodeServer  + 'resetToNewPassword', 
+        { 
+          password: actionData['payload']['password'], 
+          confirmPassword: actionData['payload']['confirmPassword'],
+          token: actionData['payload']['token']
+        })
+        .pipe(
+          map(res => {
+            if(res['type'] === 'success'){
+              return new AuthActions.ResetPassSuccess();
+            } else {
+              const messages: any[] = [];
+              for(let err of res['errors']){
+                messages.push(err['msg'])
+              }
+              return new AuthActions.AuthFailure(messages);
+            }
+          }),
+          catchError(err => {
+            return handleError(err);
+          })
+        );
     })
   );
 }

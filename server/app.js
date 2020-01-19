@@ -62,10 +62,6 @@ mongoose.connect(`mongodb://${globalVars.MONGO_DB_USER}:${globalVars.MONGO_DB_PA
 )
 .then(() => {
   const server = app.listen(globalVars.PORT);
-  // const io = require('./socket').init(server);
-  // io.on('connection', socket => {
-  //   console.log("client connected");
-  // });
 })
 .catch(err => console.log(err));
 

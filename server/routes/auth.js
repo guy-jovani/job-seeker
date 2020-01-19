@@ -10,12 +10,11 @@ const authController = require('../controllers/auth');
 router.put('/signup', 
   [
     body('email')
-    .isEmail()
-    .withMessage('please provide a valid email')
-    .normalizeEmail(),
+      .isEmail()
+      .withMessage('please provide a valid email'),
     body('password')
-    .isLength(3)
-    .withMessage('The password need to be more than 3 characters long.'),
+      .isLength(3)
+      .withMessage('The password need to be more than 3 characters long.'),
     body('confirmPassword').custom((value, { req }) => {
       if (value !== req.body.password) {
         throw new Error('Password confirmation does not match password');
@@ -26,5 +25,27 @@ router.put('/signup',
   authController.signup);
 
 router.post('/login', authController.login);
+
+router.post('/resetPasswordEmail', 
+  [
+    body('email')
+      .isEmail()
+      .withMessage('please provide a valid email'),
+  ], 
+  authController.resetPasswordEmail);
+
+router.post('/resetToNewPassword', 
+  [
+    body('password')
+      .isLength(3)
+      .withMessage('The password need to be more than 3 characters long.'),
+    body('confirmPassword').custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error('Password confirmation does not match password');
+      }
+      return true;
+    })
+  ], 
+  authController.resetToNewPassword);
 
 module.exports = router;

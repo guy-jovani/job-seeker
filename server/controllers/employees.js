@@ -40,7 +40,8 @@ const errorHandling = require('../utils/errorHandling')
 
 exports.getEmployee = async (req, res, next) => {
   try {
-    const employee = await Employee.findOne({_id: req.query._id}).select('-password -__v');
+    const employee = await Employee.findOne({_id: req.query._id}).select(
+            '-password -__v -resetPassToken -resetPassTokenExpiration');
     res.status(200).json({
       type: 'success',
       employee
@@ -52,7 +53,8 @@ exports.getEmployee = async (req, res, next) => {
 
 exports.getEmployees = async (req, res, next) => {
   try {
-    const employees = await Employee.find({_id: { $ne: req.query._id }}).select('-password -__v');
+    const employees = await Employee.find({_id: { $ne: req.query._id }}).select(
+          '-password -__v -resetPassToken -resetPassTokenExpiration');
     res.status(200).json({
       type: 'success',
       employees
@@ -96,7 +98,8 @@ exports.updateEmployee = async (req, res, next) => {
     if(!bulkRes.result.nMatched){
       throw new Error("trying to update a non exisitng employee");
     }
-    const updatedEmployee = await Employee.findById(req.body.newEmployee._id).select('-__v -password');
+    const updatedEmployee = await Employee.findById(req.body.newEmployee._id).select(
+        '-__v -password -resetPassToken -resetPassTokenExpiration');
 
     res.status(201).json({
       message: 'employee updated successfully!',

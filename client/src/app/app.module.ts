@@ -33,6 +33,8 @@ import { CompanySignupComponent } from './auth/company-signup/company-signup.com
 import { DetailsUserComponent } from './shared/details-user/details-user.component';
 import { EditUserComponent } from './shared/edit-user/edit-user.component';
 import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinner.component';
+import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
+import { GetNewPasswordComponent } from './auth/reset-password/get-new-password/get-new-password.component';
 
 @NgModule({
   declarations: [
@@ -57,7 +59,9 @@ import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinne
     DetailsCompanyComponent,
     DetailsUserComponent,
     EditUserComponent,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    ResetPasswordComponent,
+    GetNewPasswordComponent
   ],
   imports: [
     BrowserModule,
