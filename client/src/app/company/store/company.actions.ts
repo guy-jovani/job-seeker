@@ -45,13 +45,13 @@ export class SetAllCompanies implements Action {
 export class UpdateSingleCompany implements Action {
   readonly type = UPDATE_SINGLE_COMPANY;
 
-  constructor(public payload: { company: Company }){}
+  constructor(public payload: { company: Company }) {}
 }
 
 export class UpdateSingleCompanyInDb implements Action {
   readonly type = UPDATE_SINGLE_COMPANY_IN_DB;
 
-  constructor(public payload: { company: Company, removeImage: boolean }){}
+  constructor(public payload: { company: Company, deleteImage: boolean }) {}
 }
 
 export class CompanyOpFailure implements Action {

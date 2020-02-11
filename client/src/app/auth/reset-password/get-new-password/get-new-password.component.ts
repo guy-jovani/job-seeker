@@ -20,7 +20,7 @@ export class GetNewPasswordComponent implements OnInit {
   errorMessages: string[] = [];
   isLoading = false;
   token: string;
-  
+
   constructor(private store: Store<fromApp.AppState>,
               private route: ActivatedRoute) { }
 
@@ -28,9 +28,9 @@ export class GetNewPasswordComponent implements OnInit {
     this.subscription = this.route.params.pipe(
       switchMap(params => {
         this.token = params['token'];
-        return this.store.select('auth'); 
+        return this.store.select('auth');
       })
-    )    
+    )
     .subscribe(authState => {
       this.isLoading = authState.loading;
       if(authState.messages){
@@ -67,13 +67,13 @@ export class GetNewPasswordComponent implements OnInit {
     this.showPasswords = !this.showPasswords;
   }
 
-  ngOnDestroy(){
-    if(this.subscription){
+  ngOnDestroy() {
+    if (this.subscription) {
       this.subscription.unsubscribe();
     }
   }
 
-  onClose(){
+  onClose() {
     this.store.dispatch(new AuthActions.ClearError());
   }
 

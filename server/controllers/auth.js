@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 
-const globalVars = require('../utils/globalVars');
+// const globalVars = require('../utils/globalVars');
 const Employee = require('../models/employee');
 const Company = require('../models/company');
 const validation = require('../utils/validation');
@@ -22,13 +22,25 @@ const transporter = nodemailer.createTransport({
 });
 
 
-getToken = async (employeeID) => {
-  const token = await jwt.sign({
-    employeeID: employeeID
-  }, globalVars.SECERT_TOKEN_KEY, { expiresIn: globalVars.JWT_EXPIRATION });
+getToken = (userId) => {
+  const token = jwt.sign({
+    userId: userId
+  }, process.env.SECERT_TOKEN_KEY, { expiresIn: process.env.JWT_EXPIRATION });
 
   return token;
 }
+
+getUserSignup = (req, password) => {
+  let user, kind;
+  if(req.body.name){
+    user = new Company({ email: req.body.email, password: password, name: req.body.name });
+    kind = "company";
+  } else {
+    user = new Employee({ email: req.body.email, password: password });
+    kind = "employee";
+  }
+  return [user, kind];
+};
 
 exports.signup = async (req, res, next) => {
   try {
@@ -37,27 +49,21 @@ exports.signup = async (req, res, next) => {
     if(emailExist){ return; }
 
     const password = await bcrypt.hash(req.body.password, 12);
-    let user, kind;
-    if(req.body.name){
-      user = new Company({ email: req.body.email, password: password, name: req.body.name });
-      kind = "company";
-    } else {
-      user = new Employee({ email: req.body.email, password: password });
-      kind = "employee";
-    }
-
+    let [user, kind] = getUserSignup(req, password);
     await user.save();
 
-    const token = await getToken();
+    const token = getToken(user._id);
 
-    res.status(200).json({
+    res.status(201).json({
       message: 'Signed up successfully!',
       type: 'success',
-      token: token,
+      token,
+      expiresIn: process.env.TOKEN_EXPIRATION_SECONDS,
       user,
       kind
     });
   } catch (error) {
+    console.log(error);
     next(handleServerErrors(error, 500, "there was an unexpected error while trying to signup"));
   }
 };
@@ -71,35 +77,44 @@ loginEmailPassIncorrectMessage = (res) => {
   });
 }
 
+getUserLogin = async (req, res) => {
+  let user = await Employee.findOne({email: req.body.email}).select('-__v');
+  let kind = "employee";
+  if(!user) {
+    user = await Company.findOne({email: req.body.email}).select(
+                  '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration'
+                );
+    kind = "company";
+  }
+  if(!user){ 
+    return loginEmailPassIncorrectMessage(res);
+  }
+  return [user, kind];
+};
+
 exports.login = async (req, res, next) => {
   try {
-    let user = await Employee.findOne({email: req.body.email}).select('-__v');
-    let kind = "employee";
-    if(!user) {
-      user = await Company.findOne({email: req.body.email}).select(
-                    '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration'
-                  );
-      kind = "company";
-    }
-    if(!user){ 
-      return loginEmailPassIncorrectMessage(res);
-    }
+    let [user, kind] = await getUserLogin(req, res);
+    if(!user) return;
+
     const verifiedPassword = await bcrypt.compare(req.body.password, user.password);
     if(!verifiedPassword){ 
       return loginEmailPassIncorrectMessage(res);
     }
-    user = user.toObject()
-    delete user.password;
-    const token = await getToken();
+
+    user = user.toObject();
+    Reflect.deleteProperty(user, 'password');
+    const token = getToken(user._id);
     res.status(200).json({
       message: 'Logged in successfully!',
       type: 'success',
-      token: token,
+      token,
+      expiresIn: process.env.TOKEN_EXPIRATION_SECONDS,
       user,
       kind
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     next(handleServerErrors(error, 500, "there was an unexpected error while trying to login"));
   }
 };
@@ -131,7 +146,7 @@ exports.resetPasswordEmail = async (req, res, next) => {
         from: 'shop@node-complete',
         to: req.body.email,
         subject: 'password reset',
-        html: `<a href="${globalVars.RESET_URL}${token}">reset password</a>`
+        html: `<a href="${process.env.RESET_URL}${token}">reset password</a>`
       }, err => { if(err) console.log(err) }); 
 
       res.status(200).json({

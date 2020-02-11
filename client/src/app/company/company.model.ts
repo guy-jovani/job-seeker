@@ -12,13 +12,13 @@ export class Company {
   public email: string;
   public description: string;
   public website: string;
-  public image: string;
+  public imagePath: string;
   public token?: string;
 
-  constructor(init?:Partial<Company>){
+  constructor(init?: Partial<Company>){
     Object.assign(this, init);
   }
-  
+
 
 }
 

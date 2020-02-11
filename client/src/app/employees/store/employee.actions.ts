@@ -18,7 +18,7 @@ export const EMPLOYEE_OP_FAILURE = "[Employee] Employee operation failed";
 export const CLEAR_ERROR = "[Employee] Clear error";
 export const LOGOUT = "[Employee] LOGOUT";
 
-export type EmployeeActions = // SetSingleEmployee 
+export type EmployeeActions = // SetSingleEmployee
                               UpdateSingleEmployee
                             | FetchSingleEmployee
                             // | DeleteEmployee
@@ -35,20 +35,20 @@ export class FetchAllEmployees implements Action {
 
 export class UpdateSingleEmployeeInDB implements Action {
   readonly type = UPDATE_SINGLE_EMPLOYEE_IN_DB;
-  
-  constructor(public payload: Employee){}
+
+  constructor(public payload: Employee) {}
 }
 
 export class SetAllEmployees implements Action {
   readonly type = SET_ALL_EMPLOYEES;
 
-  constructor(public payload: Employee[]){}
+  constructor(public payload: Employee[]) {}
 }
 
 export class EmployeeOpFailure implements Action {
   readonly type = EMPLOYEE_OP_FAILURE;
 
-  constructor(public payload: any[]){}
+  constructor(public payload: any[]) {}
 }
 
 export class ClearError implements Action {
@@ -63,7 +63,7 @@ export class FetchSingleEmployee implements Action {
 
 export class UpdateSingleEmployee implements Action {
   readonly type = UPDATE_SINGLE_EMPLOYEE;
-  
+
   constructor( public payload: Employee ){}
 }
 
@@ -73,13 +73,13 @@ export class Logout implements Action {
 
 // export class DeleteEmployee implements Action {
 //   readonly type = DELETE_EMPLOYEE;
-  
+
 //   constructor(public payload: number){}
 // }
 
 // export class DeleteEmployeeFromDB implements Action {
 //   readonly type = DELETE_EMPLOYEE_FROM_DB;
-  
+
 //   constructor(public payload: number){}
 // }
 

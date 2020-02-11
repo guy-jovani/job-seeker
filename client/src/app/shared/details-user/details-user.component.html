@@ -1,4 +1,6 @@
 
+
+<app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (close)="onClose()"></app-alert>
 <app-details-employee *ngIf="userEmployee"></app-details-employee>
 <app-details-company *ngIf="!userEmployee"></app-details-company>
 

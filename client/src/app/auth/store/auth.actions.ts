@@ -34,7 +34,7 @@ export type AuthActions = SignupAttempt
 export class SignupAttempt implements Action {
   readonly type = SIGNUP_ATTEMPT;
 
-  constructor(public payload: { 
+  constructor(public payload: {
       email: string,  password: string, confirmPassword: string, name?: string
   }){}
 }
@@ -62,25 +62,26 @@ export class LoginAttempt implements Action {
 export class AuthSuccess implements Action {
   readonly type = AUTH_SUCCESS;
 
-  constructor(public payload: { user: Employee | Company, redirect: boolean, kind: string }){}
+  constructor(public payload: {
+    user: Employee | Company, redirect: boolean, kind: string, token: string }) {}
 }
 
 export class UpdateActiveUser implements Action {
   readonly type = UPDATE_ACTIVE_USER;
 
-  constructor(public payload: { user: Employee | Company, kind: string }){}
+  constructor(public payload: { user: Employee | Company, kind: string }) {}
 }
 
 export class AuthFailure implements Action {
   readonly type = AUTH_FAILURE;
 
-  constructor(public payload: any[]){}
+  constructor(public payload: any[]) {}
 }
 
 export class ClearError implements Action {
   readonly type = CLEAR_ERROR;
 }
-   
+
 export class AutoLogin implements Action {
   readonly type = AUTO_LOGIN;
 }

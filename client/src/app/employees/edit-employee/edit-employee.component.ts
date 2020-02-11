@@ -36,9 +36,9 @@ export class EditEmployeeComponent implements OnInit, OnDestroy{
         employeeState => {
           this.emailInput.nativeElement.focus();
           this.emailInput.nativeElement.blur();
-          if(employeeState.messages){
-            for(let msg of employeeState.messages){
-              this.errorMessages.push(msg)
+          if (employeeState.messages) {
+            for (const msg of employeeState.messages) {
+              this.errorMessages.push(msg);
             }
           } else {
             this.errorMessages = [];
@@ -54,16 +54,16 @@ export class EditEmployeeComponent implements OnInit, OnDestroy{
           map(authState => authState.user )
         )
         .subscribe((user: Employee) => {
-          if(user){
+          if(user) {
             this.employeeForm.form.setValue({
               email: user.email,
               _id: user._id,
-              firstName: user.firstName || "",
-              lastName: user.lastName || "",
+              firstName: user.firstName || '',
+              lastName: user.lastName || '',
             });
           }
-        });        
-    }, 0); 
+        });
+    }, 0);
   }
 
   onSubmit(form: NgForm){
@@ -72,33 +72,33 @@ export class EditEmployeeComponent implements OnInit, OnDestroy{
     const newEmployee = new Employee({
       _id: form.value._id, email: form.value.email
     });
-    if(firstName){
+    if (firstName) {
       newEmployee.firstName = firstName;
     }
-    if(lastName){
+    if (lastName) {
       newEmployee.lastName = lastName;
     }
     this.store.dispatch(new EmployeeActions.UpdateSingleEmployeeInDB(newEmployee));
   }
 
-  onCancel(){
+  onCancel() {
     this.router.navigate(['../'], {relativeTo: this.route});
   }
 
-  onDelete(){
+  onDelete() {
     // this.store.dispatch(new EmployeeActions.DeleteEmployeeFromDB(this.index));
   }
 
-  ngOnDestroy(){
-    if(this.subscription){
+  ngOnDestroy() {
+    if (this.subscription) {
       this.subscription.unsubscribe();
     }
-    if(this.errorSub){
+    if (this.errorSub) {
       this.errorSub.unsubscribe();
     }
   }
 
-  onClose(){
+  onClose() {
     this.store.dispatch(new EmployeeActions.ClearError());
   }
 }

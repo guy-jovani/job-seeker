@@ -24,10 +24,10 @@ import { GetNewPasswordComponent } from './auth/reset-password/get-new-password/
 
 const routes: Routes = [
   {
-    path: '', component: HomeComponent, 
+    path: '', component: HomeComponent,
   },
   {
-    path: 'reset', component: ResetPasswordComponent, 
+    path: 'reset', component: ResetPasswordComponent,
   },
   {
     path: 'signup', component: SignupComponent
@@ -39,34 +39,34 @@ const routes: Routes = [
     path: 'signup/company', component: CompanySignupComponent
   },
   {
-    path: 'login', component: LoginComponent, 
+    path: 'login', component: LoginComponent,
   },
   {
-    path: 'employees', canActivate: [AuthGuard], 
-    component: EmployeesComponent, 
+    path: 'employees', canActivate: [AuthGuard],
+    component: EmployeesComponent,
     resolve: [EmployeesResolverService],
     children: [
       {
         path: ':index', component: DetailsEmployeeComponent, canActivate: [DetailsEmployeeGuard]
       },
-    ]  
+    ]
   },
   {
-    path: 'companies', component: CompaniesComponent, canActivate: [AuthGuard], 
+    path: 'companies', component: CompaniesComponent, canActivate: [AuthGuard],
     resolve: [CompanyResolverService],
     children: [
       {
         path: ':index/company', component: DetailsCompanyComponent, canActivate: [DetailsCompanyGuard]
       },
-    ]  
+    ]
   },
   {
-    path: 'my-details', component: DetailsUserComponent, canActivate: [AuthGuard],  
+    path: 'my-details', component: DetailsUserComponent, canActivate: [AuthGuard],
     children: [
       {
         path: 'edit', component: EditUserComponent
       },
-    ]   
+    ]
   },
   {
     path: '**', component: ErrorsComponent

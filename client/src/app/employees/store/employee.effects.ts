@@ -15,40 +15,53 @@ import { environment } from '../../../environments/environment';
 
 const nodeServer = environment.nodeServer + 'employees/';
 
+const getErrorMessages = (errors: [{ [msg: string]: string }]) => {
+  const messages: any[] = [];
+  for (const err of errors) {
+    messages.push(err['msg']);
+  }
+  return messages;
+};
+
 const handleError = (errorRes: any) => {
   let messages: any[] = [];
-  if(!errorRes.error || !errorRes.error.errors){
+  if (!errorRes.error || !errorRes.error.errors) {
     messages = ['an unknown error occured'];
   } else {
-    for(let err of errorRes.error.errors){
-      messages.push(err['msg'])
+    for (const err of errorRes.error.errors) {
+      messages.push(err['msg']);
     }
   }
   return of(new EmployeeActions.EmployeeOpFailure(messages));
-}
+};
 
 @Injectable()
-export class EmployeeEffects { 
+export class EmployeeEffects {
 
   constructor(private actions$: Actions,
               private http: HttpClient,
               private store: Store<fromApp.AppState>,
-              private router: Router){}
+              private router: Router) {}
 
 
   @Effect()
   updateActiveEmployee = this.actions$.pipe(
     ofType(EmployeeActions.UPDATE_SINGLE_EMPLOYEE_IN_DB),
-    switchMap(actionData => {
-      return this.http.post(nodeServer  + 'update', 
-        { 
-          newEmployee: actionData['payload']
+    switchMap((actionData: { payload: Employee }) => {
+      return this.http.post(nodeServer  + 'update',
+        {
+          ...actionData['payload']
         })
-        .pipe( 
+        .pipe(
           map(res => {
             // const employee = new Employee({...res['employee']});
-            return new AuthActions.UpdateActiveUser({ user: {...res['employee']}, kind: "employee" }); 
-          }), 
+            if (res['type'] === 'success') {
+              this.store.dispatch(new EmployeeActions.ClearError());
+              return new AuthActions.UpdateActiveUser({ user: {...res['employee']}, kind: 'employee' });
+            } else {
+              return new AuthActions.AuthFailure(getErrorMessages(res['errors']));
+            }
+          }),
           catchError(err => {
             return handleError(err);
           })
@@ -56,7 +69,6 @@ export class EmployeeEffects {
     })
   );
 
-  
   @Effect()
   fetchAllEmployees = this.actions$.pipe(
     ofType(EmployeeActions.FETCH_ALL_EMPLOYEES),
@@ -67,7 +79,11 @@ export class EmployeeEffects {
       })
         .pipe(
           map(res => {
-            return new EmployeeActions.SetAllEmployees(res['employees']);
+            if (res['type'] === 'success') {
+              return new EmployeeActions.SetAllEmployees(res['employees']);
+            } else {
+              return new EmployeeActions.EmployeeOpFailure(getErrorMessages(res['errors']));
+            }
           }),
           catchError(err => {
             return handleError(err);
@@ -86,9 +102,11 @@ export class EmployeeEffects {
         })
         .pipe(
           map(res => {
-            if(res['type'] === 'success'){
+            if (res['type'] === 'success') {
               return new EmployeeActions.UpdateSingleEmployee({...res['employee']});
-            } 
+            } else {
+              return new EmployeeActions.EmployeeOpFailure(getErrorMessages(res['errors']));
+            }
           }),
           catchError(err => {
             return handleError(err);
@@ -101,10 +119,10 @@ export class EmployeeEffects {
   // storeEmployee = this.actions$.pipe(
   //   ofType(EmployeeActions.STORE_EMPLOYEE_IN_DB),
   //   switchMap(actionData => {
-  //     return this.http.post(nodeServer  + 'store', 
-  //       { 
-  //         name: actionData['payload']['name'], 
-  //         email: actionData['payload']['email'] 
+  //     return this.http.post(nodeServer  + 'store',
+  //       {
+  //         name: actionData['payload']['name'],
+  //         email: actionData['payload']['email']
   //       })
   //       .pipe(
   //         map(res => {
@@ -113,7 +131,7 @@ export class EmployeeEffects {
   //               _id: res['employeeId'], email: res['email'], token: res['token'],
   //               firstName: res['firstName'], lastName: res['lastName']
   //             });
-  //             return new EmployeeActions.SetOneEmployee(employee); 
+  //             return new EmployeeActions.SetOneEmployee(employee);
   //           } else {
   //             return new EmployeeActions.EmployeeOpFailure([res['message']]);
   //           }
@@ -124,18 +142,18 @@ export class EmployeeEffects {
   //       );
   //   })
   // );
-  
+
   // @Effect()
   // deleteEmployee = this.actions$.pipe(
   //   ofType(EmployeeActions.DELETE_EMPLOYEE_FROM_DB),
   //   withLatestFrom(this.store.select('employee')),
   //   switchMap(([actionData, employeesState]) => {
-  //     return this.http.post(nodeServer  + 'delete', 
+  //     return this.http.post(nodeServer  + 'delete',
   //       { id: employeesState.employees[actionData['payload']]['_id'] }
   //     )
   //     .pipe(
   //       map(res => {
-  //         return new EmployeeActions.DeleteEmployee(res['id']); 
+  //         return new EmployeeActions.DeleteEmployee(res['id']);
   //       }),
   //       catchError(err => {
   //         return handleError(err);
@@ -145,5 +163,5 @@ export class EmployeeEffects {
   // );
 
 
-  
+
 }

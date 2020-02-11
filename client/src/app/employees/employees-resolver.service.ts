@@ -15,17 +15,17 @@ import * as EmployeesActions from './store/employee.actions';
 })
 export class EmployeesResolverService implements Resolve<Employee[]> {
 
-  constructor(private store: Store<fromApp.AppState>, 
+  constructor(private store: Store<fromApp.AppState>,
               private actions$: Actions){}
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot){
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     return this.store.select('employee').pipe(
       take(1),
       map(employeeState => {
         return employeeState.employees;
       }),
       switchMap(employees => {
-        if(!employees.length){
+        if (!employees.length) {
           this.store.dispatch(new EmployeesActions.FetchAllEmployees());
           return this.actions$.pipe(
             ofType(EmployeesActions.SET_ALL_EMPLOYEES),

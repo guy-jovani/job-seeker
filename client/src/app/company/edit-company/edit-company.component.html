@@ -7,8 +7,8 @@
   <form (ngSubmit)="onSubmit()" [formGroup]="companyForm" *ngIf="!isLoading">
     <div class="row">
       <label for="name">name:  </label>
-      <input 
-        type="text" 
+      <input
+        type="text"
         formControlName="name"
         #name
       >
@@ -18,8 +18,8 @@
     </div>
     <div class="row">
       <label for="website">website:  </label>
-      <input 
-        type="text" 
+      <input
+        type="text"
         formControlName="website"
         #website
       >
@@ -29,7 +29,7 @@
     </div>
     <div class="row">
       <label for="description">description:  </label>
-      <textarea 
+      <textarea
         formControlName="description"
         #description
       ></textarea>
@@ -40,17 +40,17 @@
     <div class="row">
       <label for="image">Image</label>
       <div class="row">
-        <input 
+        <input
           #image
-          type="file" 
+          type="file"
           class="form-control image-upload-input col-xs-11"
           (change)="handleImageInput($event)">
-        <span class="glyphicon glyphicon-remove btn btn-default col-xs-1" (click)="onRemoveImage()"></span>
+        <span class="glyphicon glyphicon-remove btn btn-default col-xs-1" (click)="onRemoveImage(image)"></span>
       </div>
       <img *ngIf='imagePreview && companyForm.get("image").valid'
-            class="image-preview" 
+            class="image-preview"
             [src]="imagePreview"/>
-      <span class="help-block" 
+      <span class="help-block"
             *ngIf="!companyForm.get('image').valid &&
                     companyForm.get('image').errors &&
                     companyForm.get('image').errors.invalidMimeType">
@@ -58,29 +58,29 @@
       </span>
       <div class="form-check">
         <input type="checkbox" class="form-check-input"
-          formControlName="removeImage"
-          #removeImage>
-        <label class="form-check-label" for="removeImage">Delete Image?</label>
+          formControlName="deleteImage"
+          #deleteImage>
+        <label class="form-check-label" for="deleteImage">Delete Last Uploaded Image?</label>
         <!-- <span class="help-block">To override the previous image, just upload a new one.</span> -->
       </div>
     </div>
     <hr>
-    <button 
-      type="submit" 
+    <button
+      type="submit"
       class="btn btn-success"
       [disabled]="!companyForm.valid"
       >
       {{ !this.company ? 'Register' : 'Edit' }}
     </button>
-    <button 
-      type="button" 
+    <button
+      type="button"
       class="btn btn-danger"
       (click)="onCancel()"
       >
       Cancel
     </button>
-    <!-- <button 
-      type="button" 
+    <!-- <button
+      type="button"
       class="btn btn-danger"
       *ngIf="edit"
       (click)="onDelete()"
@@ -117,7 +117,7 @@
 
 
 
-<!-- 
+<!--
 
 <app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (close)="onClose()"></app-alert>
 <div class="container">
@@ -125,9 +125,9 @@
   <form (ngSubmit)="onSubmit(companyForm)" #companyForm="ngForm">
     <div class="row">
       <label for="name">name:  </label>
-      <input 
-        type="text" 
-        name="name" 
+      <input
+        type="text"
+        name="name"
         id="name"
         required
         ngModel
@@ -139,9 +139,9 @@
     </div>
     <div class="row">
       <label for="website">website:  </label>
-      <input 
-        type="textarea" 
-        name="website" 
+      <input
+        type="textarea"
+        name="website"
         id="website"
         ngModel
         #website="ngModel"
@@ -152,9 +152,9 @@
     </div>
     <div class="row">
       <label for="description">description:  </label>
-      <input 
-        type="textarea" 
-        name="description" 
+      <input
+        type="textarea"
+        name="description"
         id="description"
         ngModel
         #description="ngModel"
@@ -165,8 +165,8 @@
     </div>
     <div class="row">
       <label for="image">Image URl</label>
-      <input 
-        type="file" 
+      <input
+        type="file"
         id="image"
         name="image"
         class="form-control image-upload-input"
@@ -178,27 +178,27 @@
       </span>
     </div>
     <hr>
-    <button 
-      type="submit" 
+    <button
+      type="submit"
       class="btn btn-success"
       [disabled]="!companyForm.form.valid"
       >
       {{ !this.company ? 'Register' : 'Edit' }}
     </button>
-    <button 
-      type="button" 
+    <button
+      type="button"
       class="btn btn-danger"
       (click)="onCancel()"
       >
       Cancel
     </button>
-    <button 
-      type="button" 
+    <button
+      type="button"
       class="btn btn-danger"
       *ngIf="edit"
       (click)="onDelete()"
       >
       Delete
-    </button> 
+    </button>
   </form>
 </div> -->

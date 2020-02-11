@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 
 import * as fromApp from '../store/app.reducer';
-// import * as EmployeeActions from './store/employee.actions';
+import * as CompanyActions from './store/company.actions';
 
 @Component({
   selector: 'app-companies',
@@ -17,18 +17,6 @@ export class CompaniesComponent implements OnInit {
   constructor(private store: Store<fromApp.AppState>) { }
 
   ngOnInit(){
-    // this.storeSubscription = this.store.select('employee')
-      // .subscribe(
-        // employeeState => {
-        //   if(employeeState.messages){
-        //     for(let msg of employeeState.messages){
-        //       this.errorMessages.push(msg)
-        //     }
-        //   } else {
-        //     this.errorMessages = [];
-        //   }
-        // }
-      // );
     this.storeSubscription = this.store.select('company')
       .subscribe(
         companyState => {
@@ -44,12 +32,12 @@ export class CompaniesComponent implements OnInit {
   }
 
   ngOnDestroy(){
-    // if(this.storeSubscription){
-    //   this.storeSubscription.unsubscribe();
-    // }
+    if(this.storeSubscription){
+      this.storeSubscription.unsubscribe();
+    }
   }
 
   onClose(){
-    // this.store.dispatch(new EmployeeActions.ClearError());
+    this.store.dispatch(new CompanyActions.ClearError());
   }
 }

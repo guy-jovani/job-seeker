@@ -15,17 +15,25 @@ import { Company } from '../company.model';
 
 const nodeServer = environment.nodeServer + 'companies/';
 
+const getErrorMessages = (errors: [{ [msg: string]: string }]) => {
+  const messages: any[] = [];
+  for (const err of errors) {
+    messages.push(err['msg']);
+  }
+  return messages;
+};
+
 const handleError = (errorRes: any) => {
   let messages: any[] = [];
-  if(!errorRes.error || !errorRes.error.errors){
+  if (!errorRes.error || !errorRes.error.errors) {
     messages = ['an unknown error occured'];
   } else {
-    for(let err of errorRes.error.errors){
-      messages.push(err['msg'])
+    for (const err of errorRes.error.errors) {
+      messages.push(err['msg']);
     }
   }
   return of(new CompanyActions.CompanyOpFailure(messages));
-}
+};
 
 @Injectable()
 export class CompanyEffects {
@@ -34,7 +42,7 @@ export class CompanyEffects {
               private router: Router,
               private route: ActivatedRoute,
               private http: HttpClient,
-              private store: Store<fromApp.AppState>){}
+              private store: Store<fromApp.AppState>) {}
 
 
   @Effect()
@@ -42,25 +50,22 @@ export class CompanyEffects {
     ofType(CompanyActions.UPDATE_SINGLE_COMPANY_IN_DB),
     switchMap((actionData) => {
       const companyData = new FormData();
-      console.log(actionData['payload']['company'])
       Object.keys(actionData['payload']['company']).forEach(key => {
-        console.log(key, actionData['payload']['company'][key])
         companyData.append(key, actionData['payload']['company'][key]);
       });
-      console.log(companyData)
       return this.http.post(nodeServer + 'update', companyData, {
           params: {
-            removeImage: actionData['payload']['removeImage']
+            removeImage: actionData['payload']['deleteImage']
           }
         })
         .pipe(
           map(res => {
-            if(res['type'] === 'success'){ 
-              // this.store.dispatch(new AuthActions.AddActiveEmployeeCompany(res['company']));
-              // return new CompanyActions.UpdateSingleCompany({company: res['company'], redirect: true});
+            if (res['type'] === 'success') {
               this.store.dispatch(new CompanyActions.ClearError());
-              return new AuthActions.UpdateActiveUser({ user: {...res['company']}, kind: "company" }); 
-            }          
+              return new AuthActions.UpdateActiveUser({ user: {...res['company']}, kind: 'company' });
+            } else {
+              return new AuthActions.AuthFailure(getErrorMessages(res['errors']));
+            }
           }),
           catchError(err => {
             return handleError(err);
@@ -68,7 +73,7 @@ export class CompanyEffects {
         );
       }
     )
-  )
+  );
 
   @Effect()
   fetchAll = this.actions$.pipe(
@@ -80,16 +85,18 @@ export class CompanyEffects {
       })
       .pipe(
         map(res => {
-          if(res['type'] === 'success'){
+          if (res['type'] === 'success') {
             return new CompanyActions.SetAllCompanies(res['companies']);
-          }          
+          } else {
+            return new CompanyActions.CompanyOpFailure(getErrorMessages(res['errors']));
+          }
         }),
         catchError(err => {
           return handleError(err);
         })
       );
     })
-  )
+  );
 
   @Effect()
   fetchSingle = this.actions$.pipe(
@@ -102,16 +109,18 @@ export class CompanyEffects {
       })
       .pipe(
         map(res => {
-          if(res['type'] === 'success'){
+          if (res['type'] === 'success') {
             return new CompanyActions.UpdateSingleCompany({company: res['company']});
-          }          
+          } else {
+            return new CompanyActions.CompanyOpFailure(getErrorMessages(res['errors']));
+          }
         }),
         catchError(err => {
           return handleError(err);
         })
       );
     })
-  )
+  );
 }
 
 
@@ -132,10 +141,10 @@ export class CompanyEffects {
   //     return this.http.post(nodeServer + 'register', companyData)
   //       .pipe(
   //         map(res => {
-  //           if(res['type'] === 'success'){ 
+  //           if(res['type'] === 'success'){
   //             // this.store.dispatch(new AuthActions.AddActiveEmployeeCompany(res['company']));
   //             return new CompanyActions.SetSingleCompany({company: res['company'], redirect: true});
-  //           }          
+  //           }
   //         }),
   //         catchError(err => {
   //           return handleError(err);
@@ -148,7 +157,7 @@ export class CompanyEffects {
     // @Effect({dispatch: false})
   // redirect = this.actions$.pipe(
   //   ofType(CompanyActions.UPDATE_SINGLE_COMPANY),
-  //   tap((actionData: CompanyActions.UpdateSingleCompany) => { 
+  //   tap((actionData: CompanyActions.UpdateSingleCompany) => {
   //     if(actionData.payload.redirect){
   //       const currUrl = this.route.snapshot['_routerState'].url.substring(1).split("/");
   //       this.router.navigate([currUrl[0]]);

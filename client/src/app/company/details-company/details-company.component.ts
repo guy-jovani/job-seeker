@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { Company } from '../company.model';
 import * as fromApp from '../../store/app.reducer';
 import { Store } from '@ngrx/store';
-import { switchMap, map } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-details-company',
@@ -15,7 +15,7 @@ import { switchMap, map } from 'rxjs/operators';
 export class DetailsCompanyComponent implements OnInit, OnDestroy {
   companySub: Subscription;
   authSub: Subscription;
-  paramSub: Subscription;
+  routeSub: Subscription;
   company: Company;
   // index: number;
   allowEdit: boolean;
@@ -28,39 +28,40 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     let currUrl;
-    this.paramSub = this.route.params.pipe(
+    this.routeSub = this.route.params.pipe(
       switchMap(() => {
-        currUrl = this.route.snapshot['_routerState'].url.substring(1).split("/");
-        if(currUrl[0] === 'my-details'){
+        currUrl = this.route.snapshot['_routerState'].url.substring(1).split('/');
+        if (currUrl[0] === 'my-details') {
           return this.store.select('auth');
         } else {
           return this.store.select('company');
         }
       }))
       .subscribe(currState => {
-        if(currUrl[0] === 'my-details'){
-          this.company = <Company> currState['user'];
+        if (currUrl[0] === 'my-details') {
+          this.company = currState['user'] as Company;
           this.allowEdit = true;
-        } else {
+        } else { // company list details
           this.isLoading = currState['loadingSingle'];
-          if(currUrl[1] >= currState['companies'].length || currUrl[1] < 0){
+          if (currUrl[1] >= currState['companies'].length || currUrl[1] < 0) {
+            // check if trying to get details of an undefined employee
             return this.router.navigate(['companies']);
-          } 
+          }
           this.company = currState['companies'][+currUrl[1]];
           this.allowEdit = false;
         }
-      })
+      });
   }
 
-  ngOnDestroy(){
-    if(this.companySub){
+  ngOnDestroy() {
+    if (this.companySub) {
       this.companySub.unsubscribe();
     }
-    if(this.authSub){
+    if (this.authSub) {
       this.authSub.unsubscribe();
     }
-    if(this.paramSub){
-      this.paramSub.unsubscribe();
+    if (this.routeSub) {
+      this.routeSub.unsubscribe();
     }
   }
 }

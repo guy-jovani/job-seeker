@@ -31,28 +31,28 @@ export class HeaderComponent implements OnInit, OnDestroy {
         return authState.user;
       })).subscribe(user => {
         this.isAuthenticated = !!user;
-        if(this.isAuthenticated){
+        if (this.isAuthenticated) {
           this.user = user;
         }
       });
   }
 
-  onLogout(){
+  onLogout() {
     this.store.dispatch(new EmployeeActions.Logout());
     this.store.dispatch(new CompanyActions.Logout());
     this.store.dispatch(new AuthActions.Logout());
   }
 
-  onFetchEmployees(){
+  onFetchEmployees() {
     this.store.dispatch(new EmployeeActions.FetchAllEmployees());
   }
 
-  onFetchCompanies(){
+  onFetchCompanies() {
     this.store.dispatch(new CompanyActions.FetchAllCompanies());
   }
 
-  ngOnDestroy(){
-    if(this.checkAuthSub){
+  ngOnDestroy() {
+    if (this.checkAuthSub) {
       this.checkAuthSub.unsubscribe();
     }
   }

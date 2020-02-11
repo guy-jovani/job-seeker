@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { EffectsModule } from '@ngrx/effects';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -35,6 +35,7 @@ import { EditUserComponent } from './shared/edit-user/edit-user.component';
 import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinner.component';
 import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
 import { GetNewPasswordComponent } from './auth/reset-password/get-new-password/get-new-password.component';
+import { AuthInterceptor } from './auth/auth-interceptor';
 
 @NgModule({
   declarations: [
@@ -72,7 +73,7 @@ import { GetNewPasswordComponent } from './auth/reset-password/get-new-password/
     StoreModule.forRoot(fromApp.appReducer),
     EffectsModule.forRoot([EmployeeEffects, AuthEffects, CompanyEffects]),
   ],
-  providers: [],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
