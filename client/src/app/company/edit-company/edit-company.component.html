@@ -17,6 +17,19 @@
       </span>
     </div>
     <div class="row">
+      <label for="email">email:  </label>
+      <input
+        type="email"
+        name="email"
+        id="email"
+        formControlName="email"
+        #email
+      >
+      <span class="help-block" *ngIf="!companyForm.get('email').valid && companyForm.get('email').touched">
+        please enter a valid email address
+      </span>
+    </div>
+    <div class="row">
       <label for="website">website:  </label>
       <input
         type="text"
@@ -65,12 +78,58 @@
       </div>
     </div>
     <hr>
+    <div formGroupName="passwords">
+      <div>
+        <label for="name">password  </label>
+        <input
+          [type]="showPasswords ? 'text' : 'password'"
+          name="password"
+          id="password"
+          formControlName="password"
+          #password
+        >
+        <span *ngIf="companyForm.get('passwords.password').touched &&
+                        !companyForm.get('passwords.password').valid">
+          <span class="help-block" *ngIf="companyForm.get('passwords.password').errors.required">
+            the password field is required
+          </span>
+          <span class="help-block" *ngIf="companyForm.get('passwords.password').errors.minlength">
+              password must be of at least 3 characters long
+          </span>
+        </span>
+      </div>
+      <div>
+        <label for="name">confirm password  </label>
+        <input
+          [type]="showPasswords ? 'text' : 'password'"
+          name="confirmPassword"
+          id="confirmPassword"
+          formControlName="confirmPassword"
+        >
+        <span *ngIf="companyForm.get('passwords.password').touched &&
+                companyForm.get('passwords.confirmPassword').touched &&
+                companyForm.get('passwords.password').valid &&
+                !companyForm.get('passwords').valid">
+          <span class="help-block" *ngIf="companyForm.get('passwords').errors.equality">
+            the passwords fields must be identical
+          </span>
+        </span>
+      </div>
+        <button
+          type="button"
+          class="btn btn-default btn-sm"
+          (click)="onTogglePasswords()"
+          >
+          {{ showPasswords ? 'hide' : 'show' }} passwords
+        </button>
+    </div>
+    <hr>
     <button
       type="submit"
       class="btn btn-success"
       [disabled]="!companyForm.valid"
       >
-      {{ !this.company ? 'Register' : 'Edit' }}
+      Edit
     </button>
     <button
       type="button"
@@ -79,14 +138,6 @@
       >
       Cancel
     </button>
-    <!-- <button
-      type="button"
-      class="btn btn-danger"
-      *ngIf="edit"
-      (click)="onDelete()"
-      >
-      Delete
-    </button> -->
   </form>
 </div>
 

@@ -45,7 +45,7 @@ app.use((error, req, res, next) => {
   console.log("====================================================");
   console.log("====================================================");
   console.log("an error cought and printed in app.js");
-  // console.log(error);
+  console.log(error);
   res.status(error.statusCode || 500).json({ 
     // errors: [{
     //   msg: 'An unknown error occured'

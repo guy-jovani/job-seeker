@@ -30,9 +30,13 @@ export class CompanyEffects {
       Object.keys(actionData['payload']['company']).forEach(key => {
         companyData.append(key, actionData['payload']['company'][key]);
       });
+      if (actionData['payload']['password']) {
+        companyData.append('password', actionData['payload']['password']);
+        companyData.append('confirmPassword', actionData['payload']['confirmPassword']);
+      }
       return this.http.post(nodeServer + 'update', companyData, {
           params: {
-            removeImage: actionData['payload']['deleteImage']
+            removeImage: actionData['payload']['deleteImage'],
           }
         })
         .pipe(

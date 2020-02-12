@@ -7,9 +7,9 @@
   </div>
   <div class="row" *ngIf="!isLoading">
     <p>name: {{ company.name }}</p>
-    <p>description: {{ company.description || "------" }}</p>
-    <p>website: {{ company.website || "------" }}</p>
     <p>email: {{ company.email || "------" }}</p>
+    <p>website: {{ company.website || "------" }}</p>
+    <p>description: {{ company.description || "------" }}</p>
     <p *ngIf="company.imagePath"><img class="image" [src]='company.imagePath'></p>
   </div>
   <hr>

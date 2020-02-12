@@ -15,7 +15,7 @@ import { Employee } from '../employee.model';
   templateUrl: './edit-employee.component.html',
   styleUrls: ['./edit-employee.component.css']
 })
-export class EditEmployeeComponent implements OnInit, OnDestroy{
+export class EditEmployeeComponent implements OnInit, OnDestroy {
   subscription: Subscription;
   errorMessages: string[];
   errorSub: Subscription;
@@ -27,7 +27,7 @@ export class EditEmployeeComponent implements OnInit, OnDestroy{
     private store: Store<fromApp.AppState>,
     private router: Router,
     private route: ActivatedRoute
-  ){}
+  ) {}
 
   ngOnInit() {
     this.initForm();
@@ -47,14 +47,14 @@ export class EditEmployeeComponent implements OnInit, OnDestroy{
       );
   }
 
-  initForm(){
+  initForm() {
     setTimeout(() => {
       this.subscription = this.store.select('auth')
         .pipe(
           map(authState => authState.user )
         )
         .subscribe((user: Employee) => {
-          if(user) {
+          if (user) {
             this.employeeForm.form.setValue({
               email: user.email,
               _id: user._id,
@@ -66,7 +66,7 @@ export class EditEmployeeComponent implements OnInit, OnDestroy{
     }, 0);
   }
 
-  onSubmit(form: NgForm){
+  onSubmit(form: NgForm) {
     const firstName = form.value.firstName ? form.value.firstName : undefined;
     const lastName = form.value.lastName ? form.value.lastName : undefined;
     const newEmployee = new Employee({

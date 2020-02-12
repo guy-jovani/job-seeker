@@ -5,14 +5,14 @@ import { Company } from '../company.model';
 
 // export const STORE_COMPANY_IN_DB = "[Company] STORE company in db";
 // export const SET_SINGLE_COMPANY = "[Company] Set single company";
-export const UPDATE_SINGLE_COMPANY = "[Company] Update single company";
-export const UPDATE_SINGLE_COMPANY_IN_DB = "[Company] Update single company in db";
-export const SET_ALL_COMPANIES = "[Company] Set All Companies";
-export const FETCH_ALL_COMPANIES = "[Company] Fetch All companies";
-export const FETCH_SINGLE_COMPANY = "[Company] Fetch Single company";
-export const COMPANY_OP_FAILURE = "[Company] Company operation failed";
-export const CLEAR_ERROR = "[Company] Clear error";
-export const LOGOUT = "[Company] LOGOUT";
+export const UPDATE_SINGLE_COMPANY = '[Company] Update single company';
+export const UPDATE_SINGLE_COMPANY_IN_DB = '[Company] Update single company in db';
+export const SET_ALL_COMPANIES = '[Company] Set All Companies';
+export const FETCH_ALL_COMPANIES = '[Company] Fetch All companies';
+export const FETCH_SINGLE_COMPANY = '[Company] Fetch Single company';
+export const COMPANY_OP_FAILURE = '[Company] Company operation failed';
+export const CLEAR_ERROR = '[Company] Clear error';
+export const LOGOUT = '[Company] LOGOUT';
 
 export type CompanyActions = FetchAllCompanies
                             | FetchSingleCompany
@@ -33,13 +33,13 @@ export class FetchAllCompanies implements Action {
 export class FetchSingleCompany implements Action {
   readonly type = FETCH_SINGLE_COMPANY;
 
-  constructor(public payload: string){}
+  constructor(public payload: string) {}
 }
 
 export class SetAllCompanies implements Action {
   readonly type = SET_ALL_COMPANIES;
 
-  constructor(public payload: Company[]){}
+  constructor(public payload: Company[]) {}
 }
 
 export class UpdateSingleCompany implements Action {
@@ -51,13 +51,18 @@ export class UpdateSingleCompany implements Action {
 export class UpdateSingleCompanyInDb implements Action {
   readonly type = UPDATE_SINGLE_COMPANY_IN_DB;
 
-  constructor(public payload: { company: Company, deleteImage: boolean }) {}
+  constructor(public payload: {
+    company: Company,
+    deleteImage: boolean,
+    password: string,
+    confirmPassword: string
+  }) {}
 }
 
 export class CompanyOpFailure implements Action {
   readonly type = COMPANY_OP_FAILURE;
 
-  constructor(public payload: any[]){}
+  constructor(public payload: any[]) {}
 }
 
 export class ClearError implements Action {

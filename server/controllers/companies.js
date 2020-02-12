@@ -50,15 +50,15 @@ const updateReqImagePath = req => {
   return false;
 };
 
-const getUpdateQuery = (req) => {
+const getUpdateQuery = async (req) => {
   let newImage = updateReqImagePath(req);
 
   // get an object with keys to delete from the company document (all keys that are null)
   const companyRemovableKeys = ['name', 'website', 'description', 'imagePath'];
   const nullKeys = getNullKeysForUpdate(req, companyRemovableKeys);
   if(req.query.removeImage === 'true' && !newImage) nullKeys.imagePath = ''; 
-  
-  return getBulkArrayForUpdate(req, nullKeys);
+
+  return await getBulkArrayForUpdate(req, nullKeys);
 };
 
 exports.updateCompany = async (req, res, next) => {
@@ -66,15 +66,17 @@ exports.updateCompany = async (req, res, next) => {
     if(validation.handleValidationRoutesErrors(req, res)) return;
     const nameExist = await validation.companyNameExistValidation(req.body.name, res, req.body._id);
     if(nameExist) return;
-       
-    const bulkRes = await Company.bulkWrite(getUpdateQuery(req));
+    const emailExist = await validation.userEmailExistValidation(
+          req.body.email, res, req.body._id);
+    if(emailExist){ return ; }
+    
+    const bulkRes = await Company.bulkWrite(await getUpdateQuery(req));
     if(!bulkRes.result.nMatched){
       throw new Error("trying to update a non exisitng company");
     }
-
     const updatedCompany = await Company.aggregate([
                 { "$match": { '_id':  mongoose.Types.ObjectId(req.body._id) } },
-                { "$project": { 'createdAt': 0, 'updatedAt': 0, '__v': 0 } }
+                { "$project": { 'createdAt': 0, 'updatedAt': 0, '__v': 0, 'password': 0 } }
               ]);
 
     res.status(201).json({

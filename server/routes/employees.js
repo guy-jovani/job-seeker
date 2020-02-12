@@ -9,13 +9,11 @@ const employeeController = require('../controllers/employees');
 
 router.get('/fetchAll', employeeController.getEmployees);
 router.get('/fetchSingle', employeeController.getEmployee);
-// router.post('/store', employeeController.postEmployee);
-// router.post('/delete', employeeController.deleteEmployee);
+
 router.post('/update', [
   body('email')
     .isEmail()
-    .withMessage('please provide a valid email')
-    .normalizeEmail(),
+    .withMessage('please provide a valid email'),
   body('firstName')
     .exists()
     .optional()
@@ -35,3 +33,11 @@ router.post('/update', [
 
 
 module.exports = router;
+
+
+
+
+
+
+// router.post('/store', employeeController.postEmployee);
+// router.post('/delete', employeeController.deleteEmployee);

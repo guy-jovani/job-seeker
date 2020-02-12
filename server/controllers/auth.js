@@ -53,7 +53,7 @@ exports.signup = async (req, res, next) => {
     await user.save();
 
     const token = getToken(user._id);
-
+    Reflect.deleteProperty(user, 'password');
     res.status(201).json({
       message: 'Signed up successfully!',
       type: 'success',
@@ -85,7 +85,7 @@ getUserLogin = async (req, res) => {
     kind = "company";
   }
   if(!user){ 
-    return loginEmailPassIncorrectMessage(res);
+    loginEmailPassIncorrectMessage(res);
   }
   return [user, kind];
 };

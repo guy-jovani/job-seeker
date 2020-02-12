@@ -1,5 +1,5 @@
 
-
+const bcrypt = require('bcryptjs');
 
 
 
@@ -14,8 +14,13 @@ exports.getNullKeysForUpdate = (req, removableKeys) => {
 };
 
 
-exports.getBulkArrayForUpdate = (req, nullKeys) => { 
+exports.getBulkArrayForUpdate = async (req, nullKeys) => { 
   let bulkArr = [];
+  if(req.body.password) {
+    const password = await bcrypt.hash(req.body.password, 12);
+    req.body.password = password;
+  }
+
   bulkArr.push({ updateOne: { // updating the fields
     filter: { _id: req.body._id },
     update: { $set: { ...req.body } }
@@ -26,6 +31,7 @@ exports.getBulkArrayForUpdate = (req, nullKeys) => {
       update: { $unset: { ...nullKeys } } 
     }})
   }
+  
   return bulkArr;
 }
 

@@ -17,18 +17,15 @@ import { mimeType } from './mime-type.validator';
   styleUrls: ['./edit-company.component.css']
 })
 export class EditCompanyComponent implements OnInit, OnDestroy {
-  // edit: boolean;
-  // index: number;
   errorMessages: string[];
   authState: Subscription;
-  // user: Company;
   company: Company;
   imagePreview: string;
   companyForm: FormGroup;
   isLoading = false;
+  showPasswords = false;
 
   @ViewChild('name', {static: true, read: ElementRef}) nameInput: ElementRef;
-  // @ViewChild('image', {static: true, read: ElementRef}) imageInput: ElementRef;
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -39,10 +36,15 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.companyForm = new FormGroup({
       name: new FormControl(null, [Validators.required]),
+      email: new FormControl(null, [Validators.required, Validators.email]),
       description: new FormControl(null),
       website: new FormControl(null),
       image: new FormControl(null, { asyncValidators : [mimeType]}),
       deleteImage: new FormControl(false),
+      passwords: new FormGroup({
+        password: new FormControl(null, [Validators.minLength(3)]),
+        confirmPassword: new FormControl(null, [])
+      }, this.checkPasswordEquality)
     });
 
     this.authState = this.store.select('auth').pipe(
@@ -65,17 +67,29 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
       });
   }
 
+  checkPasswordEquality(control: FormControl): {[s: string]: boolean} {
+    if (control.get('password').value !== control.get('confirmPassword').value) {
+      return { equality: true };
+    }
+    return null;
+  }
+
   initForm() {
     this.companyForm.setValue({
       name: this.company.name,
+      email: this.company.email,
       description: this.company.description || '',
       website: this.company.website || '',
       image: this.company.imagePath || '',
+      passwords: {
+        password: '',
+        confirmPassword: '',
+      },
       deleteImage: false,
     });
   }
 
-  handleImageInput(event: Event){
+  handleImageInput(event: Event) {
     const file = (event.target as HTMLInputElement).files[0];
     if (file) {
       this.companyForm.patchValue({ image: file });
@@ -89,18 +103,21 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    const name = this.companyForm.value.name;
-    const deleteImage = this.companyForm.value.deleteImage;
-    const description = this.companyForm.value.description ? this.companyForm.value.description : undefined;
-    const website = this.companyForm.value.website ? this.companyForm.value.website : undefined;
-    const newCompany = new Company({name});
-    if (description) { newCompany.description = description; }
-    if (website) { newCompany.website = website; }
-    if (this.companyForm.value.image) {
-      newCompany.imagePath = this.companyForm.value.image;
+    const formValue = this.companyForm.value;
+    const name = formValue.name;
+    const email = formValue.email;
+    const deleteImage = formValue.deleteImage;
+    const password = formValue.passwords.password ? formValue.passwords.password : undefined;
+    const confirmPassword = formValue.passwords.confirmPassword ? formValue.passwords.confirmPassword : undefined;
+    const newCompany = new Company({name, email});
+    if (formValue.description) { newCompany.description = formValue.description; }
+    if (formValue.website) { newCompany.website = formValue.website; }
+    if (formValue.image) {
+      newCompany.imagePath = formValue.image;
     }
     newCompany._id = this.company._id;
-    this.store.dispatch(new CompanyActions.UpdateSingleCompanyInDb({ company: newCompany, deleteImage }));
+    this.store.dispatch(new CompanyActions.UpdateSingleCompanyInDb({
+      company: newCompany, deleteImage, password, confirmPassword }));
   }
 
   onCancel() {
@@ -125,5 +142,9 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
 
   onClose() {
     this.store.dispatch(new CompanyActions.ClearError());
+  }
+
+  onTogglePasswords() {
+    this.showPasswords = !this.showPasswords;
   }
 }

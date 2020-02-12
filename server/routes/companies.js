@@ -14,8 +14,21 @@ router.get('/fetchSingle', companyController.getCompany);
 router.post('/update', extractImage,
   [
     body('name')
-    .exists()
-      .withMessage('the "name" field is a required one')
+      .exists()
+      .withMessage('the "name" field is a required one'),
+    body('email')
+      .isEmail()
+      .withMessage('please provide a valid email'),
+    body('password')
+      .optional()
+      .isLength(3)
+      .withMessage('The password need to be more than 3 characters long.'),
+    body('confirmPassword').custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error('Password confirmation does not match password');
+      }
+      return true;
+    })
   ], 
   companyController.updateCompany);
   
