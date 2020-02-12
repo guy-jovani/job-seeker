@@ -10,9 +10,7 @@ exports.userEmailExistValidation = async (email, res, _id = null) => {
   const company = await Company.findOne({ _id: { $ne: _id }, email: email });
   if(employee || company){
     res.status(422).json({
-      errors: [{
-        msg: 'You can not use this email address, please provide a different one'
-      }],
+      messages: ['You can not use this email address, please provide a different one'],
       type: 'failure'
     });
     return true;
@@ -24,9 +22,7 @@ exports.companyNameExistValidation = async (name, res, _id = null) => {
   const company = await Company.findOne({ _id: { $ne: _id }, name: name });
   if(company){
     res.status(422).json({
-      errors: [{
-        msg: 'A company with this name already exist, please provide a different one'
-      }],
+      messages: ['A company with this name already exist, please provide a different one'],
       type: 'failure'
     });
     return true;
@@ -38,9 +34,13 @@ exports.companyNameExistValidation = async (name, res, _id = null) => {
 exports.handleValidationRoutesErrors = ( req, res ) => {
   const reqErrors = validationResult(req);
   if(!reqErrors.isEmpty()){
+    let messages = reqErrors.errors.reduce((prev, curr) => {
+      prev.push(curr['msg']);
+      return prev;
+    }, []);
     res.status(422).json({
       type: 'failure',
-      errors: reqErrors.errors
+      messages
     });
     return true;
   }

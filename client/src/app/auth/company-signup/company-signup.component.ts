@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as fromApp from '../../store/app.reducer';
 import * as AuthActions from '../store/auth.actions';
 import { Store } from '@ngrx/store';
@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
   templateUrl: '../signup/signup.component.html',
   styleUrls: ['./company-signup.component.css']
 })
-export class CompanySignupComponent implements OnInit {
+export class CompanySignupComponent implements OnInit, OnDestroy {
   showPasswords = false;
   authForm: FormGroup;
   errorSub: Subscription;
@@ -25,9 +25,9 @@ export class CompanySignupComponent implements OnInit {
       .subscribe(
         authState => {
           this.isLoading = authState.loading;
-          if(authState.messages){
-            for(let msg of authState.messages){
-              this.errorMessages.push(msg)
+          if (authState.messages) {
+            for (const msg of authState.messages) {
+              this.errorMessages.push(msg);
             }
           } else {
             this.errorMessages = [];
@@ -36,23 +36,23 @@ export class CompanySignupComponent implements OnInit {
       );
 
     this.authForm = new FormGroup({
-      'email': new FormControl(null, [Validators.required, Validators.email]),
-      'name': new FormControl(null, [Validators.required]),
-      'passwords': new FormGroup({
-        'password': new FormControl(null, [Validators.required, Validators.minLength(3)]),
-        'confirmPassword': new FormControl(null, [Validators.required])
+      email: new FormControl(null, [Validators.required, Validators.email]),
+      name: new FormControl(null, [Validators.required]),
+      passwords: new FormGroup({
+        password: new FormControl(null, [Validators.required, Validators.minLength(3)]),
+        confirmPassword: new FormControl(null, [Validators.required])
       }, this.checkPasswordEquality)
     });
   }
 
-  checkPasswordEquality(control: FormControl) : {[s: string] : boolean}{
-    if(control.get('password').value !== control.get('confirmPassword').value){
-      return { equality: true }
+  checkPasswordEquality(control: FormControl): {[s: string]: boolean} {
+    if (control.get('password').value !== control.get('confirmPassword').value) {
+      return { equality: true };
     }
     return null;
   }
 
-  onSubmit(){
+  onSubmit() {
     const email = this.authForm.value.email;
     const name = this.authForm.value.name;
     const password = this.authForm.value.passwords.password;
@@ -62,17 +62,17 @@ export class CompanySignupComponent implements OnInit {
     }));
   }
 
-  onTogglePasswords(){
+  onTogglePasswords() {
     this.showPasswords = !this.showPasswords;
   }
 
-  ngOnDestroy(){
-    if(this.errorSub){
+  ngOnDestroy() {
+    if (this.errorSub) {
       this.errorSub.unsubscribe();
     }
   }
 
-  onClose(){
+  onClose() {
     this.store.dispatch(new AuthActions.ClearError());
   }
 }

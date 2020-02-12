@@ -19,7 +19,7 @@ import { EmployeesModule } from './employees/employees.module';
 import { CompanyModule } from './company/company.module';
 import { SharedModule } from './shared/shared.module';
 import { CoreModule } from './core.module';
-import { UserModule } from './shared/user.module';
+import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.modue';
 
 @NgModule({
@@ -39,7 +39,6 @@ import { AuthModule } from './auth/auth.modue';
     CompanyModule,
     SharedModule,
     CoreModule,
-    UserModule,
     AuthModule,
     UserModule,
     AppRoutingModule,

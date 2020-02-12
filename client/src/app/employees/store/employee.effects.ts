@@ -1,11 +1,10 @@
 import { Actions, ofType, Effect } from '@ngrx/effects';
 
-import { switchMap, withLatestFrom, map, catchError, tap } from 'rxjs/operators';
+import { switchMap, withLatestFrom, map, catchError } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import { Injectable } from '@angular/core';
 import { of } from 'rxjs';
-import { Router } from '@angular/router';
 
 import * as fromApp from '../../store/app.reducer';
 import * as EmployeeActions from './employee.actions';
@@ -15,33 +14,13 @@ import { environment } from '../../../environments/environment';
 
 const nodeServer = environment.nodeServer + 'employees/';
 
-const getErrorMessages = (errors: [{ [msg: string]: string }]) => {
-  const messages: any[] = [];
-  for (const err of errors) {
-    messages.push(err['msg']);
-  }
-  return messages;
-};
-
-const handleError = (errorRes: any) => {
-  let messages: any[] = [];
-  if (!errorRes.error || !errorRes.error.errors) {
-    messages = ['an unknown error occured'];
-  } else {
-    for (const err of errorRes.error.errors) {
-      messages.push(err['msg']);
-    }
-  }
-  return of(new EmployeeActions.EmployeeOpFailure(messages));
-};
 
 @Injectable()
 export class EmployeeEffects {
 
   constructor(private actions$: Actions,
               private http: HttpClient,
-              private store: Store<fromApp.AppState>,
-              private router: Router) {}
+              private store: Store<fromApp.AppState>) {}
 
 
   @Effect()
@@ -59,11 +38,11 @@ export class EmployeeEffects {
               this.store.dispatch(new EmployeeActions.ClearError());
               return new AuthActions.UpdateActiveUser({ user: {...res['employee']}, kind: 'employee' });
             } else {
-              return new AuthActions.AuthFailure(getErrorMessages(res['errors']));
+              return new AuthActions.AuthFailure(res['messages']);
             }
           }),
-          catchError(err => {
-            return handleError(err);
+          catchError(messages => {
+            return of(new EmployeeActions.EmployeeOpFailure(messages));
           })
         );
     })
@@ -82,11 +61,11 @@ export class EmployeeEffects {
             if (res['type'] === 'success') {
               return new EmployeeActions.SetAllEmployees(res['employees']);
             } else {
-              return new EmployeeActions.EmployeeOpFailure(getErrorMessages(res['errors']));
+              return new EmployeeActions.EmployeeOpFailure(res['messages']);
             }
           }),
-          catchError(err => {
-            return handleError(err);
+          catchError(messages => {
+            return of(new EmployeeActions.EmployeeOpFailure(messages));
           })
         );
     })
@@ -105,11 +84,11 @@ export class EmployeeEffects {
             if (res['type'] === 'success') {
               return new EmployeeActions.UpdateSingleEmployee({...res['employee']});
             } else {
-              return new EmployeeActions.EmployeeOpFailure(getErrorMessages(res['errors']));
+              return new EmployeeActions.EmployeeOpFailure(res['messages']);
             }
           }),
-          catchError(err => {
-            return handleError(err);
+          catchError(messages => {
+            return of(new EmployeeActions.EmployeeOpFailure(messages));
           })
         );
     })

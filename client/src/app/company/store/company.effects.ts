@@ -1,8 +1,7 @@
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Injectable } from '@angular/core';
 import { of } from 'rxjs';
-import { switchMap, map, catchError, tap, withLatestFrom } from 'rxjs/operators';
-import { Router, ActivatedRoute } from '@angular/router';
+import { switchMap, map, catchError, withLatestFrom } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 
@@ -11,42 +10,20 @@ import * as CompanyActions from './company.actions';
 import { environment } from '../../../environments/environment';
 import * as fromApp from '../../store/app.reducer';
 import * as AuthActions from '../../auth/store/auth.actions';
-import { Company } from '../company.model';
 
 const nodeServer = environment.nodeServer + 'companies/';
 
-const getErrorMessages = (errors: [{ [msg: string]: string }]) => {
-  const messages: any[] = [];
-  for (const err of errors) {
-    messages.push(err['msg']);
-  }
-  return messages;
-};
-
-const handleError = (errorRes: any) => {
-  let messages: any[] = [];
-  if (!errorRes.error || !errorRes.error.errors) {
-    messages = ['an unknown error occured'];
-  } else {
-    for (const err of errorRes.error.errors) {
-      messages.push(err['msg']);
-    }
-  }
-  return of(new CompanyActions.CompanyOpFailure(messages));
-};
 
 @Injectable()
 export class CompanyEffects {
 
   constructor(private actions$: Actions,
-              private router: Router,
-              private route: ActivatedRoute,
               private http: HttpClient,
               private store: Store<fromApp.AppState>) {}
 
 
   @Effect()
-  updateSingle = this.actions$.pipe(
+  updateActiveCompany = this.actions$.pipe(
     ofType(CompanyActions.UPDATE_SINGLE_COMPANY_IN_DB),
     switchMap((actionData) => {
       const companyData = new FormData();
@@ -64,11 +41,11 @@ export class CompanyEffects {
               this.store.dispatch(new CompanyActions.ClearError());
               return new AuthActions.UpdateActiveUser({ user: {...res['company']}, kind: 'company' });
             } else {
-              return new AuthActions.AuthFailure(getErrorMessages(res['errors']));
+              return new AuthActions.AuthFailure(res['messages']);
             }
           }),
-          catchError(err => {
-            return handleError(err);
+          catchError(messages => {
+            return of(new CompanyActions.CompanyOpFailure(messages));
           })
         );
       }
@@ -88,11 +65,11 @@ export class CompanyEffects {
           if (res['type'] === 'success') {
             return new CompanyActions.SetAllCompanies(res['companies']);
           } else {
-            return new CompanyActions.CompanyOpFailure(getErrorMessages(res['errors']));
+            return new CompanyActions.CompanyOpFailure(res['messages']);
           }
         }),
-        catchError(err => {
-          return handleError(err);
+        catchError(messages => {
+          return of(new CompanyActions.CompanyOpFailure(messages));
         })
       );
     })
@@ -112,11 +89,11 @@ export class CompanyEffects {
           if (res['type'] === 'success') {
             return new CompanyActions.UpdateSingleCompany({company: res['company']});
           } else {
-            return new CompanyActions.CompanyOpFailure(getErrorMessages(res['errors']));
+            return new CompanyActions.CompanyOpFailure(res['messages']);
           }
         }),
-        catchError(err => {
-          return handleError(err);
+        catchError(messages => {
+          return of(new CompanyActions.CompanyOpFailure(messages));
         })
       );
     })

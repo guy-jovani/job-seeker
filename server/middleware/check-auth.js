@@ -15,9 +15,7 @@ module.exports = (req, res, next) => {
   } catch (error) {
     if ( error.name === 'TokenExpiredError' ) {
       res.status(401).json({
-        errors: [{
-          msg: 'Only logged in users can do that.'
-        }],
+        messages: ['Only logged in users can do that.'],
         type: 'failure'
       });
     } else {

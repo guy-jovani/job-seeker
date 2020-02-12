@@ -19,6 +19,7 @@ export class SignupComponent implements OnInit, OnDestroy {
   errorSub: Subscription;
   errorMessages: string[] = [];
   isLoading = false;
+  companySignup = false;
 
   constructor(private store: Store<fromApp.AppState>) { }
 
@@ -27,9 +28,9 @@ export class SignupComponent implements OnInit, OnDestroy {
       .subscribe(
         authState => {
           this.isLoading = authState.loading;
-          if(authState.messages){
-            for(let msg of authState.messages){
-              this.errorMessages.push(msg)
+          if (authState.messages) {
+            for (const msg of authState.messages) {
+              this.errorMessages.push(msg);
             }
           } else {
             this.errorMessages = [];
@@ -38,40 +39,40 @@ export class SignupComponent implements OnInit, OnDestroy {
       );
 
     this.authForm = new FormGroup({
-      'email': new FormControl(null, [Validators.required, Validators.email]),
-      'passwords': new FormGroup({
-        'password': new FormControl(null, [Validators.required, Validators.minLength(3)]),
-        'confirmPassword': new FormControl(null, [Validators.required])
+      email: new FormControl(null, [Validators.required, Validators.email]),
+      passwords: new FormGroup({
+        password: new FormControl(null, [Validators.required, Validators.minLength(3)]),
+        confirmPassword: new FormControl(null, [Validators.required])
       }, this.checkPasswordEquality)
     });
   }
 
-  checkPasswordEquality(control: FormControl) : {[s: string] : boolean}{
-    if(control.get('password').value !== control.get('confirmPassword').value){
-      return { equality: true }
+  checkPasswordEquality(control: FormControl): {[s: string]: boolean} {
+    if (control.get('password').value !== control.get('confirmPassword').value) {
+      return { equality: true };
     }
     return null;
   }
 
 
-  onSubmit(){
+  onSubmit() {
     const email = this.authForm.value.email;
     const password = this.authForm.value.passwords.password;
     const confirmPassword = this.authForm.value.passwords.confirmPassword;
     this.store.dispatch(new AuthActions.SignupAttempt({email, password, confirmPassword}));
   }
 
-  onTogglePasswords(){
+  onTogglePasswords() {
     this.showPasswords = !this.showPasswords;
   }
 
-  ngOnDestroy(){
-    if(this.errorSub){
+  ngOnDestroy() {
+    if (this.errorSub) {
       this.errorSub.unsubscribe();
     }
   }
 
-  onClose(){
+  onClose() {
     this.store.dispatch(new AuthActions.ClearError());
   }
 }

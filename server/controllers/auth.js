@@ -70,9 +70,7 @@ exports.signup = async (req, res, next) => {
 
 loginEmailPassIncorrectMessage = (res) => {
   res.status(401).json({
-    errors: [{
-      msg: 'The email and/or password are incorrect'
-    }],
+    messages: ['The email and/or password are incorrect'],
     type: 'failure'
   });
 }
@@ -132,9 +130,7 @@ exports.resetPasswordEmail = async (req, res, next) => {
                     await Company.findOne({ email: req.body.email });
       if (!user) {
         return res.status(401).json({
-          errors: [{
-            msg: 'No account with that email found.'
-          }],
+          messages: ['No account with that email found.'],
           type: 'failure'
         });
       }   
@@ -172,9 +168,7 @@ exports.resetToNewPassword = async (req, res, next) => {
 
     if (!user) {
       return res.status(401).json({
-        errors: [{
-          msg: 'Invalid Token.'
-        }],
+        messages: ['Invalid Token.'],
         type: 'failure'
       });
     }

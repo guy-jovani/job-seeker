@@ -50,7 +50,7 @@ app.use((error, req, res, next) => {
     // errors: [{
     //   msg: 'An unknown error occured'
     // }],
-    errors: error.errors,
+    messages: error.messages,
     type: 'failure'
   });
 });

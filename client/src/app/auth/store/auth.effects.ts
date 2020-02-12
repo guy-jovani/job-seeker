@@ -16,26 +16,6 @@ import { Employee } from 'app/employees/employee.model';
 
 const nodeServer = environment.nodeServer + 'auth/';
 
-const handleError = (errorRes: any) => {
-  let messages: any[] = [];
-  if (!errorRes.error || !errorRes.error.errors) {
-    messages = ['an unknown error occured'];
-  } else {
-    for (const err of errorRes.error.errors) {
-      messages.push(err['msg']);
-    }
-  }
-  return of(new AuthActions.AuthFailure(messages));
-};
-
-const getErrorMessages = (errors: [{ [msg: string]: string }]) => {
-  const messages: any[] = [];
-  for (const err of errors) {
-    messages.push(err['msg']);
-  }
-  return messages;
-};
-
 const setLocalStorage = (user: Company | Employee,
                          kind: string = null,
                          token: string = null,
@@ -87,8 +67,8 @@ export class AuthEffects {
         })
         .pipe(
           map(this.signupLoginHandler),
-          catchError(err => {
-            return handleError(err);
+          catchError(messages => {
+            return of(new AuthActions.AuthFailure(messages));
           })
         );
     })
@@ -105,8 +85,8 @@ export class AuthEffects {
         })
         .pipe(
           map(this.signupLoginHandler),
-          catchError(err => {
-            return handleError(err);
+          catchError(messages => {
+            return of(new AuthActions.AuthFailure(messages));
           })
         );
     })
@@ -134,8 +114,8 @@ export class AuthEffects {
       this.autoLogout(expirationSeconds);
       return new AuthActions.AuthSuccess({ user, redirect: false, kind, token });
     }),
-    catchError(err => {
-      return handleError(err);
+    catchError(messages => {
+      return of(new AuthActions.AuthFailure(messages));
     })
   );
 
@@ -147,8 +127,8 @@ export class AuthEffects {
       clearTimeout(this.tokenTimer);
       this.router.navigate(['/login']);
     }),
-    catchError(err => {
-      return handleError(err);
+    catchError(messages => {
+      return of(new AuthActions.AuthFailure(messages));
     })
   );
 
@@ -184,11 +164,11 @@ export class AuthEffects {
             if (res['type'] === 'success') {
               return new AuthActions.ResetPassEmailSuccess();
             } else {
-              return new AuthActions.AuthFailure(getErrorMessages(res['errors']));
+              return new AuthActions.AuthFailure(res['messages']);
             }
           }),
-          catchError(err => {
-            return handleError(err);
+          catchError(messages => {
+            return of(new AuthActions.AuthFailure(messages));
           })
         );
     })
@@ -209,11 +189,11 @@ export class AuthEffects {
             if (res['type'] === 'success') {
               return new AuthActions.ResetPassSuccess();
             } else {
-              return new AuthActions.AuthFailure(getErrorMessages(res['errors']));
+              return new AuthActions.AuthFailure(res['messages']);
             }
           }),
-          catchError(err => {
-            return handleError(err);
+          catchError(messages => {
+            return of(new AuthActions.AuthFailure(messages));
           })
         );
     })
@@ -232,7 +212,7 @@ export class AuthEffects {
       return new AuthActions.AuthSuccess({
         user: res['user'], redirect: true, kind: res['kind'], token: res['token'] });
     } else {
-      return new AuthActions.AuthFailure(getErrorMessages(res['errors']));
+      return new AuthActions.AuthFailure(res['messages']);
     }
   }
 
