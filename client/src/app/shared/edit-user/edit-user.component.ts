@@ -17,12 +17,12 @@ export class EditUserComponent implements OnInit {
 
   ngOnInit() {
     this.authSubscription = this.store.select('auth').subscribe(authState => {
-      this.userEmployee = authState.kind === "employee";
+      this.userEmployee = authState.kind === 'employee';
     })
   }
 
-  ngOnDestroy(){
-    if(this.authSubscription){
+  ngOnDestroy() {
+    if (this.authSubscription) {
       this.authSubscription.unsubscribe();
     }
   }
