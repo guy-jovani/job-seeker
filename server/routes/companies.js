@@ -20,6 +20,7 @@ router.post('/update', extractImage,
       .isEmail()
       .withMessage('please provide a valid email'),
     body('password')
+      .exists()
       .optional()
       .isLength(3)
       .withMessage('The password need to be more than 3 characters long.'),

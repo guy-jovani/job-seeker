@@ -34,12 +34,11 @@ exports.getEmployees = async (req, res, next) => {
 };
 
 
-const getUpdateQuery = (req) => {
+const getUpdateQuery = async (req) => {
   const employeeRemovableKeys = ['firstName', 'lastName']; 
   const nullKeys = getNullKeysForUpdate(req, employeeRemovableKeys);
-  return getBulkArrayForUpdate(req, nullKeys);
+  return await getBulkArrayForUpdate(req, nullKeys);
 };
-
 
 exports.updateEmployee = async (req, res, next) => {
   try {
@@ -49,7 +48,7 @@ exports.updateEmployee = async (req, res, next) => {
                     req.body.email, res, req.body._id);
     if(emailExist){ return ; }
     
-    const bulkRes = await Employee.bulkWrite(getUpdateQuery(req));
+    const bulkRes = await Employee.bulkWrite(await getUpdateQuery(req));
     if(!bulkRes.result.nMatched){
       throw new Error("trying to update a non exisitng employee");
     }

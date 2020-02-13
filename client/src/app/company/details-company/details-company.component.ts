@@ -17,9 +17,7 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy {
   authSub: Subscription;
   routeSub: Subscription;
   company: Company;
-  // index: number;
   allowEdit: boolean;
-  // user: Company;
   isLoading = false;
 
   constructor(private store: Store<fromApp.AppState>,

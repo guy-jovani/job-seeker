@@ -26,11 +26,15 @@ export class EmployeeEffects {
   @Effect()
   updateActiveEmployee = this.actions$.pipe(
     ofType(EmployeeActions.UPDATE_SINGLE_EMPLOYEE_IN_DB),
-    switchMap((actionData: { payload: Employee }) => {
-      return this.http.post(nodeServer  + 'update',
-        {
-          ...actionData['payload']
-        })
+    switchMap((actionData: { employee: Employee, password: string, confirmPassword: string}) => {
+      const employee = {
+        ...actionData['payload']['employee']
+      };
+      if (actionData['payload']['password']) {
+        employee['password'] = actionData['payload']['password'];
+        employee['confirmPassword'] = actionData['payload']['confirmPassword'];
+      };
+      return this.http.post(nodeServer  + 'update', employee)
         .pipe(
           map(res => {
             // const employee = new Employee({...res['employee']});

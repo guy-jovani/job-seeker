@@ -39,12 +39,12 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
           return this.store.select('employee');
         }),
         switchMap(employeeState => {
-          this.isLoading = employeeState.loadingSingle;
           if (this.index && (this.index >= employeeState.employees.length || this.index < 0)) {
             // check if trying to get details of an undefined employee
             this.router.navigate(['employees']);
           }
           if (this.index >= 0) {
+            this.isLoading = employeeState.loadingSingle;
             this.employee = employeeState.employees[this.index];
             this.allowEdit = false;
           }

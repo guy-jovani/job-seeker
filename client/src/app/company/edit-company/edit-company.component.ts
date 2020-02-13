@@ -25,7 +25,7 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
   isLoading = false;
   showPasswords = false;
 
-  @ViewChild('name', {static: true, read: ElementRef}) nameInput: ElementRef;
+  // @ViewChild('name', {static: true, read: ElementRef}) nameInput: ElementRef;
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -109,13 +109,12 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
     const deleteImage = formValue.deleteImage;
     const password = formValue.passwords.password ? formValue.passwords.password : undefined;
     const confirmPassword = formValue.passwords.confirmPassword ? formValue.passwords.confirmPassword : undefined;
-    const newCompany = new Company({name, email});
+    const newCompany = new Company({_id: this.company._id, name, email});
     if (formValue.description) { newCompany.description = formValue.description; }
     if (formValue.website) { newCompany.website = formValue.website; }
     if (formValue.image) {
       newCompany.imagePath = formValue.image;
     }
-    newCompany._id = this.company._id;
     this.store.dispatch(new CompanyActions.UpdateSingleCompanyInDb({
       company: newCompany, deleteImage, password, confirmPassword }));
   }
