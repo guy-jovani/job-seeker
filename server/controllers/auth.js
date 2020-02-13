@@ -47,6 +47,10 @@ exports.signup = async (req, res, next) => {
     if(handleValidationRoutesErrors(req, res)) return;
     const emailExist = await validation.userEmailExistValidation(req.body.email, res);
     if(emailExist){ return; }
+    if(req.body.name) {
+      const nameExist = await validation.companyNameExistValidation(req.body.name, res);
+      if(nameExist) return;
+    }
 
     const password = await bcrypt.hash(req.body.password, 12);
     let [user, kind] = getUserSignup(req, password);

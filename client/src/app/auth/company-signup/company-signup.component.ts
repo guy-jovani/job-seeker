@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-company-signup',
-  templateUrl: '../signup/signup.component.html',
+  templateUrl: '../auth.component.html',
   styleUrls: ['./company-signup.component.css']
 })
 export class CompanySignupComponent implements OnInit, OnDestroy {
@@ -17,6 +17,7 @@ export class CompanySignupComponent implements OnInit, OnDestroy {
   errorMessages: string[] = [];
   companySignup = true;
   isLoading = false;
+  authAction = 'companySignup';
 
   constructor(private store: Store<fromApp.AppState>) {}
 

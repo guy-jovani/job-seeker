@@ -8,15 +8,16 @@ import * as AuthActions from '../store/auth.actions';
 
 @Component({
   selector: 'app-login',
-  templateUrl: './login.component.html',
+  templateUrl: '../auth.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit, OnDestroy {
-  showPassword = false;
+  showPasswords = false;
   authForm: FormGroup;
   errorSub: Subscription;
   errorMessages: string[] = [];
   isLoading = false;
+  authAction = 'login';
 
   constructor(private store: Store<fromApp.AppState>) { }
 
@@ -37,18 +38,20 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     this.authForm = new FormGroup({
       email: new FormControl(null, [Validators.required, Validators.email]),
-      password: new FormControl(null, [Validators.required, Validators.minLength(3)])
+      passwords: new FormGroup({
+        password: new FormControl(null, [Validators.required, Validators.minLength(3)])
+      })
     });
   }
 
   onSubmit() {
     const email = this.authForm.value.email;
-    const password = this.authForm.value.password;
+    const password = this.authForm.value.passwords.password;
     this.store.dispatch(new AuthActions.LoginAttempt({email, password}));
   }
 
-  onTogglePassword() {
-    this.showPassword = !this.showPassword;
+  onTogglePasswords() {
+    this.showPasswords = !this.showPasswords;
   }
 
   ngOnDestroy() {

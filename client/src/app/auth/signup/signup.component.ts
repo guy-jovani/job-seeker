@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-signup',
-  templateUrl: './signup.component.html',
+  templateUrl: '../auth.component.html',
   styleUrls: ['./signup.component.css']
 })
 export class SignupComponent implements OnInit, OnDestroy {
@@ -20,6 +20,7 @@ export class SignupComponent implements OnInit, OnDestroy {
   errorMessages: string[] = [];
   isLoading = false;
   companySignup = false;
+  authAction = 'signup';
 
   constructor(private store: Store<fromApp.AppState>) { }
 
