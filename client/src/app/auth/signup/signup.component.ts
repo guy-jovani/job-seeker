@@ -7,6 +7,8 @@ import { Store } from '@ngrx/store';
 import * as fromApp from '../../store/app.reducer';
 import * as AuthActions from '../store/auth.actions';
 import { Subscription } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-signup',
@@ -22,11 +24,17 @@ export class SignupComponent implements OnInit, OnDestroy {
   companySignup = false;
   authAction = 'signup';
 
-  constructor(private store: Store<fromApp.AppState>) { }
+  constructor(private store: Store<fromApp.AppState>,
+              private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.errorSub = this.store.select('auth')
-      .subscribe(
+    this.errorSub = this.route.data.pipe(
+      switchMap(val => {
+        console.log(val);
+        this.authAction = val.companySignup ? 'companySignup' : 'signup';
+        return this.store.select('auth');
+      })
+    ).subscribe(
         authState => {
           this.isLoading = authState.loading;
           if (authState.messages) {
@@ -37,7 +45,7 @@ export class SignupComponent implements OnInit, OnDestroy {
             this.errorMessages = [];
           }
         }
-      );
+    );
 
     this.authForm = new FormGroup({
       email: new FormControl(null, [Validators.required, Validators.email]),
@@ -46,6 +54,10 @@ export class SignupComponent implements OnInit, OnDestroy {
         confirmPassword: new FormControl(null, [Validators.required])
       }, this.checkPasswordEquality)
     });
+
+    if (this.authAction === 'companySignup') {
+      this.authForm.addControl('name', new FormControl(null, [Validators.required]));
+    }
   }
 
   checkPasswordEquality(control: FormControl): {[s: string]: boolean} {
@@ -60,7 +72,11 @@ export class SignupComponent implements OnInit, OnDestroy {
     const email = this.authForm.value.email;
     const password = this.authForm.value.passwords.password;
     const confirmPassword = this.authForm.value.passwords.confirmPassword;
-    this.store.dispatch(new AuthActions.SignupAttempt({email, password, confirmPassword}));
+    let name;
+    if (this.authAction === 'companySignup') {
+      name = this.authForm.value.name;
+    }
+    this.store.dispatch(new AuthActions.SignupAttempt({email, password, confirmPassword, name}));
   }
 
   onTogglePasswords() {

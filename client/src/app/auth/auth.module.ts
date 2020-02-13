@@ -2,7 +2,6 @@
 
 import { NgModule } from '@angular/core';
 
-import { CompanySignupComponent } from './company-signup/company-signup.component';
 import { SignupComponent } from './signup/signup.component';
 import { LoginComponent } from './login/login.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
@@ -17,7 +16,6 @@ import { AuthRoutingModule } from './auth-routing.module';
 
 @NgModule({
   declarations: [
-    CompanySignupComponent,
     SignupComponent,
     LoginComponent,
     ResetPasswordComponent,

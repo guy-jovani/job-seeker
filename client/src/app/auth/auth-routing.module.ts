@@ -4,7 +4,6 @@ import { NgModule } from '@angular/core';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { SignupComponent } from './signup/signup.component';
 import { GetNewPasswordComponent } from './reset-password/get-new-password/get-new-password.component';
-import { CompanySignupComponent } from './company-signup/company-signup.component';
 import { LoginComponent } from './login/login.component';
 
 
@@ -18,13 +17,13 @@ const routes: Routes = [
     path: 'reset', component: ResetPasswordComponent,
   },
   {
-    path: 'signup', component: SignupComponent
+    path: 'signup', component: SignupComponent, data : {companySignup : false}
   },
   {
     path: 'reset-password/:token', component: GetNewPasswordComponent
   },
   {
-    path: 'signup/company', component: CompanySignupComponent
+    path: 'signup/company', component: SignupComponent, data : {companySignup : true}
   },
 ];
 

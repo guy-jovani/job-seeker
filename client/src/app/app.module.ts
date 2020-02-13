@@ -20,7 +20,7 @@ import { CompanyModule } from './company/company.module';
 import { SharedModule } from './shared/shared.module';
 import { CoreModule } from './core.module';
 import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.modue';
+import { AuthModule } from './auth/auth.module';
 
 @NgModule({
   declarations: [
