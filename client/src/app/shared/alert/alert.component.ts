@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-alert',
@@ -7,9 +7,13 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 })
 export class AlertComponent {
   @Input() messages: string[];
-  @Output() close = new EventEmitter<void>();
+  @Output() closeAlert = new EventEmitter<void>();
 
-  onClose(){
-    this.close.emit();
+  onClose() {
+    this.closeAlert.emit();
+  }
+
+  @HostListener('document:keypress') enterKeyPress(eventData: Event) { // depracated and needs to be replaced
+    this.onClose();
   }
 }

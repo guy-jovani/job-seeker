@@ -1,7 +1,7 @@
 
 <div class="container">
   <h4>{{ authAction !== 'login' ? "Signup" : "Login"}}</h4>
-  <app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (close)="onClose()"></app-alert>
+  <app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert>
   <div *ngIf="isLoading" style="text-align: center;">
     <app-loading-spinner></app-loading-spinner>
   </div>

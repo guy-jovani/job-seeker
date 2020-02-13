@@ -13,8 +13,6 @@ import { switchMap } from 'rxjs/operators';
   styleUrls: ['./details-company.component.css']
 })
 export class DetailsCompanyComponent implements OnInit, OnDestroy {
-  companySub: Subscription;
-  authSub: Subscription;
   routeSub: Subscription;
   company: Company;
   allowEdit: boolean;
@@ -52,12 +50,6 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.companySub) {
-      this.companySub.unsubscribe();
-    }
-    if (this.authSub) {
-      this.authSub.unsubscribe();
-    }
     if (this.routeSub) {
       this.routeSub.unsubscribe();
     }

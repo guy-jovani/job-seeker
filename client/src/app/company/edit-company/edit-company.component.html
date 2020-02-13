@@ -1,5 +1,5 @@
 
-<app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (close)="onClose()"></app-alert>
+<app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert>
 <div class="container">
   <h4>Edit</h4>
   <div *ngIf="isLoading">

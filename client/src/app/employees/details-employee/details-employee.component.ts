@@ -7,7 +7,6 @@ import { Subscription } from 'rxjs';
 import { Company } from 'app/company/company.model';
 import * as fromApp from '../../store/app.reducer';
 import { Employee } from '../employee.model';
-import * as EmployeeActions from '../store/employee.actions';
 
 @Component({
   selector: 'app-details-employee',
@@ -15,14 +14,10 @@ import * as EmployeeActions from '../store/employee.actions';
   styleUrls: ['./details-employee.component.css']
 })
 export class DetailsEmployeeComponent implements OnInit, OnDestroy {
-  index: number;
   employee: Employee;
-  storeSub: Subscription;
   routeSub: Subscription;
-  allowEdit: boolean; // only allow to edit if the current employee is the one logged in
-  companies: Company[];
+  allowEdit: boolean;
   isLoading = false;
-  errorMessages = [];
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -30,40 +25,35 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
     private router: Router) { }
 
   ngOnInit() {
+    let currUrl;
     this.routeSub = this.route.params
       .pipe(
-        map((params: Params) => {
-          this.index = +params['index'];
-        }),
         switchMap(() => {
-          return this.store.select('employee');
-        }),
-        switchMap(employeeState => {
-          if (this.index && (this.index >= employeeState.employees.length || this.index < 0)) {
-            // check if trying to get details of an undefined employee
-            this.router.navigate(['employees']);
+          currUrl = this.route.snapshot['_routerState'].url.substring(1).split('/');
+          if (currUrl[0] === 'my-details') {
+            return this.store.select('auth');
+          } else {
+            return this.store.select('employee');
           }
-          if (this.index >= 0) {
-            this.isLoading = employeeState.loadingSingle;
-            this.employee = employeeState.employees[this.index];
+        }))
+        .subscribe(currState => {
+          if (currUrl[0] === 'my-details') {
+            this.employee = currState['user'] as Employee;
+            this.allowEdit = true;
+          } else { // employee list details
+            this.isLoading = currState['loadingSingle'];
+            if (currUrl[1] >= currState['employees'].length || currUrl[1] < 0) {
+              // check if trying to get details of an undefined employee
+              return this.router.navigate(['employees']);
+            }
+            this.employee = currState['employees'][+currUrl[1]];
             this.allowEdit = false;
           }
-          return this.store.select('auth');
-        })
-      )
-      .subscribe(authState => {
-        if ( isNaN(this.index)) {
-          this.employee = authState.user as Employee;
-          this.allowEdit = true;
-        }
-      });
+        });
   }
 
 
   ngOnDestroy() {
-    if (this.storeSub) {
-      this.storeSub.unsubscribe();
-    }
     if (this.routeSub) {
       this.routeSub.unsubscribe();
     }
