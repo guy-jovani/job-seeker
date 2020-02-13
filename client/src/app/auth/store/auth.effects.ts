@@ -58,6 +58,7 @@ export class AuthEffects {
   signup = this.actions$.pipe(
     ofType(AuthActions.SIGNUP_ATTEMPT),
     switchMap(actionData => {
+      console.log(actionData)
       return this.http.put(nodeServer  + 'signup',
         {
           email: actionData['payload']['email'],
