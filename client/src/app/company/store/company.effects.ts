@@ -82,16 +82,17 @@ export class CompanyEffects {
   @Effect()
   fetchSingle = this.actions$.pipe(
     ofType(CompanyActions.FETCH_SINGLE_COMPANY),
-    switchMap(actionData => {
+    switchMap((actionData: CompanyActions.FetchSingleCompany) => {
       return this.http.get(nodeServer + 'fetchSingle', {
         params: {
-          _id: actionData['payload']
+          _id: actionData.payload._id
         }
       })
       .pipe(
         map(res => {
           if (res['type'] === 'success') {
-            return new CompanyActions.UpdateSingleCompany({company: res['company']});
+            return new CompanyActions.UpdateSingleCompany({
+                    company: res['company'], main: actionData.payload.main });
           } else {
             return new CompanyActions.CompanyOpFailure(res['messages']);
           }
@@ -108,43 +109,6 @@ export class CompanyEffects {
 
 
 
-
-
-
-  // @Effect()
-  // register = this.actions$.pipe(
-  //   ofType(CompanyActions.STORE_COMPANY_IN_DB),
-  //   switchMap(actionData => {
-  //     const companyData = new FormData();
-  //     Object.keys(actionData['payload']).forEach(key => {
-  //       companyData.append(key, actionData['payload'][key]);
-  //     });
-  //     return this.http.post(nodeServer + 'register', companyData)
-  //       .pipe(
-  //         map(res => {
-  //           if(res['type'] === 'success'){
-  //             // this.store.dispatch(new AuthActions.AddActiveEmployeeCompany(res['company']));
-  //             return new CompanyActions.SetSingleCompany({company: res['company'], redirect: true});
-  //           }
-  //         }),
-  //         catchError(err => {
-  //           return handleError(err);
-  //         })
-  //       );
-  //     }
-  //   )
-  // )
-
-    // @Effect({dispatch: false})
-  // redirect = this.actions$.pipe(
-  //   ofType(CompanyActions.UPDATE_SINGLE_COMPANY),
-  //   tap((actionData: CompanyActions.UpdateSingleCompany) => {
-  //     if(actionData.payload.redirect){
-  //       const currUrl = this.route.snapshot['_routerState'].url.substring(1).split("/");
-  //       this.router.navigate([currUrl[0]]);
-  //     }
-  //   })
-  // )
 
 
 

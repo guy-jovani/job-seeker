@@ -1,4 +1,5 @@
-import { Employee } from 'app/employees/employee.model';
+
+import { Position } from 'app/position/position.model';
 
 
 
@@ -13,9 +14,10 @@ export class Company {
   public description: string;
   public website: string;
   public imagePath: string;
-  public token?: string;
+  public positions: Position[];
+  public fetchedSingle?: boolean;
 
-  constructor(init?: Partial<Company>){
+  constructor(init?: Partial<Company>) {
     Object.assign(this, init);
   }
 

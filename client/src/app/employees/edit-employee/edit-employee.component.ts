@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgForm, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -17,13 +17,10 @@ import { Employee } from '../employee.model';
 })
 export class EditEmployeeComponent implements OnInit, OnDestroy {
   authState: Subscription;
-  errorMessages: string[];
   isLoading = false;
   employeeForm: FormGroup;
   employee: Employee;
   showPasswords = false;
-
-  // @ViewChild('email', {static: true, read: ElementRef}) emailInput: ElementRef;
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -49,17 +46,10 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
       }))
       .subscribe(
         employeeState => {
-          // this.emailInput.nativeElement.focus();
-          // this.emailInput.nativeElement.blur();
           this.isLoading = employeeState.loadingSingle;
-          if (employeeState.messages) {
-            for (const msg of employeeState.messages) {
-              this.errorMessages.push(msg);
-            }
-          } else {
-            this.errorMessages = [];
+          if (this.employee) {
+            this.initForm();
           }
-          this.initForm();
       });
   }
 
@@ -84,6 +74,9 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(form: NgForm) {
+    if (form.invalid) {
+      return this.store.dispatch(new EmployeeActions.EmployeeOpFailure(['The form is invalid']));
+    }
     const firstName = form.value.firstName ? form.value.firstName : undefined;
     const lastName = form.value.lastName ? form.value.lastName : undefined;
     const password = form.value.passwords.password ? form.value.passwords.password : undefined;
@@ -102,18 +95,10 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
     this.router.navigate(['../'], {relativeTo: this.route});
   }
 
-  onDelete() {
-    // this.store.dispatch(new EmployeeActions.DeleteEmployeeFromDB(this.index));
-  }
-
   ngOnDestroy() {
     if (this.authState) {
       this.authState.unsubscribe();
     }
-  }
-
-  onClose() {
-    this.store.dispatch(new EmployeeActions.ClearError());
   }
 
   onTogglePasswords() {

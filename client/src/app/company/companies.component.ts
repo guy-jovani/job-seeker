@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 
@@ -10,19 +10,19 @@ import * as CompanyActions from './store/company.actions';
   templateUrl: './companies.component.html',
   styleUrls: ['./companies.component.css']
 })
-export class CompaniesComponent implements OnInit {
+export class CompaniesComponent implements OnInit, OnDestroy {
   storeSubscription: Subscription;
   errorMessages: string[] = [];
 
   constructor(private store: Store<fromApp.AppState>) { }
 
-  ngOnInit(){
+  ngOnInit() {
     this.storeSubscription = this.store.select('company')
       .subscribe(
         companyState => {
-          if(companyState.messages){
-            for(let msg of companyState.messages){
-              this.errorMessages.push(msg)
+          if (companyState.messages) {
+            for (const msg of companyState.messages) {
+              this.errorMessages.push(msg);
             }
           } else {
             this.errorMessages = [];
@@ -31,13 +31,13 @@ export class CompaniesComponent implements OnInit {
       );
   }
 
-  ngOnDestroy(){
-    if(this.storeSubscription){
+  ngOnDestroy() {
+    if (this.storeSubscription) {
       this.storeSubscription.unsubscribe();
     }
   }
 
-  onClose(){
+  onClose() {
     this.store.dispatch(new CompanyActions.ClearError());
   }
 }

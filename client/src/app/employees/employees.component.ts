@@ -16,13 +16,13 @@ export class EmployeesComponent implements OnInit, OnDestroy {
 
   constructor(private store: Store<fromApp.AppState>) { }
 
-  ngOnInit(){
+  ngOnInit() {
     this.storeSubscription = this.store.select('employee')
       .subscribe(
         employeeState => {
-          if(employeeState.messages){
-            for(let msg of employeeState.messages){
-              this.errorMessages.push(msg)
+          if (employeeState.messages) {
+            for (const msg of employeeState.messages) {
+              this.errorMessages.push(msg);
             }
           } else {
             this.errorMessages = [];
@@ -31,13 +31,13 @@ export class EmployeesComponent implements OnInit, OnDestroy {
       );
   }
 
-  ngOnDestroy(){
-    if(this.storeSubscription){
+  ngOnDestroy() {
+    if (this.storeSubscription) {
       this.storeSubscription.unsubscribe();
     }
   }
 
-  onClose(){
+  onClose() {
     this.store.dispatch(new EmployeeActions.ClearError());
   }
 }

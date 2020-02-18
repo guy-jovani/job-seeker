@@ -1,10 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { map, switchMap } from 'rxjs/operators';
+import { ActivatedRoute, Router } from '@angular/router';
+import { switchMap } from 'rxjs/operators';
 
 import { Subscription } from 'rxjs';
-import { Company } from 'app/company/company.model';
 import * as fromApp from '../../store/app.reducer';
 import { Employee } from '../employee.model';
 

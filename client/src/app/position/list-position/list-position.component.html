@@ -1,0 +1,25 @@
+
+
+
+
+
+<div *ngIf="allowAdd">
+  <a class="btn btn-success" routerLink='create'>
+    Add Position
+  </a>
+</div>
+<div>
+  <div>
+    <ul class="list-group" *ngIf="positions.length">
+      <li
+        class="list-group-item"
+        *ngFor="let position of positions; let i=index">
+        <a routerLink='{{ companyPositions && companyPositions.length ? "position" : i}}'
+                      (click)='getPositioninfo(i)'>
+          <p>Title: {{ position.title }}</p>
+        </a>
+      </li>
+    </ul>
+    <p *ngIf="!positions.length">There are no open positions</p>
+  </div>
+</div>

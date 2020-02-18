@@ -6,6 +6,7 @@ import * as fromApp from '../../store/app.reducer';
 
 import * as CompanyActions from '../../company/store/company.actions';
 import * as EmployeeActions from '../../employees/store/employee.actions';
+import * as AuthActions from '../../auth/store/auth.actions';
 
 
 
@@ -23,6 +24,7 @@ export class DetailsUserComponent implements OnInit, OnDestroy {
   errorMessages: string[] = [];
   employeeErrors = false;
   companyErrors = false;
+  authErrors = false;
 
   constructor(private store: Store<fromApp.AppState>) { }
 
@@ -40,6 +42,7 @@ export class DetailsUserComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.authSubscription = this.store.select('auth').subscribe(authState => {
       this.userEmployee = authState.kind === 'employee';
+      this.authErrors = this.getErrorMessages(authState.messages);
     });
 
     this.authSubscription = this.store.select('company').subscribe(companyState => {
@@ -66,5 +69,6 @@ export class DetailsUserComponent implements OnInit, OnDestroy {
   onClose() {
     if (this.employeeErrors) { this.store.dispatch(new EmployeeActions.ClearError()); }
     if (this.companyErrors) { this.store.dispatch(new CompanyActions.ClearError()); }
+    if (this.authErrors) { this.store.dispatch(new AuthActions.ClearError()); }
   }
 }

@@ -1,0 +1,48 @@
+
+
+
+<div *ngIf="isLoading">
+  <app-loading-spinner></app-loading-spinner>
+</div>
+
+<div class="container" *ngIf="position && !isLoading">
+  <div class="row">
+    <h3>{{ position.title | titlecase }}</h3>
+    <app-back-button *ngIf='state !== "position"'></app-back-button>
+    <div>
+      <p *ngIf="!allowEdit">
+        <a routerLink='company' (click)="getCompanyinfo()"
+            *ngIf="companyLink; else companyNoLink">
+          comapny: {{ (position.companyId.name | titlecase) }}
+        </a>
+      </p>
+      <ng-template #companyNoLink>comapny: {{ (position.companyId.name | titlecase) }}</ng-template>
+      <p>description: {{ position.description || "------" }}</p>
+      <div>
+        <p>Requierments:</p>
+        <p *ngIf="!position.requirements.length">There are no prior requierments for this position</p>
+        <ul class="list-group" *ngIf="position.requirements.length">
+          <li class="list-group-item" *ngFor="let requirement of position.requirements">
+            <p>{{ requirement.skill | titlecase }}</p>
+            <p *ngIf="requirement.years">Expirience: {{ requirement.years }}+ years.</p>
+          </li>
+          </ul>
+      </div>
+      <hr>
+    </div>
+    <div class="row" *ngIf="allowEdit">
+      <a class="btn btn-primary btn-sm" routerLink='edit'>Edit position</a>
+    </div>
+  </div>
+  <hr>
+</div>
+
+
+
+
+
+
+
+
+
+

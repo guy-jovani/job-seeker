@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { DropdownDirective } from './dropdown.directive';
 import { AlertComponent } from './alert/alert.component';
 import { LoadingSpinnerComponent } from './loading-spinner/loading-spinner.component';
+import { BackButtonComponent } from './back-button/back-button.component';
 
 
 
@@ -14,6 +15,7 @@ import { LoadingSpinnerComponent } from './loading-spinner/loading-spinner.compo
     DropdownDirective,
     AlertComponent,
     LoadingSpinnerComponent,
+    BackButtonComponent,
   ],
   imports: [
     CommonModule
@@ -22,7 +24,8 @@ import { LoadingSpinnerComponent } from './loading-spinner/loading-spinner.compo
     DropdownDirective,
     AlertComponent,
     LoadingSpinnerComponent,
-    CommonModule
+    CommonModule,
+    BackButtonComponent
   ]
 })
 export class SharedModule {}

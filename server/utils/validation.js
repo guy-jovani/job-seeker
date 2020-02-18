@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator');
 
 const Employee = require('../models/employee');
 const Company = require('../models/company');
+const Position = require('../models/position');
 
 
 exports.userEmailExistValidation = async (email, res, _id = null) => {
@@ -10,7 +11,7 @@ exports.userEmailExistValidation = async (email, res, _id = null) => {
   const company = await Company.findOne({ _id: { $ne: _id }, email: email });
   if(employee || company){
     res.status(422).json({
-      messages: ['You can not use this email address, please provide a different one'],
+      messages: ['This email address is already in use, please provide a different one'],
       type: 'failure'
     });
     return true;
@@ -46,3 +47,21 @@ exports.handleValidationRoutesErrors = ( req, res ) => {
   }
   return false;
 };
+
+
+exports.positionTitleExistForCompanyValidation = async (title, res, companyId, posId = null) => {
+  const position = await Position.findOne({ 
+    _id: { $ne: posId } , companyId: companyId , title: title 
+  });
+  if(position){
+    res.status(422).json({
+      messages: ['You already have a position with that title, please choose a different one'],
+      type: 'failure'
+    });
+    return true;
+  }
+  return false;
+};
+
+
+

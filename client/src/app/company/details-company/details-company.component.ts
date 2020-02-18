@@ -17,6 +17,7 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy {
   company: Company;
   allowEdit: boolean;
   isLoading = false;
+  mainUrl: string;
 
   constructor(private store: Store<fromApp.AppState>,
               private route: ActivatedRoute,
@@ -27,6 +28,7 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy {
     this.routeSub = this.route.params.pipe(
       switchMap(() => {
         currUrl = this.route.snapshot['_routerState'].url.substring(1).split('/');
+        this.mainUrl = currUrl[0];
         if (currUrl[0] === 'my-details') {
           return this.store.select('auth');
         } else {
@@ -34,17 +36,19 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy {
         }
       }))
       .subscribe(currState => {
+        this.isLoading = currState['loadingSingle'];
         if (currUrl[0] === 'my-details') {
           this.company = currState['user'] as Company;
           this.allowEdit = true;
-        } else { // company list details
-          this.isLoading = currState['loadingSingle'];
+        } else if (currUrl[0] === 'companies') {
+          this.company = currState['companies'][+currUrl[1]];
           if (currUrl[1] >= currState['companies'].length || currUrl[1] < 0) {
             // check if trying to get details of an undefined employee
-            return this.router.navigate(['companies']);
+            return this.router.navigate([currUrl[0]]);
           }
-          this.company = currState['companies'][+currUrl[1]];
           this.allowEdit = false;
+        } else {
+          this.company = currState['tempCompany'];
         }
       });
   }

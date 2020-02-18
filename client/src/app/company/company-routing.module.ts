@@ -7,6 +7,7 @@ import { CompanyResolverService } from './company-resolver.service';
 import { AuthGuard } from 'app/auth/auth.guard';
 import { DetailsCompanyComponent } from './details-company/details-company.component';
 import { DetailsCompanyGuard } from './details-company/details-company.guard';
+import { DetailsPositionComponent } from 'app/position/details-position/details-position.component';
 
 
 
@@ -17,7 +18,11 @@ const routes: Routes = [
     resolve: [CompanyResolverService],
     children: [
       {
-        path: ':index/company', component: DetailsCompanyComponent, canActivate: [DetailsCompanyGuard]
+        path: ':index', component: DetailsCompanyComponent, canActivate: [DetailsCompanyGuard]
+      },
+      {
+        path: ':companyInx/position', component: DetailsPositionComponent,
+        canActivate: [DetailsCompanyGuard]
       },
     ]
   },

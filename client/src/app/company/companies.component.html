@@ -6,8 +6,12 @@
 <div class="container">
   <app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert>
   <div class="row">
+    <div class="row">
+      <div class="col-md-2">
+        <h3>Compenies</h3>
+      </div>
+    </div>
     <div class="col-md-5">
-      <h3>Compenies</h3>
       <app-list-companies></app-list-companies>
     </div>
     <div class="col-md-7">

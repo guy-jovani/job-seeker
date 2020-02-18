@@ -22,9 +22,8 @@ const initialState: State = {
   token: null
 };
 
-export function authReducer(state = initialState, action: AuthActions.AuthActions){
-  // console.log("auth reducer " + action.type),
-  switch(action.type){
+export function authReducer(state = initialState, action: AuthActions.AuthActions) {
+  switch (action.type) {
     case AuthActions.SIGNUP_ATTEMPT:
     case AuthActions.LOGIN_ATTEMPT:
     case AuthActions.RESET_PASS_EMAIL_ATTEMPT:
@@ -39,9 +38,30 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
         loading: false,
         messages: action.payload,
       };
+    case AuthActions.ADD_POSITION_TO_USER:
+      const updatedPositions = [ ...state.user.positions, action.payload ];
+      const updatedUser = {
+        ...state.user,
+        positions: updatedPositions
+      };
+      return {
+        ...state,
+        user: updatedUser,
+      };
+    case AuthActions.UPDATE_POSITION_OF_USER:
+      const positions = [...state.user.positions];
+      const posInd = state.user.positions.findIndex(pos => pos._id === action.payload._id);
+      positions[posInd] = action.payload;
+      const upToDateUser = {
+        ...state.user,
+        positions
+      };
+      return {
+        ...state,
+        user: upToDateUser,
+      };
     case AuthActions.AUTH_SUCCESS:
     case AuthActions.UPDATE_ACTIVE_USER:
-      console.log('auth state after success: ', action.payload.user, action.payload.kind, action.payload['token']) ;
       return {
         ...state,
         loading: false,

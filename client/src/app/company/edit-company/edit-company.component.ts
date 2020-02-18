@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -8,7 +8,6 @@ import {switchMap } from 'rxjs/operators';
 import { Company } from '../company.model';
 import * as fromApp from '../../store/app.reducer';
 import * as CompanyActions from '../store/company.actions';
-// import { Employee } from '../../employees/employee.model';
 import { mimeType } from './mime-type.validator';
 
 @Component({
@@ -17,15 +16,12 @@ import { mimeType } from './mime-type.validator';
   styleUrls: ['./edit-company.component.css']
 })
 export class EditCompanyComponent implements OnInit, OnDestroy {
-  errorMessages: string[];
   authState: Subscription;
   company: Company;
   imagePreview: string;
   companyForm: FormGroup;
   isLoading = false;
   showPasswords = false;
-
-  // @ViewChild('name', {static: true, read: ElementRef}) nameInput: ElementRef;
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -54,16 +50,9 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
       }))
       .subscribe(companyState => {
         this.isLoading = companyState.loadingSingle;
-        if (companyState.messages) {
-          for (const msg of companyState.messages) {
-            this.errorMessages.push(msg);
-          }
-        } else {
-          this.errorMessages = [];
+        if (this.company) {
+          this.initForm();
         }
-        // this.nameInput.nativeElement.focus();
-        // this.nameInput.nativeElement.blur();
-        this.initForm();
       });
   }
 
@@ -103,6 +92,9 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
+    if (this.companyForm.invalid) {
+      return this.store.dispatch(new CompanyActions.CompanyOpFailure(['The form is invalid']));
+    }
     const formValue = this.companyForm.value;
     const name = formValue.name;
     const email = formValue.email;

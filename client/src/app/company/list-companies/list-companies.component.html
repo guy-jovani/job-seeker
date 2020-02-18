@@ -5,10 +5,10 @@
 </div>
 <div *ngIf="!isLoading">
   <ul class="list-group" *ngIf="companies.length">
-    <li 
-      class="list-group-item" 
+    <li
+      class="list-group-item"
       *ngFor="let company of companies; let i=index">
-      <a routerLink='{{i}}/company' (click)='getCompanyinfo(i)'>
+      <a routerLink='{{i}}' (click)='getCompanyinfo(i)'>
         <p>Name: {{ company.name }}</p>
         <p>Description: {{ company.description ? company.description : '-----'}}</p>
       </a>

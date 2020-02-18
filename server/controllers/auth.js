@@ -44,20 +44,25 @@ getUserSignup = (req, password) => {
 
 exports.signup = async (req, res, next) => {
   try {
+    req.body.email = req.body.email ? req.body.email.toLowerCase() : null;
     if(handleValidationRoutesErrors(req, res)) return;
     const emailExist = await validation.userEmailExistValidation(req.body.email, res);
     if(emailExist){ return; }
     if(req.body.name) {
+      req.body.name = req.body.name.toLowerCase();
       const nameExist = await validation.companyNameExistValidation(req.body.name, res);
       if(nameExist) return;
     }
 
     const password = await bcrypt.hash(req.body.password, 12);
     let [user, kind] = getUserSignup(req, password);
-    await user.save();
+    user = await user.save();
 
     const token = getToken(user._id);
+    user = user.toObject();
     Reflect.deleteProperty(user, 'password');
+    Reflect.set(user, 'positions', user['positionsIds']);
+    Reflect.deleteProperty(user, 'positionsIds');
     res.status(201).json({
       message: 'Signed up successfully!',
       type: 'success',
@@ -80,12 +85,12 @@ loginEmailPassIncorrectMessage = (res) => {
 }
 
 getUserLogin = async (req, res) => {
-  let user = await Employee.findOne({email: req.body.email}).select('-__v');
+  let user = await Employee.findOne({email: req.body.email}).select('-__v').populate('positionsIds');
   let kind = "employee";
   if(!user) {
     user = await Company.findOne({email: req.body.email}).select(
                   '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration'
-                );
+                ).populate('positionsIds');
     kind = "company";
   }
   if(!user){ 
@@ -96,6 +101,7 @@ getUserLogin = async (req, res) => {
 
 exports.login = async (req, res, next) => {
   try {
+    if(handleValidationRoutesErrors(req, res)) return;
     let [user, kind] = await getUserLogin(req, res);
     if(!user) return;
 
@@ -103,9 +109,11 @@ exports.login = async (req, res, next) => {
     if(!verifiedPassword){ 
       return loginEmailPassIncorrectMessage(res);
     }
-
+    
     user = user.toObject();
     Reflect.deleteProperty(user, 'password');
+    Reflect.set(user, 'positions', user['positionsIds']);
+    Reflect.deleteProperty(user, 'positionsIds');
     const token = getToken(user._id);
     res.status(200).json({
       message: 'Logged in successfully!',

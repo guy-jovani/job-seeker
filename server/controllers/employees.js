@@ -7,10 +7,9 @@ const getBulkArrayForUpdate = require('../utils/shared').getBulkArrayForUpdate;
 const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
 
 
-exports.getEmployee = async (req, res, next) => {
+exports.fetchSingle = async (req, res, next) => {
   try {
-    const employee = await Employee.findOne({_id: req.query._id}).select(
-            '-password -__v -resetPassToken -resetPassTokenExpiration');
+    const employee = await Employee.findById(req.query._id).select('_id email');
     res.status(200).json({
       type: 'success',
       employee
@@ -20,10 +19,9 @@ exports.getEmployee = async (req, res, next) => {
   }
 };
 
-exports.getEmployees = async (req, res, next) => {
+exports.fetchAll = async (req, res, next) => {
   try {
-    const employees = await Employee.find({_id: { $ne: req.query._id }}).select(
-          '-password -__v -resetPassToken -resetPassTokenExpiration');
+    const employees = await Employee.find({_id: { $ne: req.query._id }}).select('_id email');
     res.status(200).json({
       type: 'success',
       employees
@@ -43,17 +41,18 @@ const getUpdateQuery = async (req) => {
 exports.updateEmployee = async (req, res, next) => {
   try {
     if(validation.handleValidationRoutesErrors(req, res)) return;
-
-    const emailExist = await validation.userEmailExistValidation(
-                    req.body.email, res, req.body._id);
-    if(emailExist){ return ; }
+    if(await validation.userEmailExistValidation(req.body.email, res, req.body._id)) return; 
     
     const bulkRes = await Employee.bulkWrite(await getUpdateQuery(req));
     if(!bulkRes.result.nMatched){
       throw new Error("trying to update a non exisitng employee");
     }
-    const updatedEmployee = await Employee.findById(req.body._id).select(
-        '-__v -password -resetPassToken -resetPassTokenExpiration');
+    let updatedEmployee = await Employee.findById(req.body._id).select(
+        '-__v -password -resetPassToken -resetPassTokenExpiration').populate('positionsIds');
+
+    updatedEmployee = updatedEmployee.toObject();
+    Reflect.set(updatedEmployee, 'positions', updatedEmployee['positionsIds']);
+    Reflect.deleteProperty(updatedEmployee, 'positionsIds');
 
     res.status(201).json({
       message: 'employee updated successfully!',

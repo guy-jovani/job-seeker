@@ -48,7 +48,7 @@ export class SetAllEmployees implements Action {
 export class EmployeeOpFailure implements Action {
   readonly type = EMPLOYEE_OP_FAILURE;
 
-  constructor(public payload: any[]) {}
+  constructor(public payload: string[]) {}
 }
 
 export class ClearError implements Action {

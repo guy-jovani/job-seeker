@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const employeesRoutes = require('./routes/employees');
 const authRoutes = require('./routes/auth');
 const companiesRoutes = require('./routes/companies');
+const positionsRoutes = require('./routes/positions');
 const globalVars = require('./utils/globalVars');
 const checkAuth = require('./middleware/check-auth');
 
@@ -31,6 +32,7 @@ app.use((req, res, next) => {
 app.use('/auth', authRoutes);
 app.use('/employees', checkAuth, employeesRoutes);
 app.use('/companies', checkAuth, companiesRoutes);
+app.use('/positions', checkAuth, positionsRoutes);
 
 app.use((req, res, next) => {
   console.log("general url in app.js");

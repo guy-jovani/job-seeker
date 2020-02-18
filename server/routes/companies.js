@@ -8,13 +8,15 @@ const extractImage = require('../middleware/image-upload');
 const companyController = require('../controllers/companies');
 
 
-router.get('/fetchAll', companyController.getCompanies);
-router.get('/fetchSingle', companyController.getCompany);
+router.get('/fetchAll', companyController.fetchAll);
+router.get('/fetchSingle', companyController.fetchSingle);
 
 router.post('/update', extractImage,
   [
     body('name')
       .exists()
+      .not()
+      .isEmpty()
       .withMessage('the "name" field is a required one'),
     body('email')
       .isEmail()

@@ -33,12 +33,12 @@ export class ListEmployeeComponent implements OnInit, OnDestroy {
       });
   }
 
-  getEmployeeinfo(index: number){
+  getEmployeeinfo(index: number) {
     this.store.dispatch(new EmployeeActions.FetchSingleEmployee(this.employees[index]._id));
   }
 
-  ngOnDestroy(){
-    if(this.subscription){
+  ngOnDestroy() {
+    if (this.subscription) {
       this.subscription.unsubscribe();
     }
   }

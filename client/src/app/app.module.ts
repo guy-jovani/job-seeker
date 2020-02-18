@@ -21,6 +21,8 @@ import { SharedModule } from './shared/shared.module';
 import { CoreModule } from './core.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { PositionModule } from './position/position.module';
+import { PositionEffects } from './position/store/position.effects';
 
 @NgModule({
   declarations: [
@@ -34,13 +36,14 @@ import { AuthModule } from './auth/auth.module';
     BrowserModule,
     HttpClientModule,
     StoreModule.forRoot(fromApp.appReducer),
-    EffectsModule.forRoot([EmployeeEffects, AuthEffects, CompanyEffects]),
+    EffectsModule.forRoot([EmployeeEffects, AuthEffects, CompanyEffects, PositionEffects]),
     EmployeesModule,
     CompanyModule,
     SharedModule,
     CoreModule,
     AuthModule,
     UserModule,
+    PositionModule,
     AppRoutingModule,
   ],
   bootstrap: [AppComponent]

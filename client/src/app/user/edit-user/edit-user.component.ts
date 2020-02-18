@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 
@@ -9,7 +9,7 @@ import * as fromApp from '../../store/app.reducer';
   templateUrl: './edit-user.component.html',
   styleUrls: ['./edit-user.component.css']
 })
-export class EditUserComponent implements OnInit {
+export class EditUserComponent implements OnInit, OnDestroy {
   userEmployee: boolean;
   authSubscription: Subscription;
 
@@ -18,7 +18,7 @@ export class EditUserComponent implements OnInit {
   ngOnInit() {
     this.authSubscription = this.store.select('auth').subscribe(authState => {
       this.userEmployee = authState.kind === 'employee';
-    })
+    });
   }
 
   ngOnDestroy() {

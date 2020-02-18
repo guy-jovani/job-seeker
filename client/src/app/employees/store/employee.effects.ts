@@ -33,7 +33,7 @@ export class EmployeeEffects {
       if (actionData['payload']['password']) {
         employee['password'] = actionData['payload']['password'];
         employee['confirmPassword'] = actionData['payload']['confirmPassword'];
-      };
+      }
       return this.http.post(nodeServer  + 'update', employee)
         .pipe(
           map(res => {

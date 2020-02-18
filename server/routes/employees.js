@@ -7,8 +7,8 @@ const { body } = require('express-validator');
 
 const employeeController = require('../controllers/employees');
 
-router.get('/fetchAll', employeeController.getEmployees);
-router.get('/fetchSingle', employeeController.getEmployee);
+router.get('/fetchAll', employeeController.fetchAll);
+router.get('/fetchSingle', employeeController.fetchSingle);
 
 router.post('/update', [
   body('email')
