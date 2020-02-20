@@ -6,6 +6,7 @@
 
 import { Action } from '@ngrx/store';
 import { Position } from '../position.model';
+import { Company } from 'app/company/company.model';
 
 export const CREATE_POSITION_IN_DB = '[Position] CREATE_POSITION_IN_DB';
 export const POSITION_OP_FAILURE = '[POSITION] POSITION operation failed';
@@ -16,7 +17,8 @@ export const FETCH_SINGLE_POSITION = '[POSITION] Fetch Single POSITION';
 export const SET_ALL_POSITIONS = '[POSITION] Set All POSITIONS';
 export const CLEAR_ERROR = '[POSITION] Clear error';
 export const LOGOUT = '[POSITION] LOGOUT';
-
+export const UPDATE_SINGLE_POSITION_COMPANY = '[POSITION] UPDATE_SINGLE_POSITION_COMPANY';
+export const UPDATE_SINGLE_POSITION_COMPANY_ATTEMPT = '[POSITION] UPDATE_SINGLE_POSITION_COMPANY_ATTEMPT';
 
 
 export type PositionActions = CreatePositionInDb
@@ -26,6 +28,8 @@ export type PositionActions = CreatePositionInDb
                             | SetAllPositions
                             | ClearError
                             | Logout
+                            | UpdateSinglePositionCompanyAttempt
+                            | UpdateSinglePositionCompany
                             | FetchSinglePosition;
 
 
@@ -37,6 +41,10 @@ export class SetAllPositions implements Action {
 
 export class ClearError implements Action {
   readonly type = CLEAR_ERROR;
+}
+
+export class UpdateSinglePositionCompanyAttempt implements Action {
+  readonly type = UPDATE_SINGLE_POSITION_COMPANY_ATTEMPT;
 }
 
 export class Logout implements Action {
@@ -59,6 +67,12 @@ export class UpdateSinglePosition implements Action {
   readonly type = UPDATE_SINGLE_POSITION;
 
   constructor(public payload: { position: Position, main: boolean } ) {}
+}
+
+export class UpdateSinglePositionCompany implements Action {
+  readonly type = UPDATE_SINGLE_POSITION_COMPANY;
+
+  constructor(public payload: { company: Company, posInd: number }) {}
 }
 
 export class UpdateSinglePositionInDb implements Action {

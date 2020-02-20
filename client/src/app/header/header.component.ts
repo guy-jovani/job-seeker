@@ -53,6 +53,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.store.dispatch(new CompanyActions.FetchAllCompanies());
   }
 
+  onFetchPositions() {
+    this.store.dispatch(new PositionActions.FetchAllPositions());
+  }
+
   ngOnDestroy() {
     if (this.checkAuthSub) {
       this.checkAuthSub.unsubscribe();

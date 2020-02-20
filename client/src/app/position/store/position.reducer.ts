@@ -4,6 +4,7 @@
 
 import { Position } from '../position.model';
 import * as PositionActions from './position.actions';
+import { stat } from 'fs';
 
 
 export interface State {
@@ -12,6 +13,7 @@ export interface State {
   loadingSingle: boolean;
   messages: any[];
   tempPosition: Position;
+  lastFetch: Date;
 }
 
 const initialState: State = {
@@ -19,7 +21,8 @@ const initialState: State = {
   messages: null,
   loadingAll: false,
   loadingSingle: false,
-  tempPosition: null
+  tempPosition: null,
+  lastFetch: null
 };
 
 export function positionReducer(state = initialState, action: PositionActions.PositionActions) {
@@ -37,6 +40,7 @@ export function positionReducer(state = initialState, action: PositionActions.Po
         loadingAll: true,
       };
     case PositionActions.FETCH_SINGLE_POSITION:
+    case PositionActions.UPDATE_SINGLE_POSITION_COMPANY_ATTEMPT:
       return {
         ...state,
         loadingSingle: true,
@@ -55,13 +59,15 @@ export function positionReducer(state = initialState, action: PositionActions.Po
         messages: null,
         loadingAll: false,
         positions: [],
-        tempPosition: null
+        tempPosition: null,
+        lastFetch: null
       };
     case PositionActions.SET_ALL_POSITIONS:
       return {
         ...state,
         positions: [...action.payload],
         loadingAll: false,
+        lastFetch: new Date()
       };
     case PositionActions.POSITION_OP_FAILURE:
       return {
@@ -70,14 +76,29 @@ export function positionReducer(state = initialState, action: PositionActions.Po
         loadingAll: false,
         loadingSingle: false,
       };
+    case PositionActions.UPDATE_SINGLE_POSITION_COMPANY:
+      // console.log(action.payload)
+      action.payload.company.lastFetch = new Date();
+      const upToDatePos = {
+        ...state.positions[action.payload.posInd],
+        companyId: action.payload.company
+      };
+      const upToDatePositions = [ ...state.positions ];
+      // console.log(upToDatePositions)
+      upToDatePositions[action.payload.posInd] = upToDatePos;
+      // console.log(upToDatePositions)
+      return {
+        ...state,
+        positions: upToDatePositions
+      };
     case PositionActions.UPDATE_SINGLE_POSITION:
-      if (!action.payload.main) {
-        return {
-          ...state,
-          tempPosition: action.payload.position,
-          loadingSingle: false
-        };
-      }
+      // if (!action.payload.main) {
+      //   return {
+      //     ...state,
+      //     tempPosition: action.payload.position,
+      //     loadingSingle: false
+      //   };
+      // }
       const index = state.positions.findIndex(pos => pos._id === action.payload.position._id);
       const updatedPositions = [...state.positions];
       const updatedPosition = {

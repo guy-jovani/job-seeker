@@ -22,8 +22,8 @@ export type CompanyActions = FetchAllCompanies
                             | ClearError
                             | UpdateSingleCompanyInDb
                             | UpdateSingleCompany
-                            // | UpdateSingleCompanyPositionAttempt
-                            // | UpdateSingleCompanyPosition
+                            | UpdateSingleCompanyPositionAttempt
+                            | UpdateSingleCompanyPosition
                             | Logout;
 
 
@@ -31,14 +31,14 @@ export class FetchAllCompanies implements Action {
   readonly type = FETCH_ALL_COMPANIES;
 }
 
-// export class UpdateSingleCompanyPositionAttempt implements Action {
-//   readonly type = UPDATE_SINGLE_COMPANY_POSITION_ATTEMPT;
-// }
+export class UpdateSingleCompanyPositionAttempt implements Action {
+  readonly type = UPDATE_SINGLE_COMPANY_POSITION_ATTEMPT;
+}
 
 export class FetchSingleCompany implements Action {
   readonly type = FETCH_SINGLE_COMPANY;
 
-  constructor(public payload: { _id: string, main: boolean }) {}
+  constructor(public payload: { _id: string, main: boolean, posInd?: number }) {}
 }
 
 export class SetAllCompanies implements Action {
@@ -47,11 +47,11 @@ export class SetAllCompanies implements Action {
   constructor(public payload: Company[]) {}
 }
 
-// export class UpdateSingleCompanyPosition implements Action {
-//   readonly type = UPDATE_SINGLE_COMPANY_POSITION;
+export class UpdateSingleCompanyPosition implements Action {
+  readonly type = UPDATE_SINGLE_COMPANY_POSITION;
 
-//   constructor(public payload: Position) {}
-// }
+  constructor(public payload: Position) {}
+}
 
 export class UpdateSingleCompany implements Action {
   readonly type = UPDATE_SINGLE_COMPANY;

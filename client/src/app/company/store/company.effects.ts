@@ -5,7 +5,7 @@ import { switchMap, map, catchError, withLatestFrom } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 
-
+import * as PositionActions from '../../position/store/position.actions';
 import * as CompanyActions from './company.actions';
 import { environment } from '../../../environments/environment';
 import * as fromApp from '../../store/app.reducer';
@@ -91,8 +91,11 @@ export class CompanyEffects {
       .pipe(
         map(res => {
           if (res['type'] === 'success') {
-            return new CompanyActions.UpdateSingleCompany({
-                    company: res['company'], main: actionData.payload.main });
+            this.store.dispatch(new PositionActions.ClearError());
+            this.store.dispatch(new CompanyActions.ClearError());
+            return actionData.payload.main ?
+                new CompanyActions.UpdateSingleCompany({company: res['company'], main: actionData.payload.main }) :
+                new PositionActions.UpdateSinglePositionCompany({company: res['company'], posInd: actionData.payload.posInd});
           } else {
             return new CompanyActions.CompanyOpFailure(res['messages']);
           }

@@ -3,10 +3,12 @@ import { Store } from '@ngrx/store';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import * as CompanyActions from '../../company/store/company.actions';
+import * as PositionActions from '../../position/store/position.actions';
 import * as fromApp from '../../store/app.reducer';
 import { Position } from '../position.model';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { environment } from 'environments/environment';
 
 
 
@@ -20,7 +22,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
   position: Position;
   allowEdit = false;
   isLoading = false;
-  currUrl: string = null;
+  currUrl: string[] = null;
   companyLink = true;
 
   @Input() companyPosition: Position = null;
@@ -36,6 +38,8 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
         this.currUrl = this.route.snapshot['_routerState'].url.substring(1).split('/');
         if (this.currUrl[0] === 'my-positions') {
           return this.store.select('auth');
+        } else if ( this.currUrl[0] === 'companies') {
+          return this.store.select('company');
         } else {
           return this.store.select('position');
         }
@@ -47,15 +51,56 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
             this.allowEdit = true;
           }
           this.position = currState['user'] ? currState['user'].positions[+this.currUrl[1]] : null;
-
-        } else if (this.currUrl[0] === 'positions' && this.currUrl.length < 4) {
-          this.position = currState['positions'] ? currState['positions'][+this.currUrl[1]] : null;
-
-        } else { // url - companies/:companyInd/position
-          this.companyLink = false;
-          this.position = currState['tempPosition'] ? currState['tempPosition'] : null;
+        } else if (this.currUrl[0] === 'positions') { // /positions/:posInd
+          this.checkPositionsUrl(currState);
+        } else { // /companies/:compInd/position
+          this.checkCompaniesUrl(currState);
         }
       });
+  }
+
+  private checkCompaniesUrl(currState) {
+    if (this.invalidStateListInd(currState, 'companies')) { return; }
+    this.companyLink = false;
+    this.position = !currState['companies'] ? null :
+    currState['companies'][+this.currUrl[1]]['positions'][window.history.state['positionInd']];
+    if (!this.position) {
+      this.router.navigate([this.currUrl[0]]);
+    }
+  }
+
+  private checkPositionsUrl(currState) {
+    if (this.invalidStateListInd(currState, 'positions')) { return; }
+    if (this.currUrl[this.currUrl.length - 1] === 'position') {
+      this.companyLink = false;
+      if (!currState['positions']) {
+        this.router.navigate([this.currUrl[0]]);
+      } else { // /positions/:posInd/company/position
+        if (window.history.state['positionInd'] === undefined) {
+          return this.router.navigate([this.currUrl[0]]);
+        }
+        const positions = currState['positions'];
+        const position = positions[+this.currUrl[1]];
+        const company = position['companyId'];
+        const companyPositions = company['positions'];
+        this.position = companyPositions[window.history.state['positionInd']];
+        this.position.companyId = {
+          _id: companyPositions[window.history.state['positionInd']].companyId,
+          name: company.name
+        };
+      }
+    } else { // /positions/:posInd/company
+      this.position = currState['positions'] ? currState['positions'][+this.currUrl[1]] : null;
+    }
+  }
+
+  private invalidStateListInd(currState, list) {
+    if (this.currUrl[1] >= currState[list].length || +this.currUrl[1] < 0) {
+      // check if trying to get details of an undefined position
+      this.router.navigate([this.currUrl[0]]);
+      return true;
+    }
+    return false;
   }
 
   ngOnDestroy() {
@@ -65,9 +110,13 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
   }
 
   getCompanyinfo() {
-    this.store.dispatch(new CompanyActions.FetchSingleCompany({
-      _id: this.position.companyId._id, main: false
-    }));
+    if (this.currUrl.length === 2 && this.currUrl[0] === 'positions' && (!this.position.companyId.lastFetch ||
+        new Date().getTime() - this.position.companyId.lastFetch.getTime() > environment.fetchDataMSReset )) {
+      this.store.dispatch(new PositionActions.UpdateSinglePositionCompanyAttempt());
+      this.store.dispatch(new CompanyActions.FetchSingleCompany({
+        _id: this.position.companyId._id, main: false, posInd: +this.currUrl[1]
+      }));
+    }
   }
 
 }

@@ -10,8 +10,8 @@ const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
 
 exports.fetchSingle = async (req, res, next) => {
   try {
-    let company = await Company.findById(req.query._id).select('_id email name imagePath positionIds')
-                                    .populate('positionsIds');
+    let company = await Company.findById(req.query._id).select(
+      '_id email name website description imagePath positionsIds').populate('positionsIds');
 
     company = company.toObject();
     Reflect.set(company, 'positions', company['positionsIds']);
@@ -27,8 +27,23 @@ exports.fetchSingle = async (req, res, next) => {
 };
 
 exports.fetchAll = async (req, res, next) => {
-  try {
-    const companies = await Company.find({_id: { $ne: req.query._id }}).select('_id name description');
+  try {        
+    let companies = await Company.aggregate([
+      { $match: { _id: { $ne: mongoose.Types.ObjectId(req.query._id)} } },
+      { $project: { 'createdAt': 0, 'updatedAt': 0, '__v': 0, 'password': 0 } },
+      { $lookup: { 
+        from: 'positions',
+        localField: 'positionsIds',
+        foreignField: '_id',
+        as: 'positions' }  
+      },
+      { $project: {
+        'positionsIds': 0,
+        'positions.__v': 0 } 
+      },
+    ]);
+
+
     res.status(200).json({
       type: 'success',
       companies
@@ -96,37 +111,3 @@ exports.updateCompany = async (req, res, next) => {
 
 
 
-
-
-// const getFilteredCompany = company => {
-//   // filter a company object from fileds that shouldn't return to the client
-//   const companyFieldsNotToReturn = ['__v', 'createdAt', 'updatedAt'];
-//   return Object.keys(company._doc)
-//               .filter(key => !companyFieldsNotToReturn.includes(key))
-//               .reduce((obj, key) => (obj[key] = company._doc[key], obj), {});
-// } 
-// 
-// exports.register = async (req, res, next) => {
-//   try {
-//     if(validation.handleValidationRoutesErrors(req, res)) return;
-//     const nameExist = await validation.companyNameExistValidation(req.body.name, res);
-//     if(nameExist) return;
-//     let company = await Company.create( { ...req.body } );
-//     if(req.file) {
-//       const url = req.protocol + '://' + req.get('host');
-//       const imagePath = url + '/images/' + req.file.filename;
-//       company.imagePath = imagePath;
-//       await company.save();
-//     }
-//     // gets a company object without the fields that shouldn't return         
-//     company = getFilteredCompany(company);
-// 
-//     res.status(201).json({
-//       message: 'company created successfully!',
-//       type: 'success',
-//       company
-//     });
-//   } catch (error) {
-//     next(errorHandling.handleServerErrors(error, 500, "there was an error fetching the company"));
-//   }
-// };

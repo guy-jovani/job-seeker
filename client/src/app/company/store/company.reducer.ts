@@ -11,6 +11,7 @@ export interface State {
   loadingAll: boolean;
   loadingSingle: boolean;
   tempCompany: Company; // /for positions/0/company
+  lastFetch: Date;
 }
 
 const initialState: State = {
@@ -18,7 +19,8 @@ const initialState: State = {
   messages: null,
   loadingAll: false,
   loadingSingle: false,
-  tempCompany: null
+  tempCompany: null,
+  lastFetch: null
 };
 
 export function companyReducer(state = initialState, action: CompanyActions.CompanyActions) {
@@ -28,6 +30,7 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
         ...state,
         companies: [...action.payload],
         loadingAll: false,
+        lastFetch: new Date()
       };
     case CompanyActions.COMPANY_OP_FAILURE:
       return {
@@ -38,7 +41,7 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
       };
     case CompanyActions.UPDATE_SINGLE_COMPANY_IN_DB:
     case CompanyActions.FETCH_SINGLE_COMPANY:
-    // case CompanyActions.UPDATE_SINGLE_COMPANY_POSITION_ATTEMPT:
+    case CompanyActions.UPDATE_SINGLE_COMPANY_POSITION_ATTEMPT:
       return {
         ...state,
         loadingSingle: true,
@@ -67,28 +70,29 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
         companies: [ ...updatedCompanies ],
         loadingSingle: false
       };
-    // case CompanyActions.UPDATE_SINGLE_COMPANY_POSITION:
-    //   const compInd = state.companies.findIndex(comp => comp._id === action.payload.companyId._id );
-    //   // trying to update a position of a company that doesn't exist -
-    //   // happen when a user is going through the positions of a specific company
-    //   // url - /companies/0/position/0
-    //   if (compInd < 0) { return state; }
-    //   const positions = [...state.companies[compInd].positions];
-    //   const posInd = state.companies[compInd].positions.findIndex(pos =>
-    //                             pos._id === action.payload._id );
-    //   positions[posInd] = action.payload;
+    case CompanyActions.UPDATE_SINGLE_COMPANY_POSITION:
+      const compInd = state.companies.findIndex(comp => comp._id === action.payload.companyId._id );
+      action.payload.lastFetch = new Date();
+      // trying to update a position of a company that doesn't exist -
+      // happen when a user is going through the positions of a specific company
+      // url - /companies/0/position/0
+      // if (compInd < 0) { return state; }
+      const positions = [...state.companies[compInd].positions];
+      const posInd = state.companies[compInd].positions.findIndex(pos =>
+                                pos._id === action.payload._id );
+      positions[posInd] = action.payload;
 
-    //   const upToDateCompanies = [ ...state.companies ];
-    //   const upToDateCompany = {
-    //     ...upToDateCompanies[compInd],
-    //     positions
-    //   };
-    //   upToDateCompanies[compInd] = upToDateCompany;
-    //   return {
-    //     ...state,
-    //     companies: [ ...upToDateCompanies ],
-    //     loadingSingle: false
-    //   };
+      const upToDateCompanies = [ ...state.companies ];
+      const upToDateCompany = {
+        ...upToDateCompanies[compInd],
+        positions
+      };
+      upToDateCompanies[compInd] = upToDateCompany;
+      return {
+        ...state,
+        companies: [ ...upToDateCompanies ],
+        loadingSingle: false
+      };
     case CompanyActions.CLEAR_ERROR:
       return {
         ...state,
@@ -103,7 +107,8 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
         companies: [],
         loadingAll: false,
         loadingSingle: false,
-        tempCompany: null
+        tempCompany: null,
+        lastFetch: null
       };
     default:
       return state;

@@ -22,20 +22,18 @@ export class ListEmployeeComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subscription = this.store.select('employee')
-      .pipe(
-        map(employeeState => {
+      .pipe(map(employeeState => {
           this.isLoading = employeeState.loadingAll;
           return employeeState.employees;
-        })
-      )
+      }))
       .subscribe(employees => {
         this.employees = employees;
       });
   }
 
-  getEmployeeinfo(index: number) {
-    this.store.dispatch(new EmployeeActions.FetchSingleEmployee(this.employees[index]._id));
-  }
+  // getEmployeeinfo(index: number) {
+  //   this.store.dispatch(new EmployeeActions.FetchSingleEmployee(this.employees[index]._id));
+  // }
 
   ngOnDestroy() {
     if (this.subscription) {

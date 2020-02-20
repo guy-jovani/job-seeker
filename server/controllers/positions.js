@@ -68,8 +68,9 @@ exports.fetchSingle = async (req, res, next) => {
 
 exports.fetchAll = async (req, res, next) => {
   try {
-    const positions = await Position.find().select(
-          '_id title companyId description');
+    const positions = await Position.find()
+        .select('_id title companyId description requirements')
+        .populate({path: 'companyId', select: '_id email name website description imagePath positionsIds' });
     res.status(200).json({
       type: 'success',
       positions

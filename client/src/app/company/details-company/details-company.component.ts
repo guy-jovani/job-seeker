@@ -1,6 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+
 
 import { Company } from '../company.model';
 import * as fromApp from '../../store/app.reducer';
@@ -12,45 +13,63 @@ import { switchMap } from 'rxjs/operators';
   templateUrl: './details-company.component.html',
   styleUrls: ['./details-company.component.css']
 })
-export class DetailsCompanyComponent implements OnInit, OnDestroy {
+export class DetailsCompanyComponent implements OnInit, OnDestroy, AfterViewChecked  {
   routeSub: Subscription;
-  company: Company;
+  company: Company = null;
   allowEdit: boolean;
   isLoading = false;
   mainUrl: string;
+  currUrl: string[] = null;
 
   constructor(private store: Store<fromApp.AppState>,
               private route: ActivatedRoute,
-              private router: Router) { }
+              private router: Router,
+              private ref: ChangeDetectorRef) { }
 
   ngOnInit() {
-    let currUrl;
     this.routeSub = this.route.params.pipe(
       switchMap(() => {
-        currUrl = this.route.snapshot['_routerState'].url.substring(1).split('/');
-        this.mainUrl = currUrl[0];
-        if (currUrl[0] === 'my-details') {
+        this.currUrl = this.route.snapshot['_routerState'].url.substring(1).split('/');
+        this.mainUrl = this.currUrl[0];
+        if (this.currUrl[0] === 'my-details') {
           return this.store.select('auth');
-        } else {
+        } else if (this.currUrl[0] === 'companies') {
           return this.store.select('company');
+        } else {
+          return this.store.select('position');
         }
       }))
       .subscribe(currState => {
         this.isLoading = currState['loadingSingle'];
-        if (currUrl[0] === 'my-details') {
+        if (this.currUrl[0] === 'my-details') {
           this.company = currState['user'] as Company;
           this.allowEdit = true;
-        } else if (currUrl[0] === 'companies') {
-          this.company = currState['companies'][+currUrl[1]];
-          if (currUrl[1] >= currState['companies'].length || currUrl[1] < 0) {
-            // check if trying to get details of an undefined employee
-            return this.router.navigate([currUrl[0]]);
-          }
+        } else if (this.currUrl[0] === 'companies') {
+          if (this.invalidStateListInd(this.currUrl, currState, 'companies')) { return; }
+          this.company = currState['companies'][+this.currUrl[1]];
           this.allowEdit = false;
-        } else {
+        } else { // positions
+          if (this.invalidStateListInd(this.currUrl, currState, 'positions')) { return; }
+          this.allowEdit = false;
           this.company = currState['tempCompany'];
+          this.company = !currState['positions'] ? null : currState['positions'][+this.currUrl[1]]['companyId'];
         }
+        this.ref.detectChanges();
       });
+  }
+
+  ngAfterViewChecked() {
+    if (!this.company.positions && !this.isLoading) {
+      this.router.navigate([this.currUrl[0]]);
+    }
+  }
+
+  private invalidStateListInd(currUrl, currState, list) {
+    if (this.currUrl[1] >= currState[list].length || +this.currUrl[1] < 0) {
+      this.router.navigate([this.currUrl[0]]);
+      return true;
+    }
+    return false;
   }
 
   ngOnDestroy() {

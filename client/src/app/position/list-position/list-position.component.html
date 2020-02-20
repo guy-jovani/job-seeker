@@ -15,7 +15,7 @@
         class="list-group-item"
         *ngFor="let position of positions; let i=index">
         <a routerLink='{{ companyPositions && companyPositions.length ? "position" : i}}'
-                      (click)='getPositioninfo(i)'>
+            [state]="{ positionInd : i }"  (click)='getPositioninfo(i)'>
           <p>Title: {{ position.title }}</p>
         </a>
       </li>

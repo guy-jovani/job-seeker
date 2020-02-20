@@ -6,14 +6,16 @@
 <div class="container" *ngIf="company && !isLoading">
   <div>
     <h3>{{ allowEdit ? 'My Profile' : company.name | titlecase }}</h3>
-    <app-back-button *ngIf='mainUrl !== "companies"'></app-back-button>
+    <app-back-button *ngIf='mainUrl !== "companies" && mainUrl !== "my-details"'></app-back-button>
   </div>
   <div class="row" *ngIf="!isLoading">
     <p *ngIf="company.imagePath"><img class="image" [src]='company.imagePath'></p>
     <p>email: {{ company.email || "------" }}</p>
     <p>website: {{ company.website || "------" }}</p>
     <p>description: {{ company.description || "------" }}</p>
-    <app-list-position [companyPositions]="company.positions" *ngIf="!allowEdit"></app-list-position>
+    <ng-container *ngIf="company && !allowEdit">
+      <app-list-position [companyPositions]="company.positions"></app-list-position>
+    </ng-container>
   </div>
   <hr>
   <div class="row" *ngIf="allowEdit">

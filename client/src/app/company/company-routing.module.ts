@@ -14,7 +14,9 @@ import { DetailsPositionComponent } from 'app/position/details-position/details-
 
 const routes: Routes = [
   {
-    path: 'companies', component: CompaniesComponent, canActivate: [AuthGuard],
+    path: 'companies',
+    component: CompaniesComponent,
+    canActivate: [AuthGuard],
     resolve: [CompanyResolverService],
     children: [
       {

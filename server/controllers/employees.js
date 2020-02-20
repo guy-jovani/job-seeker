@@ -9,7 +9,7 @@ const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
 
 exports.fetchSingle = async (req, res, next) => {
   try {
-    const employee = await Employee.findById(req.query._id).select('_id email');
+    const employee = await Employee.findById(req.query._id).select('_id email firstName lastName');
     res.status(200).json({
       type: 'success',
       employee
@@ -21,7 +21,7 @@ exports.fetchSingle = async (req, res, next) => {
 
 exports.fetchAll = async (req, res, next) => {
   try {
-    const employees = await Employee.find({_id: { $ne: req.query._id }}).select('_id email');
+    const employees = await Employee.find({_id: { $ne: req.query._id }}).select('_id email firstName lastName');
     res.status(200).json({
       type: 'success',
       employees

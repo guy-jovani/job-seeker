@@ -32,11 +32,11 @@ export class ListCompaniesComponent implements OnInit, OnDestroy {
       });
   }
 
-  getCompanyinfo(index: number) {
-    this.store.dispatch(new CompanyActions.FetchSingleCompany({
-                _id: this.companies[index]._id, main: true
-    }));
-  }
+  // getCompanyinfo(index: number) {
+  //   this.store.dispatch(new CompanyActions.FetchSingleCompany({
+  //               _id: this.companies[index]._id, main: true
+  //   }));
+  // }
 
   ngOnDestroy() {
     if (this.subscription) {

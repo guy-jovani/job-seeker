@@ -68,15 +68,17 @@ export class PositionEffects {
   fetchSinglePosition = this.actions$.pipe(
     ofType(PositionActions.FETCH_SINGLE_POSITION),
     switchMap((actionData: PositionActions.FetchSinglePosition) => {
-      // this.store.dispatch(new CompanyActions.UpdateSingleCompanyPositionAttempt()); // for url - /companies/0/position/0
       return this.http.get(nodeServer + 'fetchSingle', {
         params: { _id: actionData.payload._id }
       })
       .pipe(
         map(res => {
           if (res['type'] === 'success') {
-            // this.store.dispatch(new CompanyActions.UpdateSingleCompanyPosition(res['position']));
-            return new PositionActions.UpdateSinglePosition({ position: res['position'], main: actionData.payload.main });
+            this.store.dispatch(new PositionActions.ClearError());
+            this.store.dispatch(new CompanyActions.ClearError());
+            return actionData.payload.main ?
+                new PositionActions.UpdateSinglePosition({ position: res['position'], main: actionData.payload.main }) :
+                new CompanyActions.UpdateSingleCompanyPosition(res['position']);
           } else {
             return new PositionActions.PositionOpFailure(res['messages']);
           }
