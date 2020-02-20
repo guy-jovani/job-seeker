@@ -55,22 +55,14 @@ export class ListPositionComponent implements OnInit, OnDestroy {
   }
 
   getPositioninfo(index: number) {
-    // in company auth mode (allowAdd === true) the positions are always up to date
-    /// because they are loaded initialy from the db
-    // if (!this.allowAdd) {
-      // this.store.dispatch(new PositionActions.FetchSinglePosition({
-      //                 _id: this.positions[index]._id,
-      //                 main: this.currUrl[0] !== 'companies' && this.currUrl.length < 3
-      // }));
+    // if (this.currUrl.length === 2 && this.currUrl[0] === 'companies' && (!this.positions[index].lastFetch ||
+    //         new Date().getTime() - this.positions[index].lastFetch.getTime() > environment.fetchDataMSReset )) {
+    //   this.store.dispatch(new CompanyActions.UpdateSingleCompanyPositionAttempt());
+    //   this.store.dispatch(new PositionActions.FetchSinglePosition({
+    //     _id: this.positions[index]._id,
+    //     main: false
+    //   }));
     // }
-    if (this.currUrl.length === 2 && this.currUrl[0] === 'companies' && (!this.positions[index].lastFetch ||
-            new Date().getTime() - this.positions[index].lastFetch.getTime() > environment.fetchDataMSReset )) {
-      this.store.dispatch(new CompanyActions.UpdateSingleCompanyPositionAttempt());
-      this.store.dispatch(new PositionActions.FetchSinglePosition({
-        _id: this.positions[index]._id,
-        main: false
-      }));
-    }
   }
 
   ngOnDestroy() {

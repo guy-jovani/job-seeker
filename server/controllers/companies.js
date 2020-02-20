@@ -27,22 +27,36 @@ exports.fetchSingle = async (req, res, next) => {
 };
 
 exports.fetchAll = async (req, res, next) => {
-  try {        
-    let companies = await Company.aggregate([
+  try {     
+    const companies = await Company.aggregate([
       { $match: { _id: { $ne: mongoose.Types.ObjectId(req.query._id)} } },
-      { $project: { 'createdAt': 0, 'updatedAt': 0, '__v': 0, 'password': 0 } },
-      { $lookup: { 
-        from: 'positions',
-        localField: 'positionsIds',
-        foreignField: '_id',
-        as: 'positions' }  
-      },
-      { $project: {
-        'positionsIds': 0,
-        'positions.__v': 0 } 
-      },
-    ]);
-
+      { $project: { positionsIds: 0, createdAt: 0, updatedAt: 0, __v: 0, password: 0 } },
+      { $lookup: {
+        from: "positions",
+        let: { company_id: "$_id" },
+        pipeline: [
+          { $match: { $expr: { $eq: [ "$companyId", "$$company_id" ] } } },
+          { $lookup: {
+            from: "companies",
+            localField: "companyId",
+            foreignField: "_id",
+            as: "companyId" }
+          },
+          { $unwind: "$companyId" },
+          { $project: {
+            "__v": 0,
+            "companyId.positionsIds": 0,
+            "companyId.password": 0,
+            "companyId.createdAt": 0,
+            "companyId.updatedAt": 0,
+            "companyId.description": 0,
+            "companyId.__v": 0,
+            "companyId.email": 0, }
+          }
+        ],
+        as: "positions" }
+      }
+    ])
 
     res.status(200).json({
       type: 'success',

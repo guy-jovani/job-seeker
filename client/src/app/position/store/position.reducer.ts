@@ -92,13 +92,6 @@ export function positionReducer(state = initialState, action: PositionActions.Po
         positions: upToDatePositions
       };
     case PositionActions.UPDATE_SINGLE_POSITION:
-      // if (!action.payload.main) {
-      //   return {
-      //     ...state,
-      //     tempPosition: action.payload.position,
-      //     loadingSingle: false
-      //   };
-      // }
       const index = state.positions.findIndex(pos => pos._id === action.payload.position._id);
       const updatedPositions = [...state.positions];
       const updatedPosition = {

@@ -74,11 +74,12 @@ export class PositionEffects {
       .pipe(
         map(res => {
           if (res['type'] === 'success') {
-            this.store.dispatch(new PositionActions.ClearError());
-            this.store.dispatch(new CompanyActions.ClearError());
-            return actionData.payload.main ?
-                new PositionActions.UpdateSinglePosition({ position: res['position'], main: actionData.payload.main }) :
-                new CompanyActions.UpdateSingleCompanyPosition(res['position']);
+            // this.store.dispatch(new PositionActions.ClearError());
+            return new PositionActions.UpdateSinglePosition({ position: res['position'], main: actionData.payload.main });
+            // this.store.dispatch(new CompanyActions.ClearError());
+            // return actionData.payload.main ?
+            //     new PositionActions.UpdateSinglePosition({ position: res['position'], main: actionData.payload.main }) :
+            //     new CompanyActions.UpdateSingleCompanyPosition(res['position']);
           } else {
             return new PositionActions.PositionOpFailure(res['messages']);
           }

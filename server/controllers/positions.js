@@ -56,7 +56,7 @@ exports.updatePosition = async (req, res, next) => {
 exports.fetchSingle = async (req, res, next) => {
   try {
     const position = await Position.findById({ _id: req.query._id} ).select('-__v')
-                .populate({path: 'companyId', select: 'name'});
+                .populate({path: 'companyId', select: '_id name'});
     res.status(200).json({
       type: 'success',
       position
@@ -70,7 +70,10 @@ exports.fetchAll = async (req, res, next) => {
   try {
     const positions = await Position.find()
         .select('_id title companyId description requirements')
-        .populate({path: 'companyId', select: '_id email name website description imagePath positionsIds' });
+        .populate({
+                path: 'companyId', 
+                select: '_id name' 
+        });
     res.status(200).json({
       type: 'success',
       positions
