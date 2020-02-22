@@ -26,7 +26,7 @@ export class CompanyResolverService implements Resolve<Company[]> {
         if (!companyState.companies.length || timeFromLastFetchMS && timeFromLastFetchMS > environment.fetchDataMSReset) {
           this.store.dispatch(new CompanyActions.FetchAllCompanies());
           return this.actions$.pipe(
-            ofType(CompanyActions.SET_ALL_COMPANIES),
+            ofType(CompanyActions.SET_ALL_COMPANIES, CompanyActions.COMPANY_OP_FAILURE),
             take(1)
           );
         } else {

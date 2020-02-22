@@ -4,6 +4,7 @@
   <div *ngIf="isLoading">
     <app-loading-spinner></app-loading-spinner>
   </div>
+  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
   <form (ngSubmit)="onSubmit(employeeForm)"  [formGroup]="employeeForm" *ngIf="!isLoading">
     <div class="row">
         <label for="email">email:  </label>

@@ -10,7 +10,6 @@ export interface State {
   messages: any[];
   loadingAll: boolean;
   loadingSingle: boolean;
-  tempCompany: Company; // /for positions/0/company
   lastFetch: Date;
 }
 
@@ -19,7 +18,6 @@ const initialState: State = {
   messages: null,
   loadingAll: false,
   loadingSingle: false,
-  tempCompany: null,
   lastFetch: null
 };
 
@@ -30,6 +28,7 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
         ...state,
         companies: [...action.payload],
         loadingAll: false,
+        messages: null,
         lastFetch: new Date()
       };
     case CompanyActions.COMPANY_OP_FAILURE:
@@ -44,7 +43,7 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
     case CompanyActions.UPDATE_SINGLE_COMPANY_POSITION_ATTEMPT:
       return {
         ...state,
-        loadingSingle: true,
+        loadingSingle: true
       };
     case CompanyActions.FETCH_ALL_COMPANIES:
       return {
@@ -52,13 +51,6 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
         loadingAll: true,
       };
     case CompanyActions.UPDATE_SINGLE_COMPANY:
-      if (!action.payload.main) {
-        return {
-          ...state,
-          tempCompany: action.payload.company,
-          loadingSingle: false
-        };
-      }
       const index = state.companies.findIndex(comp => comp._id === action.payload.company._id );
       const updatedCompanies = [ ...state.companies ];
       const updatedCompany = {
@@ -68,15 +60,12 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
       return {
         ...state,
         companies: [ ...updatedCompanies ],
+        messages: null,
         loadingSingle: false
       };
     case CompanyActions.UPDATE_SINGLE_COMPANY_POSITION:
       const compInd = state.companies.findIndex(comp => comp._id === action.payload.companyId._id );
       action.payload.lastFetch = new Date();
-      // trying to update a position of a company that doesn't exist -
-      // happen when a user is going through the positions of a specific company
-      // url - /companies/0/position/0
-      // if (compInd < 0) { return state; }
       const positions = [...state.companies[compInd].positions];
       const posInd = state.companies[compInd].positions.findIndex(pos =>
                                 pos._id === action.payload._id );
@@ -90,6 +79,7 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
       upToDateCompanies[compInd] = upToDateCompany;
       return {
         ...state,
+        messages: null,
         companies: [ ...upToDateCompanies ],
         loadingSingle: false
       };

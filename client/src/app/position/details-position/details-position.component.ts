@@ -24,6 +24,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
   isLoading = false;
   currUrl: string[] = null;
   companyLink = true;
+  errorMessages: string[] = [];
 
   @Input() companyPosition: Position = null;
 
@@ -35,7 +36,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.subscription = this.route.params.pipe(
       switchMap(params => {
-        this.currUrl = this.route.snapshot['_routerState'].url.substring(1).split('/');
+        this.currUrl = this.router.url.substring(1).split('/');
         if (this.currUrl[0] === 'my-positions') {
           return this.store.select('auth');
         } else if ( this.currUrl[0] === 'companies') {
@@ -45,6 +46,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
         }
       })
       ).subscribe(currState => {
+        this.currUrl = this.router.url.substring(1).split('/');
         this.isLoading = currState['loadingSingle'];
         if (this.currUrl[0] === 'my-positions') {
           if (currState['kind'] === 'company') {
@@ -71,6 +73,16 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
 
   private checkPositionsUrl(currState) {
     if (this.invalidStateListInd(currState, 'positions')) { return; }
+    if (this.currUrl[this.currUrl.length - 1] === 'position') {
+      if (currState.messages) {
+        this.errorMessages = [];
+        for (const msg of currState.messages) {
+          this.errorMessages.push(msg);
+        }
+      } else {
+        this.errorMessages = [];
+      }
+    }
     if (this.currUrl[this.currUrl.length - 1] === 'position') {
       this.companyLink = false;
       if (!currState['positions']) {
@@ -106,6 +118,15 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.subscription) {
       this.subscription.unsubscribe();
+    }
+    this.onClose();
+  }
+
+  onClose() {
+    if (this.currUrl[0] === 'companies') {
+      // the only errors that can be catched here are of a company
+      // the others will be catched in a different/prev component
+      this.store.dispatch(new CompanyActions.ClearError());
     }
   }
 

@@ -6,10 +6,10 @@ const validation = require('../utils/validation');
 const errorHandling = require('../utils/errorHandling');
 const getBulkArrayForUpdate = require('../utils/shared').getBulkArrayForUpdate;
 const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
-
+const chackCompanyUpdateSignupValidation = require('../utils/shared').chackCompanyUpdateSignupValidation
 
 exports.fetchSingle = async (req, res, next) => {
-  try {
+  try { 
     let company = await Company.findById(req.query._id).select(
       '_id email name website description imagePath positionsIds').populate('positionsIds');
 
@@ -27,7 +27,7 @@ exports.fetchSingle = async (req, res, next) => {
 };
 
 exports.fetchAll = async (req, res, next) => {
-  try {     
+  try {
     const companies = await Company.aggregate([
       { $match: { _id: { $ne: mongoose.Types.ObjectId(req.query._id)} } },
       { $project: { positionsIds: 0, createdAt: 0, updatedAt: 0, __v: 0, password: 0 } },
@@ -90,10 +90,15 @@ const getUpdateQuery = async (req) => {
 };
 
 exports.updateCompany = async (req, res, next) => {
-  try {
-    if(validation.handleValidationRoutesErrors(req, res)) return;
-    if(await validation.companyNameExistValidation(req.body.name, res, req.body._id)) return;
-    if(await validation.userEmailExistValidation(req.body.email, res, req.body._id)) return;
+  try { 
+    const routeErros = validation.handleValidationRoutesErrors(req);
+    if(routeErros.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
+    }
+    const companyValid = await chackCompanyUpdateSignupValidation(req, signup = false);
+    if(companyValid.type === 'failure'){
+      return sendMessagesResponse(res, 422, companyValid.messages, 'failure');
+    }
     
     const bulkRes = await Company.bulkWrite(await getUpdateQuery(req));
     if(!bulkRes.result.nMatched){

@@ -4,7 +4,7 @@
 
 import { Position } from '../position.model';
 import * as PositionActions from './position.actions';
-import { stat } from 'fs';
+
 
 
 export interface State {
@@ -12,7 +12,6 @@ export interface State {
   loadingAll: boolean;
   loadingSingle: boolean;
   messages: any[];
-  tempPosition: Position;
   lastFetch: Date;
 }
 
@@ -21,7 +20,6 @@ const initialState: State = {
   messages: null,
   loadingAll: false,
   loadingSingle: false,
-  tempPosition: null,
   lastFetch: null
 };
 
@@ -30,7 +28,6 @@ export function positionReducer(state = initialState, action: PositionActions.Po
     case PositionActions.CREATE_POSITION_IN_DB:
       return {
         ...state,
-        messages: null,
         loadingAll: false,
         loadingSingle: true,
       };
@@ -67,6 +64,7 @@ export function positionReducer(state = initialState, action: PositionActions.Po
         ...state,
         positions: [...action.payload],
         loadingAll: false,
+        messages: null,
         lastFetch: new Date()
       };
     case PositionActions.POSITION_OP_FAILURE:
@@ -77,18 +75,16 @@ export function positionReducer(state = initialState, action: PositionActions.Po
         loadingSingle: false,
       };
     case PositionActions.UPDATE_SINGLE_POSITION_COMPANY:
-      // console.log(action.payload)
       action.payload.company.lastFetch = new Date();
       const upToDatePos = {
         ...state.positions[action.payload.posInd],
         companyId: action.payload.company
       };
       const upToDatePositions = [ ...state.positions ];
-      // console.log(upToDatePositions)
       upToDatePositions[action.payload.posInd] = upToDatePos;
-      // console.log(upToDatePositions)
       return {
         ...state,
+        messages: null,
         positions: upToDatePositions
       };
     case PositionActions.UPDATE_SINGLE_POSITION:
@@ -104,6 +100,7 @@ export function positionReducer(state = initialState, action: PositionActions.Po
       }
       return {
         ...state,
+        messages: null,
         positions: [ ...updatedPositions],
         loadingAll: false,
         loadingSingle: false,

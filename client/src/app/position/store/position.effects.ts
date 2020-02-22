@@ -9,7 +9,6 @@ import * as fromApp from '../../store/app.reducer';
 import { environment } from '../../../environments/environment';
 
 import * as PositionActions from './position.actions';
-import * as CompanyActions from '../../company/store/company.actions';
 import * as AuthActions from '../../auth/store/auth.actions';
 import { of } from 'rxjs';
 
@@ -74,12 +73,7 @@ export class PositionEffects {
       .pipe(
         map(res => {
           if (res['type'] === 'success') {
-            // this.store.dispatch(new PositionActions.ClearError());
             return new PositionActions.UpdateSinglePosition({ position: res['position'], main: actionData.payload.main });
-            // this.store.dispatch(new CompanyActions.ClearError());
-            // return actionData.payload.main ?
-            //     new PositionActions.UpdateSinglePosition({ position: res['position'], main: actionData.payload.main }) :
-            //     new CompanyActions.UpdateSingleCompanyPosition(res['position']);
           } else {
             return new PositionActions.PositionOpFailure(res['messages']);
           }

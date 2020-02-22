@@ -6,6 +6,7 @@ import { DropdownDirective } from './dropdown.directive';
 import { AlertComponent } from './alert/alert.component';
 import { LoadingSpinnerComponent } from './loading-spinner/loading-spinner.component';
 import { BackButtonComponent } from './back-button/back-button.component';
+import { MessageBoxComponent } from './message-box/message-box.component';
 
 
 
@@ -16,6 +17,7 @@ import { BackButtonComponent } from './back-button/back-button.component';
     AlertComponent,
     LoadingSpinnerComponent,
     BackButtonComponent,
+    MessageBoxComponent,
   ],
   imports: [
     CommonModule
@@ -25,7 +27,8 @@ import { BackButtonComponent } from './back-button/back-button.component';
     AlertComponent,
     LoadingSpinnerComponent,
     CommonModule,
-    BackButtonComponent
+    BackButtonComponent,
+    MessageBoxComponent
   ]
 })
 export class SharedModule {}

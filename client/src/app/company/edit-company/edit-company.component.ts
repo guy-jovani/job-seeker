@@ -22,6 +22,8 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
   companyForm: FormGroup;
   isLoading = false;
   showPasswords = false;
+  errorMessages: string[] = [];
+  currUrl: string[] = null;
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -49,7 +51,18 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
         return this.store.select('company');
       }))
       .subscribe(companyState => {
+        this.currUrl = this.router.url.substring(1).split('/');
         this.isLoading = companyState.loadingSingle;
+        if (this.currUrl[this.currUrl.length - 1] === 'edit') {
+          if (companyState.messages) {
+            this.errorMessages = [];
+            for (const msg of companyState.messages) {
+              this.errorMessages.push(msg);
+            }
+          } else {
+            this.errorMessages = [];
+          }
+        }
         if (this.company) {
           this.initForm();
         }
@@ -121,14 +134,11 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
     this.imagePreview = '';
   }
 
-  onDelete() {
-    // this.store.dispatch(new EmployeeActions.DeleteEmployeeFromDB(this.index));
-  }
-
   ngOnDestroy() {
     if (this.authState) {
       this.authState.unsubscribe();
     }
+    this.onClose();
   }
 
   onClose() {

@@ -21,6 +21,8 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
   employeeForm: FormGroup;
   employee: Employee;
   showPasswords = false;
+  errorMessages: string[] = [];
+  currUrl: string[] = null;
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -46,7 +48,18 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
       }))
       .subscribe(
         employeeState => {
+          this.currUrl = this.router.url.substring(1).split('/');
           this.isLoading = employeeState.loadingSingle;
+          if (this.currUrl[this.currUrl.length - 1] === 'edit') {
+            if (employeeState.messages) {
+              this.errorMessages = [];
+              for (const msg of employeeState.messages) {
+                this.errorMessages.push(msg);
+              }
+            } else {
+              this.errorMessages = [];
+            }
+          }
           if (this.employee) {
             this.initForm();
           }
@@ -81,6 +94,7 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
     const lastName = form.value.lastName ? form.value.lastName : undefined;
     const password = form.value.passwords.password ? form.value.passwords.password : undefined;
     const confirmPassword = form.value.passwords.confirmPassword ? form.value.passwords.confirmPassword : undefined;
+
     const newEmployee = new Employee({
       _id: this.employee._id, email: form.value.email
     });
@@ -99,6 +113,11 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
     if (this.authState) {
       this.authState.unsubscribe();
     }
+    this.onClose();
+  }
+
+  onClose() {
+    this.store.dispatch(new EmployeeActions.ClearError());
   }
 
   onTogglePasswords() {

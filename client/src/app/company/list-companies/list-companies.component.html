@@ -4,7 +4,9 @@
   <app-loading-spinner></app-loading-spinner>
 </div>
 <div *ngIf="!isLoading">
-  <ul class="list-group" *ngIf="companies.length">
+  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
+  <!-- <app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert> -->
+  <ul class="list-group" *ngIf="companies.length && !errorMessages.length">
     <li
       class="list-group-item"
       *ngFor="let company of companies; let i=index">
@@ -14,7 +16,7 @@
       </a>
     </li>
   </ul>
-  <p *ngIf="!companies.length">There are no registers companies</p>
+  <p *ngIf="!companies.length && !errorMessages.length">There are no registers companies</p>
 </div>
 
 

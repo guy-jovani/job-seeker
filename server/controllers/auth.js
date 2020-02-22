@@ -9,8 +9,8 @@ const Employee = require('../models/employee');
 const Company = require('../models/company');
 const validation = require('../utils/validation');
 const handleServerErrors = require('../utils/errorHandling').handleServerErrors
-
-const handleValidationRoutesErrors = require('../utils/validation').handleValidationRoutesErrors;
+const sendMessagesResponse = require('../utils/shared').sendMessagesResponse
+const chackCompanyUpdateSignupValidation = require('../utils/shared').chackCompanyUpdateSignupValidation
 
 
 const transporter = nodemailer.createTransport({
@@ -45,15 +45,14 @@ getUserSignup = (req, password) => {
 exports.signup = async (req, res, next) => {
   try {
     req.body.email = req.body.email ? req.body.email.toLowerCase() : null;
-    if(handleValidationRoutesErrors(req, res)) return;
-    const emailExist = await validation.userEmailExistValidation(req.body.email, res);
-    if(emailExist){ return; }
-    if(req.body.name) {
-      req.body.name = req.body.name.toLowerCase();
-      const nameExist = await validation.companyNameExistValidation(req.body.name, res);
-      if(nameExist) return;
+    const routeErros = validation.handleValidationRoutesErrors(req);
+    if(routeErros.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
     }
-
+    const companyValid = await chackCompanyUpdateSignupValidation(req);
+    if(companyValid.type === 'failure'){
+      return sendMessagesResponse(res, 422, companyValid.messages, 'failure');
+    }
     const password = await bcrypt.hash(req.body.password, 12);
     let [user, kind] = getUserSignup(req, password);
     user = await user.save();
@@ -77,13 +76,6 @@ exports.signup = async (req, res, next) => {
   }
 };
 
-loginEmailPassIncorrectMessage = (res) => {
-  res.status(401).json({
-    messages: ['The email and/or password are incorrect'],
-    type: 'failure'
-  });
-}
-
 getUserLogin = async (req, res) => {
   let user = await Employee.findOne({email: req.body.email}).select('-__v').populate('positionsIds');
   let kind = "employee";
@@ -94,20 +86,23 @@ getUserLogin = async (req, res) => {
     kind = "company";
   }
   if(!user){ 
-    loginEmailPassIncorrectMessage(res);
+    sendMessagesResponse(res, 401, ['The email and/or password are incorrect'], 'failure');
   }
   return [user, kind];
 };
 
 exports.login = async (req, res, next) => {
   try {
-    if(handleValidationRoutesErrors(req, res)) return;
+    const routeErros = validation.handleValidationRoutesErrors(req);
+    if(routeErros.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
+    }
     let [user, kind] = await getUserLogin(req, res);
     if(!user) return;
 
     const verifiedPassword = await bcrypt.compare(req.body.password, user.password);
     if(!verifiedPassword){ 
-      return loginEmailPassIncorrectMessage(res);
+      return sendMessagesResponse(res, 401, ['The email and/or password are incorrect'], 'failure');
     }
     
     user = user.toObject();
@@ -141,10 +136,7 @@ exports.resetPasswordEmail = async (req, res, next) => {
       const user = await Employee.findOne({ email: req.body.email }) || 
                     await Company.findOne({ email: req.body.email });
       if (!user) {
-        return res.status(401).json({
-          messages: ['No account with that email found.'],
-          type: 'failure'
-        });
+        return sendMessagesResponse(res, 401, ['No account with that email found.'], 'failure');
       }   
       user.resetPassToken = token;
       user.resetPassTokenExpiration = Date.now() + 3600000;
@@ -171,18 +163,18 @@ exports.resetPasswordEmail = async (req, res, next) => {
 
 exports.resetToNewPassword = async (req, res, next) => {
   try {
+    const routeErros = validation.handleValidationRoutesErrors(req);
+    if(routeErros.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
+    }
     const resetPassToken = req.body.token;
-    if(handleValidationRoutesErrors(req, res)) return;
     const user = await Employee.findOne({ 
                       resetPassToken: resetPassToken, resetPassTokenExpiration: { $gt: Date.now() } }) || 
                  await Company.findOne({ 
                       resetPassToken: resetPassToken, resetPassTokenExpiration: { $gt: Date.now() } });
 
     if (!user) {
-      return res.status(401).json({
-        messages: ['Invalid Token.'],
-        type: 'failure'
-      });
+      return sendMessagesResponse(res, 401, ['Invalid Token.'], 'failure');
     }
     const hashedPassword = await bcrypt.hash(req.body.password, 12);
     user.password = hashedPassword;

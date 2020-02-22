@@ -13,10 +13,10 @@ import * as AuthActions from './auth/store/auth.actions';
 export class AppComponent implements OnInit{
   title = 'company-web';
 
-  constructor(private store: Store<fromApp.AppState>){}
+  constructor(private store: Store<fromApp.AppState>) {}
 
 
-  ngOnInit(){
+  ngOnInit() {
     this.store.dispatch(new AuthActions.AutoLogin());
   }
 

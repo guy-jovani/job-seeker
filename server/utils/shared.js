@@ -1,6 +1,6 @@
 
 const bcrypt = require('bcryptjs');
-
+const validation = require('../utils/validation');
 
 
 
@@ -33,12 +33,41 @@ exports.getBulkArrayForUpdate = async (req, nullKeys) => {
   }
   
   return bulkArr;
-}
+};
 
 
+sendMessagesResponse = (res, statusCode, messages, type) => {
+  res.status(statusCode).json({ type, messages });
+};
+
+exports.sendMessagesResponse = sendMessagesResponse;
 
 
+exports.chackCompanyUpdateSignupValidation = async (req, signup = true) => {
+  let messages, nameExist, emailExist;
+  if(signup){console.log('1111')
+    emailExist = await validation.userEmailExistValidation(req.body.email);
+  } else {
+    emailExist = await validation.userEmailExistValidation(req.body.email, req.body._id);
+  }
+  messages = emailExist.messages;
+  if(req.body.name) {
+    req.body.name = req.body.name.toLowerCase();
+    nameExist = await validation.companyNameExistValidation(req.body.name, req.body._id);
+    messages = messages.concat(nameExist.messages);
+  }
 
+  if(emailExist.type === 'failure' || nameExist.type === 'failure'){
+    return {
+      type: 'failure', 
+      messages
+    }
+  }
+  return {
+    type: 'success',
+    messages: []
+  }
+};
 
 
 

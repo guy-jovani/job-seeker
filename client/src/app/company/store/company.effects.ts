@@ -90,18 +90,23 @@ export class CompanyEffects {
       })
       .pipe(
         map(res => {
+          this.store.dispatch(new PositionActions.ClearError());
+          this.store.dispatch(new CompanyActions.ClearError());
           if (res['type'] === 'success') {
-            this.store.dispatch(new PositionActions.ClearError());
-            this.store.dispatch(new CompanyActions.ClearError());
             return actionData.payload.main ?
-                new CompanyActions.UpdateSingleCompany({company: res['company'], main: actionData.payload.main }) :
-                new PositionActions.UpdateSinglePositionCompany({company: res['company'], posInd: actionData.payload.posInd});
+                  new CompanyActions.UpdateSingleCompany({company: res['company'], main: actionData.payload.main }) :
+                  new PositionActions.UpdateSinglePositionCompany({company: res['company'], posInd: actionData.payload.posInd });
+
           } else {
-            return new CompanyActions.CompanyOpFailure(res['messages']);
+            return actionData.payload.main ?
+                  new CompanyActions.CompanyOpFailure(res['messages']) :
+                  new PositionActions.PositionOpFailure(res['messages']);
           }
         }),
         catchError(messages => {
-          return of(new CompanyActions.CompanyOpFailure(messages));
+          return actionData.payload.main ?
+                  of(new CompanyActions.CompanyOpFailure(messages)) :
+                  of(new PositionActions.PositionOpFailure(messages));
         })
       );
     })

@@ -1,6 +1,6 @@
 
-<app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert>
 <div class="container">
+  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
   <h4>{{ index >= 0 ? 'Update' : 'Create' }}</h4>
   <div *ngIf="isLoading">
     <app-loading-spinner></app-loading-spinner>
@@ -60,17 +60,13 @@
         </span>
       </div>
     </div>
-
-
-
-
     <hr>
     <button
       type="submit"
       class="btn btn-success"
-      >
-      <!-- [disabled]="!positionForm.valid" -->
-      {{ index && index >= 0 ? 'Update' : 'Create' }}
+      [disabled]="!positionForm.valid"
+    >
+      {{ !(+index).constructor.isNaN(+index) && index >= 0 ? 'Update' : 'Create' }}
     </button>
     <button
       type="button"

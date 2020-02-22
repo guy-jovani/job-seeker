@@ -13,7 +13,7 @@ export class AlertComponent {
     this.closeAlert.emit();
   }
 
-  @HostListener('document:keypress') enterKeyPress(eventData: Event) {
+  @HostListener('document:keypress') enterKeyPress(eventData: Event) { // TODO
     this.onClose();
   }
 }

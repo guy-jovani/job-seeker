@@ -1,5 +1,7 @@
 
 <div class="container">
+  <!-- <app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert> -->
+  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
   <h4>Edit</h4>
   <div *ngIf="isLoading">
     <app-loading-spinner></app-loading-spinner>

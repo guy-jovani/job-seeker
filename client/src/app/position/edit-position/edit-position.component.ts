@@ -23,7 +23,8 @@ export class EditPositionComponent implements OnInit, OnDestroy {
   positionForm: FormGroup;
   position: Position = null;
   index: number = null;
-  companyId: string = null;
+  company: Company = null;
+  currUrl: string[] = null;
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -40,27 +41,31 @@ export class EditPositionComponent implements OnInit, OnDestroy {
 
     this.positionSub = this.route.params.pipe(
       switchMap(params => {
-        if (params['index']) {
-          this.index = params['index'];
-        }
+        this.currUrl = this.router.url.substring(1).split('/');
+        this.index = params['index'];
         return this.store.select('auth');
       }),
       switchMap(authState => {
-        if (this.index !== null) {
+        this.company = authState.user as Company;
+        if (!isNaN(this.index)) { // /my-positions/:index/edit
           this.position = (authState.user as Company)['positions'][this.index];
           this.initForm();
         }
-        this.companyId = authState.user._id;
         return this.store.select('position');
       })
     ).subscribe(positionState => {
+      this.currUrl = this.router.url.substring(1).split('/');
       this.isLoading = positionState['loadingSingle'];
-      if (positionState.messages) {
-        for (const msg of positionState.messages) {
-          this.errorMessages.push(msg);
+      if (this.currUrl[this.currUrl.length - 1] === 'edit' ||
+          this.currUrl[this.currUrl.length - 1] === 'create') {
+        if (positionState.messages) {
+          this.errorMessages = [];
+          for (const msg of positionState.messages) {
+            this.errorMessages.push(msg);
+          }
+        } else {
+          this.errorMessages = [];
         }
-      } else {
-        this.errorMessages = [];
       }
     });
   }
@@ -79,9 +84,11 @@ export class EditPositionComponent implements OnInit, OnDestroy {
 
   initForm() {
     if (this.index !== null) {
-      this.position.requirements.forEach(req => {
-        this.onAddRequirement(req.years, req.skill);
-      });
+      if (this.position.requirements) {
+        this.position.requirements.forEach(req => {
+          this.onAddRequirement(req.years, req.skill);
+        });
+      }
       this.positionForm.patchValue({
         title: this.position.title,
         description: this.position.description,
@@ -90,7 +97,8 @@ export class EditPositionComponent implements OnInit, OnDestroy {
   }
   onSubmit(form: NgForm) {
     const newPosition = new Position({
-      title: form.value.title, description: form.value.description, companyId: {_id: this.companyId}
+      title: form.value.title, description: form.value.description,
+      companyId: { _id: this.company._id, name: this.company.name }
     });
     if (form.value.requirements.length > 0) {
       newPosition.requirements = form.value.requirements;
@@ -104,6 +112,7 @@ export class EditPositionComponent implements OnInit, OnDestroy {
   }
 
   onCancel() {
+    this.onClose();
     this.router.navigate(['../'], {relativeTo: this.route});
   }
 
@@ -111,6 +120,7 @@ export class EditPositionComponent implements OnInit, OnDestroy {
     if (this.positionSub) {
       this.positionSub.unsubscribe();
     }
+    this.onClose();
   }
 
   onClose() {

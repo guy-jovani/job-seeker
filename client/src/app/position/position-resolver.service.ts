@@ -29,7 +29,7 @@ export class PositionResolverService implements Resolve<Position[]> {
         if (!positionState.positions.length || timeFromLastFetchMS && timeFromLastFetchMS > environment.fetchDataMSReset) {
           this.store.dispatch(new PositionActions.FetchAllPositions());
           return this.actions$.pipe(
-            ofType(PositionActions.SET_ALL_POSITIONS),
+            ofType(PositionActions.SET_ALL_POSITIONS, PositionActions.POSITION_OP_FAILURE),
             take(1)
           );
         } else {

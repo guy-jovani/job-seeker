@@ -6,6 +6,7 @@ import { DetailsPositionComponent } from './details-position/details-position.co
 import { DetailsCompanyComponent } from 'app/company/details-company/details-company.component';
 import { DetailsPositionGuard } from './details-position/details-position.guard';
 import { AuthGuard } from 'app/auth/auth.guard';
+import { DetailsCompanyGuard } from 'app/company/details-company/details-company.guard';
 
 
 
@@ -21,7 +22,7 @@ const routes: Routes = [
         path: ':index', component: DetailsPositionComponent, canActivate: [DetailsPositionGuard],
       },
       {
-        path: ':index/company', component: DetailsCompanyComponent, canActivate: [DetailsPositionGuard],
+        path: ':index/company', component: DetailsCompanyComponent, canActivate: [DetailsCompanyGuard],
       },
       {
         path: ':index/company/position', component: DetailsPositionComponent, canActivate: [DetailsPositionGuard],

@@ -8,7 +8,7 @@ const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
 
 
 exports.fetchSingle = async (req, res, next) => {
-  try {
+  try {throw "111"
     const employee = await Employee.findById(req.query._id).select('_id email firstName lastName');
     res.status(200).json({
       type: 'success',
@@ -40,9 +40,16 @@ const getUpdateQuery = async (req) => {
 
 exports.updateEmployee = async (req, res, next) => {
   try {
-    if(validation.handleValidationRoutesErrors(req, res)) return;
-    if(await validation.userEmailExistValidation(req.body.email, res, req.body._id)) return; 
-    
+    const routeErros = validation.handleValidationRoutesErrors(req);
+    if(routeErros.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
+    } 
+    const emailExist = await validation.userEmailExistValidation(req.body.email, req.body._id);
+    console.log(emailExist)
+    if(emailExist.type === 'failure'){
+      return sendMessagesResponse(res, 422, emailExist.messages, 'failure');
+    }
+
     const bulkRes = await Employee.bulkWrite(await getUpdateQuery(req));
     if(!bulkRes.result.nMatched){
       throw new Error("trying to update a non exisitng employee");
@@ -80,53 +87,3 @@ exports.updateEmployee = async (req, res, next) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// exports.postEmployee = async (req, res, next) => {
-//   try {
-//     const emailExist = await validation.employeeEmailExistValidation(req.body.email, res);
-//     if(!emailExist){
-//       const employee = new Employee({ name: req.body.name, email: req.body.email });
-//       await employee.save();
-//       res.status(200).json({
-//         message: 'employee created successfully!',
-//         type: 'success',
-//         id: employee._id,
-//         firstName: employee.firstName,
-//         lastName: employee.lastName,
-//         email: employee.email,
-//       });
-//     }
-//   } catch (error) {
-//     next(errorHandling.handleServerErrors(error, 500, "there was an error creating the employee"));
-//   }
-// };
-//
-// exports.deleteEmployee = async (req, res, next) => {
-//   try {
-//     await Employee.findByIdAndDelete(req.body.id);
-//     res.status(200).json({
-//       message: 'employee deleted successfully!',
-//       type: 'success',
-//       id: req.body.id
-//     });
-//   } catch (error) {
-//     next(errorHandling.handleServerErrors(error, 500, "there was an error deleting the employee"));
-//   }
-// };

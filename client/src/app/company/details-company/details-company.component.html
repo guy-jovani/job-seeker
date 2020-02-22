@@ -4,11 +4,13 @@
   <app-loading-spinner></app-loading-spinner>
 </div>
 <div class="container" *ngIf="company && !isLoading">
+  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
+  <!-- <app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert> -->
   <div>
     <h3>{{ allowEdit ? 'My Profile' : company.name | titlecase }}</h3>
-    <app-back-button *ngIf='mainUrl !== "companies" && mainUrl !== "my-details"'></app-back-button>
+    <app-back-button *ngIf='mainUrl !== "my-details"'></app-back-button>
   </div>
-  <div class="row" *ngIf="!isLoading">
+  <div class="row" *ngIf="!isLoading && !errorMessages.length">
     <p *ngIf="company.imagePath"><img class="image" [src]='company.imagePath'></p>
     <p>email: {{ company.email || "------" }}</p>
     <p>website: {{ company.website || "------" }}</p>

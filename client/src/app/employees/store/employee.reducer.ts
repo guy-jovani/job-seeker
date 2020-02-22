@@ -20,7 +20,6 @@ const initialState: State = {
 };
 
 export function employeeReducer(state = initialState, action: EmployeeActions.EmployeeActions) {
-  // console.log("employee reducer " + action.type);
   switch (action.type) {
     case EmployeeActions.SET_ALL_EMPLOYEES:
       return {
@@ -79,25 +78,6 @@ export function employeeReducer(state = initialState, action: EmployeeActions.Em
       };
     default:
       return state;
-          // case EmployeeActions.SET_ONE_EMPLOYEE:
-          //   return {
-          //     ...state,
-          //     employees: [...state.employees, action.payload],
-          //     messages: null
-          //   };
-          // case EmployeeActions.DELETE_EMPLOYEE:
-          //   return {
-          //     ...state,
-          //     // employees: state.employees.filter((emp, index) =>
-          //     //               emp['_id'] !== action.payload),
-          //     messages: null
-          //   };
-          //   updatedEmployees[index] = updatedEmployee;
-            // return {
-            //   ...state,
-            //   employees: [...updatedEmployees],
-            //   messages: null
-            // };
   }
 }
 

@@ -30,6 +30,7 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
     case AuthActions.RESET_PASS_ATTEMPT:
       return {
         ...state,
+        messages: null,
         loading: true,
       };
     case AuthActions.AUTH_FAILURE:
@@ -42,6 +43,7 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
       const updatedPositions = [ ...state.user.positions, action.payload ];
       const updatedUser = {
         ...state.user,
+        messages: null,
         positions: updatedPositions
       };
       return {
@@ -54,6 +56,7 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
       positions[posInd] = action.payload;
       const upToDateUser = {
         ...state.user,
+        messages: null,
         positions
       };
       return {

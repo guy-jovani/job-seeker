@@ -2,15 +2,20 @@
 
 
 
-
+<div *ngIf="isLoading" style="text-align: center;">
+  <app-loading-spinner></app-loading-spinner>
+</div>
 <div *ngIf="allowAdd">
   <a class="btn btn-success" routerLink='create'>
     Add Position
   </a>
 </div>
-<div>
+<div *ngIf="!isLoading">
   <div>
-    <ul class="list-group" *ngIf="positions.length">
+    <h3 *ngIf="!companyPositions">Positions</h3>
+    <h4 *ngIf="companyPositions">Positions</h4>
+    <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
+    <ul class="list-group" *ngIf="positions && positions.length && !errorMessages.length">
       <li
         class="list-group-item"
         *ngFor="let position of positions; let i=index">
@@ -20,6 +25,6 @@
         </a>
       </li>
     </ul>
-    <p *ngIf="!positions.length">There are no open positions</p>
+    <p *ngIf="!positions || !positions.length && !errorMessages.length">There are no open positions</p>
   </div>
 </div>
