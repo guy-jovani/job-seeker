@@ -65,7 +65,7 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy  {
           }
           this.allowEdit = false;
           this.company = !currState['positions'] ? null : currState['positions'][+this.currUrl[1]]['companyId'];
-          if (!this.company.email) { this.errorMessages =['There was an error fetching the company']; }
+          if (!this.company.email) { this.errorMessages = ['There was an error fetching the company']; }
         }
         this.ref.detectChanges();
       });

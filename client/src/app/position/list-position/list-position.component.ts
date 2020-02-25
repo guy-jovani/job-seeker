@@ -67,7 +67,7 @@ export class ListPositionComponent implements OnInit, OnDestroy {
 
   }
 
-  onClose() {
+  onClose() {console.log(this.currUrl)
     this.store.dispatch(new PositionActions.ClearError());
   }
 
@@ -75,7 +75,9 @@ export class ListPositionComponent implements OnInit, OnDestroy {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
-    this.onClose();
+    if (this.currUrl.length === 1 && this.currUrl[0] === 'positions') {
+      this.onClose();
+    }
   }
 
 }

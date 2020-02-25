@@ -70,6 +70,10 @@ export class EditPositionComponent implements OnInit, OnDestroy {
     });
   }
 
+  getControls() {
+    return (this.positionForm.get('requirements') as FormArray).controls;
+  }
+
   onAddRequirement(years: number = null, skill: string = null) {
     (this.positionForm.get('requirements') as FormArray).push(
       new FormGroup({

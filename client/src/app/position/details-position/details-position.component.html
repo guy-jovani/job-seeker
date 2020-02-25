@@ -1,15 +1,15 @@
 
 
 
+
 <div *ngIf="isLoading">
   <app-loading-spinner></app-loading-spinner>
 </div>
-
-<div class="container" *ngIf="position && !isLoading">
+<div class="container-fluid" *ngIf="position && !isLoading">
   <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
   <div class="row">
     <h3>{{ position.title | titlecase }}</h3>
-    <app-back-button *ngIf='state !== "position"'></app-back-button>
+    <app-back-button></app-back-button>
     <div>
       <p *ngIf="!allowEdit">
         <a routerLink='company' (click)="getCompanyinfo()"

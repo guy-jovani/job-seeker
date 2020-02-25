@@ -5,7 +5,7 @@
 <div *ngIf="isLoading">
   <app-loading-spinner></app-loading-spinner>
 </div>
-<div class="container" *ngIf="employee && !isLoading">
+<div class="container-fluid" *ngIf="employee && !isLoading">
   <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
   <div class="row">
     <div class="col-md-6">

@@ -23,7 +23,6 @@ export class DetailsPositionGuard implements CanActivate {
             map(positionState => {
               const re = /\d+/;
               const index = re.exec(next.url[0].path);
-              console.log(window.history.state)
               if (index && index[0]) { //  && +index < positionState.companies.length
                 return true;
               }
