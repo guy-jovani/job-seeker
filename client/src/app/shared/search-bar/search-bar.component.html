@@ -1,0 +1,27 @@
+
+
+
+
+
+
+
+
+<app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert>
+<input type="text" class="search-bar" placeholder="{{placeholder}}" (input)="onSearchChange($event.target.value)" (focus)="onSearchChange($event.target.value)" #searchInput>
+
+<ul class="list-results hide" #listResults>
+  <li *ngFor='let res of searchRes; let i=index' class="list-item" (click)="onWantedRes(i)">
+    {{  res.fullName  }}
+  </li>
+  <li *ngIf="searchRes && !searchRes.length" class="list-item">No Results Found.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+

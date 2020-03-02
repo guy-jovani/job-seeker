@@ -21,6 +21,7 @@ import { SharedModule } from './shared/shared.module';
 import { CoreModule } from './core.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { MessagesModule } from './messages/messages.module';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { AuthModule } from './auth/auth.module';
     CompanyModule,
     SharedModule,
     CoreModule,
+    MessagesModule,
     AuthModule,
     UserModule,
     AppRoutingModule,

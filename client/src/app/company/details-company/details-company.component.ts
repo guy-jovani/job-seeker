@@ -10,7 +10,7 @@ import { switchMap } from 'rxjs/operators';
 @Component({
   selector: 'app-details-company',
   templateUrl: './details-company.component.html',
-  styleUrls: ['./details-company.component.css']
+  styleUrls: ['./details-company.component.scss']
 })
 export class DetailsCompanyComponent implements OnInit, OnDestroy {
   routeSub: Subscription;

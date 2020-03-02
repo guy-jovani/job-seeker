@@ -14,7 +14,7 @@ import { mimeType } from './mime-type.validator';
 @Component({
   selector: 'app-edit-company',
   templateUrl: './edit-company.component.html',
-  styleUrls: ['./edit-company.component.css']
+  styleUrls: ['./edit-company.component.scss']
 })
 export class EditCompanyComponent implements OnInit, OnDestroy {
   errorMessages: string[];

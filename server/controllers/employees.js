@@ -1,5 +1,6 @@
 
 
+const mongoose = require('mongoose');
 const Employee = require('../models/employee');
 const validation = require('../utils/validation');
 const errorHandling = require('../utils/errorHandling')
@@ -7,7 +8,7 @@ const getBulkArrayForUpdate = require('../utils/shared').getBulkArrayForUpdate;
 const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
 
 
-exports.getEmployee = async (req, res, next) => {
+exports.fetchEmployee = async (req, res, next) => {
   try {
     const employee = await Employee.findOne({_id: req.query._id}).select(
             '-password -__v -resetPassToken -resetPassTokenExpiration');
@@ -20,10 +21,10 @@ exports.getEmployee = async (req, res, next) => {
   }
 };
 
-exports.getEmployees = async (req, res, next) => {
-  try {
-    const employees = await Employee.find({_id: { $ne: req.query._id }}).select(
-          '-password -__v -resetPassToken -resetPassTokenExpiration');
+exports.fetchEmployees = async (req, res, next) => {
+  try { 
+    const employees = await Employee.find({_id: { $ne: mongoose.Types.ObjectId(req.query._id) }}).select(
+        '-password -__v -resetPassssToken -resetPassTokenExpiration');
     res.status(200).json({
       type: 'success',
       employees

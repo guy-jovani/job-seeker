@@ -8,7 +8,7 @@ import * as CompanyActions from './store/company.actions';
 @Component({
   selector: 'app-companies',
   templateUrl: './companies.component.html',
-  styleUrls: ['./companies.component.css']
+  styleUrls: ['./companies.component.scss']
 })
 export class CompaniesComponent implements OnInit {
   storeSubscription: Subscription;

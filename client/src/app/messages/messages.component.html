@@ -1,0 +1,73 @@
+
+
+
+
+<app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert>
+<div class="parent-messages">
+
+  <div class="conversations">
+    <div class="create-messages">
+      Messages
+      <button (click)="onNewMessage(true)" type="button" class="my-btn glyphicon glyphicon-edit">
+      </button>
+      <button (click)="onNewMessage(false)" type="button" class="my-btn">
+        <span class="glyphicon glyphicon-edit"></span>
+        <span class="glyphicon glyphicon-edit"></span>
+      </button>
+    </div>
+    <div class="messages-list">
+      messages list
+    </div>
+  </div>
+
+
+  <div class="new-message">
+    <div class="title">
+        New {{ privateMsg ? '' : 'Group' }} Message
+    </div>
+    <div class="add-people">
+      <app-search-bar [placeholder]="'Type one or more names'" [search]="['employee','company']" (nameListEmitter)="onGetNames($event)"></app-search-bar>
+    </div>
+    <div class="name-list">
+      <ul class='name-list__list'>
+        <li *ngFor="let name of nameList; let i=index" class="name-list__item">
+          {{ name.fullName }}
+          <span class="glyphicon glyphicon-remove name-list__item-remove" (click)="onRemoveName(i)"></span>
+        </li>
+      </ul>
+    </div>
+    <form class="message-form" (ngSubmit)="onSubmit(newConversationForm)" #newConversationForm="ngForm">
+      <div class="input-box">
+        <label for="messageContent"></label>
+        <textarea
+          ngModel
+          required
+          name="messageContent"
+          class="message-content"
+          placeholder="Type your message here"></textarea>
+      </div>
+      <div class="submit-message">
+        <button class="submit-message__button" [disabled]="!newConversationForm.valid">Send</button>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

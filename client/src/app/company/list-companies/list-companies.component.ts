@@ -12,7 +12,7 @@ import * as CompanyActions from '../store/company.actions';
 @Component({
   selector: 'app-list-companies',
   templateUrl: './list-companies.component.html',
-  styleUrls: ['./list-companies.component.css']
+  styleUrls: ['./list-companies.component.scss']
 })
 export class ListCompaniesComponent implements OnInit {
   companies: Company[];
@@ -22,7 +22,7 @@ export class ListCompaniesComponent implements OnInit {
 
   constructor(private store: Store<fromApp.AppState>,
               private route: ActivatedRoute) { }
-              
+
 
   ngOnInit() {
     this.subscription = this.store.select('company')
@@ -35,7 +35,7 @@ export class ListCompaniesComponent implements OnInit {
       });
   }
 
-  getCompanyinfo(index: number){ 
+  getCompanyinfo(index: number){
     this.store.dispatch(new CompanyActions.FetchSingleCompany(this.companies[index]._id));
   }
 

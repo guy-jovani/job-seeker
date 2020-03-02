@@ -13,7 +13,7 @@ import * as EmployeeActions from '../../employees/store/employee.actions';
 @Component({
   selector: 'app-details-user',
   templateUrl: './details-user.component.html',
-  styleUrls: ['./details-user.component.css']
+  styleUrls: ['./details-user.component.scss']
 })
 export class DetailsUserComponent implements OnInit, OnDestroy {
   userEmployee: boolean;

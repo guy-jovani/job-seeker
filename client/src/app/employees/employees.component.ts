@@ -8,7 +8,7 @@ import * as EmployeeActions from './store/employee.actions';
 @Component({
   selector: 'app-empolyees',
   templateUrl: './employees.component.html',
-  styleUrls: ['./employees.component.css']
+  styleUrls: ['./employees.component.scss']
 })
 export class EmployeesComponent implements OnInit, OnDestroy {
   storeSubscription: Subscription;

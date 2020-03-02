@@ -11,7 +11,7 @@ import { Employee } from '../employee.model';
 @Component({
   selector: 'app-details-employee',
   templateUrl: './details-employee.component.html',
-  styleUrls: ['./details-employee.component.css']
+  styleUrls: ['./details-employee.component.scss']
 })
 export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   employee: Employee;

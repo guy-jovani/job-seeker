@@ -5,12 +5,12 @@
     <div class="navbar-header">
         <a class="navbar-brand" routerLink='/'>Job Seeker</a>
       <button type="button" class="navbar-toggle" (click)="collapsed = !collapsed">
-        <span class="icon-bar" *ngFor="let iconBar of [1, 2, 3]"></span>                        
+        <span class="icon-bar" *ngFor="let iconBar of [1, 2, 3]"></span>
       </button>
-    </div> 
+    </div>
     <div class="navbar-collapse collapse" [class.collapse]="collapsed" (window:resize)="collapsed = true">
       <ul class="nav navbar-nav">
-        <li routerLinkActive="active" 
+        <li routerLinkActive="active"
             [routerLinkActiveOptions]="{exact: true}" *ngIf="isAuthenticated">
           <a class="navbar-link" routerLink='/'>Home</a>
         </li>
@@ -29,16 +29,19 @@
           <a routerLink='/login' >Login</a>
         </li>
         <li routerLinkActive="active" *ngIf="isAuthenticated">
+          <a routerLink='/messages' class="glyphicon glyphicon-envelope"></a>
+        </li>
+        <li routerLinkActive="active" *ngIf="isAuthenticated">
           <a routerLink='/my-details' class="glyphicon glyphicon-user"></a>
         </li>
         <li class="dropdown dropdown-menu-right" *ngIf="isAuthenticated" appDropdown>
           <a
-            style="cursor: pointer;" 
+            style="cursor: pointer;"
             class="dropdown-toggle">
             Manage
             <span class="caret"></span>
           </a>
-          <ul class="dropdown-menu"> 
+          <ul class="dropdown-menu">
             <li><a style="cursor: pointer;" (click)="onFetchEmployees()">Fetch Employees</a></li>
             <li><a style="cursor: pointer;" (click)="onFetchCompanies()">Fetch Companies</a></li>
           </ul>

@@ -7,8 +7,8 @@ const { body } = require('express-validator');
 
 const employeeController = require('../controllers/employees');
 
-router.get('/fetchAll', employeeController.getEmployees);
-router.get('/fetchSingle', employeeController.getEmployee);
+router.get('/fetchAll', employeeController.fetchEmployees);
+router.get('/fetchSingle', employeeController.fetchEmployee);
 
 router.post('/update', [
   body('email')
@@ -37,8 +37,7 @@ router.post('/update', [
   body('_id')
     .exists()
     .withMessage('Something went wrong with the edit process, please refresh the page and try again. If the error still hapennig please notify the admins.')
-]
-,employeeController.updateEmployee);
+], employeeController.updateEmployee);
 
 
 

@@ -1,0 +1,43 @@
+.search-bar {
+  height: 100%;
+  width: 100%;
+  padding-left: 1.2rem;
+  border: none;
+  min-height: 3rem;
+  outline: none;
+}
+
+.hide {
+  display: hidden;
+}
+
+.list-results {
+  position: relative;
+  background: white;
+  border: 1px solid #8080805e;
+  list-style: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 5;
+}
+
+.list-item {
+  height: 2.5rem;
+  padding: 0.2rem 1rem;
+}
+
+.list-item:hover {
+  background: #f2f2f29c;
+}
+
+.list-item:after {
+  border-bottom: 1px solid #1f1d1d42;
+  content: "";
+  display: block;
+  width: 90%;
+  margin: 0 auto;
+}
+
+.list-item:last-child::after {
+  border-bottom: none;
+}

@@ -6,8 +6,10 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const employeesRoutes = require('./routes/employees');
+const searchRoutes = require('./routes/search');
 const authRoutes = require('./routes/auth');
 const companiesRoutes = require('./routes/companies');
+const messagesRoutes = require('./routes/messages');
 const globalVars = require('./utils/globalVars');
 const checkAuth = require('./middleware/check-auth');
 
@@ -31,12 +33,14 @@ app.use((req, res, next) => {
 app.use('/auth', authRoutes);
 app.use('/employees', checkAuth, employeesRoutes);
 app.use('/companies', checkAuth, companiesRoutes);
+app.use('/search', checkAuth, searchRoutes);
+app.use('/messages', checkAuth, messagesRoutes);
 
 app.use((req, res, next) => {
   console.log("general url in app.js");
   console.log(req.url);
-  res.status(404).json({ 
-    message: "invalid url",
+  res.status(200).json({ // the developer is the only one that can get here
+    messages: ["invalid url"],
     type: "failure"
   });
 });

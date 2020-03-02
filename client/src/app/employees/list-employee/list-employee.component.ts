@@ -10,7 +10,7 @@ import * as EmployeeActions from '../store/employee.actions';
 @Component({
   selector: 'app-list-employee',
   templateUrl: './list-employee.component.html',
-  styleUrls: ['./list-employee.component.css']
+  styleUrls: ['./list-employee.component.scss']
 })
 export class ListEmployeeComponent implements OnInit, OnDestroy {
 
