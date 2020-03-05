@@ -9,17 +9,19 @@ const router = express.Router();
 const { body } = require('express-validator');
 
 
-const messagesController = require('../controllers/messages');
+const chatController = require('../controllers/chat');
 
-router.post('/', [
+router.post('/postMessage', [
   body('message')
     .notEmpty()
     .withMessage('You can\'t send an empty message.'),
   body('recipients')
     .notEmpty()
     .withMessage('You need to choose who to send the message to.'),
-], messagesController.postMessage);
+], chatController.postMessage);
 
+
+router.get('/fetchAllConversations', chatController.fetchConversations);
 
 module.exports = router;
 

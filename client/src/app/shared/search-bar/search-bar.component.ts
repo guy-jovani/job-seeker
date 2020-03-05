@@ -8,6 +8,7 @@ import { Company } from 'app/company/company.model';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
+
 @Component({
   selector: 'app-search-bar',
   templateUrl: './search-bar.component.html',
@@ -17,7 +18,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   subscription: Subscription;
   user: Employee | Company = null;
   searchRes: Employee[] | Company[] = null;
-  nameList: {}[] = null;
+  nameList: Map<string, {}> = null;
   errorMessages: string[] = [];
 
   @ViewChild('listResults', { static: false }) listRes: ElementRef;
@@ -27,7 +28,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   // tslint:disable-next-line: no-input-rename
   @Input('search') searchDB: string[] = null;
 
-  @Output() nameListEmitter = new EventEmitter<{}[]>();
+  @Output() nameListEmitter = new EventEmitter<Map<string, {}>>();
 
   constructor(
     private http: HttpClient,
@@ -39,7 +40,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.subscription = this.store.select('auth').subscribe(authState => {
       this.user = authState.user;
     });
-    this.nameList = [];
+    this.nameList = new Map<string, {}>();
   }
 
   onSearchChange(value: string) {
@@ -47,8 +48,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     if (!value) {
       return this.renderer2.addClass(this.listRes.nativeElement, 'hide');
     }
-    const usedIds = [this.user._id];
-    this.nameList.forEach(val => usedIds.push(val['_id']));
+    const usedIds = Array.from( this.nameList.keys() );
+    usedIds.push(this.user._id);
     this.http
       .get(nodeServer, {
         params: {
@@ -74,7 +75,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   onWantedRes(ind: number) {
-    this.nameList.push(this.searchRes[ind]);
+    this.nameList.set(this.searchRes[ind]._id, this.searchRes[ind]);
     this.searchInput.nativeElement.value = '';
     this.nameListEmitter.emit(this.nameList);
   }

@@ -12,14 +12,13 @@ exports.postMessage = async (req, res, next) => {
   try {
     if(validation.handleValidationRoutesErrors(req, res)) return;
     if(!req.body.privateMsg){
-      createUpdateConversation(req.body.recipients, req.body.message, req.body.senderId, req.body.senderType);
+      await createUpdateConversation(req.body.recipients, req.body.message, req.body.senderId, req.body.senderType);
     } else {
       for(recipient of req.body.recipients) {
-        createUpdateConversation([recipient], req.body.message, req.body.senderId, req.body.senderType);
+        await createUpdateConversation([recipient], req.body.message, req.body.senderId, req.body.senderType);
       }
     }
-    // const con = await Conversation.find().populate('participants');
-    // console.log(con)
+
     res.status(200).json({
       type: 'success'
     });
@@ -52,7 +51,7 @@ const createUpdateConversation = async (recipients, content, senderId, senderTyp
 
   // 1. check if conversation exists
   let conversation = await checkIfConExists(participantsIds);
-
+  // console.log(conversation)
   // 2. if exists - just update with new message
   if (conversation.length) {
     conversation = conversation[0]; // only one conversation should be found
@@ -64,15 +63,53 @@ const createUpdateConversation = async (recipients, content, senderId, senderTyp
 
 
 const checkIfConExists = async participantsIds => {
+  // console.log(participantsIds)
   return await Conversation.aggregate([
     {
       $match: {
         'participants.user' : {
           $all: participantsIds
+        },
+        'participants' : {
+          $size: participantsIds.length
         }
-      }
+      },
     },
   ]);
+};
+
+
+exports.fetchConversations = async (req, res, next) => {
+  try {
+    let conversations = await Conversation.aggregate([
+      {
+        $match: {
+          'participants.user' : {
+            $in: [mongoose.Types.ObjectId(req.query._id)]
+          }
+        }
+      }
+    ]);
+    conversations = await Conversation.populate(conversations, 
+      {
+        path: 'participants.user',
+        select: [ 'name', 'firstName', 'lastName' ]
+      });
+    conversations = await Conversation.populate(conversations, 
+      {
+        path: 'messages',
+        select: ['creator', 'content', 'createdAt'],
+        // $sort: {
+        //   createdAt: 1
+        // }
+      });
+    res.status(200).json({
+      type: 'success',
+      conversations
+    });
+  } catch (error) {
+    next(errorHandling.handleServerErrors(error, 500, 'There was an error fetching the conversations. Please try again later.'));
+  }
 };
 
 
@@ -80,35 +117,3 @@ const checkIfConExists = async participantsIds => {
 
 
 
-
-
-
-
-
-// const addMessageToConversation = async (conversation, content, senderId, senderType) => {
-//   const message = await Message.create({
-//     conversation: conversation._id, 
-//     creator: senderId,
-//     content: content, 
-//     onModel: senderType
-//   });
-//   // conversation = conversation.toObject();
-//   conversation.messages.push(message);
-//   await conversation.save();
-// };
-
-// const createUpdatePrivateConversations = async (recipients, content, senderId, senderType) => {
-//   for(_id of recipients) {
-//     const participants = [mongoose.Types.ObjectId(senderId)];
-//     participants.push(mongoose.Types.ObjectId(_id));
-//     // 1. check if conversation exists
-//     let conversation = await Conversation.findOne({participants: participants});
-//     // 2. if exists - just update with new message
-//     if (conversation) {
-//       await addMessageToConversation(conversation, content, senderId, senderType);
-//     } else { // 3. doesn't exists - create conversation
-//       conversation = await Conversation.create({participants: participants, onModel: senderType});
-//       await addMessageToConversation(conversation, content, senderId, senderType);
-//     }
-//   };
-// };

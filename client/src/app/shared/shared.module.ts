@@ -5,13 +5,19 @@ import { DropdownDirective } from './dropdown.directive';
 import { AlertComponent } from './alert/alert.component';
 import { LoadingSpinnerComponent } from './loading-spinner/loading-spinner.component';
 import { SearchBarComponent } from './search-bar/search-bar.component';
+import { TrimPipe } from './trim.pipe';
+import { CutPipe } from './cut.pipe';
+import { ScrollToBottomDirective } from './scroll-to-bottom.directive';
 
 @NgModule({
   declarations: [
     DropdownDirective,
     AlertComponent,
     LoadingSpinnerComponent,
-    SearchBarComponent
+    SearchBarComponent,
+    TrimPipe,
+    CutPipe,
+    ScrollToBottomDirective
   ],
   imports: [CommonModule],
   exports: [
@@ -19,7 +25,10 @@ import { SearchBarComponent } from './search-bar/search-bar.component';
     AlertComponent,
     LoadingSpinnerComponent,
     CommonModule,
-    SearchBarComponent
+    SearchBarComponent,
+    TrimPipe,
+    CutPipe,
+    ScrollToBottomDirective
   ]
 })
 export class SharedModule {}

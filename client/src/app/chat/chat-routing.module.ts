@@ -1,12 +1,14 @@
 import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { AuthGuard } from 'app/auth/auth.guard';
-import { MessagesComponent } from './messages.component';
+import { ChatComponent } from './chat.component';
+import { ChatResolverService } from './chat-resolver.service';
 
 
 const routes: Routes = [
   {
-    path: 'messages', canActivate: [AuthGuard], component: MessagesComponent,
+    path: 'chat', canActivate: [AuthGuard], component: ChatComponent,
+    resolve: [ChatResolverService]
   },
 ];
 
@@ -15,7 +17,7 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class MessagesRoutingModule { }
+export class ChatRoutingModule { }
 
 
 

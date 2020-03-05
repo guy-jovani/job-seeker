@@ -6,18 +6,8 @@ const conversationSchema = new Schema(
     messages: [{
       type: Schema.Types.ObjectId, 
       required: true,
-      refPath: 'Message'
+      ref: 'Message'
     }],
-    // participants: [{
-    //   type: Schema.Types.ObjectId, 
-    //   required: true,
-    //   refPath: 'onModel'
-    // }],
-    // onModel: {
-    //   type: String,
-    //   required: true,
-    //   enum: ['Employee', 'Company']
-    // },
     participants: [{
       user: {
         type: Schema.Types.ObjectId, 

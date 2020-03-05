@@ -1,0 +1,128 @@
+
+
+
+
+<app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert>
+<div class="chat-container">
+
+  <div class="side-menu">
+
+    <div class="create-messages">
+      Messages
+      <button (click)="onNewMessage(true)" type="button" class="my-btn glyphicon glyphicon-edit">
+      </button>
+      <button (click)="onNewMessage(false)" type="button" class="my-btn">
+        <span class="glyphicon glyphicon-edit"></span>
+        <span class="glyphicon glyphicon-edit"></span>
+      </button>
+    </div>
+
+    <div class="conversations-list-container">
+      <div *ngIf="conversations && conversations.length">
+        <div *ngFor="let con of conversations; let i=index" class="single-conversation" (click)="onFucosCon($event.currentTarget)" [attr.data-con-ind]="i">
+          <ul class='conversation__participants-list'>
+            <li *ngFor="let participant of con.participants.slice(0,3); let i=index" class="conversation__participants-list__item">
+              {{ i !== 2 ? ( participant.user.name ?
+                (participant.user.name | cut) :
+                ((participant.user.firstName || '') + ' ' + (participant.user.lastName || '')) | trim | cut ) : '' }}</li>
+          </ul>
+        </div>
+      </div>
+      <p *ngIf="!conversations || !conversations.length" class="conversations-list-container__no-messages">
+        No messages yet.
+      </p>
+    </div>
+
+  </div>
+
+
+  <div class="new-message" *ngIf="!currConversation">
+
+    <div class="title">
+        New {{ privateMsg ? '' : 'Group' }} Message
+    </div>
+    <div class="new-message__add-people">
+      <app-search-bar [placeholder]="'Type one or more names'" [search]="['employee','company']" (nameListEmitter)="onGetNames($event)"></app-search-bar>
+    </div>
+    <div class="name-list-container">
+      <ul class='name-list-container__list'>
+        <li *ngFor="let name of nameList | keyvalue; let i=index" class="name-list-container__item">
+          {{ name.value.fullName }}
+          <span class="glyphicon glyphicon-remove name-list-container__item-remove" (click)="onRemoveName(name.value._id)"></span>
+        </li>
+      </ul>
+    </div>
+    <form class="new-message__message-form" (ngSubmit)="onSubmit(sendMessageForm)" #sendMessageForm="ngForm">
+      <div class="input-box">
+        <label for="messageContent"></label>
+        <textarea
+          ngModel
+          required
+          name="messageContent"
+          class="new-message__message-content"
+          placeholder="Type your message here"></textarea>
+      </div>
+      <div class="new-message__submit-message">
+        <button class="submit-message__button" [disabled]="!sendMessageForm.valid">Send</button>
+      </div>
+    </form>
+
+  </div>
+
+  <div class="chat" *ngIf="currConversation">
+
+    <div class="title">
+      Chat
+    </div>
+    <div class="name-list-container">
+      <ul class='name-list-container__list'>
+        <li *ngFor="let name of nameList | keyvalue; let i=index" class="name-list-container__item">
+            {{ name.value.fullName }}</li>
+      </ul>
+    </div>
+
+    <div class="messages">
+      <ul class='messages__list' appScrollToBottom>
+        <li *ngFor="let msg of currConversation.messages; let i=index" class="messages__list__item">
+          <p class="message message-name">{{ nameList.get(msg.creator) ? nameList.get(msg.creator).fullName : getFullName(user) }}</p>
+          <p class="message message-content">{{ msg.content }}<span class="message-time">{{ msg.hours }}:{{ msg.minutes }}</span></p>
+        </li>
+      </ul>
+    </div>
+
+    <form class="chat__message-form" (ngSubmit)="onSubmit(sendMessageForm)" #sendMessageForm="ngForm">
+      <div class="chat__input-box">
+        <label for="messageContent"></label>
+        <textarea
+          ngModel
+          required
+          name="messageContent"
+          class="chat__message-content"
+          placeholder="Type your message here"></textarea>
+      </div>
+      <div class="chat__submit-message">
+        <button class="submit-message__button" [disabled]="!sendMessageForm.valid">Send</button>
+      </div>
+    </form>
+
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

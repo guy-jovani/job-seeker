@@ -3,6 +3,7 @@ import { Employee } from 'app/employees/employee.model';
 
 import * as AuthActions from './auth.actions';
 import { Company } from 'app/company/company.model';
+import { Conversation } from 'app/chat/conversation.model';
 
 
 
@@ -12,6 +13,7 @@ export interface State {
   loading: boolean;
   kind: string;
   token: string;
+  conversations: Conversation[];
 }
 
 const initialState: State = {
@@ -19,7 +21,8 @@ const initialState: State = {
   messages: null,
   loading: false,
   kind: null,
-  token: null
+  token: null,
+  conversations: null
 };
 
 export function authReducer(state = initialState, action: AuthActions.AuthActions){
@@ -29,9 +32,16 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
     case AuthActions.LOGIN_ATTEMPT:
     case AuthActions.RESET_PASS_EMAIL_ATTEMPT:
     case AuthActions.RESET_PASS_ATTEMPT:
+    case AuthActions.FETCH_ALL_CONVERSATIONS:
       return {
         ...state,
         loading: true,
+      };
+    case AuthActions.SET_ALL_CONVERSATIONS:
+      return {
+        ...state,
+        loading: false,
+        conversations: action.payload
       };
     case AuthActions.AUTH_FAILURE:
       return {
@@ -65,6 +75,7 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
         messages: null,
         user: null,
         kind: null,
+        conversations: null,
         token: null
       };
     default:

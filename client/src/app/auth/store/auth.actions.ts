@@ -3,19 +3,22 @@
 import { Action } from '@ngrx/store';
 import { Employee } from 'app/employees/employee.model';
 import { Company } from 'app/company/company.model';
+import { Conversation } from 'app/chat/conversation.model';
 
-export const SIGNUP_ATTEMPT = "[Auth] SIGNUP_ATTEMPT";
-export const LOGIN_ATTEMPT = "[Auth] LOGIN_ATTEMPT";
-export const LOGOUT = "[Auth] LOGOUT";
-export const AUTH_SUCCESS = "[Auth] AUTH_SUCCESS";
-export const UPDATE_ACTIVE_USER = "[Auth] UPDATE_ACTIVE_USER";
-export const AUTH_FAILURE = "[Auth] AUTH_FAILURE";
-export const CLEAR_ERROR = "[Auth] CLEAR_ERROR";
-export const AUTO_LOGIN = "[Auth] AUTO_LOGIN";
-export const RESET_PASS_EMAIL_ATTEMPT = "[Auth] RESET_PASS_EMAIL_ATTEMPT";
-export const RESET_PASS_EMAIL_SUCCESS = "[Auth] RESET_PASS_EMAIL_SUCCESS";
-export const RESET_PASS_ATTEMPT = "[Auth] RESET_PASS_ATTEMPT";
-export const RESET_PASS_SUCCESS = "[Auth] RESET_PASS_SUCCESS";
+export const SIGNUP_ATTEMPT = '[Auth] SIGNUP_ATTEMPT';
+export const LOGIN_ATTEMPT = '[Auth] LOGIN_ATTEMPT';
+export const LOGOUT = '[Auth] LOGOUT';
+export const AUTH_SUCCESS = '[Auth] AUTH_SUCCESS';
+export const UPDATE_ACTIVE_USER = '[Auth] UPDATE_ACTIVE_USER';
+export const AUTH_FAILURE = '[Auth] AUTH_FAILURE';
+export const CLEAR_ERROR = '[Auth] CLEAR_ERROR';
+export const AUTO_LOGIN = '[Auth] AUTO_LOGIN';
+export const RESET_PASS_EMAIL_ATTEMPT = '[Auth] RESET_PASS_EMAIL_ATTEMPT';
+export const RESET_PASS_EMAIL_SUCCESS = '[Auth] RESET_PASS_EMAIL_SUCCESS';
+export const RESET_PASS_ATTEMPT = '[Auth] RESET_PASS_ATTEMPT';
+export const RESET_PASS_SUCCESS = '[Auth] RESET_PASS_SUCCESS';
+export const FETCH_ALL_CONVERSATIONS = '[Auth] FETCH_ALL_CONVERSATIONS';
+export const SET_ALL_CONVERSATIONS = '[Auth] SET_ALL_CONVERSATIONS';
 
 export type AuthActions = SignupAttempt
                         | LoginAttempt
@@ -28,6 +31,8 @@ export type AuthActions = SignupAttempt
                         | ResetPassSuccess
                         | ResetPassAttempt
                         | Logout
+                        | SetAllConversations
+                        | FetchAllConversations
                         | UpdateActiveUser;
 
 
@@ -42,7 +47,17 @@ export class SignupAttempt implements Action {
 export class ResetPassEmailAttempt implements Action {
   readonly type = RESET_PASS_EMAIL_ATTEMPT;
 
-  constructor(public payload: string){}
+  constructor(public payload: string) {}
+}
+
+export class FetchAllConversations implements Action {
+  readonly type = FETCH_ALL_CONVERSATIONS;
+}
+
+export class SetAllConversations implements Action {
+  readonly type = SET_ALL_CONVERSATIONS;
+
+  constructor(public payload: Conversation[]) {}
 }
 
 export class ResetPassAttempt implements Action {

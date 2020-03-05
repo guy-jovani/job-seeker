@@ -3,7 +3,7 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { switchMap, map, catchError, tap } from 'rxjs/operators';
+import { switchMap, map, catchError, tap, withLatestFrom } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
@@ -188,6 +188,33 @@ export class AuthEffects {
           map(res => {
             if (res['type'] === 'success') {
               return new AuthActions.ResetPassSuccess();
+            } else {
+              return new AuthActions.AuthFailure(res['messages']);
+            }
+          }),
+          catchError(messages => {
+            return of(new AuthActions.AuthFailure(messages));
+          })
+        );
+    })
+  );
+
+  @Effect()
+  fetchConversations = this.actions$.pipe(
+    ofType(AuthActions.FETCH_ALL_CONVERSATIONS),
+    withLatestFrom(this.store.select('auth')),
+    switchMap(([actionData, authState]) => {
+      return this.http.get(environment.nodeServer + 'chat/fetchAllConversations',
+        {
+          params: {
+            _id: authState.user._id
+          }
+        })
+        .pipe(
+          map(res => {
+            console.log(res)
+            if (res['type'] === 'success') {
+              return new AuthActions.SetAllConversations(res['conversations']);
             } else {
               return new AuthActions.AuthFailure(res['messages']);
             }
