@@ -8,13 +8,17 @@
   <div class="side-menu">
 
     <div class="create-messages">
-      Messages
-      <button (click)="onNewMessage(true)" type="button" class="my-btn glyphicon glyphicon-edit">
-      </button>
-      <button (click)="onNewMessage(false)" type="button" class="my-btn">
-        <span class="glyphicon glyphicon-edit"></span>
-        <span class="glyphicon glyphicon-edit"></span>
-      </button>
+      <div class="create-messages__title">
+        <p>Messages</p>
+      </div>
+      <div class="create-messages__buttons">
+        <button (click)="onNewMessage(true)" type="button" class="create-messages__my-btn glyphicon glyphicon-edit">
+        </button>
+        <button (click)="onNewMessage(false)" type="button" class="create-messages__my-btn">
+          <span class="glyphicon glyphicon-edit"></span>
+          <span class="glyphicon glyphicon-edit"></span>
+        </button>
+      </div>
     </div>
 
     <div class="conversations-list-container">
@@ -83,10 +87,10 @@
 
     <div class="messages">
       <ul class='messages__list' appScrollToBottom>
-        <li *ngFor="let msg of currConversation.messages; let i=index"
-              class="{{msg.creator === user._id ? 'messages__list__item user-msg' : 'messages__list__item'}}">
-          <span *ngIf="msg.first" class="message-full-date">{{ msg.first }}</span>
-          <p *ngIf="currConversation.participants.length > 1" class="message message-name">{{ nameList.get(msg.creator) ? nameList.get(msg.creator).fullName : getFullName(user) }}</p>
+        <li *ngFor="let msg of currConversation.messages"
+              class="{{ msg.creator === user._id ? 'messages__list__item user-msg' : 'messages__list__item' }}" [attr.data-date]=" msg.first ? msg.first: ''">
+          <p *ngIf="msg.creator !== user._id && currConversation.participants.length > 1" class="message message-name" [style.color]="nameList.get(msg.creator).nameColor['changingThisBreaksApplicationSecurity']">
+            {{ nameList.get(msg.creator) ? nameList.get(msg.creator).fullName : getFullName(user) }}</p>
           <p class="message message-content">{{ msg.content }}<span class="message-time">{{ msg.hours }}:{{ msg.minutes }}</span></p>
         </li>
       </ul>

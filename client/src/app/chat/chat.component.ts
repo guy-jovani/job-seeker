@@ -10,6 +10,7 @@ import { Conversation } from './conversation.model';
 import { ChatService } from './chat-socket.service';
 import * as AuthActions from '../auth/store/auth.actions';
 import { Message } from './message.model';
+import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 
 
 @Component({
@@ -20,7 +21,7 @@ import { Message } from './message.model';
 export class ChatComponent implements OnInit, OnDestroy {
   subscription: Subscription;
   user: Employee | Company = null;
-  nameList: Map<string, { _id: string, fullName: string, type: string }> = null;
+  nameList: Map<string, { _id: string, fullName: string, type: string, nameColor?: SafeStyle }> = null;
   errorMessages: string[] = [];
   privateMsg = true;
   userKind: string = null;
@@ -32,6 +33,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   constructor(private renderer: Renderer2,
               private chatService: ChatService,
+              private sanitizer: DomSanitizer,
               private store: Store<fromApp.AppState>) { }
 
   ngOnInit() {
@@ -45,7 +47,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         this.conversations.forEach(con => {
           const userId = con.participants.findIndex(participant => participant['user']['_id'] === this.user._id);
           if (userId !== -1) {
-            con.participants.splice(userId, 1);
+            con.participants.splice(userId, 1); // removig curr user from participants list
           }
         });
       }
@@ -88,7 +90,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.store.dispatch(new AuthActions.SetSingleConversation({
         conversation: this.currConversation,
         message: new Message({
-          sender: { _id: this.user._id, name: this.getFullName(this.user) },
+          creator: this.user._id,
           content: form.value.messageContent,
           createdAt: new Date()
         })
@@ -115,8 +117,15 @@ export class ChatComponent implements OnInit, OnDestroy {
     for (const participant of this.currConversation.participants) {
       this.nameList.set(participant['user']['_id'], { _id: participant['user']['_id'],
                   fullName: this.getFullName(participant.user), type: participant['type'] });
+
+      const participantNameList = this.nameList.get(participant.user._id);
+      if (participantNameList) {
+        this.nameList.set(participant.user._id, { ...participantNameList,
+          nameColor: this.sanitizer.bypassSecurityTrustStyle(`rgb(\
+            ${(Math.floor(Math.random() * 255))},${(Math.floor(Math.random() * 128))},\
+            ${(Math.floor(Math.random() * 255))})`)});
+      }
     }
-    this.privateMsg = this.nameList.size === 1 ? true : false;
 
     if (this.currConversation.messages.length && typeof(this.currConversation.messages[0].createdAt) === 'string') {
       let prevMsgDate: string = null;
@@ -128,6 +137,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         prevMsgDate = msg.createdAt.toDateString();
       });
     }
+    this.privateMsg = this.currConversation.participants.length === 1;
   }
 
   getFullName(user: { _id: string; name?: string; firstName?: string; lastName?: string; }) {

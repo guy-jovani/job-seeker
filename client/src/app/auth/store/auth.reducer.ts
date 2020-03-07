@@ -40,10 +40,14 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
         loading: true,
       };
     case AuthActions.SET_CHAT_NOTIFICATION:
+      const setNewNotifications = [...state.notificatios];
+      if (setNewNotifications.findIndex(val => val === 'chat') === -1 ){
+        setNewNotifications.push('chat');
+      }
       return {
         ...state,
         loading: true,
-        notificatios: [...state.notificatios, 'chat']
+        notificatios: [...setNewNotifications]
       };
     case AuthActions.REMOVE_CHAT_NOTIFICATION:
       const newNotifications = [...state.notificatios];
@@ -64,9 +68,9 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
       };
     case AuthActions.SET_SINGLE_CONVERSATION:
       const newConId = action.payload.conversation._id;
-      // check waht to do if the user still didnt load the cons
-      const oldConId = state.conversations.findIndex(con => con._id === newConId);
-      const updatedCons = [...state.conversations];
+
+      const oldConId = state.conversations ? state.conversations.findIndex(con => con._id === newConId) : -1;
+      const updatedCons = state.conversations ? [...state.conversations] : [];
 
       if (oldConId === -1) { // a new conversation
         action.payload.conversation.messages = [action.payload.message];

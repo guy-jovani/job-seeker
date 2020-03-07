@@ -237,7 +237,7 @@ export class AuthEffects {
 
   private signupLoginHandler = res => {
     if (res['type'] === 'success') {
-      this.chatService.sendMessage('login', {  _id: res['user']['_id'], msg: 'logged' } );
+      this.chatService.sendMessage('login', {  _id: res['user']['_id'] } );
       setLocalStorage(res['user'], res['kind'], res['token'], res['expiresIn'] * 1000);
       this.autoLogout(res['expiresIn'] * 1000);
       return new AuthActions.AuthSuccess({

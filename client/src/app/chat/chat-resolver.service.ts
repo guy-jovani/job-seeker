@@ -23,15 +23,16 @@ export class ChatResolverService implements Resolve<Conversation[]> {
         return authState.conversations;
       }),
       switchMap(conversations => {
-        if (!conversations || !conversations.length) {
-          this.store.dispatch(new AuthActions.FetchAllConversations());
-          return this.actions$.pipe(
-            ofType(AuthActions.SET_ALL_CONVERSATIONS),
-            take(1)
-          );
-        } else {
-          return of(conversations);
-        }
+        console.log('chat resolver')
+        // if (!conversations || !conversations.length) {
+        this.store.dispatch(new AuthActions.FetchAllConversations());
+        return this.actions$.pipe(
+          ofType(AuthActions.SET_ALL_CONVERSATIONS),
+          take(1)
+        );
+        // } else {
+        //   return of(conversations);
+        // }
       })
     );
   }

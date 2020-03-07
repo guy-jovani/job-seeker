@@ -21,7 +21,7 @@ const conversationSchema = new Schema(
       }
     }]    
   },
-  { timestamps: { createdAt: true, updatedAt: false } }
+  { timestamps: { createdAt: true, updatedAt: true } }
 );
 
 module.exports = mongoose.model('Conversation', conversationSchema);

@@ -27,9 +27,16 @@
   background-color: #efefef;
   min-height: 3rem;
   border-bottom: 1px solid #8080805e;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.my-btn {
+.create-messages__title,
+.create-messages__buttons {
+  margin: auto;
+}
+
+.create-messages__my-btn {
   height: max-content;
   background: transparent;
   border: none;
@@ -123,6 +130,7 @@
   align-items: center;
   overflow: auto;
   scrollbar-width: thin;
+  justify-content: center;
 }
 
 .name-list-container__list,
@@ -134,24 +142,43 @@
   margin: 0;
 }
 
-.messages__list {
-  transform: rotate(0);
-}
-
 .message-full-date {
-  position: fixed;
-  left: 45%;
+  bottom: 100%;
+  position: absolute;
+  display: inline-block;
+  width: max-content;
 }
 
 .messages__list {
   height: 100%;
   flex-direction: column;
   overflow: auto;
+  transform: rotate(0);
+}
+
+.messages__list__item:not([data-date=""])::before {
+  content: attr(data-date);
+  display: block;
+  width: max-content;
+  position: absolute;
+  bottom: 100%;
+}
+
+.messages__list__item:not([data-date=""]) {
+  margin-top: 2rem;
+}
+
+.messages__list__item.user-msg:not([data-date=""])::before {
+  right: 0;
+}
+
+.messages__list__item:not(.user-msg):not([data-date=""])::before {
+  left: 0;
 }
 
 .messages__list__item {
+  position: relative;
   margin: 3px 0;
-  display: inline-block;
   width: max-content;
   max-width: 55%;
   overflow-wrap: break-word;
@@ -164,8 +191,7 @@
 
 .user-msg {
   background-color: #12a9cc8a !important;
-  float: right;
-  align-self: end;
+  align-self: flex-end;
 }
 
 .messages__list__item:last-child::after {
@@ -199,6 +225,7 @@
 
 .message-name {
   color: rgb(255, 0, 179);
+  font-weight: bold;
 }
 
 .name-list-container__item {
