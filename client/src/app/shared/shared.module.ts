@@ -8,6 +8,11 @@ import { SearchBarComponent } from './search-bar/search-bar.component';
 import { TrimPipe } from './trim.pipe';
 import { CutPipe } from './cut.pipe';
 import { ScrollToBottomDirective } from './scroll-to-bottom.directive';
+import { BackButtonComponent } from './back-button/back-button.component';
+import { MessageBoxComponent } from './message-box/message-box.component';
+
+
+
 
 @NgModule({
   declarations: [
@@ -17,7 +22,9 @@ import { ScrollToBottomDirective } from './scroll-to-bottom.directive';
     SearchBarComponent,
     TrimPipe,
     CutPipe,
-    ScrollToBottomDirective
+    ScrollToBottomDirective,
+    BackButtonComponent,
+    MessageBoxComponent,
   ],
   imports: [CommonModule],
   exports: [
@@ -28,7 +35,9 @@ import { ScrollToBottomDirective } from './scroll-to-bottom.directive';
     SearchBarComponent,
     TrimPipe,
     CutPipe,
-    ScrollToBottomDirective
+    ScrollToBottomDirective,
+    BackButtonComponent,
+    MessageBoxComponent
   ]
 })
 export class SharedModule {}

@@ -3,18 +3,20 @@
 <div *ngIf="isLoading" style="text-align: center;">
   <app-loading-spinner></app-loading-spinner>
 </div>
-<div *ngIf="!isLoading">
-  <ul class="list-group" *ngIf="companies.length">
-    <li 
-      class="list-group-item" 
+<div *ngIf="!isLoading" CLASS="container-fluid">
+  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
+  <!-- <app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert> -->
+  <ul class="list-group" *ngIf="companies.length && !errorMessages.length">
+    <li
+      class="list-group-item"
       *ngFor="let company of companies; let i=index">
-      <a routerLink='{{i}}/company' (click)='getCompanyinfo(i)'>
+      <a routerLink='{{i}}'>
         <p>Name: {{ company.name }}</p>
         <p>Description: {{ company.description ? company.description : '-----'}}</p>
       </a>
     </li>
   </ul>
-  <p *ngIf="!companies.length">There are no registers companies</p>
+  <p *ngIf="!companies.length && !errorMessages.length">There are no registers companies</p>
 </div>
 
 

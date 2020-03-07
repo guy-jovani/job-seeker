@@ -10,6 +10,7 @@ const searchRoutes = require('./routes/search');
 const authRoutes = require('./routes/auth');
 const companiesRoutes = require('./routes/companies');
 const chatRoutes = require('./routes/chat');
+const positionsRoutes = require('./routes/positions');
 const globalVars = require('./utils/globalVars');
 const checkAuth = require('./middleware/check-auth');
 
@@ -35,6 +36,7 @@ app.use('/employees', checkAuth, employeesRoutes);
 app.use('/companies', checkAuth, companiesRoutes);
 app.use('/search', checkAuth, searchRoutes);
 app.use('/chat', checkAuth, chatRoutes);
+app.use('/positions', checkAuth, positionsRoutes);
 
 app.use((req, res, next) => {
   console.log("general url in app.js");

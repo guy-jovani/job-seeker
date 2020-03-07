@@ -21,6 +21,11 @@ const employeeSchema = new Schema(
       type: String,
       required: false
     },
+    positionsIds: [{
+      type: Schema.Types.ObjectId, 
+      ref: 'Position',
+      require: false
+    }],
     resetPassToken: String,
     resetPassTokenExpiration: Date,
   }

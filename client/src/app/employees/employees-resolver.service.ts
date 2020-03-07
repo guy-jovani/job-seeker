@@ -28,7 +28,7 @@ export class EmployeesResolverService implements Resolve<Employee[]> {
         if (!employees.length) {
           this.store.dispatch(new EmployeesActions.FetchAllEmployees());
           return this.actions$.pipe(
-            ofType(EmployeesActions.SET_ALL_EMPLOYEES),
+            ofType(EmployeesActions.SET_ALL_EMPLOYEES, EmployeesActions.EMPLOYEE_OP_FAILURE),
             take(1)
           );
         } else {

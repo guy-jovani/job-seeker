@@ -1,0 +1,10 @@
+
+<div class="message-box">
+  <button class="close-button glyphicon glyphicon-remove" (click)="onClose()">
+  </button>
+  <ul>
+    <li *ngFor="let message of messages">
+      {{ message }}
+    </li>
+  </ul>
+</div>

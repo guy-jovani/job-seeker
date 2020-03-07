@@ -1,9 +1,19 @@
 
 
-<app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert>
-<app-details-employee *ngIf="userEmployee"></app-details-employee>
-<app-details-company *ngIf="!userEmployee"></app-details-company>
 
+
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <app-details-employee *ngIf="userEmployee"></app-details-employee>
+      <app-details-company *ngIf="!userEmployee"></app-details-company>
+    </div>
+    <div class="col-md-6">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
 
 
 

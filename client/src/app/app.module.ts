@@ -28,6 +28,8 @@ import { environment } from 'environments/environment';
 
 const config: SocketIoConfig = { url: environment.nodeServer, options: {} };
 
+import { PositionModule } from './position/position.module';
+import { PositionEffects } from './position/store/position.effects';
 
 @NgModule({
   declarations: [
@@ -41,8 +43,8 @@ const config: SocketIoConfig = { url: environment.nodeServer, options: {} };
     BrowserModule,
     HttpClientModule,
     StoreModule.forRoot(fromApp.appReducer),
-    EffectsModule.forRoot([EmployeeEffects, AuthEffects, CompanyEffects]),
     SocketIoModule.forRoot(config),
+    EffectsModule.forRoot([EmployeeEffects, AuthEffects, CompanyEffects, PositionEffects]),
     EmployeesModule,
     CompanyModule,
     SharedModule,
@@ -50,6 +52,7 @@ const config: SocketIoConfig = { url: environment.nodeServer, options: {} };
     ChatModule,
     AuthModule,
     UserModule,
+    PositionModule,
     AppRoutingModule,
   ],
   bootstrap: [AppComponent]

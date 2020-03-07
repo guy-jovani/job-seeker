@@ -5,7 +5,7 @@ import { switchMap, map, catchError, withLatestFrom } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 
-
+import * as PositionActions from '../../position/store/position.actions';
 import * as CompanyActions from './company.actions';
 import { environment } from '../../../environments/environment';
 import * as fromApp from '../../store/app.reducer';
@@ -82,22 +82,31 @@ export class CompanyEffects {
   @Effect()
   fetchSingle = this.actions$.pipe(
     ofType(CompanyActions.FETCH_SINGLE_COMPANY),
-    switchMap(actionData => {
+    switchMap((actionData: CompanyActions.FetchSingleCompany) => {
       return this.http.get(nodeServer + 'fetchSingle', {
         params: {
-          _id: actionData['payload']
+          _id: actionData.payload._id
         }
       })
       .pipe(
         map(res => {
+          this.store.dispatch(new PositionActions.ClearError());
+          this.store.dispatch(new CompanyActions.ClearError());
           if (res['type'] === 'success') {
-            return new CompanyActions.UpdateSingleCompany({company: res['company']});
+            return actionData.payload.main ?
+                  new CompanyActions.UpdateSingleCompany({company: res['company'], main: actionData.payload.main }) :
+                  new PositionActions.UpdateSinglePositionCompany({company: res['company'], posInd: actionData.payload.posInd });
+
           } else {
-            return new CompanyActions.CompanyOpFailure(res['messages']);
+            return actionData.payload.main ?
+                  new CompanyActions.CompanyOpFailure(res['messages']) :
+                  new PositionActions.PositionOpFailure(res['messages']);
           }
         }),
         catchError(messages => {
-          return of(new CompanyActions.CompanyOpFailure(messages));
+          return actionData.payload.main ?
+                  of(new CompanyActions.CompanyOpFailure(messages)) :
+                  of(new PositionActions.PositionOpFailure(messages));
         })
       );
     })
@@ -108,43 +117,6 @@ export class CompanyEffects {
 
 
 
-
-
-
-  // @Effect()
-  // register = this.actions$.pipe(
-  //   ofType(CompanyActions.STORE_COMPANY_IN_DB),
-  //   switchMap(actionData => {
-  //     const companyData = new FormData();
-  //     Object.keys(actionData['payload']).forEach(key => {
-  //       companyData.append(key, actionData['payload'][key]);
-  //     });
-  //     return this.http.post(nodeServer + 'register', companyData)
-  //       .pipe(
-  //         map(res => {
-  //           if(res['type'] === 'success'){
-  //             // this.store.dispatch(new AuthActions.AddActiveEmployeeCompany(res['company']));
-  //             return new CompanyActions.SetSingleCompany({company: res['company'], redirect: true});
-  //           }
-  //         }),
-  //         catchError(err => {
-  //           return handleError(err);
-  //         })
-  //       );
-  //     }
-  //   )
-  // )
-
-    // @Effect({dispatch: false})
-  // redirect = this.actions$.pipe(
-  //   ofType(CompanyActions.UPDATE_SINGLE_COMPANY),
-  //   tap((actionData: CompanyActions.UpdateSingleCompany) => {
-  //     if(actionData.payload.redirect){
-  //       const currUrl = this.route.snapshot['_routerState'].url.substring(1).split("/");
-  //       this.router.navigate([currUrl[0]]);
-  //     }
-  //   })
-  // )
 
 
 

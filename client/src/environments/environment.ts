@@ -4,6 +4,7 @@
 
 export const environment = {
   production: false,
+  fetchDataMSReset: 30 * 60 * 1000, // 30 min in milliseconds
   nodeServer: 'http://localhost:4300/'
 };
 

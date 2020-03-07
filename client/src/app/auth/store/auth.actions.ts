@@ -1,16 +1,19 @@
 
 
 import { Action } from '@ngrx/store';
-import { Employee } from 'app/employees/employee.model';
 import { Company } from 'app/company/company.model';
 import { Conversation } from 'app/chat/conversation.model';
 import { Message } from 'app/chat/message.model';
+import { Employee } from 'app/employees/employee.model';
+import { Position } from '../../position/position.model';
 
 export const SIGNUP_ATTEMPT = '[Auth] SIGNUP_ATTEMPT';
 export const LOGIN_ATTEMPT = '[Auth] LOGIN_ATTEMPT';
 export const LOGOUT = '[Auth] LOGOUT';
 export const AUTH_SUCCESS = '[Auth] AUTH_SUCCESS';
 export const UPDATE_ACTIVE_USER = '[Auth] UPDATE_ACTIVE_USER';
+export const ADD_POSITION_TO_USER = '[Auth] ADD_POSITION_TO_USER';
+export const UPDATE_POSITION_OF_USER = '[Auth] UPDATE_POSITION_OF_USER';
 export const AUTH_FAILURE = '[Auth] AUTH_FAILURE';
 export const CLEAR_ERROR = '[Auth] CLEAR_ERROR';
 export const AUTO_LOGIN = '[Auth] AUTO_LOGIN';
@@ -41,7 +44,10 @@ export type AuthActions = SignupAttempt
                         | RemoveChatNotification
                         | SetAllConversations
                         | FetchAllConversations
+                        | UpdatePositionOfUser
+                        | AddPositionToUser
                         | UpdateActiveUser;
+
 
 
 export class SignupAttempt implements Action {
@@ -109,10 +115,22 @@ export class UpdateActiveUser implements Action {
   constructor(public payload: { user: Employee | Company, kind: string }) {}
 }
 
+export class AddPositionToUser implements Action {
+  readonly type = ADD_POSITION_TO_USER;
+
+  constructor(public payload: Position) {}
+}
+
+export class UpdatePositionOfUser implements Action {
+  readonly type = UPDATE_POSITION_OF_USER;
+
+  constructor(public payload: Position) {}
+}
+
 export class AuthFailure implements Action {
   readonly type = AUTH_FAILURE;
 
-  constructor(public payload: any[]) {}
+  constructor(public payload: string[]) {}
 }
 
 export class ClearError implements Action {

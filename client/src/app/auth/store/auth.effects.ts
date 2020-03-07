@@ -17,10 +17,10 @@ import { ChatService } from 'app/chat/chat-socket.service';
 
 const nodeServer = environment.nodeServer + 'auth/';
 
-const setLocalStorage = (user: Company | Employee,
-                         kind: string = null,
-                         token: string = null,
-                         expirationDate: number = null) => {
+const setUserLocalStorage = (user: Company | Employee,
+                             kind: string = null,
+                             token: string = null,
+                             expirationDate: number = null) => {
   localStorage.setItem('userData', JSON.stringify({...user}));
   if (kind) { localStorage.setItem('kind', JSON.stringify(kind)); }
   if (token) { localStorage.setItem('token', JSON.stringify(token)); }
@@ -30,7 +30,18 @@ const setLocalStorage = (user: Company | Employee,
   }
 };
 
-const getLocalStorage = () => {
+const updateUserPositionsLocalStorage = (position, type) => {
+  const [user] = geUsertLocalStorage();
+  if (type === AuthActions.ADD_POSITION_TO_USER) {
+    user.positions.push(position);
+  } else {
+    const index = user.positions.findIndex(pos => pos._id === position._id);
+    user.positions[index] = position;
+  }
+  setUserLocalStorage(user);
+};
+
+const geUsertLocalStorage = () => {
   const user = JSON.parse(localStorage.getItem('userData'));
   const kind = JSON.parse(localStorage.getItem('kind'));
   const token = JSON.parse(localStorage.getItem('token'));
@@ -38,7 +49,7 @@ const getLocalStorage = () => {
   return [user, kind, token, expirationDate];
 };
 
-const removeLocalStorage = () => {
+const removeUserLocalStorage = () => {
   localStorage.removeItem('userData');
   localStorage.removeItem('kind');
   localStorage.removeItem('token');
@@ -98,8 +109,17 @@ export class AuthEffects {
   activeUserChanges = this.actions$.pipe(
     ofType(AuthActions.UPDATE_ACTIVE_USER),
     map((actionData: AuthActions.UpdateActiveUser) => {
-      setLocalStorage(actionData.payload.user);
+      setUserLocalStorage(actionData.payload.user);
       this.router.navigate(['../my-details']);
+    })
+  );
+
+  @Effect({dispatch: false})
+  AddUpdatePositionToUser = this.actions$.pipe(
+    ofType(AuthActions.ADD_POSITION_TO_USER, AuthActions.UPDATE_POSITION_OF_USER),
+    map((actionData: AuthActions.AddPositionToUser | AuthActions.UpdateActiveUser) => {
+      updateUserPositionsLocalStorage(actionData.payload, actionData.type);
+      this.router.navigate(['../my-positions']);
     })
   );
 
@@ -107,7 +127,7 @@ export class AuthEffects {
   autoLogin = this.actions$.pipe(
     ofType(AuthActions.AUTO_LOGIN),
     map(() => {
-      const [user, kind, token, expirationDate] = getLocalStorage();
+      const [user, kind, token, expirationDate] = geUsertLocalStorage();
       if (!user || !kind || !token || !expirationDate) {
         return { type: 'dummy' };
       }
@@ -126,7 +146,7 @@ export class AuthEffects {
   logout = this.actions$.pipe(
     ofType(AuthActions.LOGOUT),
     map(() => {
-      removeLocalStorage();
+      removeUserLocalStorage();
       clearTimeout(this.tokenTimer);
       this.router.navigate(['/login']);
     }),
@@ -237,8 +257,7 @@ export class AuthEffects {
 
   private signupLoginHandler = res => {
     if (res['type'] === 'success') {
-      this.chatService.sendMessage('login', {  _id: res['user']['_id'] } );
-      setLocalStorage(res['user'], res['kind'], res['token'], res['expiresIn'] * 1000);
+      setUserLocalStorage(res['user'], res['kind'], res['token'], res['expiresIn'] * 1000);
       this.autoLogout(res['expiresIn'] * 1000);
       return new AuthActions.AuthSuccess({
         user: res['user'], redirect: true, kind: res['kind'], token: res['token'] });

@@ -17,13 +17,12 @@ import { Employee } from '../employee.model';
 })
 export class EditEmployeeComponent implements OnInit, OnDestroy {
   authState: Subscription;
-  errorMessages: string[];
   isLoading = false;
   employeeForm: FormGroup;
   employee: Employee;
   showPasswords = false;
-
-  // @ViewChild('email', {static: true, read: ElementRef}) emailInput: ElementRef;
+  errorMessages: string[] = [];
+  currUrl: string[] = null;
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -49,17 +48,21 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
       }))
       .subscribe(
         employeeState => {
-          // this.emailInput.nativeElement.focus();
-          // this.emailInput.nativeElement.blur();
+          this.currUrl = this.router.url.substring(1).split('/');
           this.isLoading = employeeState.loadingSingle;
-          if (employeeState.messages) {
-            for (const msg of employeeState.messages) {
-              this.errorMessages.push(msg);
+          if (this.currUrl[this.currUrl.length - 1] === 'edit') {
+            if (employeeState.messages) {
+              this.errorMessages = [];
+              for (const msg of employeeState.messages) {
+                this.errorMessages.push(msg);
+              }
+            } else {
+              this.errorMessages = [];
             }
-          } else {
-            this.errorMessages = [];
           }
-          this.initForm();
+          if (this.employee) {
+            this.initForm();
+          }
       });
   }
 
@@ -84,10 +87,14 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(form: NgForm) {
+    if (form.invalid) {
+      return this.store.dispatch(new EmployeeActions.EmployeeOpFailure(['The form is invalid']));
+    }
     const firstName = form.value.firstName ? form.value.firstName : undefined;
     const lastName = form.value.lastName ? form.value.lastName : undefined;
     const password = form.value.passwords.password ? form.value.passwords.password : undefined;
     const confirmPassword = form.value.passwords.confirmPassword ? form.value.passwords.confirmPassword : undefined;
+
     const newEmployee = new Employee({
       _id: this.employee._id, email: form.value.email
     });
@@ -102,14 +109,11 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
     this.router.navigate(['../'], {relativeTo: this.route});
   }
 
-  onDelete() {
-    // this.store.dispatch(new EmployeeActions.DeleteEmployeeFromDB(this.index));
-  }
-
   ngOnDestroy() {
     if (this.authState) {
       this.authState.unsubscribe();
     }
+    this.onClose();
   }
 
   onClose() {

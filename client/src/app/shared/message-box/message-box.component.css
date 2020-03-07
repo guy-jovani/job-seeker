@@ -1,0 +1,39 @@
+
+
+.message-box {
+  border: 1px solid red;
+  background: #ff000036;
+  width: 80%;
+  position: relative;
+  margin: 0 auto;
+}
+
+li:last-child {
+  padding-bottom: 1rem;
+}
+
+ul {
+  font-weight: bold;
+  position: relative;
+  top: 1rem;
+}
+
+.close-button {
+  background: transparent;
+  border:none;
+  padding: 0;
+  right: 1.25rem;
+  position: absolute;
+  z-index: 10;
+  top: 1.25rem;
+  color: #000000ad;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  color: #f00b0b;
+}
+
+.my-btn {
+  background: transparent;
+}

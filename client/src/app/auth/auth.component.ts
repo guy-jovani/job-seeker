@@ -32,6 +32,7 @@ export class AuthComponent implements OnInit, OnDestroy {
       authState => {
         this.isLoading = authState.loading;
         if (authState.messages) {
+          this.errorMessages = [];
           for (const msg of authState.messages) {
             this.errorMessages.push(msg);
           }

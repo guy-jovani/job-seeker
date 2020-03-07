@@ -1,17 +1,25 @@
 
+
+
+
+
+
+
+
 <div *ngIf="isLoading" style="text-align: center;">
   <app-loading-spinner></app-loading-spinner>
 </div>
 
-<div *ngIf="!isLoading">
-  <ul class="list-group" *ngIf="employees.length">
-    <li 
-      class="list-group-item" 
+<div class="container-fluid" *ngIf="!isLoading">
+  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
+  <ul class="list-group" *ngIf="employees.length && !errorMessages.length">
+    <li
+      class="list-group-item"
       *ngFor="let employee of employees; let i=index">
-      <a routerLink='{{i}}' (click)='getEmployeeinfo(i)'>
+      <a routerLink='{{i}}'>
         <p>Employee Email: {{ employee.email }}</p>
       </a>
     </li>
   </ul>
-  <p *ngIf="!employees.length">There are no registers employees</p>
+  <p *ngIf="!employees.length && !errorMessages.length">There are no registers employees</p>
 </div>

@@ -1,16 +1,21 @@
 
 
-<div class="container" *ngIf="company">
-  <h3>{{ allowEdit ? 'My Profile' : 'Company Details' }}</h3>
-  <div *ngIf="isLoading" >
-    <app-loading-spinner></app-loading-spinner>
+<div *ngIf="isLoading" >
+  <app-loading-spinner></app-loading-spinner>
+</div>
+<div class="container-fluid" *ngIf="company && !isLoading">
+  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
+  <!-- <app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert> -->
+  <div>
+    <h3>{{ allowEdit ? 'My Profile' : company.name | titlecase }}</h3>
+    <app-back-button *ngIf='mainUrl !== "my-details"'></app-back-button>
   </div>
-  <div class="row" *ngIf="!isLoading">
-    <p>name: {{ company.name }}</p>
+  <div class="row" *ngIf="!isLoading && !errorMessages.length">
+    <p *ngIf="company.imagePath"><img class="image" [src]='company.imagePath'></p>
     <p>email: {{ company.email || "------" }}</p>
     <p>website: {{ company.website || "------" }}</p>
     <p>description: {{ company.description || "------" }}</p>
-    <p *ngIf="company.imagePath"><img class="image" [src]='company.imagePath'></p>
+    <app-list-position *ngIf="company && !allowEdit" [companyPositions]="company.positions"></app-list-position>
   </div>
   <hr>
   <div class="row" *ngIf="allowEdit">
@@ -18,13 +23,6 @@
   </div>
   <hr>
 </div>
-
-
-
-<router-outlet></router-outlet>
-
-
-
 
 
 

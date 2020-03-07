@@ -24,12 +24,23 @@ router.put('/signup',
   ], 
   authController.signup);
 
-router.post('/login', authController.login);
+router.post('/login', [
+  body('email')
+    .exists()
+    .not()
+    .isEmpty()
+    .withMessage('please provide a valid email'),
+  body('password')
+    .isLength(3)
+    .withMessage('The password need to be more than 3 characters long.')
+], authController.login);
 
 router.post('/resetPasswordEmail', 
   [
     body('email')
       .isEmail()
+      .not()
+      .isEmpty()
       .withMessage('please provide a valid email'),
   ], 
   authController.resetPasswordEmail);

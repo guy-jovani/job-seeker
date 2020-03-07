@@ -20,6 +20,9 @@
         <li routerLinkActive="active" *ngIf="isAuthenticated">
           <a routerLink='/companies' >Companies</a>
         </li>
+        <li routerLinkActive="active" *ngIf="isAuthenticated">
+          <a routerLink='/positions' >Positions</a>
+        </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li routerLinkActive="active" *ngIf="!isAuthenticated">
@@ -36,6 +39,8 @@
         <li routerLinkActive="active" *ngIf="isAuthenticated">
           <a routerLink='/my-details' class="glyphicon glyphicon-user"></a>
         </li>
+
+
         <li class="dropdown dropdown-menu-right" *ngIf="isAuthenticated" appDropdown>
           <a
             style="cursor: pointer;"
@@ -46,8 +51,12 @@
           <ul class="dropdown-menu">
             <li><a style="cursor: pointer;" (click)="onFetchEmployees()">Fetch Employees</a></li>
             <li><a style="cursor: pointer;" (click)="onFetchCompanies()">Fetch Companies</a></li>
+            <li><a style="cursor: pointer;" (click)="onFetchPositions()">Fetch Positions</a></li>
           </ul>
         </li>
+
+
+
         <li *ngIf="isAuthenticated">
           <a style="cursor: pointer;" (click)="onLogout()">Logout</a>
         </li>

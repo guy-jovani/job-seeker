@@ -2,10 +2,11 @@
 
 import { Action } from '@ngrx/store';
 import { Company } from '../company.model';
+import { Position } from 'app/position/position.model';
 
-// export const STORE_COMPANY_IN_DB = "[Company] STORE company in db";
-// export const SET_SINGLE_COMPANY = "[Company] Set single company";
 export const UPDATE_SINGLE_COMPANY = '[Company] Update single company';
+export const UPDATE_SINGLE_COMPANY_POSITION = '[Company] Update single company position';
+export const UPDATE_SINGLE_COMPANY_POSITION_ATTEMPT = '[Company] Update single company position attempt';
 export const UPDATE_SINGLE_COMPANY_IN_DB = '[Company] Update single company in db';
 export const SET_ALL_COMPANIES = '[Company] Set All Companies';
 export const FETCH_ALL_COMPANIES = '[Company] Fetch All companies';
@@ -20,9 +21,9 @@ export type CompanyActions = FetchAllCompanies
                             | CompanyOpFailure
                             | ClearError
                             | UpdateSingleCompanyInDb
-                            // | SetSingleCompany
                             | UpdateSingleCompany
-                            // | StoreCompanyInDb
+                            | UpdateSingleCompanyPositionAttempt
+                            | UpdateSingleCompanyPosition
                             | Logout;
 
 
@@ -30,10 +31,14 @@ export class FetchAllCompanies implements Action {
   readonly type = FETCH_ALL_COMPANIES;
 }
 
+export class UpdateSingleCompanyPositionAttempt implements Action {
+  readonly type = UPDATE_SINGLE_COMPANY_POSITION_ATTEMPT;
+}
+
 export class FetchSingleCompany implements Action {
   readonly type = FETCH_SINGLE_COMPANY;
 
-  constructor(public payload: string) {}
+  constructor(public payload: { _id: string, main: boolean, posInd?: number }) {}
 }
 
 export class SetAllCompanies implements Action {
@@ -42,10 +47,16 @@ export class SetAllCompanies implements Action {
   constructor(public payload: Company[]) {}
 }
 
+export class UpdateSingleCompanyPosition implements Action {
+  readonly type = UPDATE_SINGLE_COMPANY_POSITION;
+
+  constructor(public payload: Position) {}
+}
+
 export class UpdateSingleCompany implements Action {
   readonly type = UPDATE_SINGLE_COMPANY;
 
-  constructor(public payload: { company: Company }) {}
+  constructor(public payload: { company: Company, main: boolean }) {}
 }
 
 export class UpdateSingleCompanyInDb implements Action {
@@ -62,7 +73,7 @@ export class UpdateSingleCompanyInDb implements Action {
 export class CompanyOpFailure implements Action {
   readonly type = COMPANY_OP_FAILURE;
 
-  constructor(public payload: any[]) {}
+  constructor(public payload: string[]) {}
 }
 
 export class ClearError implements Action {

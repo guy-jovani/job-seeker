@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import * as fromApp from '../../store/app.reducer';
 import { Employee } from '../employee.model';
 import * as EmployeeActions from '../store/employee.actions';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-list-employee',
@@ -17,30 +17,42 @@ export class ListEmployeeComponent implements OnInit, OnDestroy {
   employees: Employee[];
   subscription: Subscription;
   isLoading = false;
+  errorMessages: string[] = [];
+  currUrl: string[] = null;
 
-  constructor(private store: Store<fromApp.AppState>) { }
+  constructor(private store: Store<fromApp.AppState>,
+              private router: Router) { }
 
   ngOnInit() {
+
     this.subscription = this.store.select('employee')
-      .pipe(
-        map(employeeState => {
-          this.isLoading = employeeState.loadingAll;
-          return employeeState.employees;
-        })
-      )
-      .subscribe(employees => {
-        this.employees = employees;
+      .subscribe(employeeState => {
+        this.currUrl = this.router.url.substring(1).split('/');
+        this.isLoading = employeeState.loadingAll;
+        console.log(employeeState)
+        if (this.currUrl[this.currUrl.length - 1] === 'employees') {
+          if (employeeState.messages) {
+            this.errorMessages = [];
+            for (const msg of employeeState.messages) {
+              this.errorMessages.push(msg);
+            }
+          } else {
+            this.errorMessages = [];
+          }
+        }
+        this.employees = employeeState.employees;
       });
   }
 
-  getEmployeeinfo(index: number){
-    this.store.dispatch(new EmployeeActions.FetchSingleEmployee(this.employees[index]._id));
-  }
+    onClose() {
+      this.store.dispatch(new EmployeeActions.ClearError());
+    }
 
-  ngOnDestroy(){
-    if(this.subscription){
+  ngOnDestroy() {
+    if (this.subscription) {
       this.subscription.unsubscribe();
     }
+    this.onClose();
   }
 
 }

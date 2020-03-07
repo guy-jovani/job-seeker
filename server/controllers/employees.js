@@ -8,10 +8,9 @@ const getBulkArrayForUpdate = require('../utils/shared').getBulkArrayForUpdate;
 const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
 
 
-exports.fetchEmployee = async (req, res, next) => {
-  try {
-    const employee = await Employee.findOne({_id: req.query._id}).select(
-            '-password -__v -resetPassToken -resetPassTokenExpiration');
+exports.fetchSingle = async (req, res, next) => {
+  try {throw "111"
+    const employee = await Employee.findById(req.query._id).select('_id email firstName lastName');
     res.status(200).json({
       type: 'success',
       employee
@@ -21,10 +20,9 @@ exports.fetchEmployee = async (req, res, next) => {
   }
 };
 
-exports.fetchEmployees = async (req, res, next) => {
-  try { 
-    const employees = await Employee.find({_id: { $ne: mongoose.Types.ObjectId(req.query._id) }}).select(
-        '-password -__v -resetPassssToken -resetPassTokenExpiration');
+exports.fetchAll = async (req, res, next) => {
+  try {
+    const employees = await Employee.find({_id: { $ne: req.query._id }}).select('_id email firstName lastName');
     res.status(200).json({
       type: 'success',
       employees
@@ -43,18 +41,26 @@ const getUpdateQuery = async (req) => {
 
 exports.updateEmployee = async (req, res, next) => {
   try {
-    if(validation.handleValidationRoutesErrors(req, res)) return;
+    const routeErros = validation.handleValidationRoutesErrors(req);
+    if(routeErros.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
+    } 
+    const emailExist = await validation.userEmailExistValidation(req.body.email, req.body._id);
+    console.log(emailExist)
+    if(emailExist.type === 'failure'){
+      return sendMessagesResponse(res, 422, emailExist.messages, 'failure');
+    }
 
-    const emailExist = await validation.userEmailExistValidation(
-                    req.body.email, res, req.body._id);
-    if(emailExist){ return ; }
-    
     const bulkRes = await Employee.bulkWrite(await getUpdateQuery(req));
     if(!bulkRes.result.nMatched){
       throw new Error("trying to update a non exisitng employee");
     }
-    const updatedEmployee = await Employee.findById(req.body._id).select(
-        '-__v -password -resetPassToken -resetPassTokenExpiration');
+    let updatedEmployee = await Employee.findById(req.body._id).select(
+        '-__v -password -resetPassToken -resetPassTokenExpiration').populate('positionsIds');
+
+    updatedEmployee = updatedEmployee.toObject();
+    Reflect.set(updatedEmployee, 'positions', updatedEmployee['positionsIds']);
+    Reflect.deleteProperty(updatedEmployee, 'positionsIds');
 
     res.status(201).json({
       message: 'employee updated successfully!',
@@ -82,53 +88,3 @@ exports.updateEmployee = async (req, res, next) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// exports.postEmployee = async (req, res, next) => {
-//   try {
-//     const emailExist = await validation.employeeEmailExistValidation(req.body.email, res);
-//     if(!emailExist){
-//       const employee = new Employee({ name: req.body.name, email: req.body.email });
-//       await employee.save();
-//       res.status(200).json({
-//         message: 'employee created successfully!',
-//         type: 'success',
-//         id: employee._id,
-//         firstName: employee.firstName,
-//         lastName: employee.lastName,
-//         email: employee.email,
-//       });
-//     }
-//   } catch (error) {
-//     next(errorHandling.handleServerErrors(error, 500, "there was an error creating the employee"));
-//   }
-// };
-//
-// exports.deleteEmployee = async (req, res, next) => {
-//   try {
-//     await Employee.findByIdAndDelete(req.body.id);
-//     res.status(200).json({
-//       message: 'employee deleted successfully!',
-//       type: 'success',
-//       id: req.body.id
-//     });
-//   } catch (error) {
-//     next(errorHandling.handleServerErrors(error, 500, "there was an error deleting the employee"));
-//   }
-// };

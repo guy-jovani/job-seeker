@@ -1,10 +1,10 @@
 
-<app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert>
-<div class="container">
+<div class="container-fluid">
   <h4>Edit</h4>
   <div *ngIf="isLoading">
     <app-loading-spinner></app-loading-spinner>
   </div>
+  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
   <form (ngSubmit)="onSubmit(employeeForm)"  [formGroup]="employeeForm" *ngIf="!isLoading">
     <div class="row">
         <label for="email">email:  </label>
@@ -21,7 +21,7 @@
       </div>
     <div class="row">
       <div class="col">
-        <label for="lastName">first name:  </label>
+        <label for="firstName">first name:  </label>
         <input
           type="text"
           name="firstName"

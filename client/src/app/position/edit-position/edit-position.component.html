@@ -1,0 +1,79 @@
+
+<div class="container-fluid">
+  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
+  <h4>{{ index >= 0 ? 'Update' : 'Create' }}</h4>
+  <div *ngIf="isLoading">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+  <form (ngSubmit)="onSubmit(positionForm)"  [formGroup]="positionForm" *ngIf="!isLoading">
+    <div class="row">
+        <label for="title">title:  </label>
+        <input
+          type="title"
+          name="title"
+          id="title"
+          formControlName="title"
+          #title
+        >
+        <span class="help-block" *ngIf="!positionForm.get('title').valid && positionForm.get('title').touched">
+          please enter a valid email address
+        </span>
+      </div>
+    <div class="row">
+      <label for="description">description:  </label>
+      <textarea
+        name="description"
+        id="description"
+        formControlName="description"
+        #description
+        >
+        </textarea>
+        <span class="help-block" *ngIf="!positionForm.get('description').valid && positionForm.get('description').touched">
+          please enter a description
+        </span>
+    </div>
+
+
+
+    <div class="row" formArrayName="requirements">
+      <span>requirement:  </span>
+      <button type="button" class="btn btn-info btn-sm" (click)="onAddRequirement()">(+) Add Requirement</button>
+      <span class="help-block" *ngIf="getControls().length > 0">
+        The 'years' field only allows numbers.
+      </span>
+      <div *ngFor="let requirement of getControls(); let i=index"
+              [formGroupName]="i" >
+
+        <label for="years">(min) number of years:  </label>
+        <input formControlName="years" type="number" name="years"/>
+        <label for="skill">skill:  </label>
+        <input formControlName="skill" name="skill" type="text"/>
+
+        <button class="btn btn-danger btn-sm" type="button" (click)="onRemoveRequirement(i)">X</button>
+        <span class="help-block" *ngIf="!getControls()[i].get('years').valid &&
+                                        getControls()[i].get('years').touched">
+          The 'years' field is a required one.
+        </span>
+        <span class="help-block" *ngIf="!getControls()[i].get('skill').valid &&
+                                        getControls()[i].get('skill').touched">
+          The 'skill' field is a required one.
+        </span>
+      </div>
+    </div>
+    <hr>
+    <button
+      type="submit"
+      class="btn btn-success"
+      [disabled]="!positionForm.valid"
+    >
+      {{ position ? 'Update' : 'Create' }}
+    </button>
+    <button
+      type="button"
+      class="btn btn-danger"
+      (click)="onCancel()"
+      >
+      Cancel
+    </button>
+  </form>
+</div>

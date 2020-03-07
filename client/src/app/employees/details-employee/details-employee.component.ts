@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { map, switchMap } from 'rxjs/operators';
+import { ActivatedRoute, Router } from '@angular/router';
+import { switchMap } from 'rxjs/operators';
 
 import { Subscription } from 'rxjs';
-import { Company } from 'app/company/company.model';
 import * as fromApp from '../../store/app.reducer';
 import { Employee } from '../employee.model';
+import * as EmployeeActions from '../store/employee.actions';
 
 @Component({
   selector: 'app-details-employee',
@@ -18,6 +18,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   routeSub: Subscription;
   allowEdit: boolean;
   isLoading = false;
+  errorMessages: string[] = [];
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -29,7 +30,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
     this.routeSub = this.route.params
       .pipe(
         switchMap(() => {
-          currUrl = this.route.snapshot['_routerState'].url.substring(1).split('/');
+          currUrl = this.router.url.substring(1).split('/');
           if (currUrl[0] === 'my-details') {
             return this.store.select('auth');
           } else {
@@ -37,14 +38,25 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
           }
         }))
         .subscribe(currState => {
+          currUrl = this.router.url.substring(1).split('/');
           if (currUrl[0] === 'my-details') {
             this.employee = currState['user'] as Employee;
             this.allowEdit = true;
           } else { // employee list details
-            this.isLoading = currState['loadingSingle'];
             if (currUrl[1] >= currState['employees'].length || currUrl[1] < 0) {
               // check if trying to get details of an undefined employee
               return this.router.navigate(['employees']);
+            }
+            this.isLoading = currState['loadingSingle'];
+            if (currUrl[currUrl.length - 1] === 'employee') {
+              if (currState.messages) {
+                this.errorMessages = [];
+                for (const msg of currState.messages) {
+                  this.errorMessages.push(msg);
+                }
+              } else {
+                this.errorMessages = [];
+              }
             }
             this.employee = currState['employees'][+currUrl[1]];
             this.allowEdit = false;
@@ -52,10 +64,14 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
         });
   }
 
+  onClose() {
+    this.store.dispatch(new EmployeeActions.ClearError());
+  }
 
   ngOnDestroy() {
     if (this.routeSub) {
       this.routeSub.unsubscribe();
     }
+    this.onClose();
   }
 }

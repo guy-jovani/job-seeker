@@ -1,47 +1,57 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { map } from 'rxjs/operators';
-import { ActivatedRoute } from '@angular/router';
 
+import * as CompanyActions from '../store/company.actions';
 import * as fromApp from '../../store/app.reducer';
 import { Company } from '../company.model';
 import { Employee } from 'app/employees/employee.model';
-import * as CompanyActions from '../store/company.actions';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-list-companies',
   templateUrl: './list-companies.component.html',
   styleUrls: ['./list-companies.component.scss']
 })
-export class ListCompaniesComponent implements OnInit {
+export class ListCompaniesComponent implements OnInit, OnDestroy {
   companies: Company[];
   subscription: Subscription;
   activeEmployee: Employee;
   isLoading = false;
+  errorMessages: string[] = [];
+  currUrl: string[] = null;
 
   constructor(private store: Store<fromApp.AppState>,
-              private route: ActivatedRoute) { }
-
+              private router: Router) { }
 
   ngOnInit() {
+
     this.subscription = this.store.select('company')
-      .pipe(map(companieState => {
-        this.isLoading = companieState.loadingAll;
-        return companieState.companies;
-      }))
-      .subscribe(companies => {
-        this.companies = companies;
+      .subscribe(companyState => {
+        this.currUrl = this.router.url.substring(1).split('/');
+        this.isLoading = companyState.loadingAll;
+        if (this.currUrl[this.currUrl.length - 1] === 'companies') {
+          if (companyState.messages) {
+            this.errorMessages = [];
+            for (const msg of companyState.messages) {
+              this.errorMessages.push(msg);
+            }
+          } else {
+            this.errorMessages = [];
+          }
+        }
+        this.companies = companyState.companies;
       });
   }
 
-  getCompanyinfo(index: number){
-    this.store.dispatch(new CompanyActions.FetchSingleCompany(this.companies[index]._id));
+  onClose() {
+    this.store.dispatch(new CompanyActions.ClearError());
   }
 
-  ngOnDestroy(){
-    if(this.subscription){
+  ngOnDestroy() {
+    if (this.subscription) {
       this.subscription.unsubscribe();
     }
+    this.onClose();
   }
 }

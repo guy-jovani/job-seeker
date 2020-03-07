@@ -5,13 +5,12 @@ import { Company } from '../company.model';
 
 
 
-
-
 export interface State {
   companies: Company[];
   messages: any[];
   loadingAll: boolean;
   loadingSingle: boolean;
+  lastFetch: Date;
 }
 
 const initialState: State = {
@@ -19,6 +18,7 @@ const initialState: State = {
   messages: null,
   loadingAll: false,
   loadingSingle: false,
+  lastFetch: null
 };
 
 export function companyReducer(state = initialState, action: CompanyActions.CompanyActions) {
@@ -27,9 +27,9 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
       return {
         ...state,
         companies: [...action.payload],
-        messages: null,
         loadingAll: false,
-        loadingSingle: false
+        messages: null,
+        lastFetch: new Date()
       };
     case CompanyActions.COMPANY_OP_FAILURE:
       return {
@@ -40,9 +40,10 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
       };
     case CompanyActions.UPDATE_SINGLE_COMPANY_IN_DB:
     case CompanyActions.FETCH_SINGLE_COMPANY:
+    case CompanyActions.UPDATE_SINGLE_COMPANY_POSITION_ATTEMPT:
       return {
         ...state,
-        loadingSingle: true,
+        loadingSingle: true
       };
     case CompanyActions.FETCH_ALL_COMPANIES:
       return {
@@ -60,7 +61,26 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
         ...state,
         companies: [ ...updatedCompanies ],
         messages: null,
-        loadingAll: false,
+        loadingSingle: false
+      };
+    case CompanyActions.UPDATE_SINGLE_COMPANY_POSITION:
+      const compInd = state.companies.findIndex(comp => comp._id === action.payload.companyId._id );
+      action.payload.lastFetch = new Date();
+      const positions = [...state.companies[compInd].positions];
+      const posInd = state.companies[compInd].positions.findIndex(pos =>
+                                pos._id === action.payload._id );
+      positions[posInd] = action.payload;
+
+      const upToDateCompanies = [ ...state.companies ];
+      const upToDateCompany = {
+        ...upToDateCompanies[compInd],
+        positions
+      };
+      upToDateCompanies[compInd] = upToDateCompany;
+      return {
+        ...state,
+        messages: null,
+        companies: [ ...upToDateCompanies ],
         loadingSingle: false
       };
     case CompanyActions.CLEAR_ERROR:
@@ -76,19 +96,16 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
         messages: null,
         companies: [],
         loadingAll: false,
-        loadingSingle: false
+        loadingSingle: false,
+        tempCompany: null,
+        lastFetch: null
       };
     default:
       return state;
   }
 }
 
-    // case CompanyActions.SET_SINGLE_COMPANY:
-    //   return {
-    //     ...state,
-    //     companies: [ ...state.companies, action.payload.company ],
-    //     messages: null
-    //   }
+
 
 
 

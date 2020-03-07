@@ -18,7 +18,7 @@ export class EditUserComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.authSubscription = this.store.select('auth').subscribe(authState => {
       this.userEmployee = authState.kind === 'employee';
-    })
+    });
   }
 
   ngOnDestroy() {

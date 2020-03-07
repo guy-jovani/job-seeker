@@ -2,34 +2,62 @@
 const mongoose = require('mongoose');
 
 const Company = require('../models/company');
-// const Employee = require('../models/employee');
 const validation = require('../utils/validation');
 const errorHandling = require('../utils/errorHandling');
 const getBulkArrayForUpdate = require('../utils/shared').getBulkArrayForUpdate;
 const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
+const chackCompanyUpdateSignupValidation = require('../utils/shared').chackCompanyUpdateSignupValidation
 
+exports.fetchSingle = async (req, res, next) => {
+  try { 
+    let company = await Company.findById(req.query._id).select(
+      '_id email name website description imagePath positionsIds').populate('positionsIds');
 
-exports.getCompany = async (req, res, next) => {
-  try {
-    const company = await Company.aggregate([
-                { "$match": { '_id':  mongoose.Types.ObjectId(req.query._id) } },
-                { "$project": { 'createdAt': 0, 'updatedAt': 0, '__v': 0, 'password': 0 } }
-              ]);
+    company = company.toObject();
+    Reflect.set(company, 'positions', company['positionsIds']);
+    Reflect.deleteProperty(company, 'positionsIds');
+
     res.status(200).json({
       type: 'success',
-      company: company[0]
+      company: company
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "there was an error fetching the company"));
   }
 };
 
-exports.getCompanies = async (req, res, next) => {
+exports.fetchAll = async (req, res, next) => {
   try {
     const companies = await Company.aggregate([
-                { "$match": { '_id': { $ne: mongoose.Types.ObjectId(req.query._id) }}},
-                { "$project": { 'createdAt': 0, 'updatedAt': 0, 'website': 0, 'email': 0, '__v': 0, 'password': 0 } }
-              ]);
+      { $match: { _id: { $ne: mongoose.Types.ObjectId(req.query._id)} } },
+      { $project: { positionsIds: 0, createdAt: 0, updatedAt: 0, __v: 0, password: 0 } },
+      { $lookup: {
+        from: "positions",
+        let: { company_id: "$_id" },
+        pipeline: [
+          { $match: { $expr: { $eq: [ "$companyId", "$$company_id" ] } } },
+          { $lookup: {
+            from: "companies",
+            localField: "companyId",
+            foreignField: "_id",
+            as: "companyId" }
+          },
+          { $unwind: "$companyId" },
+          { $project: {
+            "__v": 0,
+            "companyId.positionsIds": 0,
+            "companyId.password": 0,
+            "companyId.createdAt": 0,
+            "companyId.updatedAt": 0,
+            "companyId.description": 0,
+            "companyId.__v": 0,
+            "companyId.email": 0, }
+          }
+        ],
+        as: "positions" }
+      }
+    ])
+
     res.status(200).json({
       type: 'success',
       companies
@@ -62,27 +90,32 @@ const getUpdateQuery = async (req) => {
 };
 
 exports.updateCompany = async (req, res, next) => {
-  try {
-    if(validation.handleValidationRoutesErrors(req, res)) return;
-    const nameExist = await validation.companyNameExistValidation(req.body.name, res, req.body._id);
-    if(nameExist) return;
-    const emailExist = await validation.userEmailExistValidation(
-          req.body.email, res, req.body._id);
-    if(emailExist){ return ; }
+  try { 
+    const routeErros = validation.handleValidationRoutesErrors(req);
+    if(routeErros.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
+    }
+    const companyValid = await chackCompanyUpdateSignupValidation(req, signup = false);
+    if(companyValid.type === 'failure'){
+      return sendMessagesResponse(res, 422, companyValid.messages, 'failure');
+    }
     
     const bulkRes = await Company.bulkWrite(await getUpdateQuery(req));
     if(!bulkRes.result.nMatched){
       throw new Error("trying to update a non exisitng company");
     }
-    const updatedCompany = await Company.aggregate([
-                { "$match": { '_id':  mongoose.Types.ObjectId(req.body._id) } },
-                { "$project": { 'createdAt': 0, 'updatedAt': 0, '__v': 0, 'password': 0 } }
-              ]);
 
+    let updatedCompany = await Company.findById(req.body._id).select(
+                            '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration -password'
+                          ).populate('positionsIds');
+    
+    updatedCompany = updatedCompany.toObject();
+    Reflect.set(updatedCompany, 'positions', updatedCompany['positionsIds']);
+    Reflect.deleteProperty(updatedCompany, 'positionsIds');
     res.status(201).json({
       message: 'company updated successfully!',
       type: 'success',
-      company: updatedCompany[0]
+      company: updatedCompany
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "there was an error updating the company"));
@@ -97,37 +130,3 @@ exports.updateCompany = async (req, res, next) => {
 
 
 
-
-
-// const getFilteredCompany = company => {
-//   // filter a company object from fileds that shouldn't return to the client
-//   const companyFieldsNotToReturn = ['__v', 'createdAt', 'updatedAt'];
-//   return Object.keys(company._doc)
-//               .filter(key => !companyFieldsNotToReturn.includes(key))
-//               .reduce((obj, key) => (obj[key] = company._doc[key], obj), {});
-// } 
-// 
-// exports.register = async (req, res, next) => {
-//   try {
-//     if(validation.handleValidationRoutesErrors(req, res)) return;
-//     const nameExist = await validation.companyNameExistValidation(req.body.name, res);
-//     if(nameExist) return;
-//     let company = await Company.create( { ...req.body } );
-//     if(req.file) {
-//       const url = req.protocol + '://' + req.get('host');
-//       const imagePath = url + '/images/' + req.file.filename;
-//       company.imagePath = imagePath;
-//       await company.save();
-//     }
-//     // gets a company object without the fields that shouldn't return         
-//     company = getFilteredCompany(company);
-// 
-//     res.status(201).json({
-//       message: 'company created successfully!',
-//       type: 'success',
-//       company
-//     });
-//   } catch (error) {
-//     next(errorHandling.handleServerErrors(error, 500, "there was an error fetching the company"));
-//   }
-// };
