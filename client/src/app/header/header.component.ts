@@ -22,18 +22,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
   checkAuthSub: Subscription;
   user: Employee | Company = null;
+  chatNotifications = false;
 
   constructor(private store: Store<fromApp.AppState>) { }
 
   ngOnInit() {
-    this.checkAuthSub = this.store.select('auth').pipe(
-      map(authState => {
-        return authState.user;
-      })).subscribe(user => {
-        this.isAuthenticated = !!user;
+    this.checkAuthSub = this.store.select('auth')
+      .subscribe(authState => {
+        this.isAuthenticated = !!authState.user;
         if (this.isAuthenticated) {
-          this.user = user;
+          this.user = authState.user;
         }
+        this.chatNotifications = !!authState.notificatios.find(notification => notification === 'chat');
       });
   }
 

@@ -1,2 +1,6 @@
+
+
+
+<app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert>
 <app-header></app-header>
 <router-outlet></router-outlet>

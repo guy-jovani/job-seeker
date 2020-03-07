@@ -1,29 +1,36 @@
 const mongoose = require('mongoose');
-const errorHandling = require('../utils/errorHandling')
-const Employee = require('../models/employee');
-const Company = require('../models/company');
+const errorHandling = require('../utils/errorHandling');
 const Message = require('../models/message');
 const Conversation = require('../models/conversation');
-const validation = require('../utils/validation');
 
 
 
-exports.postMessage = async (req, res, next) => {
+exports.postMessage = async (privateMsg, recipients, content, senderId, senderType) => {
   try {
-    if(validation.handleValidationRoutesErrors(req, res)) return;
-    if(!req.body.privateMsg){
-      await createUpdateConversation(req.body.recipients, req.body.message, req.body.senderId, req.body.senderType);
+    // if(validation.handleValidationRoutesErrors(req, res)) return;
+    let error = new Error();
+    error.messages = [];
+    if(!content) {
+      error.messages.push('You can\'t send an empty message.');
+    }
+    if(!recipients || !recipients.length){
+      error.messages.push('You need to choose who to send the message to.');
+    }
+    
+    if(error.messages.length) {
+      throw error;
+    }
+    let conversations = [];
+    if(!privateMsg){
+      conversations.push(await createUpdateConversation(recipients, content, senderId, senderType));
     } else {
-      for(recipient of req.body.recipients) {
-        await createUpdateConversation([recipient], req.body.message, req.body.senderId, req.body.senderType);
+      for(recipient of recipients) {
+        conversations.push(await createUpdateConversation([recipient], content, senderId, senderType));
       }
     }
-
-    res.status(200).json({
-      type: 'success'
-    });
+    return conversations;
   } catch (error) {
-    next(errorHandling.handleServerErrors(error, 500, 'There was an error sending the message. Please try again later.'));
+    throw errorHandling.handleServerErrors(error, 500, 'There was an error sending the message. Please try again later.');
   }
 };
 
@@ -38,6 +45,7 @@ const addMessageToConversation = async (conversation, content, senderId, senderT
   });
   await Conversation.updateOne({ _id: conversation._id }, {
     $push: { messages: message }});
+  return {creator: message.creator, content: message.content, createdAt: message.createdAt};
 };
 
 
@@ -51,14 +59,17 @@ const createUpdateConversation = async (recipients, content, senderId, senderTyp
 
   // 1. check if conversation exists
   let conversation = await checkIfConExists(participantsIds);
-  // console.log(conversation)
-  // 2. if exists - just update with new message
-  if (conversation.length) {
+  let newCon = true;
+
+  if (conversation.length) { // 2. if exists - just update with new message
     conversation = conversation[0]; // only one conversation should be found
   } else { // 3. doesn't exists - create conversation
     conversation = await Conversation.create({participants: participants, onModel: senderType});
+    newCon = false;
   }
-  await addMessageToConversation(conversation, content, senderId, senderType);
+  const message = await addMessageToConversation(conversation, content, senderId, senderType);
+  conversation = await populateConversationParticipants(conversation);
+  return [message, conversation, newCon];
 };
 
 
@@ -90,19 +101,8 @@ exports.fetchConversations = async (req, res, next) => {
         }
       }
     ]);
-    conversations = await Conversation.populate(conversations, 
-      {
-        path: 'participants.user',
-        select: [ 'name', 'firstName', 'lastName' ]
-      });
-    conversations = await Conversation.populate(conversations, 
-      {
-        path: 'messages',
-        select: ['creator', 'content', 'createdAt'],
-        // $sort: {
-        //   createdAt: 1
-        // }
-      });
+    conversations = await populateConversationParticipants(conversations);
+    conversations = await populateConversationMessages(conversations);
     res.status(200).json({
       type: 'success',
       conversations
@@ -112,8 +112,19 @@ exports.fetchConversations = async (req, res, next) => {
   }
 };
 
+const populateConversationParticipants = async conversations => {
+  return await Conversation.populate(conversations, 
+    {
+      path: 'participants.user',
+      select: [ 'name', 'firstName', 'lastName' ]
+    });
+};
 
-
-
-
+const populateConversationMessages = async conversations => {
+  return await Conversation.populate(conversations, 
+    {
+      path: 'messages',
+      select: ['creator', 'content', 'createdAt']
+    });
+};
 

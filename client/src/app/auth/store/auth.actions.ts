@@ -4,6 +4,7 @@ import { Action } from '@ngrx/store';
 import { Employee } from 'app/employees/employee.model';
 import { Company } from 'app/company/company.model';
 import { Conversation } from 'app/chat/conversation.model';
+import { Message } from 'app/chat/message.model';
 
 export const SIGNUP_ATTEMPT = '[Auth] SIGNUP_ATTEMPT';
 export const LOGIN_ATTEMPT = '[Auth] LOGIN_ATTEMPT';
@@ -19,6 +20,10 @@ export const RESET_PASS_ATTEMPT = '[Auth] RESET_PASS_ATTEMPT';
 export const RESET_PASS_SUCCESS = '[Auth] RESET_PASS_SUCCESS';
 export const FETCH_ALL_CONVERSATIONS = '[Auth] FETCH_ALL_CONVERSATIONS';
 export const SET_ALL_CONVERSATIONS = '[Auth] SET_ALL_CONVERSATIONS';
+export const SET_SINGLE_CONVERSATION = '[Auth] SET_SINGLE_CONVERSATION';
+export const SET_CHAT_NOTIFICATION = '[Auth] SET_CHAT_NOTIFICATION';
+export const REMOVE_CHAT_NOTIFICATION = '[Auth] REMOVE_CHAT_NOTIFICATION';
+
 
 export type AuthActions = SignupAttempt
                         | LoginAttempt
@@ -31,6 +36,9 @@ export type AuthActions = SignupAttempt
                         | ResetPassSuccess
                         | ResetPassAttempt
                         | Logout
+                        | SetChatNotification
+                        | SetSingleConversation
+                        | RemoveChatNotification
                         | SetAllConversations
                         | FetchAllConversations
                         | UpdateActiveUser;
@@ -41,7 +49,7 @@ export class SignupAttempt implements Action {
 
   constructor(public payload: {
       email: string,  password: string, confirmPassword: string, name?: string
-  }){}
+  }) {}
 }
 
 export class ResetPassEmailAttempt implements Action {
@@ -54,16 +62,30 @@ export class FetchAllConversations implements Action {
   readonly type = FETCH_ALL_CONVERSATIONS;
 }
 
+export class SetChatNotification implements Action {
+  readonly type = SET_CHAT_NOTIFICATION;
+}
+
+export class RemoveChatNotification implements Action {
+  readonly type = REMOVE_CHAT_NOTIFICATION;
+}
+
 export class SetAllConversations implements Action {
   readonly type = SET_ALL_CONVERSATIONS;
 
   constructor(public payload: Conversation[]) {}
 }
 
+export class SetSingleConversation implements Action {
+  readonly type = SET_SINGLE_CONVERSATION;
+
+  constructor(public payload: { conversation: Conversation, message: Message }) {}
+}
+
 export class ResetPassAttempt implements Action {
   readonly type = RESET_PASS_ATTEMPT;
 
-  constructor(public payload: { password: string, confirmPassword: string, token: string }){}
+  constructor(public payload: { password: string, confirmPassword: string, token: string }) {}
 }
 
 export class LoginAttempt implements Action {
@@ -71,7 +93,7 @@ export class LoginAttempt implements Action {
 
   constructor(public payload:
       { email: string,  password: string }
-    ){}
+    ) {}
 }
 
 export class AuthSuccess implements Action {

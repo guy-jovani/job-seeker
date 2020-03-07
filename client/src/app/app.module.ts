@@ -23,6 +23,12 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
 
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+import { environment } from 'environments/environment';
+
+const config: SocketIoConfig = { url: environment.nodeServer, options: {} };
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -36,6 +42,7 @@ import { ChatModule } from './chat/chat.module';
     HttpClientModule,
     StoreModule.forRoot(fromApp.appReducer),
     EffectsModule.forRoot([EmployeeEffects, AuthEffects, CompanyEffects]),
+    SocketIoModule.forRoot(config),
     EmployeesModule,
     CompanyModule,
     SharedModule,

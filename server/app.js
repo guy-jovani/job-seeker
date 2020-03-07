@@ -74,9 +74,12 @@ mongoose.connect("mongodb://" +
   }
 )
 .then(() => {
-  // const server = http2.createServer(app);
   const server = app.listen(process.env.PORT || globalVars.PORT); // process.env for the hosting provider
-  // server.listen(process.env.PORT || globalVars.PORT);
+  const io = require('./socket').socketInitializer.init(server);
+  io.on('connection', socket => {
+    console.log('connected')
+    require('./socket').socketHandler(socket);
+  });
 })
 .catch(err => console.log(err));
 

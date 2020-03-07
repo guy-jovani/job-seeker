@@ -13,6 +13,7 @@ export interface State {
   loading: boolean;
   kind: string;
   token: string;
+  notificatios: string[];
   conversations: Conversation[];
 }
 
@@ -22,12 +23,13 @@ const initialState: State = {
   loading: false,
   kind: null,
   token: null,
+  notificatios: [],
   conversations: null
 };
 
-export function authReducer(state = initialState, action: AuthActions.AuthActions){
+export function authReducer(state = initialState, action: AuthActions.AuthActions) {
   // console.log("auth reducer " + action.type),
-  switch(action.type){
+  switch (action.type) {
     case AuthActions.SIGNUP_ATTEMPT:
     case AuthActions.LOGIN_ATTEMPT:
     case AuthActions.RESET_PASS_EMAIL_ATTEMPT:
@@ -37,11 +39,57 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
         ...state,
         loading: true,
       };
+    case AuthActions.SET_CHAT_NOTIFICATION:
+      return {
+        ...state,
+        loading: true,
+        notificatios: [...state.notificatios, 'chat']
+      };
+    case AuthActions.REMOVE_CHAT_NOTIFICATION:
+      const newNotifications = [...state.notificatios];
+      const chatNotInd = newNotifications.findIndex(notification => notification === 'chat');
+      if (chatNotInd !== -1) {
+        newNotifications.splice(chatNotInd, 1);
+      }
+      return {
+        ...state,
+        loading: true,
+        notificatios: newNotifications
+      };
     case AuthActions.SET_ALL_CONVERSATIONS:
       return {
         ...state,
         loading: false,
         conversations: action.payload
+      };
+    case AuthActions.SET_SINGLE_CONVERSATION:
+      const newConId = action.payload.conversation._id;
+      // check waht to do if the user still didnt load the cons
+      const oldConId = state.conversations.findIndex(con => con._id === newConId);
+      const updatedCons = [...state.conversations];
+
+      if (oldConId === -1) { // a new conversation
+        action.payload.conversation.messages = [action.payload.message];
+        updatedCons.push(action.payload.conversation);
+
+      } else { // added message to an existing conversation
+        const newMsg = action.payload.message;
+        newMsg.createdAt = new Date(newMsg.createdAt);
+        const oldMessagesLength = updatedCons[oldConId].messages.length;
+        if ( oldMessagesLength ) {
+          const lastMsgDate = new Date(updatedCons[oldConId].messages[oldMessagesLength - 1].createdAt);
+          newMsg['first'] = lastMsgDate.toDateString() === newMsg.createdAt.toDateString() ? null : newMsg.createdAt.toDateString() ;
+        } else { // no older messages
+          newMsg['first'] = newMsg.createdAt.toDateString();
+        }
+        newMsg['hours'] = newMsg.createdAt.getHours().toString().padStart(2, '0');
+        newMsg['minutes'] = newMsg.createdAt.getMinutes().toString().padStart(2, '0');
+        updatedCons[oldConId].messages.push(action.payload.message);
+      }
+      return {
+        ...state,
+        loading: false,
+        conversations: updatedCons
       };
     case AuthActions.AUTH_FAILURE:
       return {
@@ -75,6 +123,7 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
         messages: null,
         user: null,
         kind: null,
+        notificatios: [],
         conversations: null,
         token: null
       };

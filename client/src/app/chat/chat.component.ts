@@ -1,16 +1,15 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Renderer2 } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
 
 import * as fromApp from '../store/app.reducer';
 import { Employee } from 'app/employees/employee.model';
 import { Company } from 'app/company/company.model';
-import { environment } from 'environments/environment';
 import { Conversation } from './conversation.model';
-
+import { ChatService } from './chat-socket.service';
+import * as AuthActions from '../auth/store/auth.actions';
+import { Message } from './message.model';
 
 
 @Component({
@@ -31,18 +30,23 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   @ViewChild('sendMessageForm', { static: false }) sendMessageForm: NgForm;
 
-  constructor(private http: HttpClient,
-              private renderer: Renderer2,
+  constructor(private renderer: Renderer2,
+              private chatService: ChatService,
               private store: Store<fromApp.AppState>) { }
 
   ngOnInit() {
+    this.store.dispatch(new AuthActions.RemoveChatNotification());
     this.subscription = this.store.select('auth').subscribe(authState => {
       this.user = authState.user;
       this.userKind = authState.user ? authState.kind[0].toUpperCase() + authState.kind.slice(1) : null;
       this.conversations = authState.conversations;
+
       if (this.conversations) {
         this.conversations.forEach(con => {
-          con.participants.splice(con.participants.findIndex(participant => participant['user']['_id'] === this.user._id), 1);
+          const userId = con.participants.findIndex(participant => participant['user']['_id'] === this.user._id);
+          if (userId !== -1) {
+            con.participants.splice(userId, 1);
+          }
         });
       }
     });
@@ -53,6 +57,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.nameList = nameList;
   }
 
+  // tslint:disable-next-line: variable-name
   onRemoveName(_id: string) {
     this.nameList.delete(_id);
   }
@@ -67,37 +72,36 @@ export class ChatComponent implements OnInit, OnDestroy {
     if (this.errorMessages.length) {
       return;
     }
-    const nodeServer = environment.nodeServer + 'chat/postMessage/';
-    this.http.post(nodeServer,
-      {
-        senderId: this.user._id,
-        senderType: this.userKind,
-        message: form.value.messageContent,
-        privateMsg: this.privateMsg,
-        recipients: Array.from(this.nameList.keys()).map(key => {
-          const nameObj = this.nameList.get(key);
-          return { _id: nameObj._id, type: nameObj.type };
-        })
+
+    this.chatService.sendMessage('postAMsg', {
+      senderId: this.user._id,
+      senderType: this.userKind,
+      content: form.value.messageContent,
+      privateMsg: this.privateMsg,
+      recipients: Array.from(this.nameList.keys()).map(key => {
+        const nameObj = this.nameList.get(key);
+        return { _id: nameObj._id, type: nameObj.type };
       })
-    .pipe(take(1))
-    .subscribe(
-      res => {
-        if (res['type'] === 'success') {
-          if (!this.currConversation) {
-            this.sendMessageForm.resetForm();
-            this.nameList.clear();
-          }
-          this.sendMessageForm.form.patchValue({
-            messageContent: ''
-          })
-        } else {
-          this.errorMessages.push(...res['messages']);
-        }
-      },
-      errorMessages => {
-        this.errorMessages.push(...errorMessages);
-      }
-    );
+    });
+
+    if (this.currConversation) {
+      this.store.dispatch(new AuthActions.SetSingleConversation({
+        conversation: this.currConversation,
+        message: new Message({
+          sender: { _id: this.user._id, name: this.getFullName(this.user) },
+          content: form.value.messageContent,
+          createdAt: new Date()
+        })
+      }));
+    }
+
+    if (!this.currConversation) {
+      this.sendMessageForm.resetForm();
+      this.nameList.clear();
+    }
+    this.sendMessageForm.form.patchValue({
+      messageContent: ''
+    });
   }
 
   onFucosCon(conversationDiv: ElementRef) {
@@ -114,14 +118,14 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
     this.privateMsg = this.nameList.size === 1 ? true : false;
 
-    if (typeof(this.currConversation.messages[0].createdAt) === 'string') {
-      let lastDay = null;
+    if (this.currConversation.messages.length && typeof(this.currConversation.messages[0].createdAt) === 'string') {
+      let prevMsgDate: string = null;
       this.currConversation.messages.forEach(msg => {
         msg.createdAt = new Date(msg.createdAt);
-        msg['first'] = !lastDay ? true : false;
+        msg['first'] = !prevMsgDate || prevMsgDate !== msg.createdAt.toDateString() ? msg.createdAt.toDateString() : null;
         msg['hours'] = msg.createdAt.getHours().toString().padStart(2, '0');
         msg['minutes'] = msg.createdAt.getMinutes().toString().padStart(2, '0');
-        lastDay = msg['hours'] ;
+        prevMsgDate = msg.createdAt.toDateString();
       });
     }
   }

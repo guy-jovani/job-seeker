@@ -83,8 +83,10 @@
 
     <div class="messages">
       <ul class='messages__list' appScrollToBottom>
-        <li *ngFor="let msg of currConversation.messages; let i=index" class="messages__list__item">
-          <p class="message message-name">{{ nameList.get(msg.creator) ? nameList.get(msg.creator).fullName : getFullName(user) }}</p>
+        <li *ngFor="let msg of currConversation.messages; let i=index"
+              class="{{msg.creator === user._id ? 'messages__list__item user-msg' : 'messages__list__item'}}">
+          <span *ngIf="msg.first" class="message-full-date">{{ msg.first }}</span>
+          <p *ngIf="currConversation.participants.length > 1" class="message message-name">{{ nameList.get(msg.creator) ? nameList.get(msg.creator).fullName : getFullName(user) }}</p>
           <p class="message message-content">{{ msg.content }}<span class="message-time">{{ msg.hours }}:{{ msg.minutes }}</span></p>
         </li>
       </ul>

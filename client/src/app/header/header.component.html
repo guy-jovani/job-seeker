@@ -28,8 +28,10 @@
         <li routerLinkActive="active" *ngIf="!isAuthenticated">
           <a routerLink='/login' >Login</a>
         </li>
-        <li routerLinkActive="active" *ngIf="isAuthenticated">
-          <a routerLink='/chat' class="glyphicon glyphicon-envelope"></a>
+        <li class="chat-item-list" routerLinkActive="active" *ngIf="isAuthenticated">
+          <a routerLink='/chat' class="glyphicon glyphicon-envelope">
+            <span class="chat-notification" *ngIf="chatNotifications"></span>
+          </a>
         </li>
         <li routerLinkActive="active" *ngIf="isAuthenticated">
           <a routerLink='/my-details' class="glyphicon glyphicon-user"></a>

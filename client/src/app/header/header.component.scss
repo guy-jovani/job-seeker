@@ -1,6 +1,15 @@
 
 
 
+.chat-item-list {
+  position: relative;
+}
 
-
-
+.chat-notification {
+  position: absolute;
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  background-color: red;
+  border-radius: 50%;
+}

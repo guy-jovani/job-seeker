@@ -11,6 +11,7 @@ import * as fromApp from '../../store/app.reducer';
 import * as AuthActions from './auth.actions';
 import { Company } from 'app/company/company.model';
 import { Employee } from 'app/employees/employee.model';
+import { ChatService } from 'app/chat/chat-socket.service';
 
 
 
@@ -51,6 +52,7 @@ export class AuthEffects {
 
   constructor(private actions$: Actions,
               private http: HttpClient,
+              private chatService: ChatService,
               private store: Store<fromApp.AppState>,
               private router: Router) {}
 
@@ -112,6 +114,7 @@ export class AuthEffects {
       const expirationSeconds = new Date(expirationDate).getTime() - new Date().getTime();
       if (expirationSeconds <= 0) { return { type: 'dummy' }; }
       this.autoLogout(expirationSeconds);
+      this.chatService.sendMessage('login', {  _id: user['_id'], msg: 'logged' } );
       return new AuthActions.AuthSuccess({ user, redirect: false, kind, token });
     }),
     catchError(messages => {
@@ -234,6 +237,7 @@ export class AuthEffects {
 
   private signupLoginHandler = res => {
     if (res['type'] === 'success') {
+      this.chatService.sendMessage('login', {  _id: res['user']['_id'], msg: 'logged' } );
       setLocalStorage(res['user'], res['kind'], res['token'], res['expiresIn'] * 1000);
       this.autoLogout(res['expiresIn'] * 1000);
       return new AuthActions.AuthSuccess({

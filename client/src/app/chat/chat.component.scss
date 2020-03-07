@@ -135,6 +135,15 @@
 }
 
 .messages__list {
+  transform: rotate(0);
+}
+
+.message-full-date {
+  position: fixed;
+  left: 45%;
+}
+
+.messages__list {
   height: 100%;
   flex-direction: column;
   overflow: auto;
@@ -153,8 +162,18 @@
   box-shadow: -2px 2px 0px;
 }
 
-.messages__list__item:last-child {
+.user-msg {
+  background-color: #12a9cc8a !important;
+  float: right;
+  align-self: end;
+}
 
+.messages__list__item:last-child::after {
+  content: "";
+  display: block;
+  height: 1px;
+  bottom: -10px;
+  position: relative;
 }
 
 .conversation__participants-list {
@@ -173,7 +192,9 @@
 
 .message-time {
   position: absolute;
-  right: .5rem;
+  font-size: 0.95rem;
+  right: 2px;
+  bottom: -2px;
 }
 
 .message-name {
