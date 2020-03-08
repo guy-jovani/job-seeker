@@ -9,6 +9,7 @@ import * as fromApp from '../../store/app.reducer';
 import { environment } from '../../../environments/environment';
 
 import * as PositionActions from './position.actions';
+import * as UserActions from '../../user/store/user.actions';
 import * as AuthActions from '../../auth/store/auth.actions';
 import { of } from 'rxjs';
 
@@ -31,7 +32,7 @@ export class PositionEffects {
         map(res => {
           if (res['type'] === 'success') {
             this.store.dispatch(new PositionActions.ClearError());
-            return new AuthActions.AddPositionToUser(res['position']);
+            return new UserActions.AddPositionToUser(res['position']);
           } else {
             return new PositionActions.PositionOpFailure(res['messages']);
           }
@@ -51,7 +52,7 @@ export class PositionEffects {
       .pipe(
         map(res => {
           if (res['type'] === 'success') {
-            return new AuthActions.UpdatePositionOfUser(res['position']);
+            return new UserActions.UpdatePositionOfUser(res['position']);
           } else {
             return new PositionActions.PositionOpFailure(res['messages']);
           }

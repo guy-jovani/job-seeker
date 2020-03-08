@@ -9,6 +9,7 @@ import { of } from 'rxjs';
 import * as fromApp from '../../store/app.reducer';
 import * as EmployeeActions from './employee.actions';
 import * as AuthActions from '../../auth/store/auth.actions';
+import * as UserActions from '../../user/store/user.actions';
 import { Employee } from '../employee.model';
 import { environment } from '../../../environments/environment';
 
@@ -40,9 +41,9 @@ export class EmployeeEffects {
             // const employee = new Employee({...res['employee']});
             if (res['type'] === 'success') {
               this.store.dispatch(new EmployeeActions.ClearError());
-              return new AuthActions.UpdateActiveUser({ user: {...res['employee']}, kind: 'employee' });
+              return new UserActions.UpdateActiveUser({ user: {...res['employee']}, kind: 'employee' });
             } else {
-              return new AuthActions.AuthFailure(res['messages']);
+              return new EmployeeActions.EmployeeOpFailure(res['messages']);
             }
           }),
           catchError(messages => {
@@ -55,10 +56,10 @@ export class EmployeeEffects {
   @Effect()
   fetchAllEmployees = this.actions$.pipe(
     ofType(EmployeeActions.FETCH_ALL_EMPLOYEES),
-    withLatestFrom(this.store.select('auth')),
-    switchMap(([actionData, authState]) => {
+    withLatestFrom(this.store.select('user')),
+    switchMap(([actionData, userState]) => {
       return this.http.get<Employee[]>(nodeServer + 'fetchAll', {
-        params: { _id: authState.user._id }
+        params: { _id: userState.user._id }
       })
         .pipe(
           map(res => {

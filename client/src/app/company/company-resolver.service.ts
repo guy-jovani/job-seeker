@@ -17,7 +17,7 @@ export class CompanyResolverService implements Resolve<Company[]> {
   constructor(private store: Store<fromApp.AppState>,
               private actions$: Actions) {}
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot){
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     return this.store.select('company').pipe(
       take(1),
       switchMap(companyState => {

@@ -43,12 +43,12 @@ export class EditPositionComponent implements OnInit, OnDestroy {
       switchMap(params => {
         this.currUrl = this.router.url.substring(1).split('/');
         this.index = params['index'];
-        return this.store.select('auth');
+        return this.store.select('user');
       }),
-      switchMap(authState => {
-        this.company = authState.user as Company;
+      switchMap(userState => {
+        this.company = userState.user as Company;
         if (!isNaN(this.index)) { // /my-positions/:index/edit
-          this.position = (authState.user as Company)['positions'][this.index];
+          this.position = (userState.user as Company)['positions'][this.index];
           this.initForm();
         }
         return this.store.select('position');

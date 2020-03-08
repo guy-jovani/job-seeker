@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 
 import * as fromApp from './store/app.reducer';
 import * as AuthActions from './auth/store/auth.actions';
+import * as UserActions from './user/store/user.actions';
 import { ChatService } from './chat/chat-socket.service';
 import { Subscription } from 'rxjs';
 import { Router, NavigationEnd } from '@angular/router';
@@ -18,8 +19,8 @@ export class AppComponent implements OnInit, OnDestroy {
   socketPostedSub: Subscription;
   socketReconnectSub: Subscription;
   errorMessages: string[] = [];
-  authSub: Subscription;
-  // authConversationsExists = false;
+  userSub: Subscription;
+  // userConversationsExists = false;
   routerSub: Subscription;
   currUrl: string[];
   userId: string = null;
@@ -32,8 +33,8 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.store.dispatch(new AuthActions.AutoLogin());
 
-    this.authSub = this.store.select('auth').subscribe(authState => {
-      this.userId = authState.user ? authState.user._id : null;
+    this.userSub = this.store.select('user').subscribe(userState => {
+      this.userId = userState.user ? userState.user._id : null;
       // this.authConversationsExists = authState.conversations && !!authState.conversations.length;
     });
 
@@ -47,15 +48,14 @@ export class AppComponent implements OnInit, OnDestroy {
       try {
         if (res['type'] === 'success') {
           // if (this.authConversationsExists) {
-          this.store.dispatch(new AuthActions.SetSingleConversation({
+          this.store.dispatch(new UserActions.SetSingleConversation({
             conversation: res['conversation'], message: res['message']
           }));
           // }
           if (this.currUrl.length === 1 && this.currUrl[0] !== 'chat') {
-            this.store.dispatch(new AuthActions.SetChatNotification());
+            this.store.dispatch(new UserActions.SetChatNotification());
           }
         } else {
-          console.log(res)
           this.errorMessages.push(...res['messages']);
         }
       } catch (error) {
@@ -80,8 +80,8 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.socketPostedSub) {
       this.socketPostedSub.unsubscribe();
     }
-    if (this.authSub) {
-      this.authSub.unsubscribe();
+    if (this.userSub) {
+      this.userSub.unsubscribe();
     }
     if (this.routerSub) {
       this.routerSub.unsubscribe();

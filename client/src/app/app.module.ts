@@ -30,6 +30,7 @@ const config: SocketIoConfig = { url: environment.nodeServer, options: {} };
 
 import { PositionModule } from './position/position.module';
 import { PositionEffects } from './position/store/position.effects';
+import { UserEffects } from './user/store/user.effects';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,7 @@ import { PositionEffects } from './position/store/position.effects';
     HttpClientModule,
     StoreModule.forRoot(fromApp.appReducer),
     SocketIoModule.forRoot(config),
-    EffectsModule.forRoot([EmployeeEffects, AuthEffects, CompanyEffects, PositionEffects]),
+    EffectsModule.forRoot([EmployeeEffects, AuthEffects, CompanyEffects, PositionEffects, UserEffects]),
     EmployeesModule,
     CompanyModule,
     SharedModule,

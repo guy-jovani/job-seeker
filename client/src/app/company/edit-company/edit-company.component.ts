@@ -45,9 +45,9 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
       }, this.checkPasswordEquality)
     });
 
-    this.authState = this.store.select('auth').pipe(
-      switchMap(authState => {
-        this.company = authState.user as Company;
+    this.authState = this.store.select('user').pipe(
+      switchMap(userState => {
+        this.company = userState.user as Company;
         return this.store.select('company');
       }))
       .subscribe(companyState => {

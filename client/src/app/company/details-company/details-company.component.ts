@@ -34,7 +34,7 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy  {
         this.currUrl = this.router.url.substring(1).split('/');
         this.mainUrl = this.currUrl[0];
         if (this.currUrl[0] === 'my-details') {
-          return this.store.select('auth');
+          return this.store.select('user');
         } else if (this.currUrl[0] === 'companies') {
           return this.store.select('company');
         } else {

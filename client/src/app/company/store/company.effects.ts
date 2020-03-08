@@ -7,6 +7,7 @@ import { Store } from '@ngrx/store';
 
 import * as PositionActions from '../../position/store/position.actions';
 import * as CompanyActions from './company.actions';
+import * as UserActions from '../../user/store/user.actions';
 import { environment } from '../../../environments/environment';
 import * as fromApp from '../../store/app.reducer';
 import * as AuthActions from '../../auth/store/auth.actions';
@@ -43,9 +44,9 @@ export class CompanyEffects {
           map(res => {
             if (res['type'] === 'success') {
               this.store.dispatch(new CompanyActions.ClearError());
-              return new AuthActions.UpdateActiveUser({ user: {...res['company']}, kind: 'company' });
+              return new UserActions.UpdateActiveUser({ user: {...res['company']}, kind: 'company' });
             } else {
-              return new AuthActions.AuthFailure(res['messages']);
+              return new CompanyActions.CompanyOpFailure(res['messages']);
             }
           }),
           catchError(messages => {
@@ -59,10 +60,10 @@ export class CompanyEffects {
   @Effect()
   fetchAll = this.actions$.pipe(
     ofType(CompanyActions.FETCH_ALL_COMPANIES),
-    withLatestFrom(this.store.select('auth')),
-    switchMap(([actionData, authState]) => {
+    withLatestFrom(this.store.select('user')),
+    switchMap(([actionData, userState]) => {
       return this.http.get(nodeServer + 'fetchAll', {
-        params: { _id: authState.user._id }
+        params: { _id: userState.user._id }
       })
       .pipe(
         map(res => {

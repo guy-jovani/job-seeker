@@ -37,8 +37,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.subscription = this.store.select('auth').subscribe(authState => {
-      this.user = authState.user;
+    this.subscription = this.store.select('user').subscribe(userState => {
+      this.user = userState.user;
     });
     this.nameList = new Map<string, {}>();
   }

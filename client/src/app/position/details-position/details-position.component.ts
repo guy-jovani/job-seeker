@@ -38,7 +38,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
       switchMap(params => {
         this.currUrl = this.router.url.substring(1).split('/');
         if (this.currUrl[0] === 'my-positions') {
-          return this.store.select('auth');
+          return this.store.select('user');
         } else if ( this.currUrl[0] === 'companies') {
           return this.store.select('company');
         } else {

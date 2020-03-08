@@ -32,7 +32,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
         switchMap(() => {
           currUrl = this.router.url.substring(1).split('/');
           if (currUrl[0] === 'my-details') {
-            return this.store.select('auth');
+            return this.store.select('user');
           } else {
             return this.store.select('employee');
           }

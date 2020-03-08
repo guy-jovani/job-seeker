@@ -34,7 +34,7 @@ export class ListPositionComponent implements OnInit, OnDestroy {
       switchMap(() => {
         this.currUrl = this.router.url.substring(1).split('/');
         if (this.currUrl[0] === 'my-positions') {
-          return this.store.select('auth');
+          return this.store.select('user');
         } else {
           return this.store.select('position');
         }
@@ -67,7 +67,7 @@ export class ListPositionComponent implements OnInit, OnDestroy {
 
   }
 
-  onClose() {console.log(this.currUrl)
+  onClose() {
     this.store.dispatch(new PositionActions.ClearError());
   }
 

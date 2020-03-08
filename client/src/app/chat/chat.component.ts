@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Renderer2 } from '
 import { NgForm } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
+import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 
 import * as fromApp from '../store/app.reducer';
 import { Employee } from 'app/employees/employee.model';
@@ -9,8 +10,8 @@ import { Company } from 'app/company/company.model';
 import { Conversation } from './conversation.model';
 import { ChatService } from './chat-socket.service';
 import * as AuthActions from '../auth/store/auth.actions';
+import * as UserActions from '../user/store/user.actions';
 import { Message } from './message.model';
-import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 
 
 @Component({
@@ -37,11 +38,11 @@ export class ChatComponent implements OnInit, OnDestroy {
               private store: Store<fromApp.AppState>) { }
 
   ngOnInit() {
-    this.store.dispatch(new AuthActions.RemoveChatNotification());
-    this.subscription = this.store.select('auth').subscribe(authState => {
-      this.user = authState.user;
-      this.userKind = authState.user ? authState.kind[0].toUpperCase() + authState.kind.slice(1) : null;
-      this.conversations = authState.conversations;
+    this.store.dispatch(new UserActions.RemoveChatNotification());
+    this.subscription = this.store.select('user').subscribe(userState => {
+      this.user = userState.user;
+      this.userKind = userState.user ? userState.kind[0].toUpperCase() + userState.kind.slice(1) : null;
+      this.conversations = userState.conversations;
 
       if (this.conversations) {
         this.conversations.forEach(con => {
@@ -87,7 +88,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     });
 
     if (this.currConversation) {
-      this.store.dispatch(new AuthActions.SetSingleConversation({
+      this.store.dispatch(new UserActions.SetSingleConversation({
         conversation: this.currConversation,
         message: new Message({
           creator: this.user._id,

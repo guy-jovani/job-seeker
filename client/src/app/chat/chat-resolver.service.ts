@@ -7,7 +7,7 @@ import { Injectable } from '@angular/core';
 
 import * as fromApp from '../store/app.reducer';
 import { Conversation } from './conversation.model';
-import * as AuthActions from '../auth/store/auth.actions';
+import * as UserActions from '../user/store/user.actions';
 
 @Injectable({
   providedIn: 'root'
@@ -17,17 +17,16 @@ export class ChatResolverService implements Resolve<Conversation[]> {
               private actions$: Actions) {}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    return this.store.select('auth').pipe(
+    return this.store.select('user').pipe(
       take(1),
-      map(authState => {
-        return authState.conversations;
+      map(userState => {
+        return userState.conversations;
       }),
       switchMap(conversations => {
-        console.log('chat resolver')
         // if (!conversations || !conversations.length) {
-        this.store.dispatch(new AuthActions.FetchAllConversations());
+        this.store.dispatch(new UserActions.FetchAllConversations());
         return this.actions$.pipe(
-          ofType(AuthActions.SET_ALL_CONVERSATIONS),
+          ofType(UserActions.SET_ALL_CONVERSATIONS),
           take(1)
         );
         // } else {

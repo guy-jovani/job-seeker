@@ -16,10 +16,7 @@ export class ChatService {
     constructor(private socket: Socket) { }
 
     sendMessage(eventName: string, data: {}) {
-      return this.socket.emit(eventName, data, ret => {
-        console.log(ret)
-        return ret;
-      });
+      return this.socket.emit(eventName, data);
     }
      getMessage(eventName: string) {
         return this.socket.fromEvent(eventName);

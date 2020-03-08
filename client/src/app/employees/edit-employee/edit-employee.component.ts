@@ -16,7 +16,7 @@ import { Employee } from '../employee.model';
   styleUrls: ['./edit-employee.component.scss']
 })
 export class EditEmployeeComponent implements OnInit, OnDestroy {
-  authState: Subscription;
+  userSub: Subscription;
   isLoading = false;
   employeeForm: FormGroup;
   employee: Employee;
@@ -41,9 +41,9 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
       }, this.checkPasswordEquality)
     });
 
-    this.authState = this.store.select('auth').pipe(
-      switchMap(authState => {
-        this.employee = authState.user as Employee;
+    this.userSub = this.store.select('user').pipe(
+      switchMap(userState => {
+        this.employee = userState.user as Employee;
         return this.store.select('employee');
       }))
       .subscribe(
@@ -110,8 +110,8 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.authState) {
-      this.authState.unsubscribe();
+    if (this.userSub) {
+      this.userSub.unsubscribe();
     }
     this.onClose();
   }

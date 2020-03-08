@@ -8,6 +8,7 @@ import { Position } from 'app/position/position.model';
 
 
 export class Company {
+  // tslint:disable-next-line: variable-name
   public _id: string;
   public name: string;
   public email?: string;

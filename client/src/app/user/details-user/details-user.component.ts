@@ -20,8 +20,8 @@ export class DetailsUserComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    this.authSubscription = this.store.select('auth').subscribe(authState => {
-      this.userEmployee = authState.kind === 'employee';
+    this.authSubscription = this.store.select('user').subscribe(userState => {
+      this.userEmployee = userState.kind === 'employee';
     });
   }
 

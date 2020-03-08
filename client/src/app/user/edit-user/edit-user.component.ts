@@ -11,19 +11,19 @@ import * as fromApp from '../../store/app.reducer';
 })
 export class EditUserComponent implements OnInit, OnDestroy {
   userEmployee: boolean;
-  authSubscription: Subscription;
+  userSubscription: Subscription;
 
   constructor(private store: Store<fromApp.AppState>) { }
 
   ngOnInit() {
-    this.authSubscription = this.store.select('auth').subscribe(authState => {
-      this.userEmployee = authState.kind === 'employee';
+    this.userSubscription = this.store.select('user').subscribe(userState => {
+      this.userEmployee = userState.kind === 'employee';
     });
   }
 
   ngOnDestroy() {
-    if (this.authSubscription) {
-      this.authSubscription.unsubscribe();
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
     }
   }
 }

@@ -29,7 +29,6 @@ export class ListEmployeeComponent implements OnInit, OnDestroy {
       .subscribe(employeeState => {
         this.currUrl = this.router.url.substring(1).split('/');
         this.isLoading = employeeState.loadingAll;
-        console.log(employeeState)
         if (this.currUrl[this.currUrl.length - 1] === 'employees') {
           if (employeeState.messages) {
             this.errorMessages = [];

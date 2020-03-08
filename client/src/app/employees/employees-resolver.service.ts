@@ -16,7 +16,7 @@ import * as EmployeesActions from './store/employee.actions';
 export class EmployeesResolverService implements Resolve<Employee[]> {
 
   constructor(private store: Store<fromApp.AppState>,
-              private actions$: Actions){}
+              private actions$: Actions) {}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     return this.store.select('employee').pipe(
