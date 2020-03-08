@@ -49,6 +49,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.store.dispatch(new EmployeeActions.FetchAllEmployees());
   }
 
+  onFetchConversations() {
+    this.store.dispatch(new AuthActions.FetchAllConversations());
+  }
+
   onFetchCompanies() {
     this.store.dispatch(new CompanyActions.FetchAllCompanies());
   }

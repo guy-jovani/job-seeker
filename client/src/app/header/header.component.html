@@ -36,10 +36,23 @@
             <span class="chat-notification" *ngIf="chatNotifications"></span>
           </a>
         </li>
-        <li routerLinkActive="active" *ngIf="isAuthenticated">
-          <a routerLink='/my-details' class="glyphicon glyphicon-user"></a>
-        </li>
 
+        <li
+          class="dropdown dropdown-menu-right"
+          routerLinkActive="active"
+          *ngIf="isAuthenticated"
+          appDropdown
+        >
+          <a
+            style="cursor: pointer;"
+            class="glyphicon glyphicon-user dropdown-toggle">
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a style="cursor: pointer;" routerLink='/my-details'>My Details</a></li>
+            <li><a style="cursor: pointer;" routerLink='/my-positions'>My Positions</a></li>
+          </ul>
+        </li>
 
         <li class="dropdown dropdown-menu-right" *ngIf="isAuthenticated" appDropdown>
           <a
@@ -52,6 +65,8 @@
             <li><a style="cursor: pointer;" (click)="onFetchEmployees()">Fetch Employees</a></li>
             <li><a style="cursor: pointer;" (click)="onFetchCompanies()">Fetch Companies</a></li>
             <li><a style="cursor: pointer;" (click)="onFetchPositions()">Fetch Positions</a></li>
+            <li><a style="cursor: pointer;" (click)="onFetchPositions()">Fetch Positions</a></li>
+            <li><a style="cursor: pointer;" (click)="onFetchConversations()">Fetch Conversations</a></li>
           </ul>
         </li>
 
