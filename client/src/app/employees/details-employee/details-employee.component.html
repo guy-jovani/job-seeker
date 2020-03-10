@@ -1,30 +1,36 @@
 
 
 
+<div class="container">
 
-<div *ngIf="isLoading">
-  <app-loading-spinner></app-loading-spinner>
-</div>
-<div class="container-fluid" *ngIf="employee && !isLoading">
-  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
-  <div class="row">
-    <div class="col-md-6">
-      <h3>
-        {{ employee.firstName ? (employee.firstName | titlecase) : '' }}
-        {{ employee.lastName ? (employee.lastName | titlecase) : '' }}
-        {{ !employee.firstName && !employee.lastName ? 'Employee Details' : '' }}
-      </h3>
-      <div>
-        <p>email: {{ employee.email }}</p>
-        <p>first name: {{ employee.firstName || "------" }}</p>
-        <p>last name: {{ employee.lastName || "------" }}</p>
-        <hr>
-      </div>
-      <div class="row" *ngIf="allowEdit">
-        <a class="btn btn-primary btn-sm" routerLink='edit'>Edit Details</a>
+  <div *ngIf="isLoading">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+
+  <div class="container-fluid" *ngIf="employee && !isLoading">
+
+    <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
+    <div class="row">
+      <div class="col-md-12">
+        <h3>
+          {{ employee.firstName ? (employee.firstName | titlecase) : '' }}
+          {{ employee.lastName ? (employee.lastName | titlecase) : '' }}
+          {{ !employee.firstName && !employee.lastName ? 'Employee Details' : '' }}
+        </h3>
+        <app-back-button *ngIf='currUrl[0] !== "my-details"'></app-back-button>
+        <div>
+          <p>email: {{ employee.email }}</p>
+          <p>first name: {{ employee.firstName || "------" }}</p>
+          <p>last name: {{ employee.lastName || "------" }}</p>
+          <hr>
+        </div>
+        <div class="row" *ngIf="allowEdit">
+          <a class="btn btn-primary btn-sm" routerLink='edit'>Edit Details</a>
+        </div>
       </div>
     </div>
   </div>
+
 </div>
 
 

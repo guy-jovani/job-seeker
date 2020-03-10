@@ -3,20 +3,14 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { switchMap, map, catchError, tap, withLatestFrom } from 'rxjs/operators';
+import { switchMap, map, catchError, withLatestFrom } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import * as fromApp from '../../store/app.reducer';
-import * as AuthActions from '../../auth/store/auth.actions';
 import * as UserActions from './user.actions';
 import { Company } from 'app/company/company.model';
 import { Employee } from 'app/employees/employee.model';
-import { ChatService } from 'app/chat/chat-socket.service';
-
-
-
-const nodeServer = environment.nodeServer + 'auth/';
 
 const geUsertLocalStorage = () => {
   const user = JSON.parse(localStorage.getItem('userData'));
@@ -53,11 +47,8 @@ const updateUserPositionsLocalStorage = (position, type) => {
 @Injectable()
 export class UserEffects {
 
-  private tokenTimer: any;
-
   constructor(private actions$: Actions,
               private http: HttpClient,
-              private chatService: ChatService,
               private store: Store<fromApp.AppState>,
               private router: Router) {}
 
@@ -68,7 +59,9 @@ export class UserEffects {
     ofType(UserActions.UPDATE_ACTIVE_USER),
     map((actionData: UserActions.UpdateActiveUser) => {
       setUserLocalStorage(actionData.payload.user);
-      this.router.navigate(['../my-details']);
+      if (actionData.payload.redirect) {
+        this.router.navigate(['../my-details']);
+      }
     })
   );
 

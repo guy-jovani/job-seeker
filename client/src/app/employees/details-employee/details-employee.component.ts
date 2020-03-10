@@ -19,6 +19,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   allowEdit: boolean;
   isLoading = false;
   errorMessages: string[] = [];
+  currUrl: string[] = null;
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -26,29 +27,28 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
     private router: Router) { }
 
   ngOnInit() {
-    let currUrl;
     this.routeSub = this.route.params
       .pipe(
         switchMap(() => {
-          currUrl = this.router.url.substring(1).split('/');
-          if (currUrl[0] === 'my-details') {
+          this.currUrl = this.router.url.substring(1).split('/');
+          if (this.currUrl[0] === 'my-details') {
             return this.store.select('user');
           } else {
             return this.store.select('employee');
           }
         }))
         .subscribe(currState => {
-          currUrl = this.router.url.substring(1).split('/');
-          if (currUrl[0] === 'my-details') {
+          this.currUrl = this.router.url.substring(1).split('/');
+          if (this.currUrl[0] === 'my-details') {
             this.employee = currState['user'] as Employee;
             this.allowEdit = true;
           } else { // employee list details
-            if (currUrl[1] >= currState['employees'].length || currUrl[1] < 0) {
+            if (this.currUrl[1] >= currState['employees'].length || +this.currUrl[1] < 0) {
               // check if trying to get details of an undefined employee
               return this.router.navigate(['employees']);
             }
             this.isLoading = currState['loadingSingle'];
-            if (currUrl[currUrl.length - 1] === 'employee') {
+            if (this.currUrl[this.currUrl.length - 1] === 'employee') {
               if (currState.messages) {
                 this.errorMessages = [];
                 for (const msg of currState.messages) {
@@ -58,7 +58,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
                 this.errorMessages = [];
               }
             }
-            this.employee = currState['employees'][+currUrl[1]];
+            this.employee = currState['employees'][+this.currUrl[1]];
             this.allowEdit = false;
           }
         });

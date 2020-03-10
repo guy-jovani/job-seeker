@@ -20,8 +20,8 @@ export class DetailsCompanyGuard implements CanActivate {
         take(1),
         map(companyState => {
           const re = /\d+/;
-          const index = re.exec(next.url[0].path);
-          if (index && index[0]) { //  && +index < companyState.companies.length
+          const index = re.exec(next.url[1].path);
+          if (index && index[0]) {
             return true;
           }
           return this.router.createUrlTree([state.url.split('/')[1]]);

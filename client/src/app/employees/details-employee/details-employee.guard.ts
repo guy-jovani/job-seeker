@@ -20,7 +20,7 @@ export class DetailsEmployeeGuard implements CanActivate {
         take(1),
         map(employeeState => {
           const re = /\d+/;
-          const index = re.exec(next.url[0].path);
+          const index = re.exec(next.url[1].path);
           if (!index  || !index[0]) { // || +index >= employeeState.employees.length
             return this.router.createUrlTree(['/employees']);
           } else {

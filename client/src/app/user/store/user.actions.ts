@@ -67,7 +67,7 @@ export class SetSingleConversation implements Action {
 export class UpdateActiveUser implements Action {
   readonly type = UPDATE_ACTIVE_USER;
 
-  constructor(public payload: { user: Employee | Company, kind: string }) {}
+  constructor(public payload: { user: Employee | Company, kind: string, redirect?: boolean }) {}
 }
 
 export class AddPositionToUser implements Action {

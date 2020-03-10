@@ -1,13 +1,16 @@
 
 
-<div *ngIf="isLoading" style="text-align: center;">
-  <app-loading-spinner></app-loading-spinner>
-</div>
-<div *ngIf="!isLoading" CLASS="container-fluid">
-  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
-  <!-- <app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert> -->
-  <ul class="list-group" *ngIf="companies.length && !errorMessages.length">
-    <li
+
+<div class="container">
+  <div *ngIf="isLoading" style="text-align: center;">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+  <div *ngIf="!isLoading" class="container-fluid">
+    <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
+    <!-- <app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert> -->
+    <h3>Compenies</h3>
+    <ul class="list-group" *ngIf="companies.length && !errorMessages.length">
+      <li
       class="list-group-item"
       *ngFor="let company of companies; let i=index">
       <a routerLink='{{i}}'>
@@ -17,6 +20,7 @@
     </li>
   </ul>
   <p *ngIf="!companies.length && !errorMessages.length">There are no registers companies</p>
+  </div>
 </div>
 
 

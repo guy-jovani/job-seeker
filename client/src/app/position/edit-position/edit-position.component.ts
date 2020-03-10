@@ -14,7 +14,7 @@ import * as PositionActions from '../store/position.actions';
 @Component({
   selector: 'app-edit-position',
   templateUrl: './edit-position.component.html',
-  styleUrls: ['./edit-position.component.css']
+  styleUrls: ['./edit-position.component.scss']
 })
 export class EditPositionComponent implements OnInit, OnDestroy {
   positionSub: Subscription;
@@ -50,7 +50,7 @@ export class EditPositionComponent implements OnInit, OnDestroy {
         if (!isNaN(this.index)) { // /my-positions/:index/edit
           this.position = (userState.user as Company)['positions'][this.index];
           this.initForm();
-        }
+        } // else /my-positions/create
         return this.store.select('position');
       })
     ).subscribe(positionState => {
@@ -74,11 +74,10 @@ export class EditPositionComponent implements OnInit, OnDestroy {
     return (this.positionForm.get('requirements') as FormArray).controls;
   }
 
-  onAddRequirement(years: number = null, skill: string = null) {
+  onAddRequirement(requirement: {requirement: string} = null) {
     (this.positionForm.get('requirements') as FormArray).push(
       new FormGroup({
-        years: new FormControl(years, [Validators.required]),
-        skill: new FormControl(skill, [Validators.required]),
+        requirement: new FormControl(requirement ? requirement.requirement : null, [Validators.required]),
       }));
   }
 
@@ -90,7 +89,7 @@ export class EditPositionComponent implements OnInit, OnDestroy {
     if (this.index !== null) {
       if (this.position.requirements) {
         this.position.requirements.forEach(req => {
-          this.onAddRequirement(req.years, req.skill);
+          this.onAddRequirement(req);
         });
       }
       this.positionForm.patchValue({
@@ -100,6 +99,9 @@ export class EditPositionComponent implements OnInit, OnDestroy {
     }
   }
   onSubmit(form: NgForm) {
+    if (form.invalid) {
+      return this.store.dispatch(new PositionActions.PositionOpFailure(['The form is invalid']));
+    }
     const newPosition = new Position({
       title: form.value.title, description: form.value.description,
       companyId: { _id: this.company._id, name: this.company.name }

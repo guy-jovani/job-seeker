@@ -44,7 +44,7 @@ export class CompanyEffects {
           map(res => {
             if (res['type'] === 'success') {
               this.store.dispatch(new CompanyActions.ClearError());
-              return new UserActions.UpdateActiveUser({ user: {...res['company']}, kind: 'company' });
+              return new UserActions.UpdateActiveUser({ user: {...res['company']}, redirect: true, kind: 'company' });
             } else {
               return new CompanyActions.CompanyOpFailure(res['messages']);
             }
@@ -91,23 +91,40 @@ export class CompanyEffects {
       })
       .pipe(
         map(res => {
-          this.store.dispatch(new PositionActions.ClearError());
-          this.store.dispatch(new CompanyActions.ClearError());
+          // this.store.dispatch(new PositionActions.ClearError());
+          // this.store.dispatch(new CompanyActions.ClearError());
           if (res['type'] === 'success') {
-            return actionData.payload.main ?
-                  new CompanyActions.UpdateSingleCompany({company: res['company'], main: actionData.payload.main }) :
-                  new PositionActions.UpdateSinglePositionCompany({company: res['company'], posInd: actionData.payload.posInd });
-
+            if (actionData.payload.main) {
+              return new CompanyActions.UpdateSingleCompany({company: res['company'], main: actionData.payload.main });
+            } else {
+              this.store.dispatch(new CompanyActions.ClearError());
+              return new PositionActions.UpdateSinglePositionCompany({company: res['company'], posInd: actionData.payload.posInd });
+            }
+            // return actionData.payload.main ?
+            //       new CompanyActions.UpdateSingleCompany({company: res['company'], main: actionData.payload.main }) :
+            //       new PositionActions.UpdateSinglePositionCompany({company: res['company'], posInd: actionData.payload.posInd });
           } else {
-            return actionData.payload.main ?
-                  new CompanyActions.CompanyOpFailure(res['messages']) :
-                  new PositionActions.PositionOpFailure(res['messages']);
+            if (actionData.payload.main) {
+              return new CompanyActions.CompanyOpFailure(res['messages']);
+            } else {
+              this.store.dispatch(new CompanyActions.ClearError());
+              return new PositionActions.PositionOpFailure(res['messages']);
+            }
+            // return actionData.payload.main ?
+            //       new CompanyActions.CompanyOpFailure(res['messages']) :
+            //       new PositionActions.PositionOpFailure(res['messages']);
           }
         }),
         catchError(messages => {
-          return actionData.payload.main ?
-                  of(new CompanyActions.CompanyOpFailure(messages)) :
-                  of(new PositionActions.PositionOpFailure(messages));
+          if (actionData.payload.main) {
+            return of(new CompanyActions.CompanyOpFailure(messages));
+          } else {
+            this.store.dispatch(new CompanyActions.ClearError());
+            return of(new PositionActions.PositionOpFailure(messages));
+          }
+          // return actionData.payload.main ?
+          //         of(new CompanyActions.CompanyOpFailure(messages)) :
+          //         of(new PositionActions.PositionOpFailure(messages));
         })
       );
     })

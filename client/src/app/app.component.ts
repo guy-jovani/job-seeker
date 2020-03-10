@@ -15,7 +15,6 @@ import { filter } from 'rxjs/operators';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'company-web';
   socketPostedSub: Subscription;
   socketReconnectSub: Subscription;
   errorMessages: string[] = [];

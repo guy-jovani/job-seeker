@@ -13,8 +13,7 @@ const positionSchema = new Schema(
       required: true
     },
     requirements: [{
-      years: { type: Number, required: false },
-      skill: { type: String, required: false },
+      requirement: { type: String, required: false },
     }],
     companyId: {
       type: Schema.Types.ObjectId, 

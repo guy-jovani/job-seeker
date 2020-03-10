@@ -85,6 +85,7 @@ export function positionReducer(state = initialState, action: PositionActions.Po
       return {
         ...state,
         messages: null,
+        loadingSingle: false,
         positions: upToDatePositions
       };
     case PositionActions.UPDATE_SINGLE_POSITION:

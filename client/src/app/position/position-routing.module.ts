@@ -16,18 +16,25 @@ const routes: Routes = [
     path: 'positions',
     component: PositionComponent,
     canActivate: [AuthGuard],
-    resolve: [PositionResolverService],
-    children: [
-      {
-        path: ':index', component: DetailsPositionComponent, canActivate: [DetailsPositionGuard],
-      },
-      {
-        path: ':index/company', component: DetailsCompanyComponent, canActivate: [DetailsCompanyGuard],
-      },
-      {
-        path: ':index/company/position', component: DetailsPositionComponent, canActivate: [DetailsPositionGuard],
-      },
-    ]
+    resolve: [PositionResolverService]
+  },
+  {
+    path: 'positions/:index',
+    component: DetailsPositionComponent,
+    canActivate: [AuthGuard, DetailsPositionGuard],
+    resolve: [PositionResolverService]
+  },
+  {
+    path: 'positions/:index/company',
+    component: DetailsCompanyComponent,
+    canActivate: [AuthGuard, DetailsCompanyGuard],
+    resolve: [PositionResolverService]
+  },
+  {
+    path: 'positions/:index/company/position',
+    component: DetailsPositionComponent,
+    canActivate: [AuthGuard, DetailsPositionGuard],
+    resolve: [PositionResolverService]
   },
 ];
 

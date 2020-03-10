@@ -12,7 +12,7 @@ import { switchMap } from 'rxjs/operators';
 @Component({
   selector: 'app-list-position',
   templateUrl: './list-position.component.html',
-  styleUrls: ['./list-position.component.css']
+  styleUrls: ['./list-position.component.scss']
 })
 export class ListPositionComponent implements OnInit, OnDestroy {
   subscription: Subscription;

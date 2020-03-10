@@ -38,23 +38,6 @@ router.post('/update', extractImage,
   
 module.exports = router;
   
-  
-  // router.post('/register', multer({storage: fileStorage, fileFilter}).single('imagePath'), [ 
-  //     body('name')
-  //     .exists(),
-  //     // body('company.website')
-  //     //   .exists()
-  //     //   .optional()
-  //     //   .custom((value, { req }) => {
-  //     //     if (!validUrl.isWebUri(value)) {
-  //     //       throw new Error('Please enter a valid URL');
-  //     //     }
-  //     //     return true;
-  //     //   })
-  //   ],
-  //   companyController.register);
-
-
 
 
 

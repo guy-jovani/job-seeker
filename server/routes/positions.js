@@ -25,12 +25,12 @@ router.put('/create', [
     body('requirements')
       .exists()
       .optional()
-      .custom((requirements, { req }) => {
-        for(let i=0; i < requirements.length; i++){
-          if (!requirements[i].years || !requirements[i].skill) {
+      .custom(requirements => {
+        requirements.forEach(requirement => {
+          if(!requirement.requirement) {
             throw new Error('All of the requirements fields must be filled');
           }
-        }
+        })
         return true;
       }),
   ], positionController.create);

@@ -19,7 +19,6 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy  {
   company: Company = null;
   allowEdit: boolean;
   isLoading = false;
-  mainUrl: string;
   currUrl: string[] = null;
   errorMessages: string[] = [];
 
@@ -31,8 +30,7 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy  {
   ngOnInit() {
     this.routeSub = this.route.params.pipe(
       switchMap(() => {
-        this.currUrl = this.router.url.substring(1).split('/');
-        this.mainUrl = this.currUrl[0];
+        this.currUrl = this.route.snapshot['_routerState'].url.substring(1).split('/');
         if (this.currUrl[0] === 'my-details') {
           return this.store.select('user');
         } else if (this.currUrl[0] === 'companies') {
@@ -44,6 +42,14 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy  {
       .subscribe(currState => {
         this.currUrl = this.router.url.substring(1).split('/');
         this.isLoading = currState['loadingSingle'];
+        if (currState.messages) {
+          this.errorMessages = [];
+          for (const msg of currState.messages) {
+            this.errorMessages.push(msg);
+          }
+        } else {
+          this.errorMessages = [];
+        }
         if (this.currUrl[0] === 'my-details') {
           this.company = currState['user'] as Company;
           this.allowEdit = true;
@@ -53,32 +59,32 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy  {
           this.allowEdit = false;
         } else { // positions
           if (this.invalidStateListInd(currState, 'positions')) { return; }
-          if (this.currUrl[this.currUrl.length - 1] === 'company') {
-            if (currState.messages) {
-              this.errorMessages = [];
-              for (const msg of currState.messages) {
-                this.errorMessages.push(msg);
-              }
-            } else {
-              this.errorMessages = [];
-            }
+          if (this.currUrl.length !== 3 || this.currUrl[this.currUrl.length - 1] !== 'company') {
+            this.router.navigate([this.currUrl[0]]);
           }
           this.allowEdit = false;
           this.company = !currState['positions'] ? null : currState['positions'][+this.currUrl[1]]['companyId'];
-          if (!this.company.email) { this.errorMessages = ['There was an error fetching the company']; }
+          if (!this.company.email) {
+            this.errorMessages = ['There was an error fetching the company'];
+          }
         }
-        this.ref.detectChanges();
+        // this.ref.detectChanges();
+        // this.ref.markForCheck();
       });
   }
 
   onClose() {
-    this.store.dispatch(new CompanyActions.ClearError());
-    this.store.dispatch(new PositionActions.ClearError());
+    if (this.currUrl[0] === 'companies') {
+      this.store.dispatch(new CompanyActions.ClearError());
+    } else {
+      this.store.dispatch(new PositionActions.ClearError());
+    }
+    this.errorMessages = [];
   }
 
   private invalidStateListInd(currState, list) {
     if (this.currUrl[1] >= currState[list].length || +this.currUrl[1] < 0) {
-      this.router.navigate([this.currUrl[0]]);
+      this.router.navigate(['companies']);
       return true;
     }
     return false;

@@ -111,7 +111,7 @@ export class AuthEffects {
       this.autoLogout(expirationSeconds);
       this.chatService.sendMessage('login', {  _id: user['_id'], msg: 'logged' } );
 
-      this.store.dispatch(new UserActions.UpdateActiveUser({user, kind}));
+      this.store.dispatch(new UserActions.UpdateActiveUser({ user, kind }));
       return new AuthActions.AuthSuccess({ redirect: false, token });
     }),
     catchError(messages => {
@@ -207,6 +207,7 @@ export class AuthEffects {
       this.store.dispatch(new PositionActions.Logout());
       this.store.dispatch(new PositionActions.Logout());
       this.store.dispatch(new UserActions.Logout());
+      this.router.navigate(['/login']);
     }, expirationSeconds);
   }
 

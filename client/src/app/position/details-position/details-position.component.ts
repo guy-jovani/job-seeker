@@ -15,7 +15,7 @@ import { environment } from 'environments/environment';
 @Component({
   selector: 'app-details-position',
   templateUrl: './details-position.component.html',
-  styleUrls: ['./details-position.component.css']
+  styleUrls: ['./details-position.component.scss']
 })
 export class DetailsPositionComponent implements OnInit, OnDestroy {
   subscription: Subscription;
@@ -61,22 +61,22 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
       });
   }
 
-  private checkCompaniesUrl(currState) {
-    if (this.invalidStateListInd(currState, 'companies')) { return; }
+  private checkCompaniesUrl(companyState) {
+    if (this.invalidStateListInd(companyState, 'companies')) { return; }
     this.companyLink = false;
-    this.position = !currState['companies'] ? null :
-    currState['companies'][+this.currUrl[1]]['positions'][window.history.state['positionInd']];
+    this.position = !companyState['companies'] ? null :
+    companyState['companies'][+this.currUrl[1]]['positions'][window.history.state['positionInd']];
     if (!this.position) {
-      this.router.navigate([this.currUrl[0]]);
+      this.errorMessages = ['There was a problem fetching the position.'];
     }
   }
 
-  private checkPositionsUrl(currState) {
-    if (this.invalidStateListInd(currState, 'positions')) { return; }
+  private checkPositionsUrl(positionState) {
+    if (this.invalidStateListInd(positionState, 'positions')) { return; }
     if (this.currUrl[this.currUrl.length - 1] === 'position') {
-      if (currState.messages) {
+      if (positionState.messages) {
         this.errorMessages = [];
-        for (const msg of currState.messages) {
+        for (const msg of positionState.messages) {
           this.errorMessages.push(msg);
         }
       } else {
@@ -85,13 +85,13 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
     }
     if (this.currUrl[this.currUrl.length - 1] === 'position') {
       this.companyLink = false;
-      if (!currState['positions']) {
+      if (!positionState['positions']) {
         this.router.navigate([this.currUrl[0]]);
       } else { // /positions/:posInd/company/position
         if (window.history.state['positionInd'] === undefined) {
           return this.router.navigate([this.currUrl[0]]);
         }
-        const positions = currState['positions'];
+        const positions = positionState['positions'];
         const position = positions[+this.currUrl[1]];
         const company = position['companyId'];
         const companyPositions = company['positions'];
@@ -102,7 +102,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
         };
       }
     } else { // /positions/:posInd/company
-      this.position = currState['positions'] ? currState['positions'][+this.currUrl[1]] : null;
+      this.position = positionState['positions'] ? positionState['positions'][+this.currUrl[1]] : null;
     }
   }
 
@@ -126,7 +126,9 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
     if (this.currUrl[0] === 'companies') {
       // the only errors that can be catched here are of a company
       // the others will be catched in a different/prev component
+      // due to the flow of the program
       this.store.dispatch(new CompanyActions.ClearError());
+      this.errorMessages = [];
     }
   }
 

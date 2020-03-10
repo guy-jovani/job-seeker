@@ -1,5 +1,5 @@
 
-<div class="container-fluid">
+<div class="container">
   <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
   <h4>{{ index >= 0 ? 'Update' : 'Create' }}</h4>
   <div *ngIf="isLoading">
@@ -36,27 +36,18 @@
 
 
     <div class="row" formArrayName="requirements">
-      <span>requirement:  </span>
+      <span>requirements:  </span>
       <button type="button" class="btn btn-info btn-sm" (click)="onAddRequirement()">(+) Add Requirement</button>
-      <span class="help-block" *ngIf="getControls().length > 0">
-        The 'years' field only allows numbers.
-      </span>
       <div *ngFor="let requirement of getControls(); let i=index"
               [formGroupName]="i" >
 
-        <label for="years">(min) number of years:  </label>
-        <input formControlName="years" type="number" name="years"/>
-        <label for="skill">skill:  </label>
-        <input formControlName="skill" name="skill" type="text"/>
+        <label for="requirement">req:  </label>
+        <input formControlName="requirement" type="text" name="requirement"/>
 
         <button class="btn btn-danger btn-sm" type="button" (click)="onRemoveRequirement(i)">X</button>
-        <span class="help-block" *ngIf="!getControls()[i].get('years').valid &&
-                                        getControls()[i].get('years').touched">
-          The 'years' field is a required one.
-        </span>
-        <span class="help-block" *ngIf="!getControls()[i].get('skill').valid &&
-                                        getControls()[i].get('skill').touched">
-          The 'skill' field is a required one.
+        <span class="help-block" *ngIf="!getControls()[i].get('requirement').valid &&
+                                        getControls()[i].get('requirement').touched">
+          The 'req' field is a required one.
         </span>
       </div>
     </div>

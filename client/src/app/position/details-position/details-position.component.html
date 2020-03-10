@@ -2,11 +2,12 @@
 
 
 
-<div *ngIf="isLoading">
-  <app-loading-spinner></app-loading-spinner>
-</div>
-<div class="container-fluid" *ngIf="position && !isLoading">
+<app-loading-spinner *ngIf="isLoading"r></app-loading-spinner>
+<div class="container">
   <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
+  <app-back-button *ngIf="!position"></app-back-button>
+</div>
+<div class="container" *ngIf="position && !isLoading">
   <div class="row">
     <h3>{{ position.title | titlecase }}</h3>
     <app-back-button></app-back-button>
@@ -25,8 +26,7 @@
         <ng-template #reqList>
           <ul class="list-group" #reqList>
             <li class="list-group-item" *ngFor="let requirement of position.requirements">
-              <p>{{ requirement.skill | titlecase }}</p>
-              <p *ngIf="requirement.years">Expirience: {{ requirement.years }}+ years.</p>
+              <p>{{ requirement.requirement | titlecase }}</p>
             </li>
           </ul>
         </ng-template>

@@ -12,14 +12,21 @@ import { DetailsEmployeeGuard } from './details-employee/details-employee.guard'
 
 const routes: Routes = [
   {
-    path: 'employees', canActivate: [AuthGuard],
+    path: 'employees',
+    canActivate: [AuthGuard],
     component: EmployeesComponent,
     resolve: [EmployeesResolverService],
-    children: [
-      {
-        path: ':index', component: DetailsEmployeeComponent, canActivate: [DetailsEmployeeGuard]
-      },
-    ]
+    // children: [
+    //   {
+    //     path: ':index', component: DetailsEmployeeComponent, canActivate: [DetailsEmployeeGuard]
+    //   },
+    // ]
+  },
+  {
+    path: 'employees/:index',
+    component: DetailsEmployeeComponent,
+    canActivate: [AuthGuard, DetailsEmployeeGuard],
+    resolve: [EmployeesResolverService],
   },
 ];
 
