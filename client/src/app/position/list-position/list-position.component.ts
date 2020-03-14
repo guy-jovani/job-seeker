@@ -7,6 +7,9 @@ import * as PositionActions from '../store/position.actions';
 import * as fromApp from '../../store/app.reducer';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { Employee } from 'app/employees/employee.model';
+import { Company } from 'app/company/company.model';
+import { State as UserState } from 'app/user/store/user.reducer';
 
 
 @Component({
@@ -16,11 +19,15 @@ import { switchMap } from 'rxjs/operators';
 })
 export class ListPositionComponent implements OnInit, OnDestroy {
   subscription: Subscription;
-  positions: Position[];
+  positions: Employee['positions'] | Position[];
   allowAdd = false;
   currUrl: string[] = null;
   isLoading = false;
-  errorMessages: string[] = [];
+  user: Employee | Company = null;
+  kind: string = null;
+  messages: string[] = [];
+  selectedList = 'all';
+  detailsPositionUrl = '';
   @Input() companyPositions: Position[] = null;
 
   constructor(
@@ -38,33 +45,53 @@ export class ListPositionComponent implements OnInit, OnDestroy {
         } else {
           return this.store.select('position');
         }
-      }),
+      })
       ).subscribe(currState => {
         this.currUrl = this.router.url.substring(1).split('/');
-        if (this.currUrl[0] === 'my-positions') {
-          this.positions = currState['user'] ? currState['user']['positions'] : null;
-          if (currState['kind'] === 'company') { this.allowAdd = true; }
+        if (currState.messages) {
+          this.messages = [];
+          for (const msg of currState.messages) {
+            this.messages.push(msg);
+          }
         } else {
-          if (this.companyPositions) { // companies/:companyId/position
-            this.positions = this.companyPositions;
+          this.messages = [];
+        }
+        if (this.currUrl[0] === 'my-positions') {
+          this.kind = currState['kind'];
+          this.user = (currState as UserState).user;
+          this.checkPositionOfUser();
+        } else {
+          if (this.companyPositions) { // companies/:companyId || /positions/:posId/company
+            this.checkPositionOfACompany();
           } else { // /positions
-            this.isLoading = currState['loadingAll'];
-            if (this.currUrl[this.currUrl.length - 1] === 'my-positions' ||
-                this.currUrl[this.currUrl.length - 1] === 'positions') {
-              if (currState.messages) {
-                this.errorMessages = [];
-                for (const msg of currState.messages) {
-                  this.errorMessages.push(msg);
-                }
-              } else {
-                this.errorMessages = [];
-              }
-            }
-            this.positions = currState['positions'];
+            this.checkPositionFromPositionsState(currState);
           }
         }
     });
+  }
 
+  private checkPositionOfUser() {
+    this.positions = this.user ? this.user.positions : null;
+    this.detailsPositionUrl = this.selectedList + '/';
+    if (this.kind === 'company') {
+      this.allowAdd = true;
+      this.positions = this.positions as Company['positions'];
+    } else {
+      this.positions = this.positions as Employee['positions'];
+      if (!this.positions) { return; }
+      this.positions = this.selectedList === 'all' ? this.positions : this.positions.filter(pos => {
+        return pos.status.toString() === this.selectedList;
+      });
+    }
+  }
+
+  private checkPositionOfACompany() {
+    this.positions = this.companyPositions;
+  }
+
+  private checkPositionFromPositionsState(positionState) {
+    this.isLoading = positionState['loadingAll'];
+    this.positions = positionState['positions'];
   }
 
   onClose() {

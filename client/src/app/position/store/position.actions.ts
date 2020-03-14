@@ -10,7 +10,8 @@ import { Company } from 'app/company/company.model';
 
 export const CREATE_POSITION_IN_DB = '[Position] CREATE_POSITION_IN_DB';
 export const POSITION_OP_FAILURE = '[POSITION] POSITION operation failed';
-export const UPDATE_SINGLE_POSITION = '[POSITION] Update single position';
+export const POSITION_STATE_LOAD_SINGLE = '[POSITION] POSITION_STATE_LOAD_SINGLE';
+export const ADD_UPDATE_SINGLE_POSITION = '[POSITION] Add update single position';
 export const UPDATE_SINGLE_POSITION_IN_DB = '[POSITION] Update single position in db';
 export const FETCH_ALL_POSITIONS = '[POSITION] Fetch All POSITIONS';
 export const FETCH_SINGLE_POSITION = '[POSITION] Fetch Single POSITION';
@@ -23,11 +24,12 @@ export const UPDATE_SINGLE_POSITION_COMPANY_ATTEMPT = '[POSITION] UPDATE_SINGLE_
 
 export type PositionActions = CreatePositionInDb
                             | PositionOpFailure
-                            | UpdateSinglePosition
+                            | AddUpdateSinglePosition
                             | FetchAllPositions
                             | SetAllPositions
                             | ClearError
                             | Logout
+                            | PositionStateLoadSingle
                             | UpdateSinglePositionCompanyAttempt
                             | UpdateSinglePositionCompany
                             | FetchSinglePosition;
@@ -41,6 +43,10 @@ export class SetAllPositions implements Action {
 
 export class ClearError implements Action {
   readonly type = CLEAR_ERROR;
+}
+
+export class PositionStateLoadSingle implements Action {
+  readonly type = POSITION_STATE_LOAD_SINGLE;
 }
 
 export class UpdateSinglePositionCompanyAttempt implements Action {
@@ -63,8 +69,8 @@ export class PositionOpFailure implements Action {
   constructor(public payload: string[] ) {}
 }
 
-export class UpdateSinglePosition implements Action {
-  readonly type = UPDATE_SINGLE_POSITION;
+export class AddUpdateSinglePosition implements Action {
+  readonly type = ADD_UPDATE_SINGLE_POSITION;
 
   constructor(public payload: { position: Position, main: boolean } ) {}
 }

@@ -1,4 +1,3 @@
-import { Employee } from 'app/employees/employee.model';
 
 
 import * as AuthActions from './auth.actions';

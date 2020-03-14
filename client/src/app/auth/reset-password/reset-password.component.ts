@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Validators, FormGroup, FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -11,13 +11,13 @@ import * as AuthActions from '../store/auth.actions';
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.css']
 })
-export class ResetPasswordComponent implements OnInit {
+export class ResetPasswordComponent implements OnInit, OnDestroy {
 
   authForm: FormGroup;
   errorSub: Subscription;
-  errorMessages: string[] = [];
+  messages: string[] = [];
   isLoading = false;
-  showConfirmation = false;
+  // showConfirmation = false;
 
   constructor(private store: Store<fromApp.AppState>) { }
 
@@ -25,35 +25,38 @@ export class ResetPasswordComponent implements OnInit {
     this.errorSub = this.store.select('auth')
       .subscribe(
         authState => {
-          if(authState.messages){
-            for(let msg of authState.messages){
-              this.errorMessages.push(msg)
+          if (authState.messages) {
+            for (const msg of authState.messages) {
+              this.messages.push(msg);
             }
           } else {
-            this.showConfirmation = this.isLoading && !authState.loading; // the reser email was sent successfuly
-            this.errorMessages = [];
+            this.messages = [];
+            if (this.isLoading && !authState.loading) {
+              this.messages.push('An email with a link to the reset page has been sent to you.')
+            }
+            // this.showConfirmation = this.isLoading && !authState.loading; // the reset email was sent successfuly
           }
           this.isLoading = authState.loading;
         }
       );
 
     this.authForm = new FormGroup({
-      'email': new FormControl(null, [Validators.required, Validators.email])
-    })
+      email: new FormControl(null, [Validators.required, Validators.email])
+    });
   }
 
-  onSubmit(){
+  onSubmit() {
     const email = this.authForm.value.email;
     this.store.dispatch(new AuthActions.ResetPassEmailAttempt(email));
   }
 
-  ngOnDestroy(){
-    if(this.errorSub){
+  ngOnDestroy() {
+    if (this.errorSub) {
       this.errorSub.unsubscribe();
     }
   }
 
-  onClose(){
+  onClose() {
     this.store.dispatch(new AuthActions.ClearError());
   }
 

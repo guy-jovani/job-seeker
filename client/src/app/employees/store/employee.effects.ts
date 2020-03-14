@@ -99,53 +99,5 @@ export class EmployeeEffects {
     })
   );
 
-  // @Effect()
-  // storeEmployee = this.actions$.pipe(
-  //   ofType(EmployeeActions.STORE_EMPLOYEE_IN_DB),
-  //   switchMap(actionData => {
-  //     return this.http.post(nodeServer  + 'store',
-  //       {
-  //         name: actionData['payload']['name'],
-  //         email: actionData['payload']['email']
-  //       })
-  //       .pipe(
-  //         map(res => {
-  //           if(res['type'] === 'success'){
-  //             const employee = new Employee({
-  //               _id: res['employeeId'], email: res['email'], token: res['token'],
-  //               firstName: res['firstName'], lastName: res['lastName']
-  //             });
-  //             return new EmployeeActions.SetOneEmployee(employee);
-  //           } else {
-  //             return new EmployeeActions.EmployeeOpFailure([res['message']]);
-  //           }
-  //         }),
-  //         catchError(err => {
-  //           return handleError(err);
-  //         })
-  //       );
-  //   })
-  // );
-
-  // @Effect()
-  // deleteEmployee = this.actions$.pipe(
-  //   ofType(EmployeeActions.DELETE_EMPLOYEE_FROM_DB),
-  //   withLatestFrom(this.store.select('employee')),
-  //   switchMap(([actionData, employeesState]) => {
-  //     return this.http.post(nodeServer  + 'delete',
-  //       { id: employeesState.employees[actionData['payload']]['_id'] }
-  //     )
-  //     .pipe(
-  //       map(res => {
-  //         return new EmployeeActions.DeleteEmployee(res['id']);
-  //       }),
-  //       catchError(err => {
-  //         return handleError(err);
-  //       })
-  //     );
-  //   })
-  // );
-
-
 
 }

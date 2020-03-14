@@ -1,7 +1,6 @@
 
 const path = require('path');
 const express = require('express');
-// const http2 = require('http2');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
@@ -25,12 +24,6 @@ app.use((req, res, next) => {
   next();
 });
 
-
-// app.use('', (req, res, next) => {
-//   console.log(req.query)
-//   next()
-// });
-
 app.use('/auth', authRoutes);
 app.use('/employees', checkAuth, employeesRoutes);
 app.use('/companies', checkAuth, companiesRoutes);
@@ -52,6 +45,7 @@ app.use((error, req, res, next) => {
   console.log("====================================================");
   console.log("an error cought and printed in app.js");
   console.log(error);
+  error.messages.push('Please refresh the page and try again. If the error is still happening please notify the admins.')
   res.status(error.statusCode || 500).json({ 
     // errors: [{
     //   msg: 'An unknown error occured'

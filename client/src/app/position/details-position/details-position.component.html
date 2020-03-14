@@ -4,22 +4,24 @@
 
 <app-loading-spinner *ngIf="isLoading"r></app-loading-spinner>
 <div class="container">
-  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
+  <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
   <app-back-button *ngIf="!position"></app-back-button>
 </div>
 <div class="container" *ngIf="position && !isLoading">
   <div class="row">
-    <h3>{{ position.title | titlecase }}</h3>
-    <app-back-button></app-back-button>
+    <div class="pos-header-container">
+      <h3>{{ position.title ? position.title : position['position'].title | titlecase }}</h3>
+      <h3 class="pos-status" *ngIf="status">{{ status }}</h3>
+      <app-back-button></app-back-button>
+    </div>
     <div>
-      <p *ngIf="!allowEdit">
-        <a routerLink='company' (click)="getCompanyinfo()"
-            *ngIf="companyLink; else companyNoLink">
-          comapny: {{ (position.companyId.name | titlecase) }}
+      <p *ngIf="!allowEdit && companyLink; else companyNoLink">
+        <a routerLink='company' (click)="getCompanyinfo()">
+          comapny: {{ (companyId.name | titlecase) }}
         </a>
       </p>
-      <ng-template #companyNoLink>comapny: {{ (position.companyId.name | titlecase) }}</ng-template>
-      <p>description: {{ position.description || "------" }}</p>
+      <ng-template #companyNoLink><p>comapny: {{ (companyId.name | titlecase) }}</p></ng-template>
+      <p>description: {{ position.title ? position.description : position['position'].description || "------" }}</p>
       <div>
         <p>Requierments:</p>
         <p *ngIf="!position.requirements || !position.requirements.length; else reqList">There are no prior requierments for this position</p>
@@ -32,12 +34,16 @@
         </ng-template>
       </div>
       <hr>
+      <div *ngIf="allowApply">
+        <button class="btn btn-primary" (click)="onApplySave('saved')" *ngIf='status !== "saved"'>Save for Later</button>
+        <button class="btn btn-success" (click)="onApplySave('applied')" *ngIf='status !== "applied"'>Apply Now</button>
+      </div>
     </div>
     <div class="row" *ngIf="allowEdit">
       <a class="btn btn-primary btn-sm" routerLink='edit'>Edit position</a>
+      <hr>
     </div>
   </div>
-  <hr>
 </div>
 
 

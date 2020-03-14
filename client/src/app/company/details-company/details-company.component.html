@@ -3,8 +3,8 @@
 
 <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 <div class="container" *ngIf="company && !isLoading">
-  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
-  <!-- <app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert> -->
+  <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
+  <!-- <app-alert *ngIf="messages.length" [messages]="messages" (closeAlert)="onClose()"></app-alert> -->
   <div>
     <h3>{{ allowEdit ? 'My Profile' : company.name | titlecase }}</h3>
     <app-back-button *ngIf='currUrl[0] !== "my-details"'></app-back-button>

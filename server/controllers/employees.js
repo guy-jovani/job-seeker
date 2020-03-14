@@ -1,11 +1,12 @@
 
 
-const mongoose = require('mongoose');
 const Employee = require('../models/employee');
 const validation = require('../utils/validation');
 const errorHandling = require('../utils/errorHandling')
 const getBulkArrayForUpdate = require('../utils/shared').getBulkArrayForUpdate;
 const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
+const sendMessagesResponse = require('../utils/shared').sendMessagesResponse;
+const changeStatusOfAUserPosition = require('../utils/shared').changeStatusOfAUserPosition;
 
 
 exports.fetchSingle = async (req, res, next) => {
@@ -46,7 +47,6 @@ exports.updateEmployee = async (req, res, next) => {
       return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
     } 
     const emailExist = await validation.userEmailExistValidation(req.body.email, req.body._id);
-    console.log(emailExist)
     if(emailExist.type === 'failure'){
       return sendMessagesResponse(res, 422, emailExist.messages, 'failure');
     }
@@ -56,11 +56,9 @@ exports.updateEmployee = async (req, res, next) => {
       throw new Error("trying to update a non exisitng employee");
     }
     let updatedEmployee = await Employee.findById(req.body._id).select(
-        '-__v -password -resetPassToken -resetPassTokenExpiration').populate('positionsIds');
+        '-__v -password -resetPassToken -resetPassTokenExpiration').populate('positions');
 
     updatedEmployee = updatedEmployee.toObject();
-    Reflect.set(updatedEmployee, 'positions', updatedEmployee['positionsIds']);
-    Reflect.deleteProperty(updatedEmployee, 'positionsIds');
 
     res.status(201).json({
       message: 'employee updated successfully!',
@@ -68,12 +66,18 @@ exports.updateEmployee = async (req, res, next) => {
       employee: updatedEmployee
     });
   } catch (error) {
-    next(errorHandling.handleServerErrors(error, 500, "there was an error updating the employee"));
+    next(errorHandling.handleServerErrors(error, 500, "There was an error updating the employee"));
   }
 };
 
 
-
+exports.applySavePosition = async (req, res, next) => {
+  try {
+    await changeStatusOfAUserPosition(req, res, req.body.companyId, req.body.employeeId, req.body.positionId, req.body.status, 'employee')
+  } catch (error) {
+    next(errorHandling.handleServerErrors(error, 500, `There was an error updating the status of the wanted position.`));
+  }
+};
 
 
 

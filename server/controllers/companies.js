@@ -6,17 +6,18 @@ const validation = require('../utils/validation');
 const errorHandling = require('../utils/errorHandling');
 const getBulkArrayForUpdate = require('../utils/shared').getBulkArrayForUpdate;
 const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
-const chackCompanyUpdateSignupValidation = require('../utils/shared').chackCompanyUpdateSignupValidation
+const checkCompanyUpdateSignupValidation = require('../utils/shared').checkCompanyUpdateSignupValidation
+const changeStatusOfAUserPosition = require('../utils/shared').changeStatusOfAUserPosition;
 
 exports.fetchSingle = async (req, res, next) => {
   try { 
     let company = await Company.findById(req.query._id).select(
-      '_id email name website description imagePath positionsIds').populate('positionsIds');
-
+      '_id email name website description imagePath positions')
+        .populate({
+          path: 'positions', 
+          populate: { path: 'company', select: 'name' }
+        });
     company = company.toObject();
-    Reflect.set(company, 'positions', company['positionsIds']);
-    Reflect.deleteProperty(company, 'positionsIds');
-
     res.status(200).json({
       type: 'success',
       company: company
@@ -30,33 +31,35 @@ exports.fetchAll = async (req, res, next) => {
   try {
     const companies = await Company.aggregate([
       { $match: { _id: { $ne: mongoose.Types.ObjectId(req.query._id)} } },
-      { $project: { positionsIds: 0, createdAt: 0, updatedAt: 0, __v: 0, password: 0 } },
+      { $project: { positions: 0, createdAt: 0, updatedAt: 0, __v: 0, password: 0 } },
+      // { $project: { positionsIds: 0, createdAt: 0, updatedAt: 0, __v: 0, password: 0 } },
       { $lookup: {
         from: "positions",
-        let: { company_id: "$_id" },
+        let: { companyId: "$_id" },
         pipeline: [
-          { $match: { $expr: { $eq: [ "$companyId", "$$company_id" ] } } },
+          { $match: { $expr: { $eq: [ "$company", "$$companyId" ] } } },
           { $lookup: {
             from: "companies",
-            localField: "companyId",
+            localField: "company",
             foreignField: "_id",
-            as: "companyId" }
+            as: "company" }
           },
-          { $unwind: "$companyId" },
+          { $unwind: "$company" },
           { $project: {
             "__v": 0,
-            "companyId.positionsIds": 0,
-            "companyId.password": 0,
-            "companyId.createdAt": 0,
-            "companyId.updatedAt": 0,
-            "companyId.description": 0,
-            "companyId.__v": 0,
-            "companyId.email": 0, }
+            "company.positions": 0,
+            "company.password": 0,
+            "company.createdAt": 0,
+            "company.website": 0,
+            "company.updatedAt": 0,
+            "company.description": 0,
+            "company.__v": 0,
+            "company.email": 0, }
           }
         ],
         as: "positions" }
       }
-    ])
+    ]);
 
     res.status(200).json({
       type: 'success',
@@ -95,7 +98,7 @@ exports.updateCompany = async (req, res, next) => {
     if(routeErros.type === 'failure') {
       return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
     }
-    const companyValid = await chackCompanyUpdateSignupValidation(req, signup = false);
+    const companyValid = await checkCompanyUpdateSignupValidation(req, signup = false);
     if(companyValid.type === 'failure'){
       return sendMessagesResponse(res, 422, companyValid.messages, 'failure');
     }
@@ -107,11 +110,9 @@ exports.updateCompany = async (req, res, next) => {
 
     let updatedCompany = await Company.findById(req.body._id).select(
                             '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration -password'
-                          ).populate('positionsIds');
+                          ).populate('positions');
     
     updatedCompany = updatedCompany.toObject();
-    Reflect.set(updatedCompany, 'positions', updatedCompany['positionsIds']);
-    Reflect.deleteProperty(updatedCompany, 'positionsIds');
     res.status(201).json({
       message: 'company updated successfully!',
       type: 'success',
@@ -123,8 +124,13 @@ exports.updateCompany = async (req, res, next) => {
 };
 
 
-
-
+exports.acceptRejectPosition = exports.updateCompany = async (req, res, next) => {
+  try {
+    await changeStatusOfAUserPosition(req, res, req.body.companyId, req.body.employeeId, req.body.positionId, req.body.status, 'company')
+  } catch (error) {
+    next(errorHandling.handleServerErrors(error, 500, `There was an error updating the status of the wanted position.`));
+  }
+};
 
 
 

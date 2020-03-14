@@ -19,7 +19,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   user: Employee | Company = null;
   searchRes: Employee[] | Company[] = null;
   nameList: Map<string, {}> = null;
-  errorMessages: string[] = [];
+  messages: string[] = [];
 
   @ViewChild('listResults', { static: false }) listRes: ElementRef;
   @ViewChild('searchInput', { static: false }) searchInput: ElementRef;
@@ -65,11 +65,11 @@ export class SearchBarComponent implements OnInit, OnDestroy {
             this.searchRes = res['resultList'];
             this.renderer2.removeClass(this.listRes.nativeElement, 'hide');
           } else {
-            this.errorMessages.push(...res['messages']);
+            this.messages.push(...res['messages']);
           }
         },
-        errorMessages => {
-          this.errorMessages.push(...errorMessages);
+        messages => {
+          this.messages.push(...messages);
         }
       );
   }
@@ -85,7 +85,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   onClose() {
-    this.errorMessages = [];
+    this.messages = [];
   }
 
   ngOnDestroy() {

@@ -9,7 +9,6 @@ import { Employee } from 'app/employees/employee.model';
 import { Company } from 'app/company/company.model';
 import { Conversation } from './conversation.model';
 import { ChatService } from './chat-socket.service';
-import * as AuthActions from '../auth/store/auth.actions';
 import * as UserActions from '../user/store/user.actions';
 import { Message } from './message.model';
 
@@ -23,7 +22,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   subscription: Subscription;
   user: Employee | Company = null;
   nameList: Map<string, { _id: string, fullName: string, type: string, nameColor?: SafeStyle }> = null;
-  errorMessages: string[] = [];
+  messages: string[] = [];
   privateMsg = true;
   userKind: string = null;
   conversations: Conversation[] = null;
@@ -67,12 +66,12 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   onSubmit(form: NgForm) {
     if (form.invalid) {
-      this.errorMessages.push('You can\'t send an empty message.');
+      this.messages.push('You can\'t send an empty message.');
     }
     if (!this.nameList.size) {
-      this.errorMessages.push('You need to choose who to send the message to.');
+      this.messages.push('You need to choose who to send the message to.');
     }
-    if (this.errorMessages.length) {
+    if (this.messages.length) {
       return;
     }
 
@@ -147,7 +146,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   onClose() {
-    this.errorMessages = [];
+    this.messages = [];
   }
 
   onNewMessage(privateMsg: boolean) {

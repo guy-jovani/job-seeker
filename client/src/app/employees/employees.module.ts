@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import { SharedModule } from 'app/shared/shared.module';
 import { EmployeesComponent } from './employees.component';
@@ -22,7 +22,8 @@ import { EmployeesRoutingModule } from './employees-routing.module';
     RouterModule,
     EmployeesRoutingModule,
     SharedModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FormsModule
   ],
   exports: [
     EditEmployeeComponent,

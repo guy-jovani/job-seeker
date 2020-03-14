@@ -18,7 +18,7 @@ import * as PositionActions from '../store/position.actions';
 })
 export class EditPositionComponent implements OnInit, OnDestroy {
   positionSub: Subscription;
-  errorMessages: string[] = [];
+  messages: string[] = [];
   isLoading = false;
   positionForm: FormGroup;
   position: Position = null;
@@ -59,12 +59,12 @@ export class EditPositionComponent implements OnInit, OnDestroy {
       if (this.currUrl[this.currUrl.length - 1] === 'edit' ||
           this.currUrl[this.currUrl.length - 1] === 'create') {
         if (positionState.messages) {
-          this.errorMessages = [];
+          this.messages = [];
           for (const msg of positionState.messages) {
-            this.errorMessages.push(msg);
+            this.messages.push(msg);
           }
         } else {
-          this.errorMessages = [];
+          this.messages = [];
         }
       }
     });
@@ -104,7 +104,7 @@ export class EditPositionComponent implements OnInit, OnDestroy {
     }
     const newPosition = new Position({
       title: form.value.title, description: form.value.description,
-      companyId: { _id: this.company._id, name: this.company.name }
+      company: { _id: this.company._id }
     });
     if (form.value.requirements.length > 0) {
       newPosition.requirements = form.value.requirements;

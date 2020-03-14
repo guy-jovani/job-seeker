@@ -9,6 +9,8 @@ import { of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import * as fromApp from '../../store/app.reducer';
 import * as UserActions from './user.actions';
+import * as PositionActions from '../../position/store/position.actions';
+import * as CompanyActions from '../../company/store/company.actions';
 import { Company } from 'app/company/company.model';
 import { Employee } from 'app/employees/employee.model';
 
@@ -35,7 +37,7 @@ const setUserLocalStorage = (user: Company | Employee,
 
 const updateUserPositionsLocalStorage = (position, type) => {
   const [user] = geUsertLocalStorage();
-  if (type === UserActions.ADD_POSITION_TO_USER) {
+  if (type === UserActions.CompanyCreatedPosition) {
     user.positions.push(position);
   } else {
     const index = user.positions.findIndex(pos => pos._id === position._id);
@@ -55,20 +57,20 @@ export class UserEffects {
 
 
   @Effect({dispatch: false})
-  activeUserChanges = this.actions$.pipe(
+  activeUserChangesNavigation = this.actions$.pipe(
     ofType(UserActions.UPDATE_ACTIVE_USER),
     map((actionData: UserActions.UpdateActiveUser) => {
       setUserLocalStorage(actionData.payload.user);
       if (actionData.payload.redirect) {
-        this.router.navigate(['../my-details']);
+        this.router.navigate([actionData.payload.redirect]);
       }
     })
   );
 
   @Effect({dispatch: false})
-  AddUpdatePositionToUser = this.actions$.pipe(
-    ofType(UserActions.ADD_POSITION_TO_USER, UserActions.UPDATE_POSITION_OF_USER),
-    map((actionData: UserActions.AddPositionToUser | UserActions.UpdateActiveUser) => {
+  AddUpdatePositionToUserNavigation = this.actions$.pipe(
+    ofType(UserActions.COMPANY_CREATED_POSITION, UserActions.COMPANY_UPDATED_POSITION),
+    map((actionData: UserActions.CompanyCreatedPosition | UserActions.CompanyUpdatedPosition) => {
       updateUserPositionsLocalStorage(actionData.payload, actionData.type);
       this.router.navigate(['../my-positions']);
     })
@@ -100,6 +102,90 @@ export class UserEffects {
         );
     })
   );
+
+  @Effect()
+  employeeApplySavePositionAttempt = this.actions$.pipe(
+    ofType(UserActions.EMPLOYEE_APPLY_SAVE_POSITION_ATTEMPT),
+    withLatestFrom(this.store.select('user')),
+    switchMap(([actionData, userState]) => {
+      return this.http.post(environment.nodeServer + 'employees/applySavePosition',
+        {
+          employeeId: userState.user._id,
+          status: actionData['payload']['status'],
+          positionId: actionData['payload']['positionId'],
+          companyId: actionData['payload']['companyId']
+        })
+        .pipe(
+          map(res => {
+            if (res['type'] === 'success') {
+              this.applySavePositionAttemptSuccess(actionData['payload']['state']);
+              return new UserActions.UpdateActiveUser({
+                user: res['user'] as Employee,
+                kind: 'employee',
+                redirect: actionData['payload']['state'] === 'my-positions' ? 'my-positions' : ''
+              });
+            } else {
+              return this.applySavePositionAttemptFailure(actionData['payload']['state'], res['messages']);
+            }
+          }),
+          catchError(messages => {
+            return this.applySavePositionAttemptFailure(actionData['payload']['state'], messages);
+          })
+        );
+    })
+  );
+
+  @Effect()
+  companyAcceptRejectPositionAttempt = this.actions$.pipe(
+    ofType(UserActions.COMPANY_ACCEPT_REJECT_POSITION_ATTEMPT),
+    withLatestFrom(this.store.select('user')),
+    switchMap(([actionData, userState]) => {
+      return this.http.post(environment.nodeServer + 'companies/acceptRejectPosition',
+        {
+          employeeId: actionData['payload']['employeeId'],
+          status: actionData['payload']['status'],
+          positionId: actionData['payload']['positionId'],
+          companyId: userState.user._id
+        })
+        .pipe(
+          map(res => {
+            if (res['type'] === 'success') {
+              return new UserActions.UpdateActiveUser({
+                user: res['user'] as Company,
+                kind: 'company',
+                redirect: ''
+              });
+            } else {
+              return new UserActions.UserFailure(res['messages']);
+            }
+          }),
+          catchError(messages => {
+            return of(new UserActions.UserFailure(messages));
+          })
+        );
+    })
+  );
+
+  private applySavePositionAttemptFailure(state: string, messages: string[]) {
+    if (state === 'positions') {
+      this.store.dispatch(new UserActions.ClearError());
+      return of(new PositionActions.PositionOpFailure(messages));
+    } else if (state === 'companies') {
+      this.store.dispatch(new UserActions.ClearError());
+      return of(new CompanyActions.CompanyOpFailure(messages));
+    } else {
+      return of(new UserActions.UserFailure(messages));
+    }
+  }
+
+  private applySavePositionAttemptSuccess(state: string) {
+    if (state === 'positions') {
+      this.store.dispatch(new PositionActions.ClearError());
+    } else if (state === 'companies') {
+      this.store.dispatch(new CompanyActions.ClearError());
+    }
+  }
+
 }
 
 

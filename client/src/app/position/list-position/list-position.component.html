@@ -10,22 +10,31 @@
       Add Position
     </a>
   </div>
+  <div *ngIf="currUrl[0] === 'my-positions' && !allowAdd">
+    <label for="position-list">Choose status list:</label>
+    <select [(ngModel)]="selectedList" (ngModelChange)="checkPositionOfUser()">
+      <option value="all">All</option>
+      <option value="saved">Saved</option>
+      <option value="applied">Applied</option>
+    </select>
+  </div>
   <div *ngIf="!isLoading">
     <div>
       <h3 *ngIf="!companyPositions">Positions</h3>
       <h4 *ngIf="companyPositions">Positions</h4>
-      <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
-      <ul class="list-group" *ngIf="positions && positions.length && !errorMessages.length">
+      <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
+      <ul class="list-group" *ngIf="positions && positions.length && !messages.length">
         <li
           class="list-group-item"
-          *ngFor="let position of positions; let i=index">
-          <a routerLink='{{ companyPositions && companyPositions.length ? "position" : i}}'
+          *ngFor="let positionInfo of positions; let i=index">
+          <a class="pos-link" routerLink='{{ companyPositions && companyPositions.length ? "position" : detailsPositionUrl + i }}'
               [state]="{ positionInd : i }">
-            <p>Title: {{ position.title }}</p>
+            <p class="pos-title">{{ positionInfo.title ? positionInfo.title : positionInfo['position'].title }}</p>
+            <p class="pos-status" *ngIf="currUrl[0] === 'my-positions' && !allowAdd">{{ positionInfo.status }}</p>
           </a>
         </li>
       </ul>
-      <p *ngIf="!positions || !positions.length && !errorMessages.length">There are no open positions</p>
+      <p *ngIf="!positions || !positions.length && !messages.length">There are no open positions</p>
     </div>
   </div>
 </div>

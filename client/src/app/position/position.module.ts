@@ -6,7 +6,7 @@ import { EditPositionComponent } from './edit-position/edit-position.component';
 import { ListPositionComponent } from './list-position/list-position.component';
 import { PositionRoutingModule } from './position-routing.module';
 import { SharedModule } from 'app/shared/shared.module';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { DetailsPositionComponent } from './details-position/details-position.component';
 
 
@@ -23,7 +23,8 @@ import { DetailsPositionComponent } from './details-position/details-position.co
   imports: [
     SharedModule,
     PositionRoutingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FormsModule
   ],
   exports: [
     PositionComponent,

@@ -15,7 +15,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   showPasswords = false;
   authForm: FormGroup;
   errorSub: Subscription;
-  errorMessages: string[] = [];
+  messages: string[] = [];
   isLoading = false;
   authAction: string;
 
@@ -32,12 +32,12 @@ export class AuthComponent implements OnInit, OnDestroy {
       authState => {
         this.isLoading = authState.loading;
         if (authState.messages) {
-          this.errorMessages = [];
+          this.messages = [];
           for (const msg of authState.messages) {
-            this.errorMessages.push(msg);
+            this.messages.push(msg);
           }
         } else {
-          this.errorMessages = [];
+          this.messages = [];
         }
       }
     );

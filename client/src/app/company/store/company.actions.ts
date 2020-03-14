@@ -7,6 +7,7 @@ import { Position } from 'app/position/position.model';
 export const UPDATE_SINGLE_COMPANY = '[Company] Update single company';
 export const UPDATE_SINGLE_COMPANY_POSITION = '[Company] Update single company position';
 export const UPDATE_SINGLE_COMPANY_POSITION_ATTEMPT = '[Company] Update single company position attempt';
+export const COMPANY_STATE_LOAD_SINGLE = '[POSITION] COMPANY_STATE_LOAD_SINGLE';
 export const UPDATE_SINGLE_COMPANY_IN_DB = '[Company] Update single company in db';
 export const SET_ALL_COMPANIES = '[Company] Set All Companies';
 export const FETCH_ALL_COMPANIES = '[Company] Fetch All companies';
@@ -20,6 +21,7 @@ export type CompanyActions = FetchAllCompanies
                             | SetAllCompanies
                             | CompanyOpFailure
                             | ClearError
+                            | CompanyStateLoadSingle
                             | UpdateSingleCompanyInDb
                             | UpdateSingleCompany
                             | UpdateSingleCompanyPositionAttempt
@@ -29,6 +31,10 @@ export type CompanyActions = FetchAllCompanies
 
 export class FetchAllCompanies implements Action {
   readonly type = FETCH_ALL_COMPANIES;
+}
+
+export class CompanyStateLoadSingle implements Action {
+  readonly type = COMPANY_STATE_LOAD_SINGLE;
 }
 
 export class UpdateSingleCompanyPositionAttempt implements Action {
@@ -84,15 +90,3 @@ export class Logout implements Action {
   readonly type = LOGOUT;
 }
 
-
-
-// export class StoreCompanyInDb implements Action {
-//   readonly type = STORE_COMPANY_IN_DB;
-
-//   constructor(public payload: Company){}
-// }
-// export class SetSingleCompany implements Action {
-//   readonly type = SET_SINGLE_COMPANY;
-
-//   constructor(public payload: { company: Company, redirect: boolean }){}
-// }

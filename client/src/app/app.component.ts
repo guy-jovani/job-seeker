@@ -17,7 +17,7 @@ import { filter } from 'rxjs/operators';
 export class AppComponent implements OnInit, OnDestroy {
   socketPostedSub: Subscription;
   socketReconnectSub: Subscription;
-  errorMessages: string[] = [];
+  messages: string[] = [];
   userSub: Subscription;
   // userConversationsExists = false;
   routerSub: Subscription;
@@ -55,10 +55,10 @@ export class AppComponent implements OnInit, OnDestroy {
             this.store.dispatch(new UserActions.SetChatNotification());
           }
         } else {
-          this.errorMessages.push(...res['messages']);
+          this.messages.push(...res['messages']);
         }
       } catch (error) {
-        this.errorMessages.push('There was a problem sending the message, please refresh your page and try again');
+        this.messages.push('There was a problem sending the message, please refresh your page and try again');
       }
     });
 
@@ -72,7 +72,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   onClose() {
-    this.errorMessages = [];
+    this.messages = [];
   }
 
   ngOnDestroy() {

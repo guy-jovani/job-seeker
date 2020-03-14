@@ -30,10 +30,33 @@ const companySchema = new Schema(
       type: String,
       required: false
     },
-    positionsIds: [{
+    positions: [{
       type: Schema.Types.ObjectId, 
       ref: 'Position',
       require: false
+    }],
+    applicants: [{
+      positions: [{
+        position: {
+          type: Schema.Types.ObjectId, 
+          ref: 'Position',
+          require: false
+        },
+        status: {
+          type: String,
+          required: true,
+          enum: ['applied', 'rejected', 'accepted']
+        },
+        date: { 
+          type: Date,
+          required: true
+        }
+      }],
+      employee: {
+        type: Schema.Types.ObjectId, 
+        ref: 'Employee',
+        required: true
+      },
     }],
     resetPassToken: String,
     resetPassTokenExpiration: Date,

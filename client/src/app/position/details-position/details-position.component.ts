@@ -4,11 +4,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import * as CompanyActions from '../../company/store/company.actions';
 import * as PositionActions from '../../position/store/position.actions';
+import * as UserActions from '../../user/store/user.actions';
 import * as fromApp from '../../store/app.reducer';
 import { Position } from '../position.model';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { environment } from 'environments/environment';
+import { Employee } from 'app/employees/employee.model';
+import { Company } from 'app/company/company.model';
 
 
 
@@ -19,12 +22,18 @@ import { environment } from 'environments/environment';
 })
 export class DetailsPositionComponent implements OnInit, OnDestroy {
   subscription: Subscription;
-  position: Position;
+  position: Position = null;
   allowEdit = false;
   isLoading = false;
   currUrl: string[] = null;
   companyLink = true;
-  errorMessages: string[] = [];
+  messages: string[] = [];
+  user: Employee | Company = null;
+  allowApply: boolean;
+  status: string = null;
+  kind: string = null;
+  fetchedCompany = false;
+  companyId: {_id: string, name: string} = null;
 
   @Input() companyPosition: Position = null;
 
@@ -34,12 +43,15 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
     private router: Router) { }
 
   ngOnInit() {
-    this.subscription = this.route.params.pipe(
-      switchMap(params => {
+    this.subscription = this.store.select('user').pipe(
+      switchMap(userState => {
         this.currUrl = this.router.url.substring(1).split('/');
+        this.kind = userState.kind;
+        this.user = userState.user;
+        // this.user = this.kind === 'employee' ? userState.user as Employee : userState.user as Company;
         if (this.currUrl[0] === 'my-positions') {
           return this.store.select('user');
-        } else if ( this.currUrl[0] === 'companies') {
+        } else if (this.currUrl[0] === 'companies') {
           return this.store.select('company');
         } else {
           return this.store.select('position');
@@ -47,63 +59,105 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
       })
       ).subscribe(currState => {
         this.currUrl = this.router.url.substring(1).split('/');
-        this.isLoading = currState['loadingSingle'];
-        if (this.currUrl[0] === 'my-positions') {
-          if (currState['kind'] === 'company') {
-            this.allowEdit = true;
+        if (currState.messages) {
+          this.messages = [];
+          for (const msg of currState.messages) {
+            this.messages.push(msg);
           }
-          this.position = currState['user'] ? currState['user'].positions[+this.currUrl[1]] : null;
-        } else if (this.currUrl[0] === 'positions') { // /positions/:posInd
-          this.checkPositionsUrl(currState);
+        } else {
+          this.messages = [];
+        }
+        this.isLoading = currState['loadingSingle'] || currState['loading'];
+        if (this.currUrl[0] === 'my-positions') {
+          this.checkPositionOfUser(currState);
+        } else if (this.currUrl[0] === 'positions') { // /positions/:posInd..
+          this.checkPositionFromPositionsState(currState);
         } else { // /companies/:compInd/position
-          this.checkCompaniesUrl(currState);
+          this.checkPositionOfACompany(currState);
         }
       });
   }
 
-  private checkCompaniesUrl(companyState) {
+  private checkPositionOfUser(authState) {
+    if (this.kind === 'employee') {
+      this.companyLink = false;
+      this.position = null;
+      if (authState['user']) {
+        if (this.currUrl[1] === 'all') {
+          this.position = authState['user'].positions[+this.currUrl[2]].position;
+        } else if (this.currUrl[1] === 'saved') {
+          this.position = authState['user']
+                          .positions.filter(pos => pos.status === 'saved')[+this.currUrl[2]].position;
+        } else {
+          this.position = authState['user']
+                          .positions.filter(pos => pos.status === 'applied')[+this.currUrl[2]].position;
+        }
+        this.companyId = { _id: this.position.company._id, name: this.position.company.name };
+        this.allowedApplySave();
+      }
+    } else {
+      this.allowEdit = true;
+      this.position = this.user ?
+                      authState['user'].positions[+this.currUrl[2]] : null;
+      this.companyId = this.position ? { _id: this.position.company as string, name: this.user['name'] } : null;
+    }
+  }
+
+  private checkPositionOfACompany(companyState) {
     if (this.invalidStateListInd(companyState, 'companies')) { return; }
     this.companyLink = false;
     this.position = !companyState['companies'] ? null :
     companyState['companies'][+this.currUrl[1]]['positions'][window.history.state['positionInd']];
     if (!this.position) {
-      this.errorMessages = ['There was a problem fetching the position.'];
+      this.messages = ['There was a problem fetching the position.'];
+    } else {
+      this.companyId = { _id: this.position.company._id, name: this.position.company.name };
+      this.allowedApplySave();
     }
   }
 
-  private checkPositionsUrl(positionState) {
+  private checkPositionFromPositionsState(positionState) {
     if (this.invalidStateListInd(positionState, 'positions')) { return; }
-    if (this.currUrl[this.currUrl.length - 1] === 'position') {
-      if (positionState.messages) {
-        this.errorMessages = [];
-        for (const msg of positionState.messages) {
-          this.errorMessages.push(msg);
-        }
-      } else {
-        this.errorMessages = [];
-      }
-    }
-    if (this.currUrl[this.currUrl.length - 1] === 'position') {
+    if (this.currUrl[this.currUrl.length - 1] === 'position') { // /positions/:posInd/company/position
       this.companyLink = false;
-      if (!positionState['positions']) {
-        this.router.navigate([this.currUrl[0]]);
-      } else { // /positions/:posInd/company/position
-        if (window.history.state['positionInd'] === undefined) {
-          return this.router.navigate([this.currUrl[0]]);
-        }
-        const positions = positionState['positions'];
-        const position = positions[+this.currUrl[1]];
-        const company = position['companyId'];
-        const companyPositions = company['positions'];
-        this.position = companyPositions[window.history.state['positionInd']];
-        this.position.companyId = {
-          _id: companyPositions[window.history.state['positionInd']].companyId,
-          name: company.name
-        };
+
+      if (window.history.state['positionInd'] === undefined) {
+        // on access from url - doesn't know which position to look for
+        return this.router.navigate([this.currUrl[0], this.currUrl[1]]);
       }
-    } else { // /positions/:posInd/company
+      const positionsList = positionState['positions'];
+      const position = positionsList[+this.currUrl[1]];
+      const companyOfPosition = position['company'];
+      const companyPositions = companyOfPosition['positions'];
+      this.position = companyPositions[window.history.state['positionInd']];
+      this.companyId = { ...position.companyId };
+    } else { // /positions/:posInd
       this.position = positionState['positions'] ? positionState['positions'][+this.currUrl[1]] : null;
+      this.companyId = { _id: this.position.company._id, name: this.position.company.name };
     }
+    this.allowedApplySave();
+  }
+
+  private allowedApplySave() {
+    this.allowApply = this.user._id !== this.companyId._id && this.kind !== 'company';
+    if (this.allowApply) {
+      const userPositionInfo = (this.user.positions as Employee['positions'])
+                      .find(pos => pos.position._id === this.position._id);
+      if (userPositionInfo) {
+        this.status = userPositionInfo.status.toString();
+      }
+    }
+  }
+
+  onApplySave(status: string) {
+    if (this.currUrl[0] === 'companies') {
+      this.store.dispatch(new CompanyActions.CompanyStateLoadSingle());
+    } else if (this.currUrl[0] === 'positions') {
+      this.store.dispatch(new PositionActions.PositionStateLoadSingle());
+    }
+    this.store.dispatch(new UserActions.EmployeeApplySavePositionAttempt({
+      positionId: this.position._id, status, companyId: this.companyId._id, state: this.currUrl[0]
+    }));
   }
 
   private invalidStateListInd(currState, list) {
@@ -123,23 +177,29 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
   }
 
   onClose() {
+    this.messages = [];
+    if (this.fetchedCompany) { return; } // in that case the effect of the apply op will handle the errors
     if (this.currUrl[0] === 'companies') {
-      // the only errors that can be catched here are of a company
-      // the others will be catched in a different/prev component
-      // due to the flow of the program
       this.store.dispatch(new CompanyActions.ClearError());
-      this.errorMessages = [];
+    } else if (this.currUrl[0] === 'positions') {
+      this.store.dispatch(new PositionActions.ClearError());
+    } else {
+      this.store.dispatch(new UserActions.ClearError());
     }
   }
 
   getCompanyinfo() {
-    if (this.currUrl.length === 2 && this.currUrl[0] === 'positions' && (!this.position.companyId.lastFetch ||
-        new Date().getTime() - this.position.companyId.lastFetch.getTime() > environment.fetchDataMSReset )) {
+    if (this.currUrl.length === 2 && this.currUrl[0] === 'positions' &&
+          (!this.position.company.lastFetch || environment.fetchDataMSReset <
+        new Date().getTime() - this.position.company.lastFetch.getTime())) {
+
       this.store.dispatch(new PositionActions.UpdateSinglePositionCompanyAttempt());
       this.store.dispatch(new CompanyActions.FetchSingleCompany({
-        _id: this.position.companyId._id, main: false, posInd: +this.currUrl[1]
+        _id: this.position.company._id, main: false, posInd: +this.currUrl[1]
       }));
+      this.fetchedCompany = true;
     }
   }
 
 }
+

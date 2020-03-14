@@ -26,6 +26,7 @@ const initialState: State = {
 export function positionReducer(state = initialState, action: PositionActions.PositionActions) {
   switch (action.type) {
     case PositionActions.CREATE_POSITION_IN_DB:
+    case PositionActions.POSITION_STATE_LOAD_SINGLE:
       return {
         ...state,
         loadingAll: false,
@@ -40,7 +41,7 @@ export function positionReducer(state = initialState, action: PositionActions.Po
     case PositionActions.UPDATE_SINGLE_POSITION_COMPANY_ATTEMPT:
       return {
         ...state,
-        loadingSingle: true,
+        loadingSingle: true
       };
     case PositionActions.CLEAR_ERROR:
       return {
@@ -76,26 +77,26 @@ export function positionReducer(state = initialState, action: PositionActions.Po
       };
     case PositionActions.UPDATE_SINGLE_POSITION_COMPANY:
       action.payload.company.lastFetch = new Date();
-      const upToDatePos = {
+      const posWithCompany = {
         ...state.positions[action.payload.posInd],
-        companyId: action.payload.company
+        company: action.payload.company
       };
       const upToDatePositions = [ ...state.positions ];
-      upToDatePositions[action.payload.posInd] = upToDatePos;
+      upToDatePositions[action.payload.posInd] = posWithCompany;
       return {
         ...state,
         messages: null,
         loadingSingle: false,
         positions: upToDatePositions
       };
-    case PositionActions.UPDATE_SINGLE_POSITION:
-      const index = state.positions.findIndex(pos => pos._id === action.payload.position._id);
+    case PositionActions.ADD_UPDATE_SINGLE_POSITION:
+      const posInd = state.positions.findIndex(pos => pos._id === action.payload.position._id);
       const updatedPositions = [...state.positions];
       const updatedPosition = {
           ...action.payload.position
         };
-      if (index > -1) {
-        updatedPositions[index] = updatedPosition;
+      if (posInd > -1) {
+        updatedPositions[posInd] = updatedPosition;
       } else {
         updatedPositions.push(updatedPosition);
       }

@@ -18,7 +18,7 @@ export class ListCompaniesComponent implements OnInit, OnDestroy {
   subscription: Subscription;
   activeEmployee: Employee;
   isLoading = false;
-  errorMessages: string[] = [];
+  messages: string[] = [];
   currUrl: string[] = null;
 
   constructor(private store: Store<fromApp.AppState>,
@@ -32,12 +32,12 @@ export class ListCompaniesComponent implements OnInit, OnDestroy {
         this.isLoading = companyState.loadingAll;
         if (this.currUrl[this.currUrl.length - 1] === 'companies') {
           if (companyState.messages) {
-            this.errorMessages = [];
+            this.messages = [];
             for (const msg of companyState.messages) {
-              this.errorMessages.push(msg);
+              this.messages.push(msg);
             }
           } else {
-            this.errorMessages = [];
+            this.messages = [];
           }
         }
         this.companies = companyState.companies;

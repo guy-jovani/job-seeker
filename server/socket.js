@@ -30,7 +30,6 @@ exports.socketHandler = (socket) => {
 
   socket.on('postAMsg', async data => {
     try {
-      console.log(data)
       const conversations = await chatController.postMessage(
         data.privateMsg, data.recipients, data.content, data.senderId, data.senderType
         )
@@ -38,7 +37,7 @@ exports.socketHandler = (socket) => {
           const [message, conversation, newCon] = con;
           Reflect.deleteProperty(conversation, 'messages');
           conversation.participants.forEach(participant => {
-            if (socketUserId === participant.user._id.toString() && newCon) return;
+            if (socketUserId === participant.user._id.toString() && !newCon) return;
             io.to(participant.user._id).emit('posted', { 
               message, conversation, type: 'success'
             } );

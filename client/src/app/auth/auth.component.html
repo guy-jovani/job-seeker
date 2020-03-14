@@ -1,6 +1,6 @@
 
 <div class="container">
-  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
+  <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
   <h4>{{ authAction !== 'login' ? "Signup" : "Login"}}</h4>
   <div *ngIf="isLoading" style="text-align: center;">
     <app-loading-spinner></app-loading-spinner>

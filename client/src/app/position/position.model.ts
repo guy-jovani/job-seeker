@@ -12,7 +12,7 @@ export class Position {
   public _id: string; // the underscore is because the database named it like that
   public description: string;
   public title: string;
-  public companyId: Company;
+  public company: Partial<Company>;
   public requirements?: { requirement: string }[];
   public lastFetch: Date;
 

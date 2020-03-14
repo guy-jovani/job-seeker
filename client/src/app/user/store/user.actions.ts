@@ -9,8 +9,8 @@ import { Position } from '../../position/position.model';
 
 
 export const UPDATE_ACTIVE_USER = '[User] UPDATE_ACTIVE_USER';
-export const ADD_POSITION_TO_USER = '[User] ADD_POSITION_TO_USER';
-export const UPDATE_POSITION_OF_USER = '[User] UPDATE_POSITION_OF_USER';
+export const COMPANY_CREATED_POSITION = '[User] COMPANY_CREATED_POSITION';
+export const COMPANY_UPDATED_POSITION = '[User] COMPANY_UPDATED_POSITION';
 export const LOGOUT = '[User] LOGOUT';
 export const USER_FAILURE = '[User] USER_FAILURE';
 export const CLEAR_ERROR = '[User] CLEAR_ERROR';
@@ -19,6 +19,8 @@ export const SET_ALL_CONVERSATIONS = '[User] SET_ALL_CONVERSATIONS';
 export const SET_SINGLE_CONVERSATION = '[User] SET_SINGLE_CONVERSATION';
 export const SET_CHAT_NOTIFICATION = '[User] SET_CHAT_NOTIFICATION';
 export const REMOVE_CHAT_NOTIFICATION = '[User] REMOVE_CHAT_NOTIFICATION';
+export const EMPLOYEE_APPLY_SAVE_POSITION_ATTEMPT = '[User] EMPLOYEE_APPLY_SAVE_POSITION_ATTEMPT';
+export const COMPANY_ACCEPT_REJECT_POSITION_ATTEMPT = '[User] COMPANY_ACCEPT_REJECT_POSITION_ATTEMPT';
 
 
 export type UserActions = SetChatNotification
@@ -26,9 +28,11 @@ export type UserActions = SetChatNotification
                         | RemoveChatNotification
                         | SetAllConversations
                         | FetchAllConversations
-                        | UpdatePositionOfUser
+                        | CompanyUpdatedPosition
                         | ClearError
-                        | AddPositionToUser
+                        | EmployeeApplySavePositionAttempt
+                        | CompanyAcceptRejectPositionAttempt
+                        | CompanyCreatedPosition
                         | Logout
                         | UserFailure
                         | UpdateActiveUser;
@@ -36,6 +40,18 @@ export type UserActions = SetChatNotification
 
 export class FetchAllConversations implements Action {
   readonly type = FETCH_ALL_CONVERSATIONS;
+}
+
+export class EmployeeApplySavePositionAttempt implements Action {
+  readonly type = EMPLOYEE_APPLY_SAVE_POSITION_ATTEMPT;
+
+  constructor(public payload: { positionId: string, status: string, companyId: string, state: string, }) {}
+}
+
+export class CompanyAcceptRejectPositionAttempt implements Action {
+  readonly type = COMPANY_ACCEPT_REJECT_POSITION_ATTEMPT;
+
+  constructor(public payload: { positionId: string, status: string, employeeId: string, state: string }) {}
 }
 
 export class UserFailure implements Action {
@@ -67,17 +83,17 @@ export class SetSingleConversation implements Action {
 export class UpdateActiveUser implements Action {
   readonly type = UPDATE_ACTIVE_USER;
 
-  constructor(public payload: { user: Employee | Company, kind: string, redirect?: boolean }) {}
+  constructor(public payload: { user: Employee | Company, kind: string, redirect?: string }) {}
 }
 
-export class AddPositionToUser implements Action {
-  readonly type = ADD_POSITION_TO_USER;
+export class CompanyCreatedPosition implements Action {
+  readonly type = COMPANY_CREATED_POSITION;
 
   constructor(public payload: Position) {}
 }
 
-export class UpdatePositionOfUser implements Action {
-  readonly type = UPDATE_POSITION_OF_USER;
+export class CompanyUpdatedPosition implements Action {
+  readonly type = COMPANY_UPDATED_POSITION;
 
   constructor(public payload: Position) {}
 }

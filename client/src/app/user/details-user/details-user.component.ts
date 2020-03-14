@@ -12,9 +12,6 @@ import * as fromApp from '../../store/app.reducer';
 export class DetailsUserComponent implements OnInit, OnDestroy {
   userEmployee: boolean;
   authSubscription: Subscription;
-  employeeErrors = false;
-  companyErrors = false;
-  authErrors = false;
 
   constructor(private store: Store<fromApp.AppState>) { }
 

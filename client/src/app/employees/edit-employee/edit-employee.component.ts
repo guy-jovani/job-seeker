@@ -21,7 +21,7 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
   employeeForm: FormGroup;
   employee: Employee;
   showPasswords = false;
-  errorMessages: string[] = [];
+  messages: string[] = [];
   currUrl: string[] = null;
 
   constructor(
@@ -52,12 +52,12 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
           this.isLoading = employeeState.loadingSingle;
           if (this.currUrl[this.currUrl.length - 1] === 'edit') {
             if (employeeState.messages) {
-              this.errorMessages = [];
+              this.messages = [];
               for (const msg of employeeState.messages) {
-                this.errorMessages.push(msg);
+                this.messages.push(msg);
               }
             } else {
-              this.errorMessages = [];
+              this.messages = [];
             }
           }
           if (this.employee) {

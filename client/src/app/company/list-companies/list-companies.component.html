@@ -6,10 +6,10 @@
     <app-loading-spinner></app-loading-spinner>
   </div>
   <div *ngIf="!isLoading" class="container-fluid">
-    <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
-    <!-- <app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert> -->
+    <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
+    <!-- <app-alert *ngIf="messages.length" [messages]="messages" (closeAlert)="onClose()"></app-alert> -->
     <h3>Compenies</h3>
-    <ul class="list-group" *ngIf="companies.length && !errorMessages.length">
+    <ul class="list-group" *ngIf="companies.length && !messages.length">
       <li
       class="list-group-item"
       *ngFor="let company of companies; let i=index">
@@ -19,7 +19,7 @@
       </a>
     </li>
   </ul>
-  <p *ngIf="!companies.length && !errorMessages.length">There are no registers companies</p>
+  <p *ngIf="!companies.length && !messages.length">There are no registers companies</p>
   </div>
 </div>
 

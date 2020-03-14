@@ -13,13 +13,13 @@ const positionSchema = new Schema(
       required: true
     },
     requirements: [{
-      requirement: { type: String, required: false },
+      requirement: { type: String, required: true },
     }],
-    companyId: {
+    company: {
       type: Schema.Types.ObjectId, 
       ref: 'Company',
       required: true
-    },
+    }
   }
 );
 

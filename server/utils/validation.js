@@ -7,10 +7,8 @@ const Position = require('../models/position');
 
 
 exports.userEmailExistValidation = async (email, _id = null) => {
-  console.log(email, _id)
   const employee = await Employee.findOne({ _id: { $ne: _id }, email: email });
   const company = await Company.findOne({ _id: { $ne: _id }, email: email });
-  console.log(employee, company)
   if(employee || company){
     return {
       messages: ['This email address is already in use, please provide a different one'],
@@ -41,7 +39,9 @@ exports.handleValidationRoutesErrors = ( req ) => {
   const reqErrors = validationResult(req);
   if(!reqErrors.isEmpty()){
     let messages = reqErrors.errors.reduce((prev, curr) => {
-      prev.push(curr['msg']);
+      if(!prev.includes(curr['msg'])) {
+        prev.push(curr['msg']);
+      }
       return prev;
     }, []);
     return {

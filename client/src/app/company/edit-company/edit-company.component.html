@@ -1,7 +1,7 @@
 
 <div class="container">
-  <!-- <app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert> -->
-  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
+  <!-- <app-alert *ngIf="messages.length" [messages]="messages" (closeAlert)="onClose()"></app-alert> -->
+  <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
   <h4>Edit</h4>
   <div *ngIf="isLoading">
     <app-loading-spinner></app-loading-spinner>
@@ -172,7 +172,7 @@
 
 <!--
 
-<app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (close)="onClose()"></app-alert>
+<app-alert *ngIf="messages.length" [messages]="messages" (close)="onClose()"></app-alert>
 <div class="container">
   <h4>{{ !this.company ? 'Register' : 'Edit' }}</h4>
   <form (ngSubmit)="onSubmit(companyForm)" #companyForm="ngForm">

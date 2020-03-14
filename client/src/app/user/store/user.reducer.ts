@@ -4,12 +4,13 @@ import { Employee } from 'app/employees/employee.model';
 import * as UserActions from './user.actions';
 import { Company } from 'app/company/company.model';
 import { Conversation } from 'app/chat/conversation.model';
+import { Position } from 'app/position/position.model';
 
 
 
 export interface State {
   user: Employee | Company;
-  messages: any[];
+  messages: string[];
   loading: boolean;
   kind: string;
   notificatios: string[];
@@ -29,6 +30,8 @@ export function userReducer(state = initialState, action: UserActions.UserAction
   // console.log("auth reducer " + action.type),
   switch (action.type) {
     case UserActions.FETCH_ALL_CONVERSATIONS:
+    case UserActions.EMPLOYEE_APPLY_SAVE_POSITION_ATTEMPT:
+    case UserActions.COMPANY_ACCEPT_REJECT_POSITION_ATTEMPT:
       return {
         ...state,
         messages: null,
@@ -66,11 +69,9 @@ export function userReducer(state = initialState, action: UserActions.UserAction
 
       const oldConId = state.conversations ? state.conversations.findIndex(con => con._id === newConId) : -1;
       const updatedCons = state.conversations ? [...state.conversations] : [];
-
       if (oldConId === -1) { // a new conversation
         action.payload.conversation.messages = [action.payload.message];
         updatedCons.push(action.payload.conversation);
-
       } else { // added message to an existing conversation
         const newMsg = action.payload.message;
         newMsg.createdAt = new Date(newMsg.createdAt);
@@ -90,28 +91,28 @@ export function userReducer(state = initialState, action: UserActions.UserAction
         loading: false,
         conversations: updatedCons
       };
-    case UserActions.ADD_POSITION_TO_USER:
-      const updatedPositions = [ ...state.user.positions, action.payload ];
+    case UserActions.COMPANY_CREATED_POSITION: // ONLY FOR A COMPANY - ON CREATE POSITION
+      const updatedPositions: Position[] = [ ...(state.user as Company).positions, action.payload ];
       const updatedUser = {
-        ...state.user,
-        messages: null,
+        ...(state.user as Company),
         positions: updatedPositions
       };
       return {
         ...state,
+        messages: null,
         user: updatedUser,
       };
-    case UserActions.UPDATE_POSITION_OF_USER:
-      const positions = [...state.user.positions];
-      const posInd = state.user.positions.findIndex(pos => pos._id === action.payload._id);
-      positions[posInd] = action.payload;
-      const upToDateUser = {
-        ...state.user,
-        messages: null,
+    case UserActions.COMPANY_UPDATED_POSITION: // ONLY FOR A COMPANY - ON UPDATE POSITION
+      const positions = [ ...(state.user as Company).positions ];
+      const posInd = (state.user as Company).positions.findIndex(pos => pos._id === action.payload._id);
+      positions[posInd] = { ...positions[posInd], ...action.payload };
+      const upToDateUser: Company = {
+        ...(state.user as Company),
         positions
       };
       return {
         ...state,
+        messages: null,
         user: upToDateUser,
       };
     case UserActions.USER_FAILURE:
@@ -126,7 +127,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
         loading: false,
         messages: null,
         kind: action.payload.kind,
-        user: action.payload.user
+        user: action.payload.kind === 'employee' ? action.payload.user as Employee : action.payload.user as Company
       };
     case UserActions.CLEAR_ERROR:
       return {

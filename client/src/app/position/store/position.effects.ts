@@ -32,7 +32,7 @@ export class PositionEffects {
         map(res => {
           if (res['type'] === 'success') {
             this.store.dispatch(new PositionActions.ClearError());
-            return new UserActions.AddPositionToUser(res['position']);
+            return new UserActions.CompanyCreatedPosition(res['position']);
           } else {
             return new PositionActions.PositionOpFailure(res['messages']);
           }
@@ -52,7 +52,8 @@ export class PositionEffects {
       .pipe(
         map(res => {
           if (res['type'] === 'success') {
-            return new UserActions.UpdatePositionOfUser(res['position']);
+            this.store.dispatch(new PositionActions.ClearError());
+            return new UserActions.CompanyUpdatedPosition(res['position']);
           } else {
             return new PositionActions.PositionOpFailure(res['messages']);
           }
@@ -74,7 +75,7 @@ export class PositionEffects {
       .pipe(
         map(res => {
           if (res['type'] === 'success') {
-            return new PositionActions.UpdateSinglePosition({ position: res['position'], main: actionData.payload.main });
+            return new PositionActions.AddUpdateSinglePosition({ position: res['position'], main: actionData.payload.main });
           } else {
             return new PositionActions.PositionOpFailure(res['messages']);
           }

@@ -60,8 +60,8 @@ exports.signup = async (req, res, next) => {
     const token = getToken(user._id);
     user = user.toObject();
     Reflect.deleteProperty(user, 'password');
-    Reflect.set(user, 'positions', user['positionsIds']);
-    Reflect.deleteProperty(user, 'positionsIds');
+    // Reflect.set(user, 'positions', user['positionsIds']);
+    // Reflect.deleteProperty(user, 'positionsIds');
     res.status(201).json({
       message: 'Signed up successfully!',
       type: 'success',
@@ -77,12 +77,18 @@ exports.signup = async (req, res, next) => {
 };
 
 getUserLogin = async (req, res) => {
-  let user = await Employee.findOne({email: req.body.email}).select('-__v').populate('positionsIds');
+  let user = await Employee.findOne({email: req.body.email}).select('-__v')
+                            .populate({
+                              path: 'positions.position', 
+                              populate: { path: 'company', select: 'name' }
+                            });
   let kind = "employee";
   if(!user) {
     user = await Company.findOne({email: req.body.email}).select(
                   '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration'
-                ).populate('positionsIds');
+                ).populate('positions');
+    user = await Company.populate(user, { path: 'applicants.employee', select: '-__v -password'});
+    user = await Company.populate(user, { path: 'applicants.positions.position', select: 'title'});
     kind = "company";
   }
   if(!user){ 
@@ -107,8 +113,8 @@ exports.login = async (req, res, next) => {
     
     user = user.toObject();
     Reflect.deleteProperty(user, 'password');
-    Reflect.set(user, 'positions', user['positionsIds']);
-    Reflect.deleteProperty(user, 'positionsIds');
+    // Reflect.set(user, 'positions', user['positionsIds']);
+    // Reflect.deleteProperty(user, 'positionsIds');
     const token = getToken(user._id);
     res.status(200).json({
       message: 'Logged in successfully!',

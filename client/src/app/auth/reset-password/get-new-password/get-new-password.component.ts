@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -13,11 +13,11 @@ import { switchMap } from 'rxjs/operators';
   templateUrl: './get-new-password.component.html',
   styleUrls: ['./get-new-password.component.css']
 })
-export class GetNewPasswordComponent implements OnInit {
+export class GetNewPasswordComponent implements OnInit, OnDestroy {
   showPasswords = false;
   authForm: FormGroup;
   subscription: Subscription;
-  errorMessages: string[] = [];
+  messages: string[] = [];
   isLoading = false;
   token: string;
 
@@ -33,26 +33,26 @@ export class GetNewPasswordComponent implements OnInit {
     )
     .subscribe(authState => {
       this.isLoading = authState.loading;
-      if(authState.messages){
-        for(let msg of authState.messages){
-          this.errorMessages.push(msg)
+      if (authState.messages) {
+        for (const msg of authState.messages) {
+          this.messages.push(msg);
         }
       } else {
-        this.errorMessages = [];
+        this.messages = [];
       }
     });
 
     this.authForm = new FormGroup({
-      'passwords': new FormGroup({
-        'password': new FormControl(null, [Validators.required, Validators.minLength(3)]),
-        'confirmPassword': new FormControl(null, [Validators.required])
+      passwords: new FormGroup({
+        password: new FormControl(null, [Validators.required, Validators.minLength(3)]),
+        confirmPassword: new FormControl(null, [Validators.required])
       }, this.checkPasswordEquality)
     });
   }
 
-  checkPasswordEquality(control: FormControl) : {[s: string] : boolean}{
-    if(control.get('password').value !== control.get('confirmPassword').value){
-      return { equality: true }
+  checkPasswordEquality(control: FormControl): {[s: string]: boolean} {
+    if (control.get('password').value !== control.get('confirmPassword').value) {
+      return { equality: true };
     }
     return null;
   }
@@ -63,7 +63,7 @@ export class GetNewPasswordComponent implements OnInit {
     this.store.dispatch(new AuthActions.ResetPassAttempt({ password, confirmPassword, token: this.token }));
   }
 
-  onTogglePasswords(){
+  onTogglePasswords() {
     this.showPasswords = !this.showPasswords;
   }
 

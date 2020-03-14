@@ -11,15 +11,18 @@
 </div>
 
 <div class="container-fluid" *ngIf="!isLoading">
-  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
-  <ul class="list-group" *ngIf="employees.length && !errorMessages.length">
-    <li
-      class="list-group-item"
-      *ngFor="let employee of employees; let i=index">
-      <a routerLink='{{i}}'>
-        <p>Employee Email: {{ employee.email }}</p>
-      </a>
-    </li>
-  </ul>
-  <p *ngIf="!employees.length && !errorMessages.length">There are no registers employees</p>
+  <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
+  <div>
+    <ul class="list-group" *ngIf="employees.length && !messages.length">
+      <li
+        class="list-group-item"
+        *ngFor="let employee of employees; let i=index">
+        <a routerLink='{{i}}' class="employee-link">
+          <p>{{ employee.email ? employee.email : employee.employee.email }}</p>
+          <p class="employee-positions" *ngIf="currUrl[0] === 'my-applicants'">Positions: {{ employee.positions.length }}</p>
+        </a>
+      </li>
+    </ul>
+    <p *ngIf="!employees.length && !messages.length">There are no registers employees</p>
+  </div>
 </div>

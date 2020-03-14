@@ -21,20 +21,22 @@ import { Company } from 'app/company/company.model';
 export class HeaderComponent implements OnInit, OnDestroy {
   collapsed = true;
   isAuthenticated = false;
-  checkAuthSub: Subscription;
+  subscription: Subscription;
   user: Employee | Company = null;
   chatNotifications = false;
+  kind: string;
 
   constructor(private store: Store<fromApp.AppState>) { }
 
   ngOnInit() {
-    this.checkAuthSub = this.store.select('user')
-      .subscribe(authState => {
-        this.isAuthenticated = !!authState.user;
+    this.subscription = this.store.select('user')
+      .subscribe(userState => {
+        this.isAuthenticated = !!userState.user;
         if (this.isAuthenticated) {
-          this.user = authState.user;
+          this.user = userState.user;
+          this.kind = userState.kind;
         }
-        this.chatNotifications = !!authState.notificatios.find(notification => notification === 'chat');
+        this.chatNotifications = !!userState.notificatios.find(notification => notification === 'chat');
       });
   }
 
@@ -64,8 +66,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.checkAuthSub) {
-      this.checkAuthSub.unsubscribe();
+    if (this.subscription) {
+      this.subscription.unsubscribe();
     }
   }
 

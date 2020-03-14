@@ -6,7 +6,7 @@
 
 
 
-<app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert>
+<app-alert *ngIf="messages.length" [messages]="messages" (closeAlert)="onClose()"></app-alert>
 <input type="text" class="search-bar" placeholder="{{placeholder}}" (input)="onSearchChange($event.target.value)" (focus)="onSearchChange($event.target.value)" #searchInput>
 
 <ul class="list-results hide" #listResults>

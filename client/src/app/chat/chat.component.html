@@ -2,7 +2,7 @@
 
 
 
-<app-alert *ngIf="errorMessages.length" [messages]="errorMessages" (closeAlert)="onClose()"></app-alert>
+<app-alert *ngIf="messages.length" [messages]="messages" (closeAlert)="onClose()"></app-alert>
 <div class="chat-container">
 
   <div class="side-menu">
@@ -88,10 +88,10 @@
     <div class="messages">
       <ul class='messages__list' appScrollToBottom>
         <li *ngFor="let msg of currConversation.messages"
-              class="{{ msg.creator === user._id ? 'messages__list__item user-msg' : 'messages__list__item' }}" [attr.data-date]=" msg.first ? msg.first: ''">
+              class="{{ msg.creator === user._id ? 'messages__list__item user-msg' : 'messages__list__item' }}" [attr.data-date]=" msg['first'] ? msg['first']: ''">
           <p *ngIf="msg.creator !== user._id && currConversation.participants.length > 1" class="message message-name" [style.color]="nameList.get(msg.creator).nameColor['changingThisBreaksApplicationSecurity']">
             {{ nameList.get(msg.creator) ? nameList.get(msg.creator).fullName : getFullName(user) }}</p>
-          <p class="message message-content">{{ msg.content }}<span class="message-time">{{ msg.hours }}:{{ msg.minutes }}</span></p>
+          <p class="message message-content">{{ msg.content }}<span class="message-time">{{ msg['hours'] }}:{{ msg['minutes'] }}</span></p>
         </li>
       </ul>
     </div>

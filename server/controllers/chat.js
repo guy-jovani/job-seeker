@@ -60,12 +60,11 @@ const createUpdateConversation = async (recipients, content, senderId, senderTyp
   // 1. check if conversation exists
   let conversation = await checkIfConExists(participantsIds);
   let newCon = true;
-
   if (conversation.length) { // 2. if exists - just update with new message
     conversation = conversation[0]; // only one conversation should be found
+    newCon = false;
   } else { // 3. doesn't exists - create conversation
     conversation = await Conversation.create({participants: participants, onModel: senderType});
-    newCon = false;
   }
   const message = await addMessageToConversation(conversation, content, senderId, senderType);
   conversation = await populateConversationParticipants(conversation);

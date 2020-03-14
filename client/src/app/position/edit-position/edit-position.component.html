@@ -1,6 +1,6 @@
 
 <div class="container">
-  <app-message-box *ngIf="errorMessages.length" [messages]="errorMessages" (closeMessages)="onClose()"></app-message-box>
+  <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
   <h4>{{ index >= 0 ? 'Update' : 'Create' }}</h4>
   <div *ngIf="isLoading">
     <app-loading-spinner></app-loading-spinner>

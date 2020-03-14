@@ -91,8 +91,6 @@ export class CompanyEffects {
       })
       .pipe(
         map(res => {
-          // this.store.dispatch(new PositionActions.ClearError());
-          // this.store.dispatch(new CompanyActions.ClearError());
           if (res['type'] === 'success') {
             if (actionData.payload.main) {
               return new CompanyActions.UpdateSingleCompany({company: res['company'], main: actionData.payload.main });
@@ -100,9 +98,6 @@ export class CompanyEffects {
               this.store.dispatch(new CompanyActions.ClearError());
               return new PositionActions.UpdateSinglePositionCompany({company: res['company'], posInd: actionData.payload.posInd });
             }
-            // return actionData.payload.main ?
-            //       new CompanyActions.UpdateSingleCompany({company: res['company'], main: actionData.payload.main }) :
-            //       new PositionActions.UpdateSinglePositionCompany({company: res['company'], posInd: actionData.payload.posInd });
           } else {
             if (actionData.payload.main) {
               return new CompanyActions.CompanyOpFailure(res['messages']);
@@ -110,9 +105,6 @@ export class CompanyEffects {
               this.store.dispatch(new CompanyActions.ClearError());
               return new PositionActions.PositionOpFailure(res['messages']);
             }
-            // return actionData.payload.main ?
-            //       new CompanyActions.CompanyOpFailure(res['messages']) :
-            //       new PositionActions.PositionOpFailure(res['messages']);
           }
         }),
         catchError(messages => {
@@ -122,9 +114,6 @@ export class CompanyEffects {
             this.store.dispatch(new CompanyActions.ClearError());
             return of(new PositionActions.PositionOpFailure(messages));
           }
-          // return actionData.payload.main ?
-          //         of(new CompanyActions.CompanyOpFailure(messages)) :
-          //         of(new PositionActions.PositionOpFailure(messages));
         })
       );
     })

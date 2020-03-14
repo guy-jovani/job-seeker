@@ -7,7 +7,7 @@ const router = express.Router();
 const positionController = require('../controllers/positions');
 
 router.put('/create', [
-    body('companyId')
+    body('company')
       .exists()
       .not()
       .isEmpty()
@@ -52,7 +52,7 @@ router.post('/update', [
     .not()
     .isEmpty()
     .withMessage('there was an error updating the position'),
-  body('companyId')
+  body('company')
     .exists()
     .not()
     .isEmpty()

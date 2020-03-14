@@ -17,19 +17,23 @@ exports.create = async (req, res, next) => {
       return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
     }
     const titleExist = await validation.positionTitleExistForCompanyValidation(
-      req.body.title, req.body.companyId, req.body._id );
+      req.body.title, req.body.company._id, req.body._id );
     if(titleExist.type === 'failure'){
       return sendMessagesResponse(res, 422, titleExist.messages, 'failure');
     }
     let position = new Position({ 
       title: req.body.title, description: req.body.description, 
-      companyId: req.body.companyId, requirements: req.body.requirements });
+      company: req.body.company._id, requirements: req.body.requirements });
 
     position = await position.save();
     await Company.findOneAndUpdate(
-      { _id: req.body.companyId }, 
-      { $push: {'positionsIds' : position._id }
-    });  
+      { _id: req.body.company._id }, 
+      { $push: {'positions' : position._id } },
+      {new: true}
+    );
+    
+    position = await Position.populate(position, { path: 'company', select: 'name' } );
+    Reflect.deleteProperty(position, '__v');
     res.status(200).json({
       type: 'success',
       position
@@ -46,7 +50,7 @@ exports.updatePosition = async (req, res, next) => {
       return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
     }
     const titleExist = await validation.positionTitleExistForCompanyValidation(
-      req.body.title, req.body.companyId, req.body._id );
+      req.body.title, req.body.company._id, req.body._id );
     if(titleExist.type === 'failure'){
       return sendMessagesResponse(res, 422, titleExist.messages, 'failure');
     }
@@ -67,7 +71,7 @@ exports.updatePosition = async (req, res, next) => {
 exports.fetchSingle = async (req, res, next) => {
   try {throw "111"
     const position = await Position.findById({ _id: req.query._id} ).select('-__v')
-                .populate({path: 'companyId', select: '_id name'});
+                .populate({path: 'company', select: '_id name'});
     res.status(200).json({
       type: 'success',
       position
@@ -80,11 +84,8 @@ exports.fetchSingle = async (req, res, next) => {
 exports.fetchAll = async (req, res, next) => {
   try {
     const positions = await Position.find()
-        .select('_id title companyId description requirements')
-        .populate({
-                path: 'companyId', 
-                select: '_id name' 
-        });
+        .select('_id title company description requirements')
+        .populate({ path: 'company', select: '_id name' });
     res.status(200).json({
       type: 'success',
       positions

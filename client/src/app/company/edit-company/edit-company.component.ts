@@ -22,7 +22,7 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
   companyForm: FormGroup;
   isLoading = false;
   showPasswords = false;
-  errorMessages: string[] = [];
+  messages: string[] = [];
   currUrl: string[] = null;
 
   constructor(
@@ -55,12 +55,12 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
         this.isLoading = companyState.loadingSingle;
         if (this.currUrl[this.currUrl.length - 1] === 'edit') {
           if (companyState.messages) {
-            this.errorMessages = [];
+            this.messages = [];
             for (const msg of companyState.messages) {
-              this.errorMessages.push(msg);
+              this.messages.push(msg);
             }
           } else {
-            this.errorMessages = [];
+            this.messages = [];
           }
         }
         if (this.company) {

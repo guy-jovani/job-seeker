@@ -8,6 +8,7 @@ import { Company } from '../company.model';
 import * as fromApp from '../../store/app.reducer';
 import { Store } from '@ngrx/store';
 import { switchMap } from 'rxjs/operators';
+import { Position } from 'app/position/position.model';
 
 @Component({
   selector: 'app-details-company',
@@ -20,7 +21,8 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy  {
   allowEdit: boolean;
   isLoading = false;
   currUrl: string[] = null;
-  errorMessages: string[] = [];
+  messages: string[] = [];
+  companyPositions: Position[] = null;
 
   constructor(private store: Store<fromApp.AppState>,
               private route: ActivatedRoute,
@@ -43,12 +45,12 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy  {
         this.currUrl = this.router.url.substring(1).split('/');
         this.isLoading = currState['loadingSingle'];
         if (currState.messages) {
-          this.errorMessages = [];
+          this.messages = [];
           for (const msg of currState.messages) {
-            this.errorMessages.push(msg);
+            this.messages.push(msg);
           }
         } else {
-          this.errorMessages = [];
+          this.messages = [];
         }
         if (this.currUrl[0] === 'my-details') {
           this.company = currState['user'] as Company;
@@ -57,16 +59,14 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy  {
           if (this.invalidStateListInd(currState, 'companies')) { return; }
           this.company = currState['companies'][+this.currUrl[1]];
           this.allowEdit = false;
-        } else { // positions
+        } else { // /positions:posInd/company
           if (this.invalidStateListInd(currState, 'positions')) { return; }
-          if (this.currUrl.length !== 3 || this.currUrl[this.currUrl.length - 1] !== 'company') {
-            this.router.navigate([this.currUrl[0]]);
-          }
           this.allowEdit = false;
-          this.company = !currState['positions'] ? null : currState['positions'][+this.currUrl[1]]['companyId'];
+          this.company = !currState['positions'] ? null : currState['positions'][+this.currUrl[1]]['company'];
           if (!this.company.email) {
-            this.errorMessages = ['There was an error fetching the company'];
+            this.messages = ['There was an error fetching the company'];
           }
+          this.companyPositions = this.company.positions;
         }
         // this.ref.detectChanges();
         // this.ref.markForCheck();
@@ -79,7 +79,7 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy  {
     } else {
       this.store.dispatch(new PositionActions.ClearError());
     }
-    this.errorMessages = [];
+    this.messages = [];
   }
 
   private invalidStateListInd(currState, list) {
