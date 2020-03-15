@@ -14,8 +14,7 @@
     <label for="position-list">Choose status list:</label>
     <select [(ngModel)]="selectedList" (ngModelChange)="checkPositionOfUser()">
       <option value="all">All</option>
-      <option value="saved">Saved</option>
-      <option value="applied">Applied</option>
+      <option *ngFor="let status of availableStatus" value="{{status}}">{{ status | titlecase }}</option>
     </select>
   </div>
   <div *ngIf="!isLoading">

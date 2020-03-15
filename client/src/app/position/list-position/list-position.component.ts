@@ -7,7 +7,7 @@ import * as PositionActions from '../store/position.actions';
 import * as fromApp from '../../store/app.reducer';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { Employee } from 'app/employees/employee.model';
+import { Employee, EmployeePositionStatus } from 'app/employees/employee.model';
 import { Company } from 'app/company/company.model';
 import { State as UserState } from 'app/user/store/user.reducer';
 
@@ -28,6 +28,7 @@ export class ListPositionComponent implements OnInit, OnDestroy {
   messages: string[] = [];
   selectedList = 'all';
   detailsPositionUrl = '';
+  availableStatus = Object.keys(EmployeePositionStatus).filter(key => isNaN(+key));
   @Input() companyPositions: Position[] = null;
 
   constructor(

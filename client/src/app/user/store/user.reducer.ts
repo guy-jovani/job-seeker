@@ -27,14 +27,13 @@ const initialState: State = {
 };
 
 export function userReducer(state = initialState, action: UserActions.UserActions) {
-  // console.log("auth reducer " + action.type),
+  // console.log("auth reducer " + action.type)
   switch (action.type) {
     case UserActions.FETCH_ALL_CONVERSATIONS:
     case UserActions.EMPLOYEE_APPLY_SAVE_POSITION_ATTEMPT:
     case UserActions.COMPANY_ACCEPT_REJECT_POSITION_ATTEMPT:
       return {
         ...state,
-        messages: null,
         loading: true,
       };
     case UserActions.SET_CHAT_NOTIFICATION:

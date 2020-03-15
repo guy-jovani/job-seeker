@@ -12,6 +12,7 @@ import { switchMap } from 'rxjs/operators';
 import { environment } from 'environments/environment';
 import { Employee } from 'app/employees/employee.model';
 import { Company } from 'app/company/company.model';
+import { ChatService } from 'app/chat/chat-socket.service';
 
 
 
@@ -32,6 +33,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
   allowApply: boolean;
   status: string = null;
   kind: string = null;
+  closedErrors = false;
   fetchedCompany = false;
   companyId: {_id: string, name: string} = null;
 
@@ -40,6 +42,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<fromApp.AppState>,
     private route: ActivatedRoute,
+    private chatService: ChatService,
     private router: Router) { }
 
   ngOnInit() {
@@ -64,6 +67,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
           for (const msg of currState.messages) {
             this.messages.push(msg);
           }
+          this.closedErrors = false;
         } else {
           this.messages = [];
         }
@@ -109,7 +113,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
     this.position = !companyState['companies'] ? null :
     companyState['companies'][+this.currUrl[1]]['positions'][window.history.state['positionInd']];
     if (!this.position) {
-      this.messages = ['There was a problem fetching the position.'];
+      this.messages = !this.closedErrors ? ['There was a problem fetching the position.'] : [];
     } else {
       this.companyId = { _id: this.position.company._id, name: this.position.company.name };
       this.allowedApplySave();
@@ -139,7 +143,8 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
   }
 
   private allowedApplySave() {
-    this.allowApply = this.user._id !== this.companyId._id && this.kind !== 'company';
+    this.allowApply = this.kind === 'employee';
+    // this.allowApply = this.user._id !== this.companyId._id && this.kind !== 'company';
     if (this.allowApply) {
       const userPositionInfo = (this.user.positions as Employee['positions'])
                       .find(pos => pos.position._id === this.position._id);
@@ -149,15 +154,24 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
     }
   }
 
-  onApplySave(status: string) {
+  onApplySave(status: string) { // employee actions
     if (this.currUrl[0] === 'companies') {
       this.store.dispatch(new CompanyActions.CompanyStateLoadSingle());
     } else if (this.currUrl[0] === 'positions') {
       this.store.dispatch(new PositionActions.PositionStateLoadSingle());
+    } else { // /my-positions
+      this.store.dispatch(new UserActions.EmployeeApplySavePositionAttempt({
+        positionId: this.position._id, status, companyId: this.companyId._id, state: this.currUrl[0]
+      }));
     }
-    this.store.dispatch(new UserActions.EmployeeApplySavePositionAttempt({
-      positionId: this.position._id, status, companyId: this.companyId._id, state: this.currUrl[0]
-    }));
+    this.chatService.sendMessage('updateStatus', {
+      status,
+      kind: 'employee',
+      positionId: this.position._id,
+      companyId: this.companyId._id,
+      employeeId: this.user._id,
+      ownerId: this.user._id,
+    });
   }
 
   private invalidStateListInd(currState, list) {
@@ -177,6 +191,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
   }
 
   onClose() {
+    this.closedErrors = true;
     this.messages = [];
     if (this.fetchedCompany) { return; } // in that case the effect of the apply op will handle the errors
     if (this.currUrl[0] === 'companies') {

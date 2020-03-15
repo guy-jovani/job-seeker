@@ -41,7 +41,7 @@ export class EmployeeEffects {
             // const employee = new Employee({...res['employee']});
             if (res['type'] === 'success') {
               this.store.dispatch(new EmployeeActions.ClearError());
-              return new UserActions.UpdateActiveUser({ user: {...res['employee']}, redirect: true, kind: 'employee' });
+              return new UserActions.UpdateActiveUser({ user: {...res['employee']}, redirect: 'my-details', kind: 'employee' });
             } else {
               return new EmployeeActions.EmployeeOpFailure(res['messages']);
             }

@@ -1,13 +1,15 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 import * as fromApp from './store/app.reducer';
 import * as AuthActions from './auth/store/auth.actions';
 import * as UserActions from './user/store/user.actions';
+import * as PositionActions from './position/store/position.actions';
+import * as CompanyActions from './company/store/company.actions';
 import { ChatService } from './chat/chat-socket.service';
-import { Subscription } from 'rxjs';
-import { Router, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -17,10 +19,10 @@ import { filter } from 'rxjs/operators';
 export class AppComponent implements OnInit, OnDestroy {
   socketPostedSub: Subscription;
   socketReconnectSub: Subscription;
-  messages: string[] = [];
+  socketUpdatedStatus: Subscription;
   userSub: Subscription;
-  // userConversationsExists = false;
   routerSub: Subscription;
+  messages: string[] = [];
   currUrl: string[];
   userId: string = null;
 
@@ -30,11 +32,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    this.store.dispatch(new AuthActions.AutoLogin());
+    this.store.dispatch(new AuthActions.AutoLogin()); // in case of a page refresh - so the socket will reconnect
 
     this.userSub = this.store.select('user').subscribe(userState => {
       this.userId = userState.user ? userState.user._id : null;
-      // this.authConversationsExists = authState.conversations && !!authState.conversations.length;
     });
 
     this.routerSub = this.router.events.pipe(
@@ -46,11 +47,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.socketPostedSub = this.chatService.getMessage('posted').subscribe(res => {
       try {
         if (res['type'] === 'success') {
-          // if (this.authConversationsExists) {
           this.store.dispatch(new UserActions.SetSingleConversation({
             conversation: res['conversation'], message: res['message']
           }));
-          // }
           if (this.currUrl.length === 1 && this.currUrl[0] !== 'chat') {
             this.store.dispatch(new UserActions.SetChatNotification());
           }
@@ -63,10 +62,35 @@ export class AppComponent implements OnInit, OnDestroy {
     });
 
     this.socketReconnectSub = this.chatService.getMessage('reconnect')
-      .subscribe(val => {
+      .subscribe(() => {
         console.log('reconnected')
         if (this.userId) {
           this.chatService.sendMessage('login', {  _id: this.userId } );
+        }
+      });
+
+    this.socketUpdatedStatus = this.chatService.getMessage('updatedStatus')
+      .subscribe(res => {
+        console.log(res)
+        if (res['type'] === 'success') {
+          if (this.currUrl[0] === 'positions') {
+            this.store.dispatch(new PositionActions.ClearError());
+          } else if (this.currUrl[0] === 'companies') {
+            this.store.dispatch(new CompanyActions.ClearError());
+          }
+          this.store.dispatch(new UserActions.UpdateActiveUser({
+            user: res['user'],
+            kind: res['kind'],
+            redirect: this.currUrl[0] === 'my-positions' ? 'my-positions' : ''
+          }));
+        } else {
+          if (this.currUrl[0] === 'positions') {
+            this.store.dispatch(new PositionActions.PositionOpFailure(res['messages']));
+          } else if (this.currUrl[0] === 'companies') {
+            this.store.dispatch(new CompanyActions.CompanyOpFailure(res['messages']));
+          } else { // this.currUrl[0] === 'my-positions'
+            this.store.dispatch(new UserActions.UserFailure(res['messages']));
+          }
         }
       });
   }
@@ -77,6 +101,12 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.socketPostedSub) {
+      this.socketPostedSub.unsubscribe();
+    }
+    if (this.socketReconnectSub) {
+      this.socketReconnectSub.unsubscribe();
+    }
+    if (this.socketUpdatedStatus) {
       this.socketPostedSub.unsubscribe();
     }
     if (this.userSub) {

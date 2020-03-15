@@ -44,7 +44,7 @@ export class CompanyEffects {
           map(res => {
             if (res['type'] === 'success') {
               this.store.dispatch(new CompanyActions.ClearError());
-              return new UserActions.UpdateActiveUser({ user: {...res['company']}, redirect: true, kind: 'company' });
+              return new UserActions.UpdateActiveUser({ user: {...res['company']}, redirect: 'my-details', kind: 'company' });
             } else {
               return new CompanyActions.CompanyOpFailure(res['messages']);
             }

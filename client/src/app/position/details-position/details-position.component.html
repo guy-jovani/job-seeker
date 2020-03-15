@@ -2,12 +2,12 @@
 
 
 
-<app-loading-spinner *ngIf="isLoading"r></app-loading-spinner>
-<div class="container">
-  <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
-  <app-back-button *ngIf="!position"></app-back-button>
-</div>
+<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 <div class="container" *ngIf="position && !isLoading">
+  <div class="container">
+    <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
+    <app-back-button *ngIf="!position"></app-back-button>
+  </div>
   <div class="row">
     <div class="pos-header-container">
       <h3>{{ position.title ? position.title : position['position'].title | titlecase }}</h3>

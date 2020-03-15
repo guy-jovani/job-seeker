@@ -124,7 +124,7 @@ exports.updateCompany = async (req, res, next) => {
 };
 
 
-exports.acceptRejectPosition = exports.updateCompany = async (req, res, next) => {
+exports.acceptRejectPosition = async (req, res, next) => {
   try {
     await changeStatusOfAUserPosition(req, res, req.body.companyId, req.body.employeeId, req.body.positionId, req.body.status, 'company')
   } catch (error) {

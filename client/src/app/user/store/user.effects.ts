@@ -103,88 +103,88 @@ export class UserEffects {
     })
   );
 
-  @Effect()
-  employeeApplySavePositionAttempt = this.actions$.pipe(
-    ofType(UserActions.EMPLOYEE_APPLY_SAVE_POSITION_ATTEMPT),
-    withLatestFrom(this.store.select('user')),
-    switchMap(([actionData, userState]) => {
-      return this.http.post(environment.nodeServer + 'employees/applySavePosition',
-        {
-          employeeId: userState.user._id,
-          status: actionData['payload']['status'],
-          positionId: actionData['payload']['positionId'],
-          companyId: actionData['payload']['companyId']
-        })
-        .pipe(
-          map(res => {
-            if (res['type'] === 'success') {
-              this.applySavePositionAttemptSuccess(actionData['payload']['state']);
-              return new UserActions.UpdateActiveUser({
-                user: res['user'] as Employee,
-                kind: 'employee',
-                redirect: actionData['payload']['state'] === 'my-positions' ? 'my-positions' : ''
-              });
-            } else {
-              return this.applySavePositionAttemptFailure(actionData['payload']['state'], res['messages']);
-            }
-          }),
-          catchError(messages => {
-            return this.applySavePositionAttemptFailure(actionData['payload']['state'], messages);
-          })
-        );
-    })
-  );
+  // @Effect()
+  // employeeApplySavePositionAttempt = this.actions$.pipe(
+  //   ofType(UserActions.EMPLOYEE_APPLY_SAVE_POSITION_ATTEMPT),
+  //   withLatestFrom(this.store.select('user')),
+  //   switchMap(([actionData, userState]) => {
+  //     return this.http.post(environment.nodeServer + 'employees/applySavePosition',
+  //       {
+  //         employeeId: userState.user._id,
+  //         status: actionData['payload']['status'],
+  //         positionId: actionData['payload']['positionId'],
+  //         companyId: actionData['payload']['companyId']
+  //       })
+  //       .pipe(
+  //         map(res => {
+  //           if (res['type'] === 'success') {
+  //             this.applySavePositionAttemptSuccess(actionData['payload']['state']);
+  //             return new UserActions.UpdateActiveUser({
+  //               user: res['user'] as Employee,
+  //               kind: 'employee',
+  //               redirect: actionData['payload']['state'] === 'my-positions' ? 'my-positions' : ''
+  //             });
+  //           } else {
+  //             return this.applySavePositionAttemptFailure(actionData['payload']['state'], res['messages']);
+  //           }
+  //         }),
+  //         catchError(messages => {
+  //           return this.applySavePositionAttemptFailure(actionData['payload']['state'], messages);
+  //         })
+  //       );
+  //   })
+  // );
 
-  @Effect()
-  companyAcceptRejectPositionAttempt = this.actions$.pipe(
-    ofType(UserActions.COMPANY_ACCEPT_REJECT_POSITION_ATTEMPT),
-    withLatestFrom(this.store.select('user')),
-    switchMap(([actionData, userState]) => {
-      return this.http.post(environment.nodeServer + 'companies/acceptRejectPosition',
-        {
-          employeeId: actionData['payload']['employeeId'],
-          status: actionData['payload']['status'],
-          positionId: actionData['payload']['positionId'],
-          companyId: userState.user._id
-        })
-        .pipe(
-          map(res => {
-            if (res['type'] === 'success') {
-              return new UserActions.UpdateActiveUser({
-                user: res['user'] as Company,
-                kind: 'company',
-                redirect: ''
-              });
-            } else {
-              return new UserActions.UserFailure(res['messages']);
-            }
-          }),
-          catchError(messages => {
-            return of(new UserActions.UserFailure(messages));
-          })
-        );
-    })
-  );
+  // @Effect()
+  // companyAcceptRejectPositionAttempt = this.actions$.pipe(
+  //   ofType(UserActions.COMPANY_ACCEPT_REJECT_POSITION_ATTEMPT),
+  //   withLatestFrom(this.store.select('user')),
+  //   switchMap(([actionData, userState]) => {
+  //     return this.http.post(environment.nodeServer + 'companies/acceptRejectPosition',
+  //       {
+  //         employeeId: actionData['payload']['employeeId'],
+  //         status: actionData['payload']['status'],
+  //         positionId: actionData['payload']['positionId'],
+  //         companyId: userState.user._id
+  //       })
+  //       .pipe(
+  //         map(res => {
+  //           if (res['type'] === 'success') {
+  //             return new UserActions.UpdateActiveUser({
+  //               user: res['user'] as Company,
+  //               kind: 'company',
+  //               redirect: ''
+  //             });
+  //           } else {
+  //             return new UserActions.UserFailure(res['messages']);
+  //           }
+  //         }),
+  //         catchError(messages => {
+  //           return of(new UserActions.UserFailure(messages));
+  //         })
+  //       );
+  //   })
+  // );
 
-  private applySavePositionAttemptFailure(state: string, messages: string[]) {
-    if (state === 'positions') {
-      this.store.dispatch(new UserActions.ClearError());
-      return of(new PositionActions.PositionOpFailure(messages));
-    } else if (state === 'companies') {
-      this.store.dispatch(new UserActions.ClearError());
-      return of(new CompanyActions.CompanyOpFailure(messages));
-    } else {
-      return of(new UserActions.UserFailure(messages));
-    }
-  }
+  // private applySavePositionAttemptFailure(state: string, messages: string[]) {
+  //   if (state === 'positions') {
+  //     this.store.dispatch(new UserActions.ClearError());
+  //     return of(new PositionActions.PositionOpFailure(messages));
+  //   } else if (state === 'companies') {
+  //     this.store.dispatch(new UserActions.ClearError());
+  //     return of(new CompanyActions.CompanyOpFailure(messages));
+  //   } else {
+  //     return of(new UserActions.UserFailure(messages));
+  //   }
+  // }
 
-  private applySavePositionAttemptSuccess(state: string) {
-    if (state === 'positions') {
-      this.store.dispatch(new PositionActions.ClearError());
-    } else if (state === 'companies') {
-      this.store.dispatch(new CompanyActions.ClearError());
-    }
-  }
+  // private applySavePositionAttemptSuccess(state: string) {
+  //   if (state === 'positions') {
+  //     this.store.dispatch(new PositionActions.ClearError());
+  //   } else if (state === 'companies') {
+  //     this.store.dispatch(new CompanyActions.ClearError());
+  //   }
+  // }
 
 }
 

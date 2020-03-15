@@ -1,6 +1,6 @@
 import { Position } from 'app/position/position.model';
 
-export enum PositionStatus {
+export enum EmployeePositionStatus {
   'saved', 'applied', 'rejected', 'accepted'
 }
 
@@ -10,7 +10,7 @@ export class Employee {
   public email: string;
   public positions?: { // TODO problem since the company positions are different
     position: Position,
-    status: PositionStatus,
+    status: EmployeePositionStatus,
     date: Date
   }[];
   public firstName?: string;

@@ -89,35 +89,52 @@ changeStatusOnEmployeePositions = async (employeeId, positionId, status) => {
                                       populate: { path: 'company', select: 'name' } });
 };
 
+
+const newApplicant = (status, company, employeeId, positionId) => {
+  if(status !== 'saved') {
+    company.applicants.push({ 
+      employee: employeeId, 
+      positions: [ { position: positionId, status: status, date: Date.now() } ] 
+    });
+  }
+}
+
+const applicantUpdatePositionStatus = (status, company, positionId, applicantInd) => {
+  const position = company.applicants[applicantInd].positions.find(posInfo => posInfo.position.toString() === positionId); 
+  if(position){ // update position status
+    position.status = status;
+    position.date = Date.now();
+  } else { // add new position with status
+    company.applicants[applicantInd].positions.push({ position: positionId, status: status, date: Date.now() });
+  }
+}
+
+const removeApplicantPosition = (company, positionId, applicantInd) => {
+  let applicantPositions = company.applicants[applicantInd].positions;
+  if(applicantPositions.length > 1) { // just remove the position
+    company.applicants[applicantInd].positions = applicantPositions.filter(pos => pos.position.toString() !== positionId);
+  } else { // remove the applicant - he has no more positions for that company
+    company.applicants.splice(applicantInd, 1);
+  }
+}
+
+const updateApplicant = (status, company, positionId, applicantInd) => {
+  if(status !== 'saved') {
+    applicantUpdatePositionStatus(status, company, positionId, applicantInd);
+  } else { // need to remove the position of the applicant
+    removeApplicantPosition(company, positionId, applicantInd);
+  }
+}
+
 changeStatusOnCompanyApplicantsPositions = async (companyId, employeeId, positionId, status) => {
   let company = await Company.findById(companyId);
   if(!company) { return 404; }
   const applicantInd = company.applicants.findIndex(applicant => applicant.employee.toString() === employeeId);
 
   if (applicantInd > -1) {
-    if(status !== 'saved') {
-      const position = company.applicants[applicantInd].positions.find(posInfo => posInfo.position.toString() === positionId); // only required cuase there is no real time updates of the positions of the user and company
-      if(position){ // update position status
-        position.status = status;
-        position.date = Date.now();
-      } else { // add new position with stats
-        company.applicants[applicantInd].positions.push({ position: positionId, status: status, date: Date.now() });
-      }
-    } else { // need to remove the position of the applicant
-      const applicantPositions = company.applicants[applicantInd].positions;
-      if(applicantPositions.length > 1) { // just remove the position
-        company.applicants[applicantInd].positions = company.applicants[applicantInd].filter(pos => pos._id !== positionId);
-      } else { // remove the applicant - he has no more positions for that company
-        company.applicants.splice(applicantInd, 1);
-      }
-    }
+    updateApplicant(status, company, positionId, applicantInd);
   } else { // new applicant
-    if(status !== 'saved') {
-      company.applicants.push({ 
-        employee: employeeId, 
-        positions: [ { position: positionId, status: status, date: Date.now() } ] 
-      });
-    }
+    newApplicant(status, company, employeeId, positionId, applicantInd);
   }
   company = (await company.save()).toObject();
   Reflect.deleteProperty(company, 'password');
@@ -130,26 +147,17 @@ changeStatusOnCompanyApplicantsPositions = async (companyId, employeeId, positio
 
 
 
-exports.changeStatusOfAUserPosition = async (req, res, companyId, employeeId, positionId, status, kind) => {
-  const routeErros = validation.handleValidationRoutesErrors(req);
-  if(routeErros.type === 'failure') {
-    return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
-  } 
-  
+exports.changeStatusOfAUserPosition = async (companyId, employeeId, positionId, status) => {
   const employee = await changeStatusOnEmployeePositions(employeeId, positionId, status);
   if(employee === 404) { 
-    return sendMessagesResponse(res, 404, ['There was an error updating the status of the wanted position.'], 'failure');
+    return 404;
   }
   const company = await changeStatusOnCompanyApplicantsPositions(companyId, employeeId, positionId, status);
   if(company === 404) {
-    return sendMessagesResponse(res, 404, ['There was an error updating the status of the wanted position.'], 'failure');
+    return 404;
   }
 
-  res.status(201).json({
-    message: 'Operation succeeded.',
-    type: 'success',
-    user: kind === 'employee' ? employee : company
-  });
+  return [employee, company];
 }
 
 

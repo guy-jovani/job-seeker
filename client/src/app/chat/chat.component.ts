@@ -76,6 +76,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
 
     this.chatService.sendMessage('postAMsg', {
+      ownerId: this.user._id,
       senderId: this.user._id,
       senderType: this.userKind,
       content: form.value.messageContent,

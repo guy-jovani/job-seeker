@@ -7,7 +7,6 @@ const Conversation = require('../models/conversation');
 
 exports.postMessage = async (privateMsg, recipients, content, senderId, senderType) => {
   try {
-    // if(validation.handleValidationRoutesErrors(req, res)) return;
     let error = new Error();
     error.messages = [];
     if(!content) {

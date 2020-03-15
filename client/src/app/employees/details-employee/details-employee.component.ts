@@ -9,6 +9,7 @@ import { Employee } from '../employee.model';
 import * as EmployeeActions from '../store/employee.actions';
 import { Company, ApplicantPosition, ApplicantStatus } from 'app/company/company.model';
 import * as UserActions from '../../user/store/user.actions';
+import { ChatService } from 'app/chat/chat-socket.service';
 
 @Component({
   selector: 'app-details-employee',
@@ -30,6 +31,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<fromApp.AppState>,
     private route: ActivatedRoute,
+    private chatService: ChatService,
     private router: Router) { }
 
   ngOnInit() {
@@ -72,11 +74,19 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
         });
   }
 
-  onAcceptReject(status: ApplicantStatus, posInd: number) {
+  onAcceptReject(status: ApplicantStatus, posInd: number) { // company actions
     this.store.dispatch(new UserActions.CompanyAcceptRejectPositionAttempt({
       positionId: this.applicantPositions[posInd].position._id, status: status.toString(),
       employeeId: this.employee._id, state: this.currUrl[0]
     }));
+    this.chatService.sendMessage('updateStatus', {
+      status,
+      kind: 'company',
+      positionId: this.applicantPositions[posInd].position._id,
+      companyId: this.user._id,
+      employeeId: this.employee._id,
+      ownerId: this.user._id,
+    });
   }
 
   private invalidStateListInd(currState, list) {
