@@ -1,0 +1,81 @@
+
+
+
+
+
+<div class="image-picker">
+  <div class="main-picker">
+    <input type="file" class="file-picker" (change)="fileChangeEvent($event)" #filePicker/>
+    <span
+      *ngIf='imagePreview'
+      class="glyphicon glyphicon-remove btn btn-default col-xs-1 btn-remove-file"
+      (click)="onRemoveImage()"
+      #removeImageBtn>
+    </span>
+    <div class="preview" *ngIf='imagePreview && (!croppedImage || confirmedImage)'>
+      <img [src]="imagePreview" class="{{roundCropper ? 'preview__image round' : 'preview__image'}}" />
+    </div>
+  </div>
+  <div class="error-picker" *ngIf="failUpload">
+    <span class="help-block">
+      <p>There was a problem uploading the image.</p>
+      <p>You can only upload an image file (jpeg, png etc..).</p>
+    </span>
+  </div>
+</div>
+
+
+<!-- only shows when select a file -->
+
+<div class="backdrop" *ngIf='croppedImage && !confirmedImage'></div>
+
+<button
+  type="button"
+  class="btn btn-primary btn-sm confirm-crop-btn"
+  (click)="onConfirmCrop()"
+  *ngIf='croppedImage && !confirmedImage'>
+  Crop OK?
+</button>
+<button
+  type="button"
+  class="btn btn-info btn-sm cancel-crop-btn"
+  (click)="onCancelCrop()"
+  *ngIf='croppedImage && !confirmedImage'>
+  Cancel
+</button>
+
+<div class="crop-container hide" #cropContainer>
+
+  <div class="cropper">
+    <image-cropper
+    [imageChangedEvent]="imageChangedEvent"
+    [maintainAspectRatio]="true"
+    [aspectRatio]="aspectRatio"
+    format="png"
+    [roundCropper]="roundCropper"
+    (imageCropped)="imageCropped($event)"
+    (loadImageFailed)="loadImageFailed()"
+    ></image-cropper>
+  </div>
+
+  <div class="preview">
+    <img [src]="croppedImage" class="{{roundCropper ? 'preview__image round' : 'preview__image'}}" />
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -75,10 +75,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   }
 
   onAcceptReject(status: ApplicantStatus, posInd: number) { // company actions
-    this.store.dispatch(new UserActions.CompanyAcceptRejectPositionAttempt({
-      positionId: this.applicantPositions[posInd].position._id, status: status.toString(),
-      employeeId: this.employee._id, state: this.currUrl[0]
-    }));
+    this.store.dispatch(new UserActions.CompanyAcceptRejectPositionAttempt());
     this.chatService.sendMessage('updateStatus', {
       status,
       kind: 'company',
@@ -95,6 +92,10 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
       return true;
     }
     return false;
+  }
+
+  applicantPositionsTracker(index, item) {
+    return index;
   }
 
   checkPositionOfUser() {

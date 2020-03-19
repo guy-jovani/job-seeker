@@ -13,11 +13,17 @@
   <hr>
 
   <div class="row" *ngIf="!isLoading && company.email">
-    <p *ngIf="company.imagePath"><img class="image" [src]='company.imagePath'></p>
     <p>email: {{ company.email || "------" }}</p>
     <p>website: {{ company.website || "------" }}</p>
     <p>description: {{ company.description || "------" }}</p>
     <app-list-position *ngIf="company && !allowEdit" [companyPositions]="company.positions"></app-list-position>
+    <div class="images-container">
+      <ul class="images-container__list">
+        <li *ngFor="let imagePath of company.imagesPath" class="images-container__list-item">
+          <img class="image" [src]='imagePath'>
+        </li>
+      </ul>
+    </div>
   </div>
 
   <hr>

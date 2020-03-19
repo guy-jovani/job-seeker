@@ -43,9 +43,14 @@ app.use((req, res, next) => {
 app.use((error, req, res, next) => {
   console.log("====================================================");
   console.log("====================================================");
-  console.log("an error cought and printed in app.js");
+  console.log("An error cought and printed in app.js");
   console.log(error);
-  error.messages.push('Please refresh the page and try again. If the error is still happening please notify the admins.')
+  if (typeof(error) !== "object"){
+    error = { messages: [error] };
+  }
+  if(!error.messages.includes('Tried to upload wrong mime type. Choose a different file.')) {
+    error.messages.push('Please refresh the page and try again. If the error is still happening please notify the admins.')
+  }
   res.status(error.statusCode || 500).json({ 
     // errors: [{
     //   msg: 'An unknown error occured'

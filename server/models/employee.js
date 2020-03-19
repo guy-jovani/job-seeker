@@ -21,6 +21,10 @@ const employeeSchema = new Schema(
       type: String,
       required: false
     },
+    profileImagePath: {
+      type: String,
+      required: false
+    },
     positions: [{
       position: {
         type: Schema.Types.ObjectId, 

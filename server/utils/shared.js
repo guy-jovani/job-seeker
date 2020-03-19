@@ -7,7 +7,7 @@ const Company = require('../models/company');
 
 
 exports.getNullKeysForUpdate = (req, removableKeys) => {
-  // get an object with keys to delete from the employee document (all keys that are null)
+  // get an object with keys to delete from the employee document (all the keys that are null)
   const reqBodyKeys = Object.keys(req.body);
   let nullKeys = removableKeys.filter(key => !reqBodyKeys.includes(key));
   nullKeys = nullKeys.reduce((obj, key) => (obj[key]='',  obj), {});
@@ -32,7 +32,6 @@ exports.getBulkArrayForUpdate = async (req, nullKeys) => {
       update: { $unset: { ...nullKeys } } 
     }})
   }
-  
   return bulkArr;
 };
 

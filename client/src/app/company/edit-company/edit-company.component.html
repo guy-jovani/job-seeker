@@ -1,7 +1,7 @@
 
 <div class="container">
   <!-- <app-alert *ngIf="messages.length" [messages]="messages" (closeAlert)="onClose()"></app-alert> -->
-  <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
+  <app-message-box *ngIf="messages.length && !isLoading" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
   <h4>Edit</h4>
   <div *ngIf="isLoading">
     <app-loading-spinner></app-loading-spinner>
@@ -52,34 +52,6 @@
         please enter a valid description
       </span>
     </div>
-    <div class="row">
-      <label for="image">Image</label>
-      <div class="row">
-        <input
-          #image
-          type="file"
-          class="form-control image-upload-input col-xs-11"
-          (change)="handleImageInput($event)">
-        <span class="glyphicon glyphicon-remove btn btn-default col-xs-1" (click)="onRemoveImage(image)"></span>
-      </div>
-      <img *ngIf='imagePreview && companyForm.get("image").valid'
-            class="image-preview"
-            [src]="imagePreview"/>
-      <span class="help-block"
-            *ngIf="!companyForm.get('image').valid &&
-                    companyForm.get('image').errors &&
-                    companyForm.get('image').errors.invalidMimeType">
-          please enter an image file (jpeg, png etc..)
-      </span>
-      <div class="form-check">
-        <input type="checkbox" class="form-check-input"
-          formControlName="deleteImage"
-          #deleteImage>
-        <label class="form-check-label" for="deleteImage">Delete Last Uploaded Image?</label>
-        <!-- <span class="help-block">To override the previous image, just upload a new one.</span> -->
-      </div>
-    </div>
-    <hr>
     <div formGroupName="passwords">
       <div>
         <label for="name">password  </label>
@@ -126,6 +98,17 @@
         </button>
     </div>
     <hr>
+    <div class="company-images-conteiner">
+      <button type="button" class="btn btn-primary" (click)="onAddImage()">Add Image </button>
+      <span class="help-block">(Up to 6).</span>
+      <app-image-cropper
+        *ngFor="let imagePath of imagesPath; let i=index; trackBy: trackImagesPath"
+        (confirmedImageEvent)="onCroppedEvent($event, i)"
+        [aspectRatio]="16 / 9"
+        [imagePreview]="imagePath">
+      </app-image-cropper>
+    </div>
+    <hr>
     <button
       type="submit"
       class="btn btn-success"
@@ -143,115 +126,3 @@
   </form>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!--
-
-<app-alert *ngIf="messages.length" [messages]="messages" (close)="onClose()"></app-alert>
-<div class="container">
-  <h4>{{ !this.company ? 'Register' : 'Edit' }}</h4>
-  <form (ngSubmit)="onSubmit(companyForm)" #companyForm="ngForm">
-    <div class="row">
-      <label for="name">name:  </label>
-      <input
-        type="text"
-        name="name"
-        id="name"
-        required
-        ngModel
-        #name="ngModel"
-      >
-      <span class="help-block" *ngIf="!name.valid && name.touched">
-        please enter a valid name
-      </span>
-    </div>
-    <div class="row">
-      <label for="website">website:  </label>
-      <input
-        type="textarea"
-        name="website"
-        id="website"
-        ngModel
-        #website="ngModel"
-      >
-      <span class="help-block" *ngIf="!website.valid && website.touched">
-        please enter a valid website
-      </span>
-    </div>
-    <div class="row">
-      <label for="description">description:  </label>
-      <input
-        type="textarea"
-        name="description"
-        id="description"
-        ngModel
-        #description="ngModel"
-      >
-      <span class="help-block" *ngIf="!description.valid && description.touched">
-        please enter a valid description
-      </span>
-    </div>
-    <div class="row">
-      <label for="image">Image URl</label>
-      <input
-        type="file"
-        id="image"
-        name="image"
-        class="form-control image-upload-input"
-        (change)="handleImageInput($event)"
-        #image>
-      <img *ngIf='uploadedImg && !imageError' class="image-upload-img" [src]="uploadedImg"/>
-      <span class="help-block" *ngIf="imageError">
-        {{ imageError }}
-      </span>
-    </div>
-    <hr>
-    <button
-      type="submit"
-      class="btn btn-success"
-      [disabled]="!companyForm.form.valid"
-      >
-      {{ !this.company ? 'Register' : 'Edit' }}
-    </button>
-    <button
-      type="button"
-      class="btn btn-danger"
-      (click)="onCancel()"
-      >
-      Cancel
-    </button>
-    <button
-      type="button"
-      class="btn btn-danger"
-      *ngIf="edit"
-      (click)="onDelete()"
-      >
-      Delete
-    </button>
-  </form>
-</div> -->

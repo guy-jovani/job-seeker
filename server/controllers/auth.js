@@ -72,7 +72,7 @@ exports.signup = async (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
-    next(handleServerErrors(error, 500, "there was an unexpected error while trying to signup"));
+    next(handleServerErrors(error, 500, "There was an unexpected error while trying to signup."));
   }
 };
 
@@ -126,7 +126,7 @@ exports.login = async (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
-    next(handleServerErrors(error, 500, "there was an unexpected error while trying to login"));
+    next(handleServerErrors(error, 500, "There was an unexpected error while trying to login."));
   }
 };
 
@@ -136,7 +136,7 @@ exports.resetPasswordEmail = async (req, res, next) => {
     crypto.randomBytes(32, async (err, buffer) => {
       if (err) {
         console.log(err);
-        next(handleServerErrors(error, 500, "there was an unexpected error while trying to reset the password."));
+        next(handleServerErrors(error, 500, "There was an unexpected error while trying to reset the password."));
       }
       const token = buffer.toString('hex');
       const user = await Employee.findOne({ email: req.body.email }) || 
@@ -162,7 +162,7 @@ exports.resetPasswordEmail = async (req, res, next) => {
     });
   } catch (error) {
     console.log(error)
-    next(handleServerErrors(error, 500, "there was an unexpected error while trying to reset the password."));
+    next(handleServerErrors(error, 500, "There was an unexpected error while trying to reset the password."));
   }
 }
 
@@ -193,7 +193,7 @@ exports.resetToNewPassword = async (req, res, next) => {
     });
   } catch (error) {
     console.log(error)
-    next(handleServerErrors(error, 500, "there was an unexpected error while trying to reset the password."));
+    next(handleServerErrors(error, 500, "There was an unexpected error while trying to reset the password."));
   }
 }
 

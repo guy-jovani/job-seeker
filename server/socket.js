@@ -65,7 +65,7 @@ const updateStatus = async data => {
       (!['employee', 'company'].includes(data.kind))){
         throw new Error('There was an error updating the status of the wanted position.');
     } 
-    const [employee, company] = await changeStatusOfAUsereqPosition(data.companyId, 
+    const [employee, company] = await changeStatusOfAUserPosition(data.companyId, 
                           data.employeeId, data.positionId, data.status);
 
     io.to(data.employeeId).emit('updatedStatus', { 

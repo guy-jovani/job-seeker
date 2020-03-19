@@ -12,7 +12,7 @@ const changeStatusOfAUserPosition = require('../utils/shared').changeStatusOfAUs
 exports.fetchSingle = async (req, res, next) => {
   try { 
     let company = await Company.findById(req.query._id).select(
-      '_id email name website description imagePath positions')
+      '_id email name website description imagesPath positions')
         .populate({
           path: 'positions', 
           populate: { path: 'company', select: 'name' }
@@ -70,27 +70,41 @@ exports.fetchAll = async (req, res, next) => {
   }
 };
 
-
-const updateReqImagePath = req => {
-  if(req.file) { // new image for company 
-    let url = req.protocol + '://' + req.get('host');
-    url = url + '/images/' + req.file.filename;
-    req.body.imagePath = url;
-    return true;
-  }   
-  return false;
+const updateCompanyImages = async (req) => {
+  if(req.files.length) { // new images for company
+    let newUrls = []; 
+    req.files.forEach(file => {
+      let url = req.protocol + '://' + req.get('host');
+      url = url + '/images/' + file.filename;
+      newUrls.push(url);
+    });
+    const oldImages = req.query.oldImages.split('%%RandomjoiN&&');
+    let updatedImageInd = 0, updatedImages = [];
+    for(const index of Object.keys(oldImages)){
+      if(oldImages[index]) {
+        updatedImages.push(oldImages[index]);
+      } else {
+        updatedImages.push(newUrls[updatedImageInd]);
+        updatedImageInd++;
+        if(updatedImageInd >= newUrls.length) break;
+      }
+    }
+    req.body.imagesPath = updatedImages;
+  } else {
+    const keptImages = req.query.oldImages.split('%%RandomjoiN&&').filter(val => !!val);
+    if(keptImages.length) req.body.imagesPath = keptImages;
+  }  
 };
 
 const getUpdateQuery = async (req) => {
-  let newImage = updateReqImagePath(req);
-
+  Reflect.deleteProperty(req.body, 'imagesPath');
+  updateCompanyImages(req);
   // get an object with keys to delete from the company document (all keys that are null)
-  const companyRemovableKeys = ['name', 'website', 'description', 'imagePath'];
+  const companyRemovableKeys = ['name', 'website', 'description'];
   const nullKeys = getNullKeysForUpdate(req, companyRemovableKeys);
-  if(req.query.removeImage === 'true' && !newImage) nullKeys.imagePath = ''; 
-
   return await getBulkArrayForUpdate(req, nullKeys);
 };
+
 
 exports.updateCompany = async (req, res, next) => {
   try { 
@@ -102,24 +116,23 @@ exports.updateCompany = async (req, res, next) => {
     if(companyValid.type === 'failure'){
       return sendMessagesResponse(res, 422, companyValid.messages, 'failure');
     }
-    
     const bulkRes = await Company.bulkWrite(await getUpdateQuery(req));
     if(!bulkRes.result.nMatched){
       throw new Error("trying to update a non exisitng company");
     }
-
+    
     let updatedCompany = await Company.findById(req.body._id).select(
                             '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration -password'
                           ).populate('positions');
-    
-    updatedCompany = updatedCompany.toObject();
+                        
+    // updatedCompany = updatedCompany.toObject();
     res.status(201).json({
       message: 'company updated successfully!',
       type: 'success',
       company: updatedCompany
     });
   } catch (error) {
-    next(errorHandling.handleServerErrors(error, 500, "there was an error updating the company"));
+    next(errorHandling.handleServerErrors(error, 500, "There was an error updating the company."));
   }
 };
 

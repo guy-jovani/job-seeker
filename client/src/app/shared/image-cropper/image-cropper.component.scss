@@ -1,0 +1,85 @@
+.image-picker {
+  display: flex;
+  flex-direction: column;
+  margin: 0.5rem 0;
+  max-width: 100vw;
+  max-height: 30rem;
+}
+
+.main-picker {
+  display: flex;
+  margin-right: 2rem;
+}
+
+.file-picker {
+  cursor: pointer;
+  height: min-content;
+}
+
+.btn-remove-file {
+  border: none;
+  width: min-content;
+  height: min-content;
+  padding: 1px;
+}
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 50;
+}
+
+.confirm-crop-btn {
+  position: fixed;
+  top: 7rem;
+  left: 3rem;
+  z-index: 110;
+}
+
+.cancel-crop-btn {
+  position: fixed;
+  top: 10rem;
+  left: 3rem;
+  z-index: 110;
+}
+
+.crop-container {
+  position: fixed;
+  top: 6rem;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: calc(100vh - 6rem);
+  width: 100vw;
+  z-index: 100;
+}
+
+.hide {
+  display: none;
+}
+
+.cropper {
+  width: 60%;
+  height: 60%;
+}
+
+.preview {
+  width: 40%;
+  height: 40%;
+  margin-bottom: 1rem;
+}
+
+.round {
+  border-radius: 50%;
+}
+
+.preview__image {
+  width: 100%;
+  height: 100%;
+}

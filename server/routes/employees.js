@@ -10,24 +10,6 @@ const employeeController = require('../controllers/employees');
 router.get('/fetchAll', employeeController.fetchAll);
 router.get('/fetchSingle', employeeController.fetchSingle);
 
-// router.post('/applySavePosition', [ 
-//   body('employeeId')
-//     .exists()
-//     .withMessage('Something went wrong with updating the status process, please refresh the page and try again. If the error is still happening please notify the admins.'),
-//   body('positionId')
-//     .exists()
-//     .withMessage('Something went wrong with updating the status process, please refresh the page and try again. If the error is still happening please notify the admins.'),
-//   body('companyId')
-//     .exists()
-//     .withMessage('Something went wrong with updating the status process, please refresh the page and try again. If the error is still happening please notify the admins.'),
-//   body('status').custom(value => {
-//     if (value !== 'saved' && value !== 'applied') {
-//       throw new Error('Illegal status value.');
-//     }
-//     return true;
-//   }),
-// ], employeeController.applySavePosition);
-
 router.post('/update', [
   body('email')
     .isEmail()

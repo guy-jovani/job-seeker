@@ -10,7 +10,6 @@ import * as CompanyActions from './company.actions';
 import * as UserActions from '../../user/store/user.actions';
 import { environment } from '../../../environments/environment';
 import * as fromApp from '../../store/app.reducer';
-import * as AuthActions from '../../auth/store/auth.actions';
 
 const nodeServer = environment.nodeServer + 'companies/';
 
@@ -26,18 +25,24 @@ export class CompanyEffects {
   @Effect()
   updateActiveCompany = this.actions$.pipe(
     ofType(CompanyActions.UPDATE_SINGLE_COMPANY_IN_DB),
-    switchMap((actionData) => {
+    switchMap((actionData: CompanyActions.UpdateSingleCompanyInDb) => {
       const companyData = new FormData();
-      Object.keys(actionData['payload']['company']).forEach(key => {
-        companyData.append(key, actionData['payload']['company'][key]);
+      Object.keys(actionData.payload.company).forEach(key => {
+        if (key === 'imagesPath') {
+          actionData.payload.company[key].forEach(imageFile => {
+            companyData.append(key, imageFile);
+          });
+        } else {
+          companyData.append(key, actionData.payload.company[key]);
+        }
       });
-      if (actionData['payload']['password']) {
-        companyData.append('password', actionData['payload']['password']);
-        companyData.append('confirmPassword', actionData['payload']['confirmPassword']);
+      if (actionData.payload['password']) {
+        companyData.append('password', actionData.payload['password']);
+        companyData.append('confirmPassword', actionData.payload['confirmPassword']);
       }
       return this.http.post(nodeServer + 'update', companyData, {
           params: {
-            removeImage: actionData['payload']['deleteImage'],
+            oldImages: actionData.payload.oldImagesPath.join('%%RandomjoiN&&'),
           }
         })
         .pipe(

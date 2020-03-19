@@ -53,7 +53,7 @@ exports.updateEmployee = async (req, res, next) => {
 
     const bulkRes = await Employee.bulkWrite(await getUpdateQuery(req));
     if(!bulkRes.result.nMatched){
-      throw new Error("trying to update a non exisitng employee");
+      throw new Error("Trying to update a non exisitng employee.");
     }
     let updatedEmployee = await Employee.findById(req.body._id).select(
         '-__v -password -resetPassToken -resetPassTokenExpiration').populate('positions');
@@ -61,12 +61,12 @@ exports.updateEmployee = async (req, res, next) => {
     updatedEmployee = updatedEmployee.toObject();
 
     res.status(201).json({
-      message: 'employee updated successfully!',
+      messages: ['employee updated successfully!'],
       type: 'success',
       employee: updatedEmployee
     });
   } catch (error) {
-    next(errorHandling.handleServerErrors(error, 500, "There was an error updating the employee"));
+    next(errorHandling.handleServerErrors(error, 500, "There was an error updating the employee."));
   }
 };
 

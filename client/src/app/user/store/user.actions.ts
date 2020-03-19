@@ -44,14 +44,10 @@ export class FetchAllConversations implements Action {
 
 export class EmployeeApplySavePositionAttempt implements Action {
   readonly type = EMPLOYEE_APPLY_SAVE_POSITION_ATTEMPT;
-
-  constructor(public payload: { positionId: string, status: string, companyId: string, state: string, }) {}
 }
 
 export class CompanyAcceptRejectPositionAttempt implements Action {
   readonly type = COMPANY_ACCEPT_REJECT_POSITION_ATTEMPT;
-
-  constructor(public payload: { positionId: string, status: string, employeeId: string, state: string }) {}
 }
 
 export class UserFailure implements Action {

@@ -22,7 +22,7 @@ export class Company {
   public email?: string;
   public description?: string;
   public website?: string;
-  public imagePath?: string;
+  public imagesPath?: string[] | File[];
   public positions?: Position[]; // TODO problem since the employee positions are different
   public applicants: { employee: Employee, positions: ApplicantPosition[] }[];
   public lastFetch?: Date;

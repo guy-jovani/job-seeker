@@ -70,7 +70,7 @@ export class UpdateSingleCompanyInDb implements Action {
 
   constructor(public payload: {
     company: Company,
-    deleteImage: boolean,
+    oldImagesPath: string[],
     password: string,
     confirmPassword: string
   }) {}

@@ -26,10 +26,10 @@ const companySchema = new Schema(
       type: String,
       required: false
     },
-    imagePath: {
+    imagesPath: [{
       type: String,
       required: false
-    },
+    }],
     positions: [{
       type: Schema.Types.ObjectId, 
       ref: 'Position',

@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ImageCropperModule } from 'ngx-image-cropper';
 
 import { DropdownDirective } from './dropdown.directive';
 import { AlertComponent } from './alert/alert.component';
@@ -10,7 +11,7 @@ import { CutPipe } from './cut.pipe';
 import { ScrollToBottomDirective } from './scroll-to-bottom.directive';
 import { BackButtonComponent } from './back-button/back-button.component';
 import { MessageBoxComponent } from './message-box/message-box.component';
-
+import { ImageCropperComponent } from './image-cropper/image-cropper.component';
 
 
 
@@ -25,8 +26,9 @@ import { MessageBoxComponent } from './message-box/message-box.component';
     ScrollToBottomDirective,
     BackButtonComponent,
     MessageBoxComponent,
+    ImageCropperComponent,
   ],
-  imports: [CommonModule],
+  imports: [CommonModule, ImageCropperModule],
   exports: [
     DropdownDirective,
     AlertComponent,
@@ -37,7 +39,8 @@ import { MessageBoxComponent } from './message-box/message-box.component';
     CutPipe,
     ScrollToBottomDirective,
     BackButtonComponent,
-    MessageBoxComponent
+    MessageBoxComponent,
+    ImageCropperComponent
   ]
 })
 export class SharedModule {}

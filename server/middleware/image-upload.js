@@ -3,9 +3,7 @@
 const multer = require('multer');
 
 
-
-
-const fileStorage = multer.diskStorage({
+const imageStorage = multer.diskStorage({
   destination: function(req, file, cb) {
       cb(null, 'images');
   },
@@ -19,16 +17,17 @@ const fileStorage = multer.diskStorage({
   }
 });
 
-const fileFilter = (req, file, cb) => {
+const imageFilter = (req, file, cb) => {
   if(file.mimetype === 'image/png' || 
     file.mimetype === 'image/jpg' ||
     file.mimetype === 'image/jpeg'
   ){
     cb(null, true);
   } else {
-    cb("try upload wrong mime type", false);
+    cb("Tried to upload wrong mime type. Choose a different file.", false);
   }
 };
 
 
-module.exports = multer({storage: fileStorage, fileFilter}).single('imagePath');
+exports.extractCompanyImages = multer({storage: imageStorage, fileFilter: imageFilter})
+                                .array('imagesPath', { maxCount: 6 });

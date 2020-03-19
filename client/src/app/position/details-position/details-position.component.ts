@@ -160,9 +160,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
     } else if (this.currUrl[0] === 'positions') {
       this.store.dispatch(new PositionActions.PositionStateLoadSingle());
     } else { // /my-positions
-      this.store.dispatch(new UserActions.EmployeeApplySavePositionAttempt({
-        positionId: this.position._id, status, companyId: this.companyId._id, state: this.currUrl[0]
-      }));
+      this.store.dispatch(new UserActions.EmployeeApplySavePositionAttempt());
     }
     this.chatService.sendMessage('updateStatus', {
       status,
