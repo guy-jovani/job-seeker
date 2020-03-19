@@ -3,6 +3,7 @@
 const express = require('express')
 const router = express.Router();
 const { body } = require('express-validator');
+const extractEmployeeProfileImage = require('../middleware/image-upload').extractEmployeeProfileImage;
 
 
 const employeeController = require('../controllers/employees');
@@ -10,10 +11,10 @@ const employeeController = require('../controllers/employees');
 router.get('/fetchAll', employeeController.fetchAll);
 router.get('/fetchSingle', employeeController.fetchSingle);
 
-router.post('/update', [
+router.post('/update', extractEmployeeProfileImage, [
   body('email')
     .isEmail()
-    .withMessage('please provide a valid email'),
+    .withMessage('Please provide a valid email.'),
   body('firstName')
     .exists()
     .optional()
@@ -28,7 +29,7 @@ router.post('/update', [
     .optional()
     .isLength(3)
     .withMessage('The password need to be more than 3 characters long.'),
-  body('confirmPassword').custom(value => {
+  body('confirmPassword').custom((value, { req }) => {
     if (value !== req.body.password) {
       throw new Error('Password confirmation does not match password');
     }
@@ -36,7 +37,7 @@ router.post('/update', [
   }),
   body('_id')
     .exists()
-    .withMessage('Something went wrong with the edit process, please refresh the page and try again. If the error is still happening please notify the admins.')
+    .withMessage('Something went wrong with the edit process.')
 ], employeeController.updateEmployee);
 
 

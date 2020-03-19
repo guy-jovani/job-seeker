@@ -27,18 +27,20 @@ export class EmployeeEffects {
   @Effect()
   updateActiveEmployee = this.actions$.pipe(
     ofType(EmployeeActions.UPDATE_SINGLE_EMPLOYEE_IN_DB),
-    switchMap((actionData: { employee: Employee, password: string, confirmPassword: string}) => {
-      const employee = {
-        ...actionData['payload']['employee']
-      };
-      if (actionData['payload']['password']) {
-        employee['password'] = actionData['payload']['password'];
-        employee['confirmPassword'] = actionData['payload']['confirmPassword'];
+    switchMap((actionData: EmployeeActions.UpdateSingleEmployeeInDB) => {
+      const employeeFormDate = new FormData();
+      Object.keys(actionData.payload.employee).forEach(key => {
+        employeeFormDate.append(key, actionData.payload.employee[key]);
+      });
+
+      if (actionData.payload['password']) {
+        employeeFormDate.append('password', actionData.payload.employee['password']);
+        employeeFormDate.append('confirmPassword', actionData.payload.employee['confirmPassword']);
       }
-      return this.http.post(nodeServer  + 'update', employee)
+      employeeFormDate.append('deleteImage', actionData.payload.deleteImage.toString() );
+      return this.http.post(nodeServer  + 'update', employeeFormDate)
         .pipe(
           map(res => {
-            // const employee = new Employee({...res['employee']});
             if (res['type'] === 'success') {
               this.store.dispatch(new EmployeeActions.ClearError());
               return new UserActions.UpdateActiveUser({ user: {...res['employee']}, redirect: 'my-details', kind: 'employee' });

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { NgForm, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -23,6 +23,9 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
   showPasswords = false;
   messages: string[] = [];
   currUrl: string[] = null;
+  profileImage: { file: File, stringFile: string } = { file: null, stringFile: '' };
+
+  @ViewChild('deleteImage', { static: false }) deleteImage: ElementRef;
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -50,15 +53,13 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
         employeeState => {
           this.currUrl = this.router.url.substring(1).split('/');
           this.isLoading = employeeState.loadingSingle;
-          if (this.currUrl[this.currUrl.length - 1] === 'edit') {
-            if (employeeState.messages) {
-              this.messages = [];
-              for (const msg of employeeState.messages) {
-                this.messages.push(msg);
-              }
-            } else {
-              this.messages = [];
+          if (employeeState.messages) {
+            this.messages = [];
+            for (const msg of employeeState.messages) {
+              this.messages.push(msg);
             }
+          } else {
+            this.messages = [];
           }
           if (this.employee) {
             this.initForm();
@@ -73,6 +74,10 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
     return null;
   }
 
+  onCroppedEvent(images: { file: File, stringFile: string }) {
+    this.profileImage = images;
+  }
+
 
   initForm() {
     this.employeeForm.setValue({
@@ -84,6 +89,10 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
         confirmPassword: '',
       },
     });
+
+    if (this.employee.profileImagePath) {
+      this.profileImage = { file: null, stringFile: this.employee.profileImagePath as string };
+    }
   }
 
   onSubmit(form: NgForm) {
@@ -100,9 +109,10 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
     });
     if (firstName) { newEmployee.firstName = firstName; }
     if (lastName) { newEmployee.lastName = lastName; }
-
+    if ( this.profileImage.file ) { newEmployee.profileImagePath = this.profileImage.file; }
     this.store.dispatch(new EmployeeActions.UpdateSingleEmployeeInDB({
-              employee: newEmployee, password, confirmPassword }));
+              employee: newEmployee, deleteImage: this.deleteImage.nativeElement.checked,
+              password, confirmPassword }));
   }
 
   onCancel() {

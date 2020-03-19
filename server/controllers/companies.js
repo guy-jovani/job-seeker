@@ -70,7 +70,7 @@ exports.fetchAll = async (req, res, next) => {
   }
 };
 
-const updateCompanyImages = async (req) => {
+const updateReqImages = async (req) => {
   if(req.files.length) { // new images for company
     let newUrls = []; 
     req.files.forEach(file => {
@@ -98,7 +98,7 @@ const updateCompanyImages = async (req) => {
 
 const getUpdateQuery = async (req) => {
   Reflect.deleteProperty(req.body, 'imagesPath');
-  updateCompanyImages(req);
+  updateReqImages(req);
   // get an object with keys to delete from the company document (all keys that are null)
   const companyRemovableKeys = ['name', 'website', 'description'];
   const nullKeys = getNullKeysForUpdate(req, companyRemovableKeys);

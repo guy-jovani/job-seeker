@@ -34,9 +34,26 @@ exports.fetchAll = async (req, res, next) => {
 };
 
 
+
+const updateReqProfileImage = (req, res, next) => {
+  console.log(req.body)
+  console.log(req.file)
+
+  if(req.file) { // new image for company 
+    let url = req.protocol + '://' + req.get('host');
+    url = url + '/images/' + req.file.filename;
+    req.body.profileImagePath = url;
+    return true;
+  }
+  return false;
+}
+
 const getUpdateQuery = async (req) => {
+  let newProfileImage = updateReqProfileImage(req);
   const employeeRemovableKeys = ['firstName', 'lastName']; 
   const nullKeys = getNullKeysForUpdate(req, employeeRemovableKeys);
+  if(req.body.deleteImage === 'true' && !newProfileImage) nullKeys.profileImagePath = ''; 
+
   return await getBulkArrayForUpdate(req, nullKeys);
 };
 

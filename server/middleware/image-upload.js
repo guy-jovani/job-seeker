@@ -31,3 +31,6 @@ const imageFilter = (req, file, cb) => {
 
 exports.extractCompanyImages = multer({storage: imageStorage, fileFilter: imageFilter})
                                 .array('imagesPath', { maxCount: 6 });
+
+exports.extractEmployeeProfileImage = multer({storage: imageStorage, fileFilter: imageFilter})
+                                .single('profileImagePath');

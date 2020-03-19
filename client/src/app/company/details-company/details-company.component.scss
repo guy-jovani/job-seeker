@@ -32,7 +32,6 @@
   transform: scale(1.15);
   opacity: 0.7;
   transition: transform 0.5s, opacity 0.5s;
-  max-height: 28rem;
 }
 
 .image:hover {
@@ -66,9 +65,23 @@
 
 
 
+.images-container__list-item:first-child:nth-last-child(1),
+.images-container__list-item:first-child:nth-last-child(1) ~ .images-container__list-item,
+.images-container__list-item:first-child:nth-last-child(2),
+.images-container__list-item:first-child:nth-last-child(2) ~ .images-container__list-item,
+.images-container__list-item:first-child:nth-last-child(3),
+.images-container__list-item:first-child:nth-last-child(3) ~ .images-container__list-item {
+  max-height: 28rem;
+}
 
-
-
+.images-container__list-item:first-child:nth-last-child(4),
+.images-container__list-item:first-child:nth-last-child(4) ~ .images-container__list-item,
+.images-container__list-item:first-child:nth-last-child(6),
+.images-container__list-item:first-child:nth-last-child(6) ~ .images-container__list-item,
+.images-container__list-item:first-child:nth-last-child(5),
+.images-container__list-item:first-child:nth-last-child(5) ~ .images-container__list-item {
+  max-height: 14rem;
+}
 
 
 

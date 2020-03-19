@@ -1,124 +1,127 @@
 
 <div class="container">
-  <h4>Edit</h4>
-  <div *ngIf="isLoading">
-    <app-loading-spinner></app-loading-spinner>
+    <h4>Edit</h4>
+    <div *ngIf="isLoading">
+      <app-loading-spinner></app-loading-spinner>
+    </div>
+    <app-message-box *ngIf="messages.length && !isLoading" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
+    <form (ngSubmit)="onSubmit(employeeForm)" [formGroup]="employeeForm" *ngIf="!isLoading">
+      <div class="row">
+          <label for="email">email:  </label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            formControlName="email"
+            #email
+          >
+          <span class="help-block" *ngIf="!employeeForm.get('email').valid && employeeForm.get('email').touched">
+            please enter a valid email address
+          </span>
+        </div>
+      <div class="row">
+        <div class="col">
+          <label for="firstName">first name:  </label>
+          <input
+            type="text"
+            name="firstName"
+            id="firstName"
+            formControlName="firstName"
+            #firstName
+            >
+          <span *ngIf="!employeeForm.get('firstName').valid && employeeForm.get('firstName').touched">
+            <span class="help-block" *ngIf="employeeForm.get('firstName').errors.minlength">
+              first name must be of at least 2 characters long
+            </span>
+          </span>
+        </div>
+        <div class="col">
+          <label for="lastName">last name:  </label>
+          <input
+            type="text"
+            name="lastName"
+            id="lastName"
+            formControlName="lastName"
+            #lastName
+          >
+          <span *ngIf="!employeeForm.get('lastName').valid && employeeForm.get('lastName').touched">
+            <span class="help-block" *ngIf="employeeForm.get('lastName').errors.minlength">
+              last name must be of at least 2 characters long
+            </span>
+          </span>
+        </div>
+      </div>
+      <hr>
+      <div formGroupName="passwords">
+        <div>
+          <label for="name">password  </label>
+          <input
+            [type]="showPasswords ? 'text' : 'password'"
+            name="password"
+            id="password"
+            formControlName="password"
+            #password
+          >
+          <span *ngIf="employeeForm.get('passwords.password').touched &&
+                          !employeeForm.get('passwords.password').valid">
+            <span class="help-block" *ngIf="employeeForm.get('passwords.password').errors.required">
+              the password field is required
+            </span>
+            <span class="help-block" *ngIf="employeeForm.get('passwords.password').errors.minlength">
+                password must be of at least 3 characters long
+            </span>
+          </span>
+        </div>
+        <div>
+          <label for="name">confirm password  </label>
+          <input
+            [type]="showPasswords ? 'text' : 'password'"
+            name="confirmPassword"
+            id="confirmPassword"
+            formControlName="confirmPassword"
+          >
+          <span *ngIf="employeeForm.get('passwords.password').touched &&
+                  employeeForm.get('passwords.confirmPassword').touched &&
+                  employeeForm.get('passwords.password').valid &&
+                  !employeeForm.get('passwords').valid">
+            <span class="help-block" *ngIf="employeeForm.get('passwords').errors.equality">
+              the passwords fields must be identical
+            </span>
+          </span>
+        </div>
+          <button
+            type="button"
+            class="btn btn-default btn-sm"
+            (click)="onTogglePasswords()"
+            >
+            {{ showPasswords ? 'hide' : 'show' }} passwords
+          </button>
+      </div>
+      <hr>
+      <div class="employee-profile-image-container">
+        <input type="checkbox" class="form-check-input" #deleteImage>
+        <label class="form-check-label" for="deleteImage">Delete Last Uploaded Image?</label>
+        <app-image-cropper
+          (confirmedImageEvent)="onCroppedEvent($event)"
+          [aspectRatio]="1 / 1"
+          [roundCropper]='true'
+          [imagePreview]="profileImage.stringFile">
+        </app-image-cropper>
+      </div>
+      <hr>
+      <button
+        type="submit"
+        class="btn btn-success"
+        [disabled]="!employeeForm.valid"
+        >
+        Edit
+      </button>
+      <button
+        type="button"
+        class="btn btn-danger"
+        (click)="onCancel()"
+        >
+        Cancel
+      </button>
+    </form>
   </div>
-  <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
-  <form (ngSubmit)="onSubmit(employeeForm)"  [formGroup]="employeeForm" *ngIf="!isLoading">
-    <div class="row">
-        <label for="email">email:  </label>
-        <input
-          type="email"
-          name="email"
-          id="email"
-          formControlName="email"
-          #email
-        >
-        <span class="help-block" *ngIf="!employeeForm.get('email').valid && employeeForm.get('email').touched">
-          please enter a valid email address
-        </span>
-      </div>
-    <div class="row">
-      <div class="col">
-        <label for="firstName">first name:  </label>
-        <input
-          type="text"
-          name="firstName"
-          id="firstName"
-          formControlName="firstName"
-          #firstName
-          >
-        <span *ngIf="!employeeForm.get('firstName').valid && employeeForm.get('firstName').touched">
-          <span class="help-block" *ngIf="employeeForm.get('firstName').errors.minlength">
-            first name must be of at least 2 characters long
-          </span>
-        </span>
-      </div>
-      <div class="col">
-        <label for="lastName">last name:  </label>
-        <input
-          type="text"
-          name="lastName"
-          id="lastName"
-          formControlName="lastName"
-          #lastName
-        >
-        <span *ngIf="!employeeForm.get('lastName').valid && employeeForm.get('lastName').touched">
-          <span class="help-block" *ngIf="employeeForm.get('lastName').errors.minlength">
-            last name must be of at least 2 characters long
-          </span>
-        </span>
-      </div>
-    </div>
-    <hr>
-    <div formGroupName="passwords">
-      <div>
-        <label for="name">password  </label>
-        <input
-          [type]="showPasswords ? 'text' : 'password'"
-          name="password"
-          id="password"
-          formControlName="password"
-          #password
-        >
-        <span *ngIf="employeeForm.get('passwords.password').touched &&
-                        !employeeForm.get('passwords.password').valid">
-          <span class="help-block" *ngIf="employeeForm.get('passwords.password').errors.required">
-            the password field is required
-          </span>
-          <span class="help-block" *ngIf="employeeForm.get('passwords.password').errors.minlength">
-              password must be of at least 3 characters long
-          </span>
-        </span>
-      </div>
-      <div>
-        <label for="name">confirm password  </label>
-        <input
-          [type]="showPasswords ? 'text' : 'password'"
-          name="confirmPassword"
-          id="confirmPassword"
-          formControlName="confirmPassword"
-        >
-        <span *ngIf="employeeForm.get('passwords.password').touched &&
-                employeeForm.get('passwords.confirmPassword').touched &&
-                employeeForm.get('passwords.password').valid &&
-                !employeeForm.get('passwords').valid">
-          <span class="help-block" *ngIf="employeeForm.get('passwords').errors.equality">
-            the passwords fields must be identical
-          </span>
-        </span>
-      </div>
-        <button
-          type="button"
-          class="btn btn-default btn-sm"
-          (click)="onTogglePasswords()"
-          >
-          {{ showPasswords ? 'hide' : 'show' }} passwords
-        </button>
-    </div>
-    <hr>
-    <button
-      type="submit"
-      class="btn btn-success"
-      [disabled]="!employeeForm.valid"
-      >
-      Edit
-    </button>
-    <button
-      type="button"
-      class="btn btn-danger"
-      (click)="onCancel()"
-      >
-      Cancel
-    </button>
-    <!-- <button
-      type="button"
-      class="btn btn-danger"
-      *ngIf="edit"
-      (click)="onDelete()"
-      >
-      Delete
-    </button> -->
-  </form>
-</div>

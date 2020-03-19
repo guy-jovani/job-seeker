@@ -29,7 +29,8 @@ export class FetchAllEmployees implements Action {
 export class UpdateSingleEmployeeInDB implements Action {
   readonly type = UPDATE_SINGLE_EMPLOYEE_IN_DB;
 
-  constructor(public payload: { employee: Employee, password: string, confirmPassword: string}) {}
+  constructor(public payload: { employee: Employee, deleteImage: boolean,
+    password: string, confirmPassword: string }) {}
 }
 
 export class SetAllEmployees implements Action {

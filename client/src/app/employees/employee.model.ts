@@ -8,6 +8,7 @@ export class Employee {
   // tslint:disable-next-line: variable-name
   public _id: string; // the underscore is because the database named it like that
   public email: string;
+  public profileImagePath?: string | File;
   public positions?: { // TODO problem since the company positions are different
     position: Position,
     status: EmployeePositionStatus,

@@ -18,6 +18,7 @@
         </h3>
         <app-back-button *ngIf='currUrl[0] !== "my-details"'></app-back-button>
         <div>
+          <img [src]="employee.profileImagePath" class="profileImage" *ngIf="employee.profileImagePath"/>
           <p>email: {{ employee.email }}</p>
           <p>first name: {{ employee.firstName || "------" }}</p>
           <p>last name: {{ employee.lastName || "------" }}</p>
