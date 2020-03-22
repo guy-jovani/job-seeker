@@ -3,19 +3,19 @@
 
 <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 <div class="container" *ngIf="company && !isLoading">
+
   <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
-  <!-- <app-alert *ngIf="messages.length" [messages]="messages" (closeAlert)="onClose()"></app-alert> -->
-  <div>
+  <div class="details-page-header">
     <h3>{{ allowEdit ? 'My Profile' : company.name | titlecase }}</h3>
     <app-back-button *ngIf='currUrl[0] !== "my-details"'></app-back-button>
   </div>
 
   <hr>
 
-  <div class="row" *ngIf="!isLoading && company.email">
-    <p>email: {{ company.email || "------" }}</p>
-    <p>website: {{ company.website || "------" }}</p>
-    <p>description: {{ company.description || "------" }}</p>
+  <div class="details-page-body" *ngIf="!isLoading && company.email">
+    <p>Email: <a href="mailto:{{company.email}}">{{ company.email }}</a></p>
+    <p>Website: {{ company.website || "------" }}</p>
+    <p>Description: {{ company.description || "------" }}</p>
     <app-list-position *ngIf="company && !allowEdit" [companyPositions]="company.positions"></app-list-position>
     <div class="images-container">
       <ul class="images-container__list">
@@ -28,7 +28,7 @@
 
   <hr>
 
-  <div class="row" *ngIf="allowEdit">
+  <div class="edit-button-container" *ngIf="allowEdit">
     <a class="btn btn-primary btn-sm" routerLink='edit'>Edit Details</a>
   </div>
 </div>

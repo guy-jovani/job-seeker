@@ -3,61 +3,61 @@
 
 <div class="container">
 
-    <div *ngIf="isLoading">
-      <app-loading-spinner></app-loading-spinner>
-    </div>
+  <div *ngIf="isLoading">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
 
-    <div class="container-fluid" *ngIf="employee && !isLoading">
+  <div class="container-fluid" *ngIf="employee && !isLoading">
+    <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
 
-      <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
-      <div class="row">
+    <div class="details-page-header">
+      <img [src]="employee.profileImagePath" class="profileImage" *ngIf="employee.profileImagePath"/>
+      <div class="emp-info-header">
         <h3>
           {{ employee.firstName ? (employee.firstName | titlecase) : '' }}
           {{ employee.lastName ? (employee.lastName | titlecase) : '' }}
           {{ !employee.firstName && !employee.lastName ? 'Employee Details' : '' }}
         </h3>
-        <app-back-button *ngIf='currUrl[0] !== "my-details"'></app-back-button>
-        <div>
-          <img [src]="employee.profileImagePath" class="profileImage" *ngIf="employee.profileImagePath"/>
-          <p>email: {{ employee.email }}</p>
-          <p>first name: {{ employee.firstName || "------" }}</p>
-          <p>last name: {{ employee.lastName || "------" }}</p>
-          <hr>
-        </div>
-        <div class="row" *ngIf="allowEdit">
-          <a class="btn btn-primary btn-sm" routerLink='edit'>Edit Details</a>
-        </div>
+        <p><a href="mailto:{{employee.email}}">{{ employee.email }}</a></p>
+      </div>
+      <app-back-button *ngIf='currUrl[0] !== "my-details"'></app-back-button>
+    </div>
+
+    <div class="details-page-body">
+      <div class="edit-button-container" *ngIf="allowEdit">
+        <a class="btn btn-primary btn-sm" routerLink='edit'>Edit Details</a>
       </div>
 
-      <div class="row" *ngIf="currUrl[0] === 'my-applicants'">
-        <div>
-          <h4>The positions of {{ user.name | titlecase }} the employee interacted with:</h4>
-          <div *ngIf="currUrl[0] === 'my-applicants'">
-            <label for="position-list">Show applicants to position:</label>
-            <select [(ngModel)]="selctedStatusList" (ngModelChange)="checkPositionOfUser()">
-              <option value="all">All</option>
-              <option *ngFor="let status of availableStatus" value="{{status}}">{{ status | titlecase }}</option>
-            </select>
-          </div>
-          <ul>
-            <li class="list-group-item pos-link" *ngFor="let pos of applicantPositions; let i=index; trackBy: applicantPositionsTracker">
-              <p class="pos-title">{{ pos.position.title }}</p>
-              <p class="pos-status">{{ pos.status }}</p>
-              <div>
-                <button class="btn btn-danger" (click)="onAcceptReject('rejected', i)"
-                *ngIf='pos.status.toString() !== "rejected"'>Reject?</button>
-                <button class="btn btn-success" (click)="onAcceptReject('accepted', i)"
-                *ngIf='pos.status.toString() !== "accepted"'>Accept?</button>
-              </div>
-            </li>
-            <li class="list-group-item" *ngIf='!applicantPositions.length'>No matching positions.</li>
-          </ul>
+      <div class="positions-list" *ngIf="currUrl[0] === 'my-applicants'">
+        <div *ngIf="currUrl[0] === 'my-applicants'">
+          <label for="position-list">Show status: </label>
+          <select [(ngModel)]="selctedStatusList" (ngModelChange)="checkPositionOfUser()">
+            <option value="all">All</option>
+            <option *ngFor="let status of availableStatus" value="{{status}}">{{ status | titlecase }}</option>
+          </select>
         </div>
+
+        <ul class="list-group">
+          <li class="list-group-item pos-link" *ngFor="let pos of applicantPositions; let i=index; trackBy: applicantPositionsTracker">
+            <p class="pos-title">{{ pos.position.title }}</p>
+            <p class="pos-status">{{ pos.status }}</p>
+            <div>
+              <button class="btn btn-danger" (click)="onAcceptReject('rejected', i)"
+              *ngIf='pos.status.toString() !== "rejected"'>Reject?</button>
+              <button class="btn btn-success" (click)="onAcceptReject('accepted', i)"
+              *ngIf='pos.status.toString() !== "accepted"'>Accept?</button>
+            </div>
+          </li>
+          <li class="list-group-item" *ngIf='!applicantPositions.length'>No matching positions.</li>
+        </ul>
+
       </div>
 
     </div>
 
   </div>
+
+</div>
 
 
 

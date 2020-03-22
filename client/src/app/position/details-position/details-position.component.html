@@ -9,7 +9,7 @@
     <app-back-button *ngIf="!position"></app-back-button>
   </div>
   <div class="row">
-    <div class="pos-header-container">
+    <div class="details-header-container">
       <h3>{{ position.title ? position.title : position['position'].title | titlecase }}</h3>
       <h3 class="pos-status" *ngIf="status">{{ status }}</h3>
       <app-back-button></app-back-button>

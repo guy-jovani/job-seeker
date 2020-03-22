@@ -1,15 +1,158 @@
 /* You can add global styles to this file, and also import other style files */
 
+/**************************
+******* General ***********
+**************************/
+
 body {
   margin-top: 70px;
   margin-bottom: 50px;
 }
-// @media (max-width: 768px) {
-//   body {
-//     margin-top: 180px;
-//     margin-bottom: 50px;
-//   }
-// }
+
 input.ng-invalid.ng-touched {
   border: 1px solid red;
 }
+
+.container {
+  min-width: 23rem;
+}
+
+/**************************
+******* Forms *************
+**************************/
+
+.form-container {
+  display: flex;
+  justify-content: center;
+}
+
+.my-form {
+  width: 100%;
+  max-width: 60vw;
+}
+
+.form-title-container {
+  width: min-content;
+}
+
+.form-action-title {
+  margin-bottom: 2rem;
+}
+
+.password-input-container {
+  min-width: 20rem;
+  margin-bottom: 0;
+}
+
+.input-form-tag {
+  width: 100%;
+  min-width: 20rem;
+}
+
+.show-password-eye {
+  position: relative;
+  left: calc(100% - 25px);
+  display: inline-block;
+  top: -24px;
+  color: grey;
+}
+
+input[type=password] {
+  padding-right: 4rem;
+}
+
+
+/**************************
+****** Details Pages ******
+***************************/
+
+.details-page-header {
+  display: grid;
+  grid-template-rows: 1f;
+  grid-template-columns: 2fr 4fr 1fr;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: #eee;
+  border-radius: 15px;
+  justify-items: center;
+  align-items: center;
+}
+
+.profileImage {
+  border-radius: 50%;
+  max-width: 15rem;
+  max-height: 15rem;
+}
+
+app-back-button {
+  justify-self: flex-end;
+  align-self: flex-start;
+  grid-column: -1;
+}
+
+.details-page-body {
+
+}
+
+.edit-button-container {
+  float: right;
+}
+
+.pos-link {
+  display: flex;
+  justify-content: space-between;
+}
+
+.pos-status {
+  background-color: bisque;
+  border-radius: 15px;
+  padding: 1px 1.5rem;
+}
+
+
+/**************************
+****** Lists Pages ******
+***************************/
+
+
+.list-page-header {
+
+}
+
+.list-page-body {
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

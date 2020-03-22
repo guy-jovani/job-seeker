@@ -1,26 +1,26 @@
 
-
-
-
-
-.profileImage {
-  border-radius: 50%;
-  max-width: 15rem;
-  max-height: 15rem;
+/**************************
+    Header
+***************************/
+.emp-info-header {
+  justify-self: start;
 }
 
 
-.pos-link {
-  display: flex;
-  justify-content: space-between;
+/**************************
+           Body
+***************************/
+
+.edit-button-container {
+  margin-top: 2rem;
 }
 
+/**************************
+        Position List
+***************************/
 
-.pos-status {
-  background-color: bisque;
-  border-radius: 15px;
-  padding: 1px 1.5rem;
-}
+
+
 
 
 

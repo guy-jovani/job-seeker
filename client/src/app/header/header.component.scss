@@ -1,6 +1,3 @@
-
-
-
 .chat-item-list {
   position: relative;
 }
@@ -12,4 +9,20 @@
   height: 5px;
   background-color: red;
   border-radius: 50%;
+}
+
+@media (max-width: 767px) {
+  .navbar-header {
+    min-width: 20rem;
+  }
+
+  .navbar-collapse {
+    overflow-y: auto;
+    max-height: 60vh;
+  }
+  .dropdown-menu.dropdown-menu-opened {
+    position: absolute;
+    background-color: white;
+    border: 1px gray solid;
+  }
 }

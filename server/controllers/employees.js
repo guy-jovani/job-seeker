@@ -11,7 +11,7 @@ const changeStatusOfAUserPosition = require('../utils/shared').changeStatusOfAUs
 
 exports.fetchSingle = async (req, res, next) => {
   try {throw "111"
-    const employee = await Employee.findById(req.query._id).select('_id email firstName lastName');
+    const employee = await Employee.findById(req.query._id).select('_id email firstName lastName profileImagePath');
     res.status(200).json({
       type: 'success',
       employee
@@ -23,7 +23,7 @@ exports.fetchSingle = async (req, res, next) => {
 
 exports.fetchAll = async (req, res, next) => {
   try {
-    const employees = await Employee.find({_id: { $ne: req.query._id }}).select('_id email firstName lastName');
+    const employees = await Employee.find({_id: { $ne: req.query._id }}).select('_id email firstName lastName profileImagePath');
     res.status(200).json({
       type: 'success',
       employees
@@ -36,9 +36,6 @@ exports.fetchAll = async (req, res, next) => {
 
 
 const updateReqProfileImage = (req, res, next) => {
-  console.log(req.body)
-  console.log(req.file)
-
   if(req.file) { // new image for company 
     let url = req.protocol + '://' + req.get('host');
     url = url + '/images/' + req.file.filename;

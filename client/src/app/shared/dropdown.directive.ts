@@ -5,16 +5,22 @@ import { Directive, ElementRef, Renderer2, HostListener } from '@angular/core';
 })
 export class DropdownDirective {
   open = false;
-  constructor(private elementRef: ElementRef,
-              private renderer: Renderer2) { }
+  clicked = 0;
+  constructor(private elementRef: ElementRef, private renderer: Renderer2) {}
 
-  @HostListener('click') onClick(eventData: Event) {
-    if (this.open) {
-      this.renderer.removeClass(this.elementRef.nativeElement, 'open');
-    } else {
+  @HostListener('click') onClose() {
+    if (!this.open) {
       this.renderer.addClass(this.elementRef.nativeElement, 'open');
+      this.open = !this.open;
     }
-    this.open = !this.open;
+    this.clicked++;
   }
 
+  @HostListener('document:click', ['$event']) onOpen(event) {
+    if (this.open && (this.clicked >= 2 || this.elementRef.nativeElement.firstChild !== event.target)) {
+      this.renderer.removeClass(this.elementRef.nativeElement, 'open');
+      this.open = !this.open;
+      this.clicked = 0;
+    }
+  }
 }

@@ -29,7 +29,7 @@ router.post('/login', [
     .exists()
     .not()
     .isEmpty()
-    .withMessage('please provide a valid email'),
+    .withMessage('Please provide a valid email.'),
   body('password')
     .isLength(3)
     .withMessage('The password need to be more than 3 characters long.')

@@ -60,8 +60,6 @@ exports.signup = async (req, res, next) => {
     const token = getToken(user._id);
     user = user.toObject();
     Reflect.deleteProperty(user, 'password');
-    // Reflect.set(user, 'positions', user['positionsIds']);
-    // Reflect.deleteProperty(user, 'positionsIds');
     res.status(201).json({
       message: 'Signed up successfully!',
       type: 'success',
@@ -92,6 +90,7 @@ getUserLogin = async (req, res) => {
     kind = "company";
   }
   if(!user){ 
+    
     sendMessagesResponse(res, 401, ['The email and/or password are incorrect'], 'failure');
   }
   return [user, kind];

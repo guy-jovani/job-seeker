@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ElementRef, ViewChildren } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 
@@ -11,6 +11,8 @@ import * as PositionActions from '../position/store/position.actions';
 import * as UserActions from '../user/store/user.actions';
 import { Employee } from '../employees/employee.model';
 import { Company } from 'app/company/company.model';
+import { Router, NavigationStart } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 
 @Component({
@@ -22,13 +24,21 @@ export class HeaderComponent implements OnInit, OnDestroy {
   collapsed = true;
   isAuthenticated = false;
   subscription: Subscription;
+  routerSub: Subscription;
   user: Employee | Company = null;
   chatNotifications = false;
   kind: string;
 
-  constructor(private store: Store<fromApp.AppState>) { }
+  constructor(private store: Store<fromApp.AppState>,
+              private router: Router) { }
 
   ngOnInit() {
+    this.routerSub = this.router.events.pipe(
+      filter(event => event instanceof NavigationStart)
+    ).subscribe(routerObj => {
+      this.collapsed = true;
+    });
+
     this.subscription = this.store.select('user')
       .subscribe(userState => {
         this.isAuthenticated = !!userState.user;
@@ -68,6 +78,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.subscription) {
       this.subscription.unsubscribe();
+    }
+    if (this.routerSub) {
+      this.routerSub.unsubscribe();
     }
   }
 

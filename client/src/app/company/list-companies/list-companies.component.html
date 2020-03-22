@@ -6,20 +6,23 @@
     <app-loading-spinner></app-loading-spinner>
   </div>
   <div *ngIf="!isLoading" class="container-fluid">
-    <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
-    <!-- <app-alert *ngIf="messages.length" [messages]="messages" (closeAlert)="onClose()"></app-alert> -->
-    <h3>Compenies</h3>
-    <ul class="list-group" *ngIf="companies.length && !messages.length">
-      <li
-      class="list-group-item"
-      *ngFor="let company of companies; let i=index">
-      <a routerLink='{{i}}'>
-        <p>Name: {{ company.name }}</p>
-        <p>Description: {{ company.description ? company.description : '-----'}}</p>
-      </a>
-    </li>
-  </ul>
-  <p *ngIf="!companies.length && !messages.length">There are no registers companies</p>
+    <div class="list-page-header">
+      <h3>Compenies</h3>
+      <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
+    </div>
+    <div class="list-page-body">
+      <ul class="list-group" *ngIf="companies.length && !messages.length">
+        <li
+          class="list-group-item"
+          *ngFor="let company of companies; let i=index">
+          <a routerLink='{{i}}'>
+            <p>Name: {{ company.name }}</p>
+            <p>Description: {{ company.description ? company.description : '-----'}}</p>
+          </a>
+        </li>
+      </ul>
+      <p *ngIf="!companies.length && !messages.length">There are no registers companies</p>
+    </div>
   </div>
 </div>
 

@@ -1,32 +1,36 @@
 
 
-.company-images-conteiner {
+.company-images-container {
   margin: 2rem 0;
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.add-image {
+  display: flex;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.add-image > button {
+  margin-right: 2rem;
+}
+
+.cropper-component {
+  width: 50%;
 }
 
 
 
+@media (max-width: 650px) {
+  .cropper-component {
+    width: 100%;
+  }
+}
 
-
-
-// .file-picker {
-//   display: flex;
-//   align-items: flex-end;
-//   margin: 0.5rem 0;
-// }
-
-// .image-upload-input {
-//   width: 30rem;
-// }
-
-// .btn-remove-file {
-//   border: none;
-//   width: min-content;
-//   height: min-content;
-//   padding: 1px;
-// }
-
-// .image-preview {
-//   width: 10rem;
-//   height: 10rem;
-// }
+@media (min-width: 1200px) {
+  .cropper-component {
+    width: 33%;
+  }
+}
