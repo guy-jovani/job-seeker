@@ -16,7 +16,11 @@
     <p>Email: <a href="mailto:{{company.email}}">{{ company.email }}</a></p>
     <p>Website: {{ company.website || "------" }}</p>
     <p>Description: {{ company.description || "------" }}</p>
-    <app-list-position *ngIf="company && !allowEdit" [companyPositions]="company.positions"></app-list-position>
+    <h4>Positions</h4>
+    <app-list-position
+      [positions]="company.positions"
+      [companyPositions]="true">
+    </app-list-position>
     <div class="images-container">
       <ul class="images-container__list">
         <li *ngFor="let imagePath of company.imagesPath" class="images-container__list-item">

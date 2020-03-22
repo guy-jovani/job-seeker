@@ -1,39 +1,16 @@
 
 
 
-<div class="container">
-  <div *ngIf="isLoading" style="text-align: center;">
-    <app-loading-spinner></app-loading-spinner>
-  </div>
-  <div *ngIf="allowAdd">
-    <a class="btn btn-success" routerLink='create'>
-      Add Position
+
+<ul class="list-group" *ngIf="positions && positions.length">
+  <li
+    class="list-group-item"
+    *ngFor="let positionInfo of positions; let i=index">
+    <a class="pos-link" routerLink='{{ companyPositions && positions.length ? "position" : detailsPositionUrl + i }}'
+        [state]="{ positionInd : i }">
+      <p class="pos-title">{{ positionInfo.title ? positionInfo.title : positionInfo['position'].title }}</p>
+      <p class="pos-status" *ngIf="showStatus">{{ positionInfo.status }}</p>
     </a>
-  </div>
-  <div *ngIf="currUrl[0] === 'my-positions' && !allowAdd">
-    <label for="position-list">Choose status list:</label>
-    <select [(ngModel)]="selectedList" (ngModelChange)="checkPositionOfUser()">
-      <option value="all">All</option>
-      <option *ngFor="let status of availableStatus" value="{{status}}">{{ status | titlecase }}</option>
-    </select>
-  </div>
-  <div *ngIf="!isLoading">
-    <div>
-      <h3 *ngIf="!companyPositions">Positions</h3>
-      <h4 *ngIf="companyPositions">Positions</h4>
-      <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
-      <ul class="list-group" *ngIf="positions && positions.length && !messages.length">
-        <li
-          class="list-group-item"
-          *ngFor="let positionInfo of positions; let i=index">
-          <a class="pos-link" routerLink='{{ companyPositions && companyPositions.length ? "position" : detailsPositionUrl + i }}'
-              [state]="{ positionInd : i }">
-            <p class="pos-title">{{ positionInfo.title ? positionInfo.title : positionInfo['position'].title }}</p>
-            <p class="pos-status" *ngIf="currUrl[0] === 'my-positions' && !allowAdd">{{ positionInfo.status }}</p>
-          </a>
-        </li>
-      </ul>
-      <p *ngIf="!positions || !positions.length && !messages.length">There are no open positions</p>
-    </div>
-  </div>
-</div>
+  </li>
+</ul>
+<p *ngIf="!positions || !positions.length">There are no open positions.</p>

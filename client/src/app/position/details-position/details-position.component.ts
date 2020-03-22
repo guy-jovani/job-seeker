@@ -51,7 +51,6 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
         this.currUrl = this.router.url.substring(1).split('/');
         this.kind = userState.kind;
         this.user = userState.user;
-        // this.user = this.kind === 'employee' ? userState.user as Employee : userState.user as Company;
         if (this.currUrl[0] === 'my-positions') {
           return this.store.select('user');
         } else if (this.currUrl[0] === 'companies') {
@@ -88,13 +87,14 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
       this.position = null;
       if (authState['user']) {
         if (this.currUrl[1] === 'all') {
+          if (this.invalidStateListInd(authState['user'].positions, +this.currUrl[2])) { return; }
           this.position = authState['user'].positions[+this.currUrl[2]].position;
-        } else if (this.currUrl[1] === 'saved') {
-          this.position = authState['user']
-                          .positions.filter(pos => pos.status === 'saved')[+this.currUrl[2]].position;
         } else {
-          this.position = authState['user']
-                          .positions.filter(pos => pos.status === 'applied')[+this.currUrl[2]].position;
+          const positionsList = authState['user']
+          .positions.filter(pos => pos.status === this.currUrl[1]);
+
+          if (this.invalidStateListInd(positionsList, +this.currUrl[2])) { return; }
+          this.position = positionsList[+this.currUrl[2]].position;
         }
         this.companyId = { _id: this.position.company._id, name: this.position.company.name };
         this.allowedApplySave();
@@ -108,7 +108,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
   }
 
   private checkPositionOfACompany(companyState) {
-    if (this.invalidStateListInd(companyState, 'companies')) { return; }
+    if (this.invalidStateListInd(companyState['companies'], +this.currUrl[1])) { return; }
     this.companyLink = false;
     this.position = !companyState['companies'] ? null :
     companyState['companies'][+this.currUrl[1]]['positions'][window.history.state['positionInd']];
@@ -121,7 +121,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
   }
 
   private checkPositionFromPositionsState(positionState) {
-    if (this.invalidStateListInd(positionState, 'positions')) { return; }
+    if (this.invalidStateListInd(positionState['positions'], +this.currUrl[1])) { return; }
     if (this.currUrl[this.currUrl.length - 1] === 'position') { // /positions/:posInd/company/position
       this.companyLink = false;
 
@@ -172,8 +172,8 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
     });
   }
 
-  private invalidStateListInd(currState, list) {
-    if (this.currUrl[1] >= currState[list].length || +this.currUrl[1] < 0) {
+  private invalidStateListInd(list, index) {
+    if (index >= list.length || index < 0) {
       // check if trying to get details of an undefined position
       this.router.navigate([this.currUrl[0]]);
       return true;
