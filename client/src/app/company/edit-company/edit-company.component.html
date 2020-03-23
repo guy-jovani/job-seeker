@@ -19,6 +19,18 @@
       <h3 class="form-action-title">Update Details</h3>
     </div>
 
+    <div class="company-profile-image-container">
+      <label for="profile-cropper">Profile Image:</label>
+      <app-image-cropper
+        id="profile-cropper"
+        name="profile-cropper"
+        class="cropper-component"
+        (confirmedImageEvent)="onCroppedEvent($event, null)"
+        [aspectRatio]="16 / 9"
+        [imagePreview]="profileImagePreview ? profileImagePreview.stringFile : ''">
+      </app-image-cropper>
+    </div>
+
     <div class="form-group">
       <label for="name">Name:  </label>
       <input

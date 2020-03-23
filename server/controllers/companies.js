@@ -70,10 +70,19 @@ exports.fetchAll = async (req, res, next) => {
   }
 };
 
-const updateReqImages = async (req) => {
-  if(req.files.length) { // new images for company
+const getProfileImage = (req, file) => {
+  if(file){
+    let url = req.protocol + '://' + req.get('host');
+    url = url + '/images/' + file[0].filename;
+    req.body.profileImagePath = url;
+  } 
+};
+
+
+const getNonProfileImages = (req, files) => {
+  if(files.imagesPath) { // new images for company
     let newUrls = []; 
-    req.files.forEach(file => {
+    files.imagesPath.forEach(file => {
       let url = req.protocol + '://' + req.get('host');
       url = url + '/images/' + file.filename;
       newUrls.push(url);
@@ -96,6 +105,11 @@ const updateReqImages = async (req) => {
   }  
 };
 
+const updateReqImages = async (req) => {
+  getNonProfileImages(req, req.files);
+  getProfileImage(req, req.files.profileImagePath);
+};
+
 const getUpdateQuery = async (req) => {
   Reflect.deleteProperty(req.body, 'imagesPath');
   updateReqImages(req);
@@ -116,6 +130,7 @@ exports.updateCompany = async (req, res, next) => {
     if(companyValid.type === 'failure'){
       return sendMessagesResponse(res, 422, companyValid.messages, 'failure');
     }
+
     const bulkRes = await Company.bulkWrite(await getUpdateQuery(req));
     if(!bulkRes.result.nMatched){
       throw new Error("trying to update a non exisitng company");

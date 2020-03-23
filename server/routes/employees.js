@@ -3,7 +3,7 @@
 const express = require('express')
 const router = express.Router();
 const { body } = require('express-validator');
-const extractEmployeeProfileImage = require('../middleware/image-upload').extractEmployeeProfileImage;
+const extractProfileImage = require('../middleware/image-upload').extractProfileImage;
 
 
 const employeeController = require('../controllers/employees');
@@ -11,7 +11,7 @@ const employeeController = require('../controllers/employees');
 router.get('/fetchAll', employeeController.fetchAll);
 router.get('/fetchSingle', employeeController.fetchSingle);
 
-router.post('/update', extractEmployeeProfileImage, [
+router.post('/update', extractProfileImage, [
   body('email')
     .isEmail()
     .withMessage('Please provide a valid email.'),

@@ -90,10 +90,15 @@ input[type=password] {
   }
 }
 
-.profileImage {
+.employeeProfileImage {
   border-radius: 50%;
   max-width: 15rem;
   max-height: 15rem;
+}
+
+.companyProfileImage {
+  max-width: 16rem;
+  max-height: 9rem;
 }
 
 app-back-button {

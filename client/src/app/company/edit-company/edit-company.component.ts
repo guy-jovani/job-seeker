@@ -24,7 +24,7 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
   currUrl: string[] = null;
   images: File[] = null;
   imagesPath: string[] = null;
-  imagePreview: string;
+  profileImagePreview: { file: File, stringFile: string };
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -92,6 +92,9 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
       this.imagesPath.push(imagePath);
       this.images.push(null);
     });
+    this.profileImagePreview = {
+      file: null, stringFile: this.company.profileImagePath as string
+    };
   }
 
   onAddImage() {
@@ -106,8 +109,12 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
   }
 
   onCroppedEvent(images: { file: File, stringFile: string }, ind: number) {
-    this.images[ind] = images.file;
-    this.imagesPath[ind] = images.stringFile;
+    if (Number.isInteger(ind)) {
+      this.images[ind] = images.file;
+      this.imagesPath[ind] = images.stringFile;
+    } else {
+      this.profileImagePreview = images;
+    }
   }
 
   onSubmit() {
@@ -124,6 +131,9 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
     if (formValue.website) { newCompany.website = formValue.website; }
     if (this.images) { // sending the files
       newCompany.imagesPath = this.images;
+    }
+    if (this.profileImagePreview) {
+      newCompany.profileImagePath = this.profileImagePreview.file || this.profileImagePreview.stringFile;
     }
     this.store.dispatch(new CompanyActions.UpdateSingleCompanyInDb({
       company: newCompany, oldImagesPath: this.imagesPath.map(path => path.startsWith('http') ? path : ''), password, confirmPassword }));

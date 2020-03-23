@@ -6,6 +6,7 @@
 
   <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
   <div class="details-page-header">
+    <img [src]="company.profileImagePath" class="companyProfileImage" *ngIf="company.profileImagePath"/>
     <h3>{{ allowEdit ? 'My Profile' : company.name | titlecase }}</h3>
     <app-back-button *ngIf='currUrl[0] !== "my-details"'></app-back-button>
   </div>

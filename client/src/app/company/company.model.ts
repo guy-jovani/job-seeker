@@ -22,6 +22,7 @@ export class Company {
   public email?: string;
   public description?: string;
   public website?: string;
+  public profileImagePath?: File | string;
   public imagesPath?: string[] | File[];
   public positions?: Position[];
   public applicants: { employee: Employee, positions: ApplicantPosition[] }[];

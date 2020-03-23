@@ -11,7 +11,7 @@
     <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
 
     <div class="details-page-header">
-      <img [src]="employee.profileImagePath" class="profileImage" *ngIf="employee.profileImagePath"/>
+      <img [src]="employee.profileImagePath" class="employeeProfileImage" *ngIf="employee.profileImagePath"/>
       <div class="emp-info-header">
         <h3>
           {{ employee.firstName ? (employee.firstName | titlecase) : '' }}

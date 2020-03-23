@@ -26,6 +26,10 @@ const companySchema = new Schema(
       type: String,
       required: false
     },
+    profileImagePath: {
+      type: String,
+      required: false
+    },
     imagesPath: [{
       type: String,
       required: false
