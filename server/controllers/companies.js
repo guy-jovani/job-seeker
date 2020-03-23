@@ -116,6 +116,8 @@ const getUpdateQuery = async (req) => {
   // get an object with keys to delete from the company document (all keys that are null)
   const companyRemovableKeys = ['name', 'website', 'description'];
   const nullKeys = getNullKeysForUpdate(req, companyRemovableKeys);
+
+  if (req.body.profileImagePath === '') nullKeys['profileImagePath'] = '';
   return await getBulkArrayForUpdate(req, nullKeys);
 };
 

@@ -1,8 +1,19 @@
+
+
+
+
+
 .applicant-position {
   display: grid;
   justify-items: center;
   grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
+
+  @media (max-width: 400px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    margin-bottom: 1rem;
+  }
 }
 
 .position-link {
@@ -25,5 +36,10 @@
 
   button {
     margin: 0.25rem 0;
+  }
+
+  @media (max-width: 400px) {
+    justify-self: center;
+    flex-direction: row;
   }
 }

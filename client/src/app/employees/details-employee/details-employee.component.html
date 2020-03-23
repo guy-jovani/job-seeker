@@ -16,7 +16,7 @@
         <h3>
           {{ employee.firstName ? (employee.firstName | titlecase) : '' }}
           {{ employee.lastName ? (employee.lastName | titlecase) : '' }}
-          {{ !employee.firstName && !employee.lastName ? 'Employee Details' : '' }}
+          {{ !employee.firstName && !employee.lastName ? employee.email : '' }}
         </h3>
         <p><a href="mailto:{{employee.email}}">{{ employee.email }}</a></p>
       </div>
@@ -31,7 +31,7 @@
       <div class="positions-list" *ngIf="currUrl[0] === 'my-applicants'">
         <h4>Shown interest</h4>
 
-        <div *ngIf="currUrl[0] === 'my-applicants'">
+        <div *ngIf="currUrl[0] === 'my-applicants'" class="select-status-list">
           <label for="position-list">Show status list: </label>
           <select [(ngModel)]="selctedStatusList" (ngModelChange)="checkPositionOfUser()">
             <option value="all">All</option>

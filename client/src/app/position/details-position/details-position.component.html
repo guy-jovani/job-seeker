@@ -31,7 +31,7 @@
   <p *ngIf="!position.requirements || !position.requirements.length; else reqList">There are no prior requierments for this position.</p>
   <ng-template #reqList>
     <ul class="requirements-list" #reqList>
-      <li class="requirements-list__item {{ currUrl[0] === 'positions' ? 'dddd' : 'fff' }}" *ngFor="let requirement of position.requirements">
+      <li class="requirements-list__item" *ngFor="let requirement of position.requirements">
         <p>{{ requirement.requirement | titlecase }}</p>
       </li>
     </ul>

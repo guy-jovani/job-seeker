@@ -10,7 +10,7 @@ const Company = require('../models/company');
 const validation = require('../utils/validation');
 const handleServerErrors = require('../utils/errorHandling').handleServerErrors
 const sendMessagesResponse = require('../utils/shared').sendMessagesResponse
-const chackCompanyUpdateSignupValidation = require('../utils/shared').chackCompanyUpdateSignupValidation
+const checkCompanyUpdateSignupValidation = require('../utils/shared').checkCompanyUpdateSignupValidation
 
 
 const transporter = nodemailer.createTransport({
@@ -49,7 +49,7 @@ exports.signup = async (req, res, next) => {
     if(routeErros.type === 'failure') {
       return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
     }
-    const companyValid = await chackCompanyUpdateSignupValidation(req);
+    const companyValid = await checkCompanyUpdateSignupValidation(req);
     if(companyValid.type === 'failure'){
       return sendMessagesResponse(res, 422, companyValid.messages, 'failure');
     }
@@ -90,7 +90,7 @@ getUserLogin = async (req, res) => {
     kind = "company";
   }
   if(!user){ 
-    
+
     sendMessagesResponse(res, 401, ['The email and/or password are incorrect'], 'failure');
   }
   return [user, kind];
@@ -112,8 +112,6 @@ exports.login = async (req, res, next) => {
     
     user = user.toObject();
     Reflect.deleteProperty(user, 'password');
-    // Reflect.set(user, 'positions', user['positionsIds']);
-    // Reflect.deleteProperty(user, 'positionsIds');
     const token = getToken(user._id);
     res.status(200).json({
       message: 'Logged in successfully!',

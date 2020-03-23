@@ -6,14 +6,17 @@
 
 
 
-<ul class="list-group" *ngIf="companies.length">
+<ul class="list-group" *ngIf="companies.length" class="list-container">
   <li
+    routerLink='{{i}}'
+    title="{{ company.description ? (company.description | cut: 20) : null }}"
     class="list-group-item"
     *ngFor="let company of companies; let i=index">
-    <a routerLink='{{i}}'>
-      <p>{{ company.name | titlecase }}</p>
-      <p>Description: {{ company.description ? company.description : '-----'}}</p>
-    </a>
+      <img
+        [src]="company.profileImagePath"
+        class="companyProfileImage"
+        *ngIf="company.profileImagePath" />
+      <h4>{{ company.name | titlecase }}</h4>
   </li>
 </ul>
 <p *ngIf="!companies.length">There are no registers companies</p>
