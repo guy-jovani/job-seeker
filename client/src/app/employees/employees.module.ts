@@ -8,6 +8,7 @@ import { EditEmployeeComponent } from './edit-employee/edit-employee.component';
 import { ListEmployeeComponent } from './list-employee/list-employee.component';
 import { DetailsEmployeeComponent } from './details-employee/details-employee.component';
 import { EmployeesRoutingModule } from './employees-routing.module';
+import { PositionModule } from 'app/position/position.module';
 
 
 
@@ -23,7 +24,8 @@ import { EmployeesRoutingModule } from './employees-routing.module';
     EmployeesRoutingModule,
     SharedModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    PositionModule
   ],
   exports: [
     EditEmployeeComponent,

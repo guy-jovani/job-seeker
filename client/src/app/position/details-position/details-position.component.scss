@@ -1,9 +1,14 @@
 
 
 
+.only-position-title {
+  grid-column: 1/3;
+  justify-self: start;
+}
 
-
-
+.requirements-list__item {
+  list-style: decimal;
+}
 
 
 

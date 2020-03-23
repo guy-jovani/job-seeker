@@ -6,7 +6,9 @@
   <div *ngIf="isLoading">
     <app-loading-spinner></app-loading-spinner>
   </div>
+
   <form (ngSubmit)="onSubmit()" [formGroup]="companyForm" *ngIf="!isLoading" class="my-form">
+
     <app-message-box
       *ngIf="messages.length && !isLoading"
       [messages]="messages"
@@ -14,8 +16,9 @@
     </app-message-box>
 
     <div class="form-title-container">
-      <h3 class="form-action-title">Edit</h3>
+      <h3 class="form-action-title">Update Details</h3>
     </div>
+
     <div class="form-group">
       <label for="name">Name:  </label>
       <input
@@ -29,6 +32,7 @@
         Please enter a valid name.
       </span>
     </div>
+
     <div class="form-group">
       <label for="email">Email:  </label>
       <input
@@ -44,6 +48,7 @@
         Please enter a valid email address.
       </span>
     </div>
+
     <div class="form-group">
       <label for="website">Website:  </label>
       <input
@@ -57,6 +62,7 @@
         Please enter a valid website.
       </span>
     </div>
+
     <div class="form-group">
       <label for="description">Description:  </label>
       <textarea
@@ -69,11 +75,12 @@
         Please enter a valid description.
       </span>
     </div>
+
     <div formGroupName="passwords" class="form-group">
       <div class="form-group password-input-container">
         <label for="name">Password  </label>
         <input
-          placeholder="Password *"
+          placeholder="Password"
           class="form-control input-form-tag"
           [type]="showPasswords ? 'text' : 'password'"
           name="password"
@@ -99,7 +106,7 @@
         <label for="name">Confirm Password  </label>
         <input
           class="form-control input-form-tag"
-          placeholder="Confirm Password *"
+          placeholder="Confirm Password"
           [type]="showPasswords ? 'text' : 'password'"
           name="confirmPassword"
           id="confirmPassword"
@@ -115,7 +122,9 @@
         </span>
       </div>
     </div>
+
     <hr>
+
     <div class="company-images-container">
       <div class="add-image">
         <button type="button" class="btn btn-primary" (click)="onAddImage()">Add Image </button>
@@ -129,21 +138,23 @@
         [imagePreview]="imagePath">
       </app-image-cropper>
     </div>
+
     <hr>
-    <button
-      type="submit"
-      class="btn btn-success"
-      [disabled]="!companyForm.valid"
-      >
-      Edit
-    </button>
-    <button
-      type="button"
-      class="btn btn-danger"
-      (click)="onCancel()"
-      >
-      Cancel
-    </button>
+
+    <div class="edit-buttons-container">
+      <button
+        type="submit"
+        class="btn btn-success"
+        [disabled]="!companyForm.valid">
+        Update
+      </button>
+      <button
+        type="button"
+        class="btn btn-danger"
+        (click)="onCancel()">
+        Cancel
+      </button>
+    </div>
   </form>
 </div>
 

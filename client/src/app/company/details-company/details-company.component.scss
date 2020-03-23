@@ -1,5 +1,9 @@
 a {
   text-decoration: none;
+
+  + span {
+    font-size: 1.1rem;
+  }
 }
 
 .images-container {

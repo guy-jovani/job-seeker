@@ -29,10 +29,14 @@ input.ng-invalid.ng-touched {
 .my-form {
   width: 100%;
   max-width: 60vw;
+
+  @media (max-width: 400px) {
+    max-width: none;
+  }
 }
 
 .form-title-container {
-  width: min-content;
+  width: 100%;
 }
 
 .form-action-title {
@@ -55,6 +59,7 @@ input.ng-invalid.ng-touched {
   display: inline-block;
   top: -24px;
   color: grey;
+  cursor: pointer;
 }
 
 input[type=password] {
@@ -69,13 +74,20 @@ input[type=password] {
 .details-page-header {
   display: grid;
   grid-template-rows: 1f;
-  grid-template-columns: 2fr 4fr 1fr;
+  grid-template-columns: 3fr 3fr 1fr;
   margin-bottom: 2rem;
   padding: 1rem;
   background-color: #eee;
   border-radius: 15px;
   justify-items: center;
   align-items: center;
+  overflow-wrap: anywhere;
+
+  @media (max-width: 400px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: 0.75fr 3fr 1fr;
+    justify-items: start;
+  }
 }
 
 .profileImage {
@@ -87,41 +99,30 @@ input[type=password] {
 app-back-button {
   justify-self: flex-end;
   align-self: flex-start;
-  grid-column: -1;
+  grid-column-end: -1;
+
+  @media (max-width: 400px) {
+    grid-column-end: -1;
+    grid-row-start: 1;
+  }
 }
 
-.details-page-body {
-
-}
-
-.edit-button-container {
+.edit-buttons-container,
+.status-buttons-container {
   float: right;
+  margin-top: 2rem;
 }
 
-.pos-link {
-  display: flex;
-  justify-content: space-between;
-}
-
-.pos-status {
+.position-status {
   background-color: bisque;
   border-radius: 15px;
   padding: 1px 1.5rem;
+  margin: 0;
+  @media (max-width: 400px) {
+    grid-row-start: 3;
+  }
 }
 
-
-/**************************
-****** Lists Pages ******
-***************************/
-
-
-.list-page-header {
-
-}
-
-.list-page-body {
-
-}
 
 
 

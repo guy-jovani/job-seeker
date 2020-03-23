@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
@@ -65,7 +65,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
             this.user = currState['user'];
             const applicant = this.user.applicants[+this.currUrl[1]];
             this.employee = applicant['employee'];
-            this.applicantPositions = applicant['positions'];
+            this.checkPositionOfUser();
           } else {
             if (this.invalidStateListInd(currState, 'employees')) { return; }
             this.employee = currState['employees'][+this.currUrl[1]];
@@ -74,12 +74,12 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
         });
   }
 
-  onAcceptReject(status: ApplicantStatus, posInd: number) { // company actions
+  onAcceptReject(positionInfo: { status: ApplicantStatus, posInd: number }) { // company actions
     this.store.dispatch(new UserActions.CompanyAcceptRejectPositionAttempt());
     this.chatService.sendMessage('updateStatus', {
-      status,
+      status: positionInfo.status,
       kind: 'company',
-      positionId: this.applicantPositions[posInd].position._id,
+      positionId: this.applicantPositions[positionInfo.posInd].position._id,
       companyId: this.user._id,
       employeeId: this.employee._id,
       ownerId: this.user._id,

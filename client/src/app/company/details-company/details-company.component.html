@@ -14,13 +14,27 @@
 
   <div class="details-page-body" *ngIf="!isLoading && company.email">
     <p>Email: <a href="mailto:{{company.email}}">{{ company.email }}</a></p>
-    <p>Website: {{ company.website || "------" }}</p>
-    <p>Description: {{ company.description || "------" }}</p>
-    <h4>Positions</h4>
+
+    <p *ngIf="company.website">Website:
+      <a target="_blank"
+        href="{{ company.website.startsWith('http://www.') ? company.website : 'http://www.' + company.website }}">
+        {{ company.website }}
+      </a>
+      <span class="glyphicon glyphicon-new-window"></span>
+    </p>
+    <p *ngIf="!company.website && currUrl[0] === 'my-details'">Website: ------</p>
+
+    <p *ngIf="company.description">Description: {{ company.description }}</p>
+    <p *ngIf="!company.description && currUrl[0] === 'my-details'">Description: ------</p>
+
+
+    <h4 *ngIf="currUrl[0] !== 'my-details'">Positions</h4>
     <app-list-position
+      *ngIf="currUrl[0] !== 'my-details'"
       [positions]="company.positions"
       [companyPositions]="true">
     </app-list-position>
+
     <div class="images-container">
       <ul class="images-container__list">
         <li *ngFor="let imagePath of company.imagesPath" class="images-container__list-item">
@@ -32,7 +46,7 @@
 
   <hr>
 
-  <div class="edit-button-container" *ngIf="allowEdit">
+  <div class="edit-buttons-container" *ngIf="allowEdit">
     <a class="btn btn-primary btn-sm" routerLink='edit'>Edit Details</a>
   </div>
 </div>

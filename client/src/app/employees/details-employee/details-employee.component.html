@@ -24,33 +24,28 @@
     </div>
 
     <div class="details-page-body">
-      <div class="edit-button-container" *ngIf="allowEdit">
+      <div class="edit-buttons-container" *ngIf="allowEdit">
         <a class="btn btn-primary btn-sm" routerLink='edit'>Edit Details</a>
       </div>
 
       <div class="positions-list" *ngIf="currUrl[0] === 'my-applicants'">
+        <h4>Shown interest</h4>
+
         <div *ngIf="currUrl[0] === 'my-applicants'">
-          <label for="position-list">Show status: </label>
+          <label for="position-list">Show status list: </label>
           <select [(ngModel)]="selctedStatusList" (ngModelChange)="checkPositionOfUser()">
             <option value="all">All</option>
             <option *ngFor="let status of availableStatus" value="{{status}}">{{ status | titlecase }}</option>
           </select>
         </div>
 
-        <ul class="list-group">
-          <li class="list-group-item pos-link" *ngFor="let pos of applicantPositions; let i=index; trackBy: applicantPositionsTracker">
-            <p class="pos-title">{{ pos.position.title }}</p>
-            <p class="pos-status">{{ pos.status }}</p>
-            <div>
-              <button class="btn btn-danger" (click)="onAcceptReject('rejected', i)"
-              *ngIf='pos.status.toString() !== "rejected"'>Reject?</button>
-              <button class="btn btn-success" (click)="onAcceptReject('accepted', i)"
-              *ngIf='pos.status.toString() !== "accepted"'>Accept?</button>
-            </div>
-          </li>
-          <li class="list-group-item" *ngIf='!applicantPositions.length'>No matching positions.</li>
-        </ul>
-
+        <app-list-position
+          [showStatus]='true'
+          [applicantPositions]='true'
+          [positions]='applicantPositions'
+          (acceptRejectEmitter)="onAcceptReject($event)"
+        >
+        </app-list-position>
       </div>
 
     </div>

@@ -134,7 +134,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
       const companyOfPosition = position['company'];
       const companyPositions = companyOfPosition['positions'];
       this.position = companyPositions[window.history.state['positionInd']];
-      this.companyId = { ...position.companyId };
+      this.companyId = { ...position.company };
     } else { // /positions/:posInd
       this.position = positionState['positions'] ? positionState['positions'][+this.currUrl[1]] : null;
       this.companyId = { _id: this.position.company._id, name: this.position.company.name };
@@ -144,7 +144,6 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
 
   private allowedApplySave() {
     this.allowApply = this.kind === 'employee';
-    // this.allowApply = this.user._id !== this.companyId._id && this.kind !== 'company';
     if (this.allowApply) {
       const userPositionInfo = (this.user.positions as Employee['positions'])
                       .find(pos => pos.position._id === this.position._id);

@@ -49,7 +49,7 @@ export class ListEmployeeComponent implements OnInit, OnDestroy {
         if (this.currUrl[0] === 'my-applicants') {
           this.user = currState['user'];
           this.isLoading = currState['loading'];
-          this.employees = this.user.applicants;
+          this.employees = this.user ? this.user.applicants : null;
         } else {
           this.isLoading = currState['loadingAll'];
           this.employees = currState['employees'];

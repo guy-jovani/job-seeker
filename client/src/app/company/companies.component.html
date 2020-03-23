@@ -4,8 +4,13 @@
 
 
 <div class="container">
-  <div class="row">
-    <app-list-companies></app-list-companies>
+  <div *ngIf="isLoading" style="text-align: center;">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+  <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
+  <div *ngIf="!isLoading" class="container-fluid">
+    <h3>Compenies</h3>
+    <app-list-companies [companies]="companies"></app-list-companies>
   </div>
 </div>
 
