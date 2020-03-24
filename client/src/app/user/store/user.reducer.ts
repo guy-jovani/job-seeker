@@ -54,7 +54,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
       }
       return {
         ...state,
-        loading: true,
+        loading: false,
         notificatios: newNotifications
       };
     case UserActions.SET_ALL_CONVERSATIONS:

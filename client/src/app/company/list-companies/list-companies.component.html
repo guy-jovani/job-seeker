@@ -16,6 +16,9 @@
         [src]="company.profileImagePath"
         class="companyProfileImage"
         *ngIf="company.profileImagePath" />
+      <div class="company-no-profile-image" *ngIf="!company.profileImagePath">
+        <span class="glyphicon glyphicon-user"></span>
+      </div>
       <h4>{{ company.name | titlecase }}</h4>
   </li>
 </ul>

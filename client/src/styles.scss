@@ -97,9 +97,40 @@ input[type=password] {
   max-height: 15rem;
 }
 
+@mixin center-with-border() {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px grey solid;
+}
+
+.employee-no-profile-image {
+  @include center-with-border();
+  width: 15rem;
+  height: 15rem;
+  font-size: 6rem;
+}
+
+.employee-no-profile-image {
+  @include center-with-border();
+  width: 15rem;
+  height: 15rem;
+  font-size: 6rem;
+  border-radius: 50%;
+}
+
+.company-no-profile-image {
+  @include center-with-border();
+  width: 16rem;
+  height: 9rem;
+  border-radius: 15px;
+  font-size: 4rem;
+}
+
 .companyProfileImage {
   max-width: 16rem;
   max-height: 9rem;
+  border-radius: 15px;
 }
 
 app-back-button {
@@ -151,6 +182,7 @@ app-back-button {
     cursor: pointer;
     color: dimgray;
     min-width: 15rem;
+    justify-content: space-between;
   }
 
   @media (max-width: 730px) {
@@ -163,11 +195,23 @@ app-back-button {
     .companyProfileImage {
       width: 12.8rem;
       height: 7.2rem;
+      font-size: 3rem;
+    }
+
+    .company-no-profile-image {
+      width: 12.8rem;
+      height: 7.2rem;
     }
 
     .employeeProfileImage {
       width: 10rem;
       height: 10rem;
+    }
+
+    .employee-no-profile-image {
+      width: 10rem;
+      height: 10rem;
+      font-size: 5rem;
     }
   }
 }

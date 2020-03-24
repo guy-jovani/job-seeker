@@ -16,6 +16,11 @@
         *ngIf="employee.employee ? employee.employee.profileImagePath : employee.profileImagePath"
         [src]="employee.profileImagePath || employee.employee.profileImagePath"
         class="employeeProfileImage" />
+      <div class="employee-no-profile-image"
+        *ngIf="!(employee.employee && employee.employee.profileImagePath) &&
+                !employee.profileImagePath">
+        <span class="glyphicon glyphicon-user"></span>
+      </div>
       <h4>
         {{ employee.firstName ? (employee.firstName | titlecase) : '' }}
           {{ employee.lastName ? (employee.lastName | titlecase) : '' }}
