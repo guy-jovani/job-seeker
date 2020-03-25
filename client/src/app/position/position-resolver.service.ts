@@ -26,7 +26,7 @@ export class PositionResolverService implements Resolve<Position[]> {
       switchMap(positionState => {
         const timeFromLastFetchMS = !positionState.lastFetch ? null :
                                     new Date().getTime() - positionState.lastFetch.getTime();
-        if (!positionState.positions.length || timeFromLastFetchMS && timeFromLastFetchMS > environment.fetchDataMSReset) {
+        if (!positionState.positions.length || timeFromLastFetchMS > environment.fetchDataMSReset) {
           this.store.dispatch(new PositionActions.FetchAllPositions());
           return this.actions$.pipe(
             ofType(PositionActions.SET_ALL_POSITIONS, PositionActions.POSITION_OP_FAILURE),

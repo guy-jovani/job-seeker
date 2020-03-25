@@ -15,6 +15,7 @@ export interface State {
   kind: string;
   notificatios: string[];
   conversations: Conversation[];
+  lastFetchConversations: Date;
 }
 
 const initialState: State = {
@@ -23,11 +24,12 @@ const initialState: State = {
   loading: false,
   kind: null,
   notificatios: [],
-  conversations: null
+  conversations: null,
+  lastFetchConversations: null
 };
 
 export function userReducer(state = initialState, action: UserActions.UserActions) {
-  // console.log("auth reducer " + action.type)
+  // console.log("user reducer " + action.type)
   switch (action.type) {
     case UserActions.FETCH_ALL_CONVERSATIONS:
     case UserActions.EMPLOYEE_APPLY_SAVE_POSITION_ATTEMPT:
@@ -61,6 +63,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
       return {
         ...state,
         loading: false,
+        lastFetchConversations: new Date(),
         conversations: action.payload
       };
     case UserActions.SET_SINGLE_CONVERSATION:
@@ -142,7 +145,8 @@ export function userReducer(state = initialState, action: UserActions.UserAction
         user: null,
         kind: null,
         notificatios: [],
-        conversations: null
+        conversations: null,
+        lastFetchConversations: null,
       };
     default:
       return state;

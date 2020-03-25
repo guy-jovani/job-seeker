@@ -10,6 +10,7 @@ export interface State {
   loadingAll: boolean;
   loadingSingle: boolean;
   messages: any[];
+  lastFetch: Date;
 }
 
 const initialState: State = {
@@ -17,6 +18,7 @@ const initialState: State = {
   messages: null,
   loadingAll: false,
   loadingSingle: false,
+  lastFetch: null
 };
 
 export function employeeReducer(state = initialState, action: EmployeeActions.EmployeeActions) {
@@ -28,6 +30,7 @@ export function employeeReducer(state = initialState, action: EmployeeActions.Em
         messages: null,
         loadingAll: false,
         loadingSingle: false,
+        lastFetch: new Date()
       };
     case EmployeeActions.EMPLOYEE_OP_FAILURE:
       return {
@@ -74,7 +77,8 @@ export function employeeReducer(state = initialState, action: EmployeeActions.Em
         messages: null,
         employees: [],
         loadingAll: false,
-        loadingSingle: false
+        loadingSingle: false,
+        lastFetch: null
       };
     default:
       return state;

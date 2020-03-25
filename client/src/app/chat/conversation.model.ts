@@ -19,7 +19,7 @@ export class Conversation {
     }
   }[];
   messages: Message[];
-
+  
 }
 
 
