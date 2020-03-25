@@ -57,7 +57,7 @@ exports.checkCompanyUpdateSignupValidation = async (req, signup = true) => {
     messages = messages.concat(nameExist.messages);
   }
 
-  if(emailExist.type === 'failure' || nameExist.type === 'failure'){
+  if(emailExist.type === 'failure' || nameExist && nameExist.type === 'failure'){
     return {
       type: 'failure', 
       messages
