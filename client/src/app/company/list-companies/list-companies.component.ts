@@ -10,5 +10,7 @@ export class ListCompaniesComponent {
 
   @Input() companies: Company[];
 
-
+  trackCompanies(index: number, company: Company) {
+    return company._id;
+  }
 }

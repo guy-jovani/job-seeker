@@ -9,16 +9,16 @@ export const UPDATE_SINGLE_COMPANY_POSITION = '[Company] Update single company p
 export const UPDATE_SINGLE_COMPANY_POSITION_ATTEMPT = '[Company] Update single company position attempt';
 export const COMPANY_STATE_LOAD_SINGLE = '[POSITION] COMPANY_STATE_LOAD_SINGLE';
 export const UPDATE_SINGLE_COMPANY_IN_DB = '[Company] Update single company in db';
-export const SET_ALL_COMPANIES = '[Company] Set All Companies';
-export const FETCH_ALL_COMPANIES = '[Company] Fetch All companies';
+export const SET_COMPANIES = '[Company] Set Companies';
+export const FETCH_COMPANIES = '[Company] Fetch companies';
 export const FETCH_SINGLE_COMPANY = '[Company] Fetch Single company';
 export const COMPANY_OP_FAILURE = '[Company] Company operation failed';
 export const CLEAR_ERROR = '[Company] Clear error';
 export const LOGOUT = '[Company] LOGOUT';
 
-export type CompanyActions = FetchAllCompanies
+export type CompanyActions = FetchCompanies
                             | FetchSingleCompany
-                            | SetAllCompanies
+                            | SetCompanies
                             | CompanyOpFailure
                             | ClearError
                             | CompanyStateLoadSingle
@@ -29,8 +29,10 @@ export type CompanyActions = FetchAllCompanies
                             | Logout;
 
 
-export class FetchAllCompanies implements Action {
-  readonly type = FETCH_ALL_COMPANIES;
+export class FetchCompanies implements Action {
+  readonly type = FETCH_COMPANIES;
+
+  constructor(public payload: { page: number } ) {}
 }
 
 export class CompanyStateLoadSingle implements Action {
@@ -47,10 +49,10 @@ export class FetchSingleCompany implements Action {
   constructor(public payload: { _id: string, main: boolean, posInd?: number }) {}
 }
 
-export class SetAllCompanies implements Action {
-  readonly type = SET_ALL_COMPANIES;
+export class SetCompanies implements Action {
+  readonly type = SET_COMPANIES;
 
-  constructor(public payload: Company[]) {}
+  constructor(public payload: {companies: Company[], total: number}) {}
 }
 
 export class UpdateSingleCompanyPosition implements Action {

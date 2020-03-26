@@ -7,7 +7,7 @@ const getBulkArrayForUpdate = require('../utils/shared').getBulkArrayForUpdate;
 const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
 const sendMessagesResponse = require('../utils/shared').sendMessagesResponse;
 const changeStatusOfAUserPosition = require('../utils/shared').changeStatusOfAUserPosition;
-
+const skippedDocuments = require('../utils/shared').skippedDocuments;
 
 exports.fetchSingle = async (req, res, next) => {
   try {throw "111"
@@ -21,12 +21,23 @@ exports.fetchSingle = async (req, res, next) => {
   }
 };
 
-exports.fetchAll = async (req, res, next) => {
+exports.fetchEmployees = async (req, res, next) => {
   try {
-    const employees = await Employee.find({_id: { $ne: req.query._id }}).select('_id email firstName lastName profileImagePath');
+    const employees = await Employee
+                              .find({_id: { $ne: req.query._id }})
+                              .skip(skippedDocuments(req.query.page))
+                              .limit(+process.env.DOCS_PER_PAGE)
+                              .select('_id email firstName lastName profileImagePath');
+
+    const total = await Employee.aggregate([
+      { $match: { _id: { $ne: req.query._id } } },
+      { $count: 'email' }
+    ]);
+
     res.status(200).json({
       type: 'success',
-      employees
+      employees,
+      total: total[0].email - 1
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "there was an error fetching the employees"));

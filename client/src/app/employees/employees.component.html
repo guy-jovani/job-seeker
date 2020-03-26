@@ -3,13 +3,16 @@
 
 
 <div class="container">
-  <div *ngIf="isLoading" style="text-align: center;">
-    <app-loading-spinner></app-loading-spinner>
-  </div>
   <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
-  <div *ngIf="!isLoading" class="container-fluid">
+  <div class="container-fluid" #containerFluid>
     <h3>Employees</h3>
     <app-list-employee [employees]="employees" [applicantsList]="applicantsList"></app-list-employee>
+    <div *ngIf="isLoading" style="text-align: center;">
+      <app-loading-spinner></app-loading-spinner>
+    </div>
+    <div *ngIf='lastEmployee' style="text-align: center;">
+      <p>There are no more employees that match your search.</p>
+    </div>
   </div>
 </div>
 

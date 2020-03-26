@@ -8,7 +8,7 @@ const extractProfileImage = require('../middleware/image-upload').extractProfile
 
 const employeeController = require('../controllers/employees');
 
-router.get('/fetchAll', employeeController.fetchAll);
+router.get('/fetchEmployees', employeeController.fetchEmployees);
 router.get('/fetchSingle', employeeController.fetchSingle);
 
 router.post('/update', extractProfileImage, [

@@ -7,23 +7,25 @@ import { Employee } from '../employee.model';
 export const UPDATE_SINGLE_EMPLOYEE = '[Employee] Update single Employee';
 export const FETCH_SINGLE_EMPLOYEE = '[Employee] single One Employee';
 export const UPDATE_SINGLE_EMPLOYEE_IN_DB = '[Employee] Update SINGLE Employee in DB';
-export const FETCH_ALL_EMPLOYEES = '[Employee] Fetch All Employees';
-export const SET_ALL_EMPLOYEES = '[Employee] Set All Employees';
+export const FETCH_EMPLOYEES = '[Employee] Fetch Employees';
+export const SET_EMPLOYEES = '[Employee] Set Employees';
 export const EMPLOYEE_OP_FAILURE = '[Employee] Employee operation failed';
 export const CLEAR_ERROR = '[Employee] Clear error';
 export const LOGOUT = '[Employee] LOGOUT';
 
 export type EmployeeActions = UpdateSingleEmployee
                             | FetchSingleEmployee
-                            | FetchAllEmployees
+                            | FetchEmployees
                             | Logout
                             | UpdateSingleEmployeeInDB
-                            | SetAllEmployees
+                            | SetEmployees
                             | EmployeeOpFailure
                             | ClearError;
 
-export class FetchAllEmployees implements Action {
-  readonly type = FETCH_ALL_EMPLOYEES;
+export class FetchEmployees implements Action {
+  readonly type = FETCH_EMPLOYEES;
+
+  constructor(public payload: { page: number } ) {}
 }
 
 export class UpdateSingleEmployeeInDB implements Action {
@@ -33,10 +35,10 @@ export class UpdateSingleEmployeeInDB implements Action {
     password: string, confirmPassword: string }) {}
 }
 
-export class SetAllEmployees implements Action {
-  readonly type = SET_ALL_EMPLOYEES;
+export class SetEmployees implements Action {
+  readonly type = SET_EMPLOYEES;
 
-  constructor(public payload: Employee[]) {}
+  constructor(public payload: {employees: Employee[], total: number}) {}
 }
 
 export class EmployeeOpFailure implements Action {

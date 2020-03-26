@@ -11,6 +11,8 @@ export interface State {
   loadingSingle: boolean;
   messages: any[];
   lastFetch: Date;
+  page: number;
+  total: number;
 }
 
 const initialState: State = {
@@ -18,17 +20,21 @@ const initialState: State = {
   messages: null,
   loadingAll: false,
   loadingSingle: false,
-  lastFetch: null
+  lastFetch: null,
+  page: 1,
+  total: null
 };
 
 export function employeeReducer(state = initialState, action: EmployeeActions.EmployeeActions) {
   switch (action.type) {
-    case EmployeeActions.SET_ALL_EMPLOYEES:
+    case EmployeeActions.SET_EMPLOYEES:
       return {
         ...state,
-        employees: [...action.payload],
+        employees: [ ...state.employees, ...action.payload.employees ],
         messages: null,
         loadingAll: false,
+        page: state.page + 1,
+        total: action.payload.total,
         loadingSingle: false,
         lastFetch: new Date()
       };
@@ -45,7 +51,7 @@ export function employeeReducer(state = initialState, action: EmployeeActions.Em
         ...state,
         loadingSingle: true,
       };
-    case EmployeeActions.FETCH_ALL_EMPLOYEES:
+    case EmployeeActions.FETCH_EMPLOYEES:
       return {
         ...state,
         loadingAll: true,
@@ -78,7 +84,9 @@ export function employeeReducer(state = initialState, action: EmployeeActions.Em
         employees: [],
         loadingAll: false,
         loadingSingle: false,
-        lastFetch: null
+        lastFetch: null,
+        page: 1,
+        total: null,
       };
     default:
       return state;

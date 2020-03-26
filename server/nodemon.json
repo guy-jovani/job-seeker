@@ -8,7 +8,8 @@
     "TOKEN_EXPIRATION_SECONDS": 7200,
     "PORT": 4300,
     "DB_LIMIT_RES": 10,
-    "RESET_URL": "http://localhost:4200/reset-password/"
+    "RESET_URL": "http://localhost:4200/reset-password/",
+    "DOCS_PER_PAGE": 10
   }
 }
 

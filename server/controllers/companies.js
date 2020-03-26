@@ -8,6 +8,7 @@ const getBulkArrayForUpdate = require('../utils/shared').getBulkArrayForUpdate;
 const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
 const checkCompanyUpdateSignupValidation = require('../utils/shared').checkCompanyUpdateSignupValidation
 const changeStatusOfAUserPosition = require('../utils/shared').changeStatusOfAUserPosition;
+const skippedDocuments = require('../utils/shared').skippedDocuments;
 
 exports.fetchSingle = async (req, res, next) => {
   try { 
@@ -27,12 +28,13 @@ exports.fetchSingle = async (req, res, next) => {
   }
 };
 
-exports.fetchAll = async (req, res, next) => {
+exports.fetchCompanies = async (req, res, next) => {
   try {
     const companies = await Company.aggregate([
-      { $match: { _id: { $ne: mongoose.Types.ObjectId(req.query._id)} } },
+      { $match: { _id: { $ne: mongoose.Types.ObjectId(req.query._id) } } },
+      { $skip: skippedDocuments(req.query.page) },
+      { $limit: +process.env.DOCS_PER_PAGE },
       { $project: { positions: 0, createdAt: 0, updatedAt: 0, __v: 0, password: 0 } },
-      // { $project: { positionsIds: 0, createdAt: 0, updatedAt: 0, __v: 0, password: 0 } },
       { $lookup: {
         from: "positions",
         let: { companyId: "$_id" },
@@ -61,9 +63,15 @@ exports.fetchAll = async (req, res, next) => {
       }
     ]);
 
+    const total = await Company.aggregate([
+      { $match: { _id: { $ne: mongoose.Types.ObjectId(req.query._id) } } },
+      { $count: 'email' }
+    ]);
+
     res.status(200).json({
       type: 'success',
-      companies
+      companies,
+      total: total[0].email - 1
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "there was an error fetching the companies"));

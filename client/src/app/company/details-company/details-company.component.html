@@ -6,7 +6,7 @@
 
   <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
   <div class="details-page-header">
-    <img [src]="company.profileImagePath" class="companyProfileImage" *ngIf="company.profileImagePath"/>
+    <img [src]="company.profileImagePath" class="company-profile-image" *ngIf="company.profileImagePath"/>
     <div class="company-no-profile-image" *ngIf="!company.profileImagePath">
       <span class="glyphicon glyphicon-user"></span>
     </div>

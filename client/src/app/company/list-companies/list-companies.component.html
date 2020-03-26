@@ -11,10 +11,10 @@
     routerLink='{{i}}'
     title="{{ company.description ? (company.description | cut: 20) : null }}"
     class="list-group-item"
-    *ngFor="let company of companies; let i=index">
+    *ngFor="let company of companies; let i=index; trackBy: trackCompanies">
       <img
         [src]="company.profileImagePath"
-        class="companyProfileImage"
+        class="company-profile-image"
         *ngIf="company.profileImagePath" />
       <div class="company-no-profile-image" *ngIf="!company.profileImagePath">
         <span class="glyphicon glyphicon-user"></span>

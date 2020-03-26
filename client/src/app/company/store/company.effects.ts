@@ -63,17 +63,22 @@ export class CompanyEffects {
   );
 
   @Effect()
-  fetchAll = this.actions$.pipe(
-    ofType(CompanyActions.FETCH_ALL_COMPANIES),
+  fetchCompanies = this.actions$.pipe(
+    ofType(CompanyActions.FETCH_COMPANIES),
     withLatestFrom(this.store.select('user')),
     switchMap(([actionData, userState]) => {
-      return this.http.get(nodeServer + 'fetchAll', {
-        params: { _id: userState.user._id }
+      return this.http.get(nodeServer + 'fetchCompanies', {
+        params: {
+          _id: userState.user._id,
+          page: actionData['payload']['page']
+        }
       })
       .pipe(
         map(res => {
           if (res['type'] === 'success') {
-            return new CompanyActions.SetAllCompanies(res['companies']);
+            return new CompanyActions.SetCompanies({
+              companies: res['companies'], total: res['total']
+            });
           } else {
             return new CompanyActions.CompanyOpFailure(res['messages']);
           }

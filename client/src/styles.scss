@@ -127,7 +127,7 @@ input[type=password] {
   font-size: 4rem;
 }
 
-.companyProfileImage {
+.company-profile-image {
   max-width: 16rem;
   max-height: 9rem;
   border-radius: 15px;
@@ -192,7 +192,7 @@ app-back-button {
   @media (max-width: 560px) {
     grid-template-columns: repeat(2, 50%);
 
-    .companyProfileImage {
+    .company-profile-image {
       width: 12.8rem;
       height: 7.2rem;
       font-size: 3rem;

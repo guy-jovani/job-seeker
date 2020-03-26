@@ -11,6 +11,8 @@ export interface State {
   loadingAll: boolean;
   loadingSingle: boolean;
   lastFetch: Date;
+  page: number;
+  total: number;
 }
 
 const initialState: State = {
@@ -18,17 +20,21 @@ const initialState: State = {
   messages: null,
   loadingAll: false,
   loadingSingle: false,
-  lastFetch: null
+  lastFetch: null,
+  page: 1,
+  total: null
 };
 
 export function companyReducer(state = initialState, action: CompanyActions.CompanyActions) {
   switch (action.type) {
-    case CompanyActions.SET_ALL_COMPANIES:
+    case CompanyActions.SET_COMPANIES:
       return {
         ...state,
-        companies: [...action.payload],
+        companies: [...state.companies, ...action.payload.companies],
         loadingAll: false,
         messages: null,
+        page: state.page + 1,
+        total: action.payload.total,
         lastFetch: new Date()
       };
     case CompanyActions.COMPANY_OP_FAILURE:
@@ -46,7 +52,7 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
         ...state,
         loadingSingle: true
       };
-    case CompanyActions.FETCH_ALL_COMPANIES:
+    case CompanyActions.FETCH_COMPANIES:
       return {
         ...state,
         loadingAll: true,
@@ -99,7 +105,9 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
         loadingAll: false,
         loadingSingle: false,
         tempCompany: null,
-        lastFetch: null
+        lastFetch: null,
+        page: 1,
+        total: null
       };
     default:
       return state;

@@ -8,7 +8,6 @@ import { of } from 'rxjs';
 
 import * as fromApp from '../../store/app.reducer';
 import * as EmployeeActions from './employee.actions';
-import * as AuthActions from '../../auth/store/auth.actions';
 import * as UserActions from '../../user/store/user.actions';
 import { Employee } from '../employee.model';
 import { environment } from '../../../environments/environment';
@@ -56,17 +55,20 @@ export class EmployeeEffects {
   );
 
   @Effect()
-  fetchAllEmployees = this.actions$.pipe(
-    ofType(EmployeeActions.FETCH_ALL_EMPLOYEES),
+  fetchEmployees = this.actions$.pipe(
+    ofType(EmployeeActions.FETCH_EMPLOYEES),
     withLatestFrom(this.store.select('user')),
     switchMap(([actionData, userState]) => {
-      return this.http.get<Employee[]>(nodeServer + 'fetchAll', {
-        params: { _id: userState.user._id }
+      return this.http.get<Employee[]>(nodeServer + 'fetchEmployees', {
+        params: {
+          _id: userState.user._id,
+          page: actionData['payload']['page']
+        }
       })
         .pipe(
           map(res => {
             if (res['type'] === 'success') {
-              return new EmployeeActions.SetAllEmployees(res['employees']);
+              return new EmployeeActions.SetEmployees({ employees: res['employees'], total: res['total']});
             } else {
               return new EmployeeActions.EmployeeOpFailure(res['messages']);
             }

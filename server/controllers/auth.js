@@ -109,6 +109,21 @@ exports.login = async (req, res, next) => {
     if(!verifiedPassword){ 
       return sendMessagesResponse(res, 401, ['The email and/or password are incorrect'], 'failure');
     }
+
+    // const nums = [];
+
+    // for(let i=16; i<101; i++){
+    //   nums.push(i);
+    // }
+
+    // for ( num of nums) {
+    //   const password = await bcrypt.hash('111', 12);
+    //   await Employee.create({ firstName: 'e' + num,  lastName: 'e' + num, password: password, email: num + '@emp.com'});
+    // }
+    // for ( num of [13,14,15, ...nums]) {
+    //   const password = await bcrypt.hash('111', 12);
+    //   await Company.create({ name: 'c' + num,  password: password, email: num + '@comp.com'});
+    // }
     
     user = user.toObject();
     Reflect.deleteProperty(user, 'password');

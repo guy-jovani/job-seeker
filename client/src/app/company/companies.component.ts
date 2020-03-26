@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, AfterViewInit, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
@@ -7,6 +7,7 @@ import { Employee } from 'app/employees/employee.model';
 
 import * as CompanyActions from './store/company.actions';
 import * as fromApp from '../store/app.reducer';
+import { ConstantPool } from '@angular/compiler';
 
 
 @Component({
@@ -14,15 +15,20 @@ import * as fromApp from '../store/app.reducer';
   templateUrl: './companies.component.html',
   styleUrls: ['./companies.component.scss']
 })
-export class CompaniesComponent implements OnInit, OnDestroy {
+export class CompaniesComponent implements OnInit, OnDestroy, AfterViewChecked {
   companies: Company[];
   subscription: Subscription;
   activeEmployee: Employee;
   isLoading = false;
   messages: string[] = [];
   currUrl: string[] = null;
+  page: number;
+  lastCompany: boolean; // if there are more companies to fetch
+
+  @ViewChild('containerFluid', { static: false }) containerFluid: ElementRef;
 
   constructor(private store: Store<fromApp.AppState>,
+              private ref: ChangeDetectorRef,
               private router: Router) { }
 
   ngOnInit() {
@@ -31,6 +37,7 @@ export class CompaniesComponent implements OnInit, OnDestroy {
       .subscribe(companyState => {
         this.currUrl = this.router.url.substring(1).split('/');
         this.isLoading = companyState.loadingAll;
+        this.page = companyState.page;
         if (this.currUrl[this.currUrl.length - 1] === 'companies') {
           if (companyState.messages) {
             this.messages = [];
@@ -42,7 +49,27 @@ export class CompaniesComponent implements OnInit, OnDestroy {
           }
         }
         this.companies = companyState.companies;
+        this.lastCompany = this.companies.length === companyState.total;
       });
+  }
+
+  private fetchNextPage() {
+    const container = this.containerFluid.nativeElement.getBoundingClientRect();
+    if (!this.isLoading && // won't fetch in a middle of a fetch
+        !this.lastCompany && // won't fetch if the last company was fetched
+        (container.bottom <= window.innerHeight || // if the whole list is shown - so fetch
+        container.height - window.pageYOffset < window.innerHeight)) { // check if scrolled to the container
+      this.store.dispatch(new CompanyActions.FetchCompanies({ page: this.page }));
+      this.ref.detectChanges();
+    }
+  }
+
+  ngAfterViewChecked() {
+    this.fetchNextPage();
+  }
+
+  @HostListener('window:scroll', ['$event']) doSomething(event) {
+    this.fetchNextPage();
   }
 
   onClose() {

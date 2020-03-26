@@ -6,6 +6,13 @@ const Company = require('../models/company');
 
 
 
+exports.skippedDocuments = page => {
+  // page: 1, docs: 20 => (1 - 1) * 20 + 1 => 1
+  // page: 2, docs: 20 => (2 - 1) * 20 + 1 => 21
+  // page: 3, docs: 20 => (3 - 1) * 20 + 1 => 41
+  return (page - 1) * process.env.DOCS_PER_PAGE + 1;
+}
+
 exports.getNullKeysForUpdate = (req, removableKeys) => {
   // get an object with keys to delete from the employee document (all the keys that are null)
   const reqBodyKeys = Object.keys(req.body);

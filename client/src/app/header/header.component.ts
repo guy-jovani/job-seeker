@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener, ElementRef, ViewChildren } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 
@@ -60,7 +60,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   onFetchEmployees() {
-    this.store.dispatch(new EmployeeActions.FetchAllEmployees());
+    this.store.dispatch(new EmployeeActions.FetchEmployees({page: 1}));
   }
 
   onFetchConversations() {
@@ -68,7 +68,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   onFetchCompanies() {
-    this.store.dispatch(new CompanyActions.FetchAllCompanies());
+    this.store.dispatch(new CompanyActions.FetchCompanies({page: 1}));
   }
 
   onFetchPositions() {

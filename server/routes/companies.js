@@ -8,8 +8,7 @@ const extractCompanyImages = require('../middleware/image-upload').extractCompan
 const companyController = require('../controllers/companies');
 
 
-router.get('/fetchAll', companyController.fetchAll);
-router.get('/fetchSingle', companyController.fetchSingle);
+router.get('/fetchCompanies', companyController.fetchCompanies  );
 router.get('/fetchSingle', companyController.fetchSingle);
 
 router.post('/update', extractCompanyImages,
