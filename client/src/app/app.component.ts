@@ -63,7 +63,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.socketReconnectSub = this.chatService.getMessage('reconnect')
       .subscribe(() => {
-        console.log('reconnected')
         if (this.userId) {
           this.chatService.sendMessage('login', {  _id: this.userId } );
         }
@@ -71,7 +70,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.socketUpdatedStatus = this.chatService.getMessage('updatedStatus')
       .subscribe(res => {
-        console.log(res)
         if (res['type'] === 'success') {
           if (this.currUrl[0] === 'positions') {
             this.store.dispatch(new PositionActions.ClearError());

@@ -28,6 +28,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   conversations: Conversation[] = null;
   conversationDiv: ElementRef = null;
   currConversation: Conversation = null;
+  isLoading = false;
 
   @ViewChild('sendMessageForm', { static: false }) sendMessageForm: NgForm;
 
@@ -42,6 +43,8 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.user = userState.user;
       this.userKind = userState.user ? userState.kind[0].toUpperCase() + userState.kind.slice(1) : null;
       this.conversations = userState.conversations;
+      this.isLoading = userState.loading;
+      console.log(this.isLoading)
 
       if (this.conversations) {
         this.conversations.forEach(con => {

@@ -3,6 +3,7 @@
 
 
 <app-alert *ngIf="messages.length" [messages]="messages" (closeAlert)="onClose()"></app-alert>
+
 <div class="chat-container">
 
   <div class="side-menu">
@@ -22,7 +23,12 @@
     </div>
 
     <div class="conversations-list-container">
-      <div *ngIf="conversations && conversations.length">
+
+      <div *ngIf="isLoading" style="text-align: center;">
+        <app-loading-spinner></app-loading-spinner>
+      </div>
+
+      <div *ngIf="!isLoading && conversations && conversations.length">
         <div *ngFor="let con of conversations; let i=index" class="single-conversation" (click)="onFucosCon($event.currentTarget)" [attr.data-con-ind]="i">
           <ul class='conversation__participants-list'>
             <li *ngFor="let participant of con.participants.slice(0,3); let i=index" class="conversation__participants-list__item">
@@ -32,9 +38,11 @@
           </ul>
         </div>
       </div>
-      <p *ngIf="!conversations || !conversations.length" class="conversations-list-container__no-messages">
+
+      <p *ngIf="!isLoading && !conversations || !conversations.length" class="conversations-list-container__no-messages">
         No messages yet.
       </p>
+
     </div>
 
   </div>
@@ -45,9 +53,11 @@
     <div class="title">
         New {{ privateMsg ? '' : 'Group' }} Message
     </div>
+
     <div class="new-message__add-people">
       <app-search-bar [placeholder]="'Type one or more names'" [search]="['employee','company']" (nameListEmitter)="onGetNames($event)"></app-search-bar>
     </div>
+
     <div class="name-list-container">
       <ul class='name-list-container__list'>
         <li *ngFor="let name of nameList | keyvalue; let i=index" class="name-list-container__item">
@@ -56,8 +66,9 @@
         </li>
       </ul>
     </div>
+
     <form class="new-message__message-form" (ngSubmit)="onSubmit(sendMessageForm)" #sendMessageForm="ngForm">
-      <div class="input-box">
+      <div class="new-message__input-box">
         <label for="messageContent"></label>
         <textarea
           ngModel
@@ -66,8 +77,9 @@
           class="new-message__message-content"
           placeholder="Type your message here"></textarea>
       </div>
+
       <div class="new-message__submit-message">
-        <button class="submit-message__button" [disabled]="!sendMessageForm.valid">Send</button>
+        <button class="submit-message__button" [disabled]="!sendMessageForm.valid || !nameList.size">Send</button>
       </div>
     </form>
 
@@ -78,6 +90,7 @@
     <div class="title">
       Chat
     </div>
+
     <div class="name-list-container">
       <ul class='name-list-container__list'>
         <li *ngFor="let name of nameList | keyvalue; let i=index" class="name-list-container__item">
@@ -107,7 +120,7 @@
           placeholder="Type your message here"></textarea>
       </div>
       <div class="chat__submit-message">
-        <button class="submit-message__button" [disabled]="!sendMessageForm.valid">Send</button>
+        <button class="submit-message__button" [disabled]="!sendMessageForm.valid || !nameList.size">Send</button>
       </div>
     </form>
 
