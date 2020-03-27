@@ -25,14 +25,8 @@ export class ChatResolverService implements Resolve<Conversation[]> {
                                 new Date().getTime() - userState.lastFetchConversations.getTime();
         if (!timeFromLastFetchMS || timeFromLastFetchMS > environment.fetchDataMSReset) {
           this.store.dispatch(new UserActions.FetchAllConversations());
-          return of(userState.conversations);
-          // return this.actions$.pipe(
-          //   ofType(UserActions.SET_ALL_CONVERSATIONS),
-          //   take(1)
-          // );
-        } else {
-          return of(userState.conversations);
         }
+        return of(userState.conversations);
       })
     );
   }

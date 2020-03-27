@@ -6,7 +6,7 @@ exports.handleServerErrors = ( error, statusCode, message ) => {
   if (typeof(error) !== "object"){
     error = {}
   }
-  error.messages = [message];
+  error.messages = error.messages ? error.messages : [message];
   if (!error.statusCode) {
     error.statusCode = statusCode;
   }

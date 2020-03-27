@@ -1,13 +1,14 @@
-import { Component, OnInit, OnDestroy, HostListener, AfterViewInit, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener,
+        ViewChild, ElementRef, AfterViewChecked,
+        ChangeDetectorRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
+
 import { Company } from './company.model';
 import { Employee } from 'app/employees/employee.model';
-
 import * as CompanyActions from './store/company.actions';
 import * as fromApp from '../store/app.reducer';
-import { ConstantPool } from '@angular/compiler';
 
 
 @Component({

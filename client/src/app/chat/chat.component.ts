@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Renderer2 } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild,
+        ElementRef, Renderer2, HostListener } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
@@ -29,8 +30,11 @@ export class ChatComponent implements OnInit, OnDestroy {
   conversationDiv: ElementRef = null;
   currConversation: Conversation = null;
   isLoading = false;
+  keyMap = {};
 
   @ViewChild('sendMessageForm', { static: false }) sendMessageForm: NgForm;
+  @ViewChild('textarea', { static: false }) textarea: ElementRef;
+  @ViewChild('submitChat', { static: false }) submitChat: ElementRef;
 
   constructor(private renderer: Renderer2,
               private chatService: ChatService,
@@ -38,13 +42,11 @@ export class ChatComponent implements OnInit, OnDestroy {
               private store: Store<fromApp.AppState>) { }
 
   ngOnInit() {
-    this.store.dispatch(new UserActions.RemoveChatNotification());
     this.subscription = this.store.select('user').subscribe(userState => {
       this.user = userState.user;
       this.userKind = userState.user ? userState.kind[0].toUpperCase() + userState.kind.slice(1) : null;
       this.conversations = userState.conversations;
       this.isLoading = userState.loading;
-      console.log(this.isLoading)
 
       if (this.conversations) {
         this.conversations.forEach(con => {
@@ -55,6 +57,9 @@ export class ChatComponent implements OnInit, OnDestroy {
         });
       }
     });
+    if (this.conversations) {
+      this.store.dispatch(new UserActions.RemoveChatNotification());
+    }
     this.nameList = new Map<string, { _id: string, fullName: string, type: string }>();
   }
 
@@ -68,7 +73,10 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(form: NgForm) {
-    if (form.invalid) {
+    if (this.textarea) {
+      this.textarea.nativeElement.focus();
+    }
+    if (form.invalid || form.value.messageContent.trim() === '') {
       this.messages.push('You can\'t send an empty message.');
     }
     if (!this.nameList.size) {
@@ -110,7 +118,23 @@ export class ChatComponent implements OnInit, OnDestroy {
     });
   }
 
+
+  @HostListener('document:keyup', ['$event'])
+  @HostListener('document:keydown', ['$event']) onKeyDown(event) {
+    if (['ControlRight', 'Enter', 'ControlLeft', 'NumpadEnter'].includes(event.code)) {
+      this.keyMap[event.code] = event.type === 'keydown';
+    }
+    if (this.textarea &&
+        (this.keyMap['ControlRight'] || this.keyMap['ControlLeft']) &&
+        (this.keyMap['Enter'] || this.keyMap['NumpadEnter'])) { // CTRL+ENTER
+      this.submitChat.nativeElement.click();
+    }
+  }
+
   onFucosCon(conversationDiv: ElementRef) {
+    if (this.textarea) {
+      this.textarea.nativeElement.focus();
+    }
     if (this.conversationDiv) {
       this.renderer.removeClass(this.conversationDiv, 'active-con');
     }

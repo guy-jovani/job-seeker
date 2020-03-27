@@ -39,7 +39,7 @@
         </div>
       </div>
 
-      <p *ngIf="!isLoading && !conversations || !conversations.length" class="conversations-list-container__no-messages">
+      <p *ngIf="!isLoading && (!conversations || !conversations.length)" class="conversations-list-container__no-messages">
         No messages yet.
       </p>
 
@@ -114,13 +114,18 @@
         <label for="messageContent"></label>
         <textarea
           ngModel
+          #textarea
           required
           name="messageContent"
           class="chat__message-content"
           placeholder="Type your message here"></textarea>
       </div>
       <div class="chat__submit-message">
-        <button class="submit-message__button" [disabled]="!sendMessageForm.valid || !nameList.size">Send</button>
+        <button class="submit-message__button"
+          [disabled]="!sendMessageForm.valid || !nameList.size"
+          title="Ctrl + Enter"
+          #submitChat>
+          Send</button>
       </div>
     </form>
 

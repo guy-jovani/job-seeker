@@ -34,7 +34,6 @@ export function userReducer(state = initialState, action: UserActions.UserAction
     case UserActions.FETCH_ALL_CONVERSATIONS:
     case UserActions.EMPLOYEE_APPLY_SAVE_POSITION_ATTEMPT:
     case UserActions.COMPANY_ACCEPT_REJECT_POSITION_ATTEMPT:
-      console.log("1111")
       return {
         ...state,
         loading: true,
@@ -61,7 +60,6 @@ export function userReducer(state = initialState, action: UserActions.UserAction
         notificatios: newNotifications
       };
     case UserActions.SET_ALL_CONVERSATIONS:
-      console.log("22222")
       return {
         ...state,
         loading: false,

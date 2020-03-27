@@ -9,7 +9,7 @@ exports.postMessage = async (privateMsg, recipients, content, senderId, senderTy
   try {
     let error = new Error();
     error.messages = [];
-    if(!content) {
+    if(!content || content.trim() === '') {
       error.messages.push('You can\'t send an empty message.');
     }
     if(!recipients || !recipients.length){
