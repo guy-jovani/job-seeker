@@ -9,8 +9,6 @@ import { of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import * as fromApp from '../../store/app.reducer';
 import * as UserActions from './user.actions';
-import * as PositionActions from '../../position/store/position.actions';
-import * as CompanyActions from '../../company/store/company.actions';
 import { Company } from 'app/company/company.model';
 import { Employee } from 'app/employees/employee.model';
 

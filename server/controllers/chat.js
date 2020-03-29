@@ -2,14 +2,18 @@ const mongoose = require('mongoose');
 const errorHandling = require('../utils/errorHandling');
 const Message = require('../models/message');
 const Conversation = require('../models/conversation');
+const getSocketFileUniqueName = require('../utils/shared').getSocketFileUniqueName;
+const getSocketFileUrl = require('../utils/shared').getSocketFileUrl;
+const saveSocketFilePath = require('../utils/shared').saveSocketFilePath;
+
+const socketInitializer = require('../socket').socketInitializer;
 
 
-
-exports.postMessage = async (privateMsg, recipients, content, senderId, senderType) => {
+exports.postMessage = async (privateMsg, recipients, content, senderId, senderType, bufferFile, fileName, fileNumBytes) => {
   try {
     let error = new Error();
     error.messages = [];
-    if(!content || content.trim() === '') {
+    if((!content || content.trim() === '') && !fileName) {
       error.messages.push('You can\'t send an empty message.');
     }
     if(!recipients || !recipients.length){
@@ -21,10 +25,10 @@ exports.postMessage = async (privateMsg, recipients, content, senderId, senderTy
     }
     let conversations = [];
     if(!privateMsg){
-      conversations.push(await createUpdateConversation(recipients, content, senderId, senderType));
+      conversations.push(await createUpdateConversation(recipients, content, senderId, senderType, bufferFile, fileName, fileNumBytes));
     } else {
       for(recipient of recipients) {
-        conversations.push(await createUpdateConversation([recipient], content, senderId, senderType));
+        conversations.push(await createUpdateConversation([recipient], content, senderId, senderType, bufferFile, fileName, fileNumBytes));
       }
     }
     return conversations;
@@ -35,44 +39,39 @@ exports.postMessage = async (privateMsg, recipients, content, senderId, senderTy
 
 
 
-const addMessageToConversation = async (conversation, content, senderId, senderType) => {
+const addMessageToConversation = async (conversation, content, senderId, senderType, bufferFile, fileName, fileNumBytes) => {
   const message = await Message.create({
     conversation: conversation._id, 
     creator: senderId,
-    content: content, 
     onModel: senderType
   });
+
+  if(bufferFile) {
+    const uniqueName = getSocketFileUniqueName(fileName);
+    saveSocketFilePath(bufferFile, uniqueName);
+    message.filePath = 
+        getSocketFileUrl(uniqueName, socketInitializer.getHostName());
+    message.fileName = fileName;
+    message.fileNumBytes = fileNumBytes;
+  } else {
+    message.content = content;
+  }
+
+  await message.save();
+
   await Conversation.updateOne({ _id: conversation._id }, {
     $push: { messages: message }});
-  return {creator: message.creator, content: message.content, createdAt: message.createdAt};
+  return {
+    creator: message.creator,
+    content: message.content,
+    createdAt: message.createdAt,
+    filePath: message.filePath,
+    fileName: message.fileName,
+    fileNumBytes: message.fileNumBytes,
+  };
 };
 
-
-const createUpdateConversation = async (recipients, content, senderId, senderType) => {
-  const participants = recipients.map(recipient => {
-    return { user: mongoose.Types.ObjectId(recipient._id), type: recipient.type };
-  });
-  participants.push({ user: mongoose.Types.ObjectId(senderId), type: senderType });
-
-  const participantsIds = participants.map(part => part.user);
-
-  // 1. check if conversation exists
-  let conversation = await checkIfConExists(participantsIds);
-  let newCon = true;
-  if (conversation.length) { // 2. if exists - just update with new message
-    conversation = conversation[0]; // only one conversation should be found
-    newCon = false;
-  } else { // 3. doesn't exists - create conversation
-    conversation = await Conversation.create({participants: participants, onModel: senderType});
-  }
-  const message = await addMessageToConversation(conversation, content, senderId, senderType);
-  conversation = await populateConversationParticipants(conversation);
-  return [message, conversation, newCon];
-};
-
-
-const checkIfConExists = async participantsIds => {
-  // console.log(participantsIds)
+const getParticipantsCon = async participantsIds => {
   return await Conversation.aggregate([
     {
       $match: {
@@ -85,6 +84,28 @@ const checkIfConExists = async participantsIds => {
       },
     },
   ]);
+};
+
+const createUpdateConversation = async (recipients, content, senderId, senderType, bufferFile, fileName, fileNumBytes) => {
+  const participants = recipients.map(recipient => {
+    return { user: mongoose.Types.ObjectId(recipient._id), type: recipient.type };
+  });
+  participants.push({ user: mongoose.Types.ObjectId(senderId), type: senderType });
+
+  const participantsIds = participants.map(part => part.user);
+
+  // 1. check if conversation exists
+  let conversation = await getParticipantsCon(participantsIds);
+  let newCon = true;
+  if (conversation.length) { // 2. if exists - just update with new message
+    conversation = conversation[0]; // only one conversation should be found
+    newCon = false;
+  } else { // 3. doesn't exists - create conversation
+    conversation = await Conversation.create({participants: participants, onModel: senderType});
+  }
+  const message = await addMessageToConversation(conversation, content, senderId, senderType, bufferFile, fileName, fileNumBytes);
+  conversation = await populateConversationParticipants(conversation);
+  return [message, conversation, newCon];
 };
 
 
@@ -122,7 +143,7 @@ const populateConversationMessages = async conversations => {
   return await Conversation.populate(conversations, 
     {
       path: 'messages',
-      select: ['creator', 'content', 'createdAt']
+      select: ['creator', 'content', 'createdAt', 'filePath', 'fileName', 'fileNumBytes']
     });
 };
 

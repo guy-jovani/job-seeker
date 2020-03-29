@@ -9,7 +9,8 @@
     "PORT": 4300,
     "DB_LIMIT_RES": 10,
     "RESET_URL": "http://localhost:4200/reset-password/",
-    "DOCS_PER_PAGE": 10
+    "DOCS_PER_PAGE": 10,
+    "REQ_PROTOCOL": "http://"
   }
 }
 

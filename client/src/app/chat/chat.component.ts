@@ -12,6 +12,7 @@ import { Conversation } from './conversation.model';
 import { ChatService } from './chat-socket.service';
 import * as UserActions from '../user/store/user.actions';
 import { Message } from './message.model';
+import { findReadVarNames } from '@angular/compiler/src/output/output_ast';
 
 
 @Component({
@@ -31,10 +32,12 @@ export class ChatComponent implements OnInit, OnDestroy {
   currConversation: Conversation = null;
   isLoading = false;
   keyMap = {};
+  file: File;
 
   @ViewChild('sendMessageForm', { static: false }) sendMessageForm: NgForm;
   @ViewChild('textarea', { static: false }) textarea: ElementRef;
   @ViewChild('submitChat', { static: false }) submitChat: ElementRef;
+  @ViewChild('inputUploadFile', { static: false }) inputUploadFile: ElementRef;
 
   constructor(private renderer: Renderer2,
               private chatService: ChatService,
@@ -76,7 +79,8 @@ export class ChatComponent implements OnInit, OnDestroy {
     if (this.textarea) {
       this.textarea.nativeElement.focus();
     }
-    if (form.invalid || form.value.messageContent.trim() === '') {
+
+    if (form.invalid && !this.file && (form.value.messageContent.trim() === '')) {
       this.messages.push('You can\'t send an empty message.');
     }
     if (!this.nameList.size) {
@@ -86,38 +90,59 @@ export class ChatComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.chatService.sendMessage('postAMsg', {
-      ownerId: this.user._id,
-      senderId: this.user._id,
-      senderType: this.userKind,
-      content: form.value.messageContent,
-      privateMsg: this.privateMsg,
-      recipients: Array.from(this.nameList.keys()).map(key => {
-        const nameObj = this.nameList.get(key);
-        return { _id: nameObj._id, type: nameObj.type };
-      })
-    });
+    if (this.file) { // update conversation in server
+      this.chatService.sendMessage('postAMsg', {
+        ownerId: this.user._id,
+        senderId: this.user._id,
+        senderType: this.userKind,
+        content: null,
+        file: this.file,
+        fileName: this.file.name,
+        fileNumBytes: this.file.size,
+        privateMsg: this.privateMsg,
+        recipients: Array.from(this.nameList.keys()).map(key => {
+          const nameObj = this.nameList.get(key);
+          return { _id: nameObj._id, type: nameObj.type };
+        })
+      });
+    }
 
-    if (this.currConversation) {
+    if (form.value.messageContent) { // update conversation in server
+      this.chatService.sendMessage('postAMsg', {
+        ownerId: this.user._id,
+        senderId: this.user._id,
+        senderType: this.userKind,
+        content: form.value.messageContent,
+        file: null,
+        privateMsg: this.privateMsg,
+        recipients: Array.from(this.nameList.keys()).map(key => {
+          const nameObj = this.nameList.get(key);
+          return { _id: nameObj._id, type: nameObj.type };
+        })
+      });
+    }
+
+
+    // localy update the conversation - only for stringMessage
+    if (this.currConversation && form.value.messageContent) {
       this.store.dispatch(new UserActions.SetSingleConversation({
         conversation: this.currConversation,
-        message: new Message({
+        stringMessage: form.value.messageContent ? new Message({
           creator: this.user._id,
           content: form.value.messageContent,
           createdAt: new Date()
-        })
+        }) : null
       }));
-    }
-
-    if (!this.currConversation) {
-      this.sendMessageForm.resetForm();
-      this.nameList.clear();
     }
     this.sendMessageForm.form.patchValue({
       messageContent: ''
     });
+    this.file = null;
+    const filesDiv = this.renderer.nextSibling(this.textarea.nativeElement);
+    if (filesDiv.firstChild) {
+      filesDiv.removeChild(filesDiv.firstChild);
+    }
   }
-
 
   @HostListener('document:keyup', ['$event'])
   @HostListener('document:keydown', ['$event']) onKeyDown(event) {
@@ -132,9 +157,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   onFucosCon(conversationDiv: ElementRef) {
-    if (this.textarea) {
-      this.textarea.nativeElement.focus();
-    }
+    this.file = null;
     if (this.conversationDiv) {
       this.renderer.removeClass(this.conversationDiv, 'active-con');
     }
@@ -168,6 +191,49 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.privateMsg = this.currConversation.participants.length === 1;
   }
 
+  uploadFile() {
+    this.inputUploadFile.nativeElement.click();
+  }
+
+  onChoseFile(event) {
+    this.file = event.target.files[0];
+    const divFile = this.renderer.createElement('div');
+    const fileName = this.renderer.createElement('span');
+    const fileSize = this.renderer.createElement('span');
+    const remove = this.renderer.createElement('span');
+    fileName.innerText = this.file.name;
+    fileSize.innerText = this.getFileSize(this.file.size);
+    this.renderer.appendChild(divFile, fileName);
+    this.renderer.appendChild(divFile, fileSize);
+    this.renderer.appendChild(divFile, remove);
+
+    this.renderer.addClass(divFile, 'file-message-container');
+    this.renderer.addClass(remove, 'glyphicon');
+    this.renderer.addClass(remove, 'glyphicon-remove');
+    this.renderer.appendChild(this.renderer.nextSibling(this.textarea.nativeElement), divFile);
+    this.renderer.listen(remove, 'click', this.removeFile.bind(this));
+  }
+
+  removeFile(event) {
+    const fileCon = this.renderer.parentNode(event.target);
+    const uploadCon = this.renderer.parentNode(fileCon);
+    this.renderer.removeChild(uploadCon, fileCon);
+    this.file = null;
+  }
+
+  private getFileSize = bytes => {
+    const kb = Math.floor(bytes / 1000);
+    if (kb < 1000) {
+      return kb + ' Kb';
+    }
+    const mb = Math.floor(kb / 1000);
+    if (mb < 1000) {
+      return mb + ' Mb';
+    }
+    const gb = Math.floor(mb / 1000);
+    return gb + ' Gb';
+  }
+
   getFullName(user: { _id: string; name?: string; firstName?: string; lastName?: string; }) {
     return user['name'] ? user['name'] :
           ((user['firstName'] || '') + ' ' + (user['lastName'] || '')).trim();
@@ -178,6 +244,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   onNewMessage(privateMsg: boolean) {
+    this.file = null;
     this.privateMsg = privateMsg;
     this.nameList.clear();
     this.currConversation = null;

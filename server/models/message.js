@@ -20,8 +20,20 @@ const messageSchema = new Schema(
     },
     content: {
       type: String,
-      required: true
-    }
+      required: false
+    },
+    filePath: {
+      type: String,
+      required: false
+    },
+    fileName: {
+      type: String,
+      required: false
+    },
+    fileNumBytes: {
+      type: Number,
+      required: false
+    },
   },
   { timestamps: { createdAt: true, updatedAt: false } }
 );

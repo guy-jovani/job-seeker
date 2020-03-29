@@ -1,8 +1,11 @@
 
+
+
 const chatController = require('./controllers/chat');
 const changeStatusOfAUserPosition = require('./utils/shared').changeStatusOfAUserPosition;
+const saveSocketFilePath = require('./utils/shared').saveSocketFilePath;
 
-let io;
+let io, hostName;
 
 const socketInitializer = {
   init : httpServer => {
@@ -14,6 +17,12 @@ const socketInitializer = {
       throw new Error('Socket.io not initialized');
     }
     return io;
+  },
+  getHostName: () => {
+    if(!hostName){
+      throw new Error('Socket.io not initialized');
+    }
+    return hostName;
   }
 };
 
@@ -22,6 +31,7 @@ exports.socketInitializer = socketInitializer;
 
 exports.socketHandler = (socket) => {
   io = socketInitializer.getIO();
+  hostName = socket.handshake.headers.host;
   // let socketUserId; // private room to each connected user
   socket.on('login', data => {
     // socketUserId = data._id;
@@ -35,15 +45,19 @@ exports.socketHandler = (socket) => {
 };
 
 
+
+
 const postAMsg = async data => {
   try {
+    const buffer = data.file ? Buffer.from(data.file) : null;
     const conversations = await chatController.postMessage(
-      data.privateMsg, data.recipients, data.content, data.senderId, data.senderType);
+      data.privateMsg, data.recipients, data.content, data.senderId, data.senderType, buffer, data.fileName, data.fileNumBytes);
       conversations.forEach(con => {
         const [message, conversation, newCon] = con;
         Reflect.deleteProperty(conversation, 'messages');
+        
         conversation.participants.forEach(participant => {
-          if (data.ownerId === participant.user._id.toString() && !newCon) return;
+          if (data.ownerId === participant.user._id.toString() && !newCon && !message.filePath) return;
           io.to(participant.user._id).emit('posted', { 
             message, conversation, type: 'success'
           } );

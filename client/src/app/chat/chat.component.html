@@ -58,30 +58,16 @@
       <app-search-bar [placeholder]="'Type one or more names'" [search]="['employee','company']" (nameListEmitter)="onGetNames($event)"></app-search-bar>
     </div>
 
-    <div class="name-list-container">
-      <ul class='name-list-container__list'>
-        <li *ngFor="let name of nameList | keyvalue; let i=index" class="name-list-container__item">
-          {{ name.value.fullName }}
-          <span class="glyphicon glyphicon-remove name-list-container__item-remove" (click)="onRemoveName(name.value._id)"></span>
-        </li>
-      </ul>
-    </div>
+    <ng-container *ngTemplateOutlet="nameListTemplate; context: {removeName: true}"></ng-container>
 
-    <form class="new-message__message-form" (ngSubmit)="onSubmit(sendMessageForm)" #sendMessageForm="ngForm">
-      <div class="new-message__input-box">
-        <label for="messageContent"></label>
-        <textarea
-          ngModel
-          required
-          name="messageContent"
-          class="new-message__message-content"
-          placeholder="Type your message here"></textarea>
-      </div>
-
-      <div class="new-message__submit-message">
-        <button class="submit-message__button" [disabled]="!sendMessageForm.valid || !nameList.size">Send</button>
-      </div>
-    </form>
+    <ng-container *ngTemplateOutlet="submitTemplate;
+      context: {
+        formClass: 'new-message__message-form',
+        inputBox: 'new-message__input-box',
+        submitDiv: 'new-message__submit-message',
+        filePreview: 'new-message__file-preview',
+        messageContent: 'new-message__message-content'
+      }"></ng-container>
 
   </div>
 
@@ -91,55 +77,91 @@
       Chat
     </div>
 
-    <div class="name-list-container">
-      <ul class='name-list-container__list'>
-        <li *ngFor="let name of nameList | keyvalue; let i=index" class="name-list-container__item">
-            {{ name.value.fullName }}</li>
-      </ul>
-    </div>
+    <ng-container *ngTemplateOutlet="nameListTemplate; context: {removeName: false}"></ng-container>
 
     <div class="messages">
       <ul class='messages__list' appScrollToBottom>
         <li *ngFor="let msg of currConversation.messages"
-              class="{{ msg.creator === user._id ? 'messages__list__item user-msg' : 'messages__list__item' }}" [attr.data-date]=" msg['first'] ? msg['first']: ''">
-          <p *ngIf="msg.creator !== user._id && currConversation.participants.length > 1" class="message message-name" [style.color]="nameList.get(msg.creator).nameColor['changingThisBreaksApplicationSecurity']">
-            {{ nameList.get(msg.creator) ? nameList.get(msg.creator).fullName : getFullName(user) }}</p>
-          <p class="message message-content">{{ msg.content }}<span class="message-time">{{ msg['hours'] }}:{{ msg['minutes'] }}</span></p>
+              class="messages__list__item {{ msg.creator === user._id ? 'user-msg' : '' }}" [attr.data-date]=" msg['first'] ? msg['first']: ''">
+          <p *ngIf="msg.creator !== user._id && currConversation.participants.length > 1"
+            class="message message-name"
+            [style.color]="nameList.get(msg.creator).nameColor['changingThisBreaksApplicationSecurity']">
+              {{ nameList.get(msg.creator) ? nameList.get(msg.creator).fullName : getFullName(user) }}
+          </p>
+          <ng-container *ngTemplateOutlet="msg.filePath ? chatFileMessage : chatStringMessage;
+              context: { msg: msg }">
+          </ng-container>
+
         </li>
       </ul>
     </div>
 
-    <form class="chat__message-form" (ngSubmit)="onSubmit(sendMessageForm)" #sendMessageForm="ngForm">
-      <div class="chat__input-box">
-        <label for="messageContent"></label>
-        <textarea
-          ngModel
-          #textarea
-          required
-          name="messageContent"
-          class="chat__message-content"
-          placeholder="Type your message here"></textarea>
-      </div>
-      <div class="chat__submit-message">
-        <button class="submit-message__button"
-          [disabled]="!sendMessageForm.valid || !nameList.size"
-          title="Ctrl + Enter"
-          #submitChat>
-          Send</button>
-      </div>
-    </form>
+    <ng-container *ngTemplateOutlet="submitTemplate;
+      context: {
+        formClass: 'chat__message-form',
+        inputBox: 'chat__input-box',
+        submitDiv: 'chat__submit-message',
+        filePreview: 'chat-file-preview',
+        messageContent: 'chat-message-content'
+      }"></ng-container>
 
   </div>
 
 </div>
 
 
+<ng-template #chatStringMessage let-msg="msg">
+  <p class="message message-content">{{ msg.content }}<span class="message-time">{{ msg['hours'] }}:{{ msg['minutes'] }}</span></p>
+</ng-template>
+
+<ng-template #chatFileMessage let-msg="msg">
+  <a href="{{msg.filePath}}" download="" target="_blank" class="message message-content">
+    <span>{{ msg.fileName }}</span>
+    <span>{{ getFileSize(msg.fileNumBytes) }}</span>
+    <span class="message-time">{{ msg['hours'] }}:{{ msg['minutes'] }}</span>
+  </a>
+</ng-template>
 
 
 
+<ng-template #nameListTemplate let-removeName="removeName">
+  <div class="name-list-container">
+    <ul class='name-list-container__list'>
+      <li *ngFor="let name of nameList | keyvalue; let i=index" class="name-list-container__item">
+        {{ name.value.fullName }}
+        <span *ngIf="removeName" class="glyphicon glyphicon-remove name-list-container__item-remove" (click)="onRemoveName(name.value._id)"></span>
+      </li>
+    </ul>
+  </div>
+</ng-template>
 
+<ng-template #submitTemplate let-formClass="formClass" let-inputBox="inputBox"
+                              let-submitDiv="submitDiv" let-filePreview="filePreview"
+                              let-messageContent="messageContent">
+  <form class="{{formClass}}" (ngSubmit)="onSubmit(sendMessageForm)" #sendMessageForm="ngForm">
+    <div class="{{inputBox}}">
+      <label for="messageContent"></label>
+      <textarea
+        ngModel
+        #textarea
+        required
+        name="messageContent"
+        class="{{messageContent}}"
+        placeholder="Type your message here"></textarea>
+      <div class="{{filePreview}}"></div>
+    </div>
 
-
+    <div class="{{submitDiv}}">
+      <input type="file" class="input-upload-file" #inputUploadFile (change)='onChoseFile($event)'>
+      <span class="glyphicon glyphicon-paperclip paperclip" (click)="uploadFile()"></span>
+      <button class="submit-message__button"
+        [disabled]="(!sendMessageForm.valid && !file) || !nameList.size"
+        title="Ctrl + Enter"
+        #submitChat>
+        Send</button>
+    </div>
+  </form>
+</ng-template>
 
 
 

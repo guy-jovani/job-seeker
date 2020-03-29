@@ -73,7 +73,7 @@ export class SetAllConversations implements Action {
 export class SetSingleConversation implements Action {
   readonly type = SET_SINGLE_CONVERSATION;
 
-  constructor(public payload: { conversation: Conversation, message: Message }) {}
+  constructor(public payload: { conversation: Conversation, stringMessage?: Message, fileMessage?: Message }) {}
 }
 
 export class UpdateActiveUser implements Action {

@@ -1,10 +1,31 @@
 
+const fs = require('fs');
+const path = require('path');
 const bcrypt = require('bcryptjs');
 const validation = require('../utils/validation');
 const Employee = require('../models/employee');
 const Company = require('../models/company');
 
 
+exports.getSocketFileUniqueName = fileName => {
+  return fileName.split('.')[0] + '-' + 
+          new Date().toISOString().replace(/:/g, '-') + 
+          '.' + fileName.split('.')[1];
+};
+
+exports.getSocketFileUrl = (fileName, hostName) => {
+  return process.env.REQ_PROTOCOL + hostName + '/files/' + fileName;
+};
+
+const getSocketFilePath = uniqueName => {
+  return path.join(__dirname, '../', 'files', uniqueName);
+}
+
+exports.saveSocketFilePath = (buffer, uniqueName) => {
+  fs.writeFile(getSocketFilePath(uniqueName), buffer, (err) => {
+    if(!err) console.log('File written');
+  });
+};
 
 exports.skippedDocuments = page => {
   // page: 1, docs: 20 => (1 - 1) * 20 + 1 => 1

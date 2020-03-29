@@ -19,6 +19,8 @@
   cursor: pointer;
   padding: 0;
   z-index: 5;
+  overflow: auto;
+  max-height: 30vh;
 }
 
 .list-item {

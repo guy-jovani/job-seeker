@@ -47,8 +47,10 @@ export class AppComponent implements OnInit, OnDestroy {
     this.socketPostedSub = this.chatService.getMessage('posted').subscribe(res => {
       try {
         if (res['type'] === 'success') {
+          const stringMessage = res['message']['content'] ? res['message'] : null;
+          const fileMessage = res['message']['filePath'] ? res['message'] : null;
           this.store.dispatch(new UserActions.SetSingleConversation({
-            conversation: res['conversation'], message: res['message']
+            conversation: res['conversation'], stringMessage, fileMessage
           }));
           if (this.currUrl.length === 1 && this.currUrl[0] !== 'chat') {
             this.store.dispatch(new UserActions.SetChatNotification());
