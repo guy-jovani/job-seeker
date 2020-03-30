@@ -34,10 +34,10 @@ export class ChatComponent implements OnInit, OnDestroy {
   keyMap = {};
   file: File;
 
-  @ViewChild('sendMessageForm', { static: false }) sendMessageForm: NgForm;
-  @ViewChild('textarea', { static: false }) textarea: ElementRef;
-  @ViewChild('submitChat', { static: false }) submitChat: ElementRef;
-  @ViewChild('inputUploadFile', { static: false }) inputUploadFile: ElementRef;
+  @ViewChild('sendMessageForm') sendMessageForm: NgForm;
+  @ViewChild('textarea') textarea: ElementRef;
+  @ViewChild('submitChat') submitChat: ElementRef;
+  @ViewChild('inputUploadFile') inputUploadFile: ElementRef;
 
   constructor(private renderer: Renderer2,
               private chatService: ChatService,
@@ -221,7 +221,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.file = null;
   }
 
-  private getFileSize = bytes => {
+  getFileSize = bytes => {
     const kb = Math.floor(bytes / 1000);
     if (kb < 1000) {
       return kb + ' Kb';

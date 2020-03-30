@@ -28,13 +28,8 @@ export class EmployeesResolverService implements Resolve<Employee[]> {
 
         if (!employeeState.employees.length || timeFromLastFetchMS > environment.fetchDataMSReset) {
           this.store.dispatch(new EmployeesActions.FetchEmployees({ page: employeeState.page }));
-          return this.actions$.pipe(
-            ofType(EmployeesActions.SET_EMPLOYEES, EmployeesActions.EMPLOYEE_OP_FAILURE),
-            take(1)
-          );
-        } else {
-          return of(employeeState.employees);
         }
+        return of(employeeState.employees);
       })
     );
   }

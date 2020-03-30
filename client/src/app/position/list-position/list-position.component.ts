@@ -16,13 +16,13 @@ export class ListPositionComponent {
   @Input() detailsPositionUrl = '';
   @Input() positions: Employee['positions'] | Company['positions'] = null;
 
-  @Output() acceptRejectEmitter = new EventEmitter<{status: ApplicantStatus, posInd: number}>();
+  @Output() acceptRejectEmitter = new EventEmitter<{status: string, posInd: number}>();
 
   positionsTracker(index, item) {
     return index;
   }
 
-  onAcceptReject(status: ApplicantStatus, posInd: number) { // company actions
+  onAcceptReject(status: string, posInd: number) { // company actions
     this.acceptRejectEmitter.emit({ status, posInd });
   }
 

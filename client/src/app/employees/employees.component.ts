@@ -24,7 +24,7 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
   lastEmployee: boolean; // if there are more employees to fetch
   page: number;
 
-  @ViewChild('containerFluid', { static: false }) containerFluid: ElementRef;
+  @ViewChild('containerFluid') containerFluid: ElementRef;
 
   constructor(private store: Store<fromApp.AppState>,
               private route: ActivatedRoute,

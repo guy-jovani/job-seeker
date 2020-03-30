@@ -111,9 +111,9 @@
         style="margin-left: 2em;"
         type="button"
         class="btn btn-info"
-        [routerLink]="authAction === 'companySignup' && authAction !== 'login' ? ['/signup'] : ['company']"
+        [routerLink]="authAction === 'companySignup' ? ['/signup'] : ['company']"
         >
-        {{ authAction === 'companySignup' && authAction !== 'login'  ? "Not a Company?" : "Sign a Company"}}
+        {{ authAction === 'companySignup'  ? "Not a Company?" : "Sign a Company"}}
       </button>
         <button *ngIf="authAction === 'login'"
         style="margin-left: 2em;"

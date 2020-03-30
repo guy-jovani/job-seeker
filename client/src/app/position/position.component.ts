@@ -66,7 +66,7 @@ export class PositionComponent implements OnInit, OnDestroy {
     });
   }
 
-  private checkPositionOfUser() {
+  checkPositionOfUser() {
     this.positions = this.user ? this.user.positions : null;
     this.detailsPositionUrl = this.selectedList + '/';
     if (this.kind === 'company') {

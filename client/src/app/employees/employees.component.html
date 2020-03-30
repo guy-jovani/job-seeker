@@ -11,7 +11,7 @@
       <app-loading-spinner></app-loading-spinner>
     </div>
     <div *ngIf='lastEmployee' style="text-align: center;">
-      <p>There are no more employees that match your search.</p>
+      <p>There are no {{ employees.length ? 'more' : '' }} employees that match your search.</p>
     </div>
   </div>
 </div>

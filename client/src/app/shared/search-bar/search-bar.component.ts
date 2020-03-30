@@ -21,8 +21,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   nameList: Map<string, {}> = null;
   messages: string[] = [];
 
-  @ViewChild('listResults', { static: false }) listRes: ElementRef;
-  @ViewChild('searchInput', { static: false }) searchInput: ElementRef;
+  @ViewChild('listResults') listRes: ElementRef;
+  @ViewChild('searchInput') searchInput: ElementRef;
 
   @Input() placeholder: string = null;
   // tslint:disable-next-line: no-input-rename

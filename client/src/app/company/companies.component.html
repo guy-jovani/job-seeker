@@ -11,8 +11,8 @@
     <div *ngIf="isLoading" style="text-align: center;">
       <app-loading-spinner></app-loading-spinner>
     </div>
-    <div *ngIf='lastCompany' style="text-align: center;">
-      <p>There are no more companies that match your search.</p>
+    <div *ngIf='lastCompany && !isLoading' style="text-align: center;">
+      <p>There are no {{ companies.length ? 'more' : '' }} companies that match your search.</p>
     </div>
   </div>
 </div>

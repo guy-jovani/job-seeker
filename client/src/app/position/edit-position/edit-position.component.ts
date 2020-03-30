@@ -98,7 +98,7 @@ export class EditPositionComponent implements OnInit, OnDestroy {
       });
     }
   }
-  onSubmit(form: NgForm) {
+  onSubmit(form: FormGroup) {
     if (form.invalid) {
       return this.store.dispatch(new PositionActions.PositionOpFailure(['The form is invalid']));
     }

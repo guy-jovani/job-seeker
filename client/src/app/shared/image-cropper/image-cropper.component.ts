@@ -15,8 +15,8 @@ export class ImageCropperComponent {
   @Input() roundCropper: boolean;
   @Input() imagePreview = '';
   @Input() aspectRatio: string;
-  @ViewChild('cropContainer', { static: false }) cropContainer: ElementRef;
-  @ViewChild('filePicker', { static: false }) filePicker: ElementRef;
+  @ViewChild('cropContainer') cropContainer: ElementRef;
+  @ViewChild('filePicker') filePicker: ElementRef;
   @Output() confirmedImageEvent = new EventEmitter<{ file: File, stringFile: string }>();
 
   constructor(private renderer: Renderer2) {}

@@ -25,7 +25,7 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
   currUrl: string[] = null;
   profileImage: { file: File, stringFile: string } = { file: null, stringFile: '' };
 
-  @ViewChild('deleteImage', { static: false }) deleteImage: ElementRef;
+  @ViewChild('deleteImage') deleteImage: ElementRef;
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -95,7 +95,7 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
     }
   }
 
-  onSubmit(form: NgForm) {
+  onSubmit(form: FormGroup) {
     if (form.invalid) {
       return this.store.dispatch(new EmployeeActions.EmployeeOpFailure(['The form is invalid']));
     }

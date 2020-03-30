@@ -3,95 +3,95 @@
 
 
 <div class="container form-container">
-  <div *ngIf="isLoading">
-    <app-loading-spinner></app-loading-spinner>
-  </div>
-
-  <form (ngSubmit)="onSubmit(positionForm)" class="my-form" [formGroup]="positionForm" *ngIf="!isLoading">
-
-    <app-message-box
-      *ngIf="messages.length && !isLoading"
-      [messages]="messages"
-      (closeMessages)="onClose()">
-    </app-message-box>
-
-    <div class="form-title-container">
-      <h3 class="form-action-title">{{ index >= 0 ? 'Update' : 'Create' }}</h3>
+    <div *ngIf="isLoading">
+      <app-loading-spinner></app-loading-spinner>
     </div>
 
-    <div class="form-group">
-        <label for="title">Title:  </label>
-        <input
-          placeholder="Title *"
-          class="form-control input-form-tag"
-          type="title"
-          name="title"
-          id="title"
-          formControlName="title"
-          #title
-        >
-        <span class="help-block" *ngIf="!positionForm.get('title').valid && positionForm.get('title').touched">
-          The title field is required.
-        </span>
+    <form (ngSubmit)="onSubmit(positionForm)" class="my-form" [formGroup]="positionForm" *ngIf="!isLoading">
+
+      <app-message-box
+        *ngIf="messages.length && !isLoading"
+        [messages]="messages"
+        (closeMessages)="onClose()">
+      </app-message-box>
+
+      <div class="form-title-container">
+        <h3 class="form-action-title">{{ index >= 0 ? 'Update' : 'Create' }}</h3>
       </div>
 
-    <div class="form-group">
-      <label for="description">Description:  </label>
-      <textarea
-        placeholder="Description *"
-        class="form-control input-form-tag"
-        name="description"
-        id="description"
-        formControlName="description"
-        #description
-        >
-        </textarea>
-        <span class="help-block" *ngIf="!positionForm.get('description').valid && positionForm.get('description').touched">
-          Please enter a description.
-        </span>
-    </div>
-
-    <div class="form-group" formArrayName="requirements">
-      <div class="requirements-title-container">
-        <p>Requirements:  </p>
-        <button type="button" class="btn btn-info btn-sm" (click)="onAddRequirement()">(+) Add</button>
-      </div>
-      <div *ngFor="let requirement of getControls(); let i=index"
-              [formGroupName]="i" >
-
-        <div class="single-requirement">
+      <div class="form-group">
+          <label for="title">Title:  </label>
           <input
-          placeholder="Requirement *"
-          class="form-control input-form-tag"
-          formControlName="requirement"
-          type="text"
-          name="requirement"/>
-
-          <button class="btn btn-danger btn-sm" type="button" (click)="onRemoveRequirement(i)">X</button>
+            placeholder="Title *"
+            class="form-control input-form-tag"
+            type="title"
+            name="title"
+            id="title"
+            formControlName="title"
+            #title
+          >
+          <span class="help-block" *ngIf="!positionForm.get('title').valid && positionForm.get('title').touched">
+            The title field is required.
+          </span>
         </div>
-        <span class="help-block" *ngIf="!getControls()[i].get('requirement').valid &&
-                                        getControls()[i].get('requirement').touched">
-          If a requirement has been added - it needs to be filled.
-        </span>
+
+      <div class="form-group">
+        <label for="description">Description:  </label>
+        <textarea
+          placeholder="Description *"
+          class="form-control input-form-tag"
+          name="description"
+          id="description"
+          formControlName="description"
+          #description
+          >
+          </textarea>
+          <span class="help-block" *ngIf="!positionForm.get('description').valid && positionForm.get('description').touched">
+            Please enter a description.
+          </span>
       </div>
-    </div>
 
-    <hr>
+      <div class="form-group" formArrayName="requirements">
+        <div class="requirements-title-container">
+          <p>Requirements:  </p>
+          <button type="button" class="btn btn-info btn-sm" (click)="onAddRequirement()">(+) Add</button>
+        </div>
+        <div *ngFor="let requirement of getControls(); let i=index"
+                [formGroupName]="i" >
 
-    <div class="edit-buttons-container">
-      <button
-        type="submit"
-        class="btn btn-success"
-        [disabled]="!positionForm.valid">
-        {{ position ? 'Update' : 'Create' }}
-      </button>
-      <button
-        type="button"
-        class="btn btn-danger"
-        (click)="onCancel()">
-        Cancel
-      </button>
-    </div>
+          <div class="single-requirement">
+            <input
+            placeholder="Requirement *"
+            class="form-control input-form-tag"
+            formControlName="requirement"
+            type="text"
+            name="requirement"/>
 
-  </form>
-</div>
+            <button class="btn btn-danger btn-sm" type="button" (click)="onRemoveRequirement(i)">X</button>
+          </div>
+          <span class="help-block" *ngIf="!getControls()[i].get('requirement').valid &&
+                                          getControls()[i].get('requirement').touched">
+            If a requirement has been added - it needs to be filled.
+          </span>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="edit-buttons-container">
+        <button
+          type="submit"
+          class="btn btn-success"
+          [disabled]="!positionForm.valid">
+          {{ position ? 'Update' : 'Create' }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="onCancel()">
+          Cancel
+        </button>
+      </div>
+
+    </form>
+  </div>

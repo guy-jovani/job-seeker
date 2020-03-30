@@ -3,170 +3,170 @@
 
 
 <div class="container form-container">
-  <div *ngIf="isLoading">
-    <app-loading-spinner></app-loading-spinner>
+    <div *ngIf="isLoading">
+      <app-loading-spinner></app-loading-spinner>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" [formGroup]="companyForm" *ngIf="!isLoading" class="my-form">
+
+      <app-message-box
+        *ngIf="messages.length && !isLoading"
+        [messages]="messages"
+        (closeMessages)="onClose()">
+      </app-message-box>
+
+      <div class="form-title-container">
+        <h3 class="form-action-title">Update Details</h3>
+      </div>
+
+      <div class="company-profile-image-container">
+        <label for="profile-cropper">Profile Image:</label>
+        <app-image-cropper
+          id="profile-cropper"
+          name="profile-cropper"
+          class="cropper-component"
+          (confirmedImageEvent)="onCroppedEvent($event, null)"
+          [aspectRatio]="16 / 9"
+          [imagePreview]="profileImagePreview ? profileImagePreview.stringFile : ''">
+        </app-image-cropper>
+      </div>
+
+      <div class="form-group">
+        <label for="name">Name:  </label>
+        <input
+          placeholder="Name *"
+          class="form-control input-form-tag"
+          type="text"
+          formControlName="name"
+          #name
+        >
+        <span class="help-block" *ngIf="!companyForm.get('name').valid && companyForm.get('name').touched">
+          Please enter a valid name.
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email:  </label>
+        <input
+          placeholder="Email *"
+          class="form-control input-form-tag"
+          type="email"
+          name="email"
+          id="email"
+          formControlName="email"
+          #email
+        >
+        <span class="help-block" *ngIf="!companyForm.get('email').valid && companyForm.get('email').touched">
+          Please enter a valid email address.
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="website">Website:  </label>
+        <input
+          placeholder="website"
+          class="form-control input-form-tag"
+          type="text"
+          formControlName="website"
+          #website
+        >
+        <span class="help-block" *ngIf="!companyForm.get('website').valid && companyForm.get('website').touched">
+          Please enter a valid website.
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description:  </label>
+        <textarea
+          placeholder="Description"
+          class="form-control input-form-tag"
+          formControlName="description"
+          #description
+        ></textarea>
+        <span class="help-block" *ngIf="!companyForm.get('description').valid && companyForm.get('description').touched">
+          Please enter a valid description.
+        </span>
+      </div>
+
+      <div formGroupName="passwords" class="form-group">
+        <div class="form-group password-input-container">
+          <label for="name">Password  </label>
+          <input
+            placeholder="Password"
+            class="form-control input-form-tag"
+            [type]="showPasswords ? 'text' : 'password'"
+            name="password"
+            id="password"
+            formControlName="password"
+            #password
+          >
+          <span (click)="onTogglePasswords()"
+                class="{{ showPasswords ? 'glyphicon glyphicon-eye-close show-password-eye' :
+                                          'glyphicon glyphicon-eye-open show-password-eye' }}">
+          </span>
+          <span *ngIf="companyForm.get('passwords.password').touched &&
+                          !companyForm.get('passwords.password').valid">
+            <span class="help-block" *ngIf="companyForm.get('passwords.password').errors.required">
+              The password field is required.
+            </span>
+            <span class="help-block" *ngIf="companyForm.get('passwords.password').errors.minlength">
+                Password must be of at least 3 characters long.
+            </span>
+          </span>
+        </div>
+        <div>
+          <label for="name">Confirm Password  </label>
+          <input
+            class="form-control input-form-tag"
+            placeholder="Confirm Password"
+            [type]="showPasswords ? 'text' : 'password'"
+            name="confirmPassword"
+            id="confirmPassword"
+            formControlName="confirmPassword"
+          >
+          <span *ngIf="companyForm.get('passwords.password').touched &&
+                  companyForm.get('passwords.confirmPassword').touched &&
+                  companyForm.get('passwords.password').valid &&
+                  !companyForm.get('passwords').valid">
+            <span class="help-block" *ngIf="companyForm.get('passwords').errors.equality">
+              The passwords fields must be identical.
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="company-images-container">
+        <div class="add-image">
+          <button type="button" class="btn btn-primary" (click)="onAddImage()">Add Image </button>
+          <span class="help-block">(Up to 6).</span>
+        </div>
+        <app-image-cropper
+          *ngFor="let imagePath of imagesPath; let i=index; trackBy: trackImagesPath"
+          class="cropper-component"
+          (confirmedImageEvent)="onCroppedEvent($event, i)"
+          [aspectRatio]="16 / 9"
+          [imagePreview]="imagePath">
+        </app-image-cropper>
+      </div>
+
+      <hr>
+
+      <div class="edit-buttons-container">
+        <button
+          type="submit"
+          class="btn btn-success"
+          [disabled]="!companyForm.valid">
+          Update
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="onCancel()">
+          Cancel
+        </button>
+      </div>
+    </form>
   </div>
-
-  <form (ngSubmit)="onSubmit()" [formGroup]="companyForm" *ngIf="!isLoading" class="my-form">
-
-    <app-message-box
-      *ngIf="messages.length && !isLoading"
-      [messages]="messages"
-      (closeMessages)="onClose()">
-    </app-message-box>
-
-    <div class="form-title-container">
-      <h3 class="form-action-title">Update Details</h3>
-    </div>
-
-    <div class="company-profile-image-container">
-      <label for="profile-cropper">Profile Image:</label>
-      <app-image-cropper
-        id="profile-cropper"
-        name="profile-cropper"
-        class="cropper-component"
-        (confirmedImageEvent)="onCroppedEvent($event, null)"
-        [aspectRatio]="16 / 9"
-        [imagePreview]="profileImagePreview ? profileImagePreview.stringFile : ''">
-      </app-image-cropper>
-    </div>
-
-    <div class="form-group">
-      <label for="name">Name:  </label>
-      <input
-        placeholder="Name *"
-        class="form-control input-form-tag"
-        type="text"
-        formControlName="name"
-        #name
-      >
-      <span class="help-block" *ngIf="!companyForm.get('name').valid && companyForm.get('name').touched">
-        Please enter a valid name.
-      </span>
-    </div>
-
-    <div class="form-group">
-      <label for="email">Email:  </label>
-      <input
-        placeholder="Email *"
-        class="form-control input-form-tag"
-        type="email"
-        name="email"
-        id="email"
-        formControlName="email"
-        #email
-      >
-      <span class="help-block" *ngIf="!companyForm.get('email').valid && companyForm.get('email').touched">
-        Please enter a valid email address.
-      </span>
-    </div>
-
-    <div class="form-group">
-      <label for="website">Website:  </label>
-      <input
-        placeholder="website"
-        class="form-control input-form-tag"
-        type="text"
-        formControlName="website"
-        #website
-      >
-      <span class="help-block" *ngIf="!companyForm.get('website').valid && companyForm.get('website').touched">
-        Please enter a valid website.
-      </span>
-    </div>
-
-    <div class="form-group">
-      <label for="description">Description:  </label>
-      <textarea
-        placeholder="Description"
-        class="form-control input-form-tag"
-        formControlName="description"
-        #description
-      ></textarea>
-      <span class="help-block" *ngIf="!companyForm.get('description').valid && companyForm.get('description').touched">
-        Please enter a valid description.
-      </span>
-    </div>
-
-    <div formGroupName="passwords" class="form-group">
-      <div class="form-group password-input-container">
-        <label for="name">Password  </label>
-        <input
-          placeholder="Password"
-          class="form-control input-form-tag"
-          [type]="showPasswords ? 'text' : 'password'"
-          name="password"
-          id="password"
-          formControlName="password"
-          #password
-        >
-        <span (click)="onTogglePasswords()"
-              class="{{ showPasswords ? 'glyphicon glyphicon-eye-close show-password-eye' :
-                                        'glyphicon glyphicon-eye-open show-password-eye' }}">
-        </span>
-        <span *ngIf="companyForm.get('passwords.password').touched &&
-                        !companyForm.get('passwords.password').valid">
-          <span class="help-block" *ngIf="companyForm.get('passwords.password').errors.required">
-            The password field is required.
-          </span>
-          <span class="help-block" *ngIf="companyForm.get('passwords.password').errors.minlength">
-              Password must be of at least 3 characters long.
-          </span>
-        </span>
-      </div>
-      <div>
-        <label for="name">Confirm Password  </label>
-        <input
-          class="form-control input-form-tag"
-          placeholder="Confirm Password"
-          [type]="showPasswords ? 'text' : 'password'"
-          name="confirmPassword"
-          id="confirmPassword"
-          formControlName="confirmPassword"
-        >
-        <span *ngIf="companyForm.get('passwords.password').touched &&
-                companyForm.get('passwords.confirmPassword').touched &&
-                companyForm.get('passwords.password').valid &&
-                !companyForm.get('passwords').valid">
-          <span class="help-block" *ngIf="companyForm.get('passwords').errors.equality">
-            The passwords fields must be identical.
-          </span>
-        </span>
-      </div>
-    </div>
-
-    <hr>
-
-    <div class="company-images-container">
-      <div class="add-image">
-        <button type="button" class="btn btn-primary" (click)="onAddImage()">Add Image </button>
-        <span class="help-block">(Up to 6).</span>
-      </div>
-      <app-image-cropper
-        *ngFor="let imagePath of imagesPath; let i=index; trackBy: trackImagesPath"
-        class="cropper-component"
-        (confirmedImageEvent)="onCroppedEvent($event, i)"
-        [aspectRatio]="16 / 9"
-        [imagePreview]="imagePath">
-      </app-image-cropper>
-    </div>
-
-    <hr>
-
-    <div class="edit-buttons-container">
-      <button
-        type="submit"
-        class="btn btn-success"
-        [disabled]="!companyForm.valid">
-        Update
-      </button>
-      <button
-        type="button"
-        class="btn btn-danger"
-        (click)="onCancel()">
-        Cancel
-      </button>
-    </div>
-  </form>
-</div>
 
