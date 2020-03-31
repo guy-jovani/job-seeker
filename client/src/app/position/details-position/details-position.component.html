@@ -28,6 +28,7 @@
   <ng-template #companyNoLink><p>Comapny: {{ (companyId.name | titlecase) }}</p></ng-template>
 
   <p>Description: {{ position.description || position['position'].description }}</p>
+  <p>Date: {{ getPositionDate(position.date) || getPositionDate(position['position'].date) }}</p>
 
 
   <p>Requierments:</p>

@@ -19,6 +19,10 @@ const positionSchema = new Schema(
       type: Schema.Types.ObjectId, 
       ref: 'Company',
       required: true
+    },
+    date: {
+      type: Date,
+      required: true
     }
   }
 );

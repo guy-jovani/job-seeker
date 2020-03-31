@@ -78,7 +78,7 @@ getUserLogin = async (req, res) => {
   let user = await Employee.findOne({email: req.body.email}).select('-__v')
                             .populate({
                               path: 'positions.position', 
-                              populate: { path: 'company', select: 'name' }
+                              populate: { path: 'company', select: 'name date' }
                             });
   let kind = "employee";
   if(!user) {

@@ -78,7 +78,6 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
         } else { // /companies/:compInd/position
           this.checkPositionOfACompany(currState);
         }
-        console.log(this.position)
       });
   }
 
@@ -104,6 +103,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
       this.allowEdit = true;
       this.position = this.user ?
                       authState['user'].positions[+this.currUrl[2]] : null;
+                      console.log(this.position)
       this.companyId = this.position ? { _id: this.position.company as string, name: this.user['name'] } : null;
     }
   }
@@ -156,6 +156,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
   }
 
   private getPositionDate(dateStr: string | Date) {
+    if (!dateStr) { return; }
     const date = new Date(dateStr);
     return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
   }

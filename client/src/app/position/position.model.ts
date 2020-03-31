@@ -15,6 +15,7 @@ export class Position {
   public company: Partial<Company>;
   public requirements?: { requirement: string }[];
   public lastFetch: Date;
+  public date: Date | string;
 
   constructor(init?: Partial<Position>) {
     Object.assign(this, init);

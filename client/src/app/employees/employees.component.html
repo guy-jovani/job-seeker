@@ -13,6 +13,9 @@
     <div *ngIf='lastEmployee' style="text-align: center;">
       <p>There are no {{ employees.length ? 'more' : '' }} employees that match your search.</p>
     </div>
+    <div *ngIf='currUrl[0] === "my-applicants" && !employees.length' style="text-align: center;">
+      <p>There are no applicants at the moment.</p>
+    </div>
   </div>
 </div>
 

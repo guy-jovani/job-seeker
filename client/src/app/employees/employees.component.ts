@@ -55,7 +55,6 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
           this.isLoading = currState['loading'];
           this.applicantsList = true;
           this.employees = currState['user'] ? currState['user'].applicants : null;
-
         } else { // /employees
           this.page = currState['page'];
           this.isLoading = currState['loadingAll'];
@@ -77,7 +76,9 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   ngAfterViewChecked() {
-    this.fetchNextPage();
+    if (this.currUrl[0] !== 'my-applicants') {
+      this.fetchNextPage();
+    }
   }
 
   @HostListener('window:scroll', ['$event']) doSomething(event) {
