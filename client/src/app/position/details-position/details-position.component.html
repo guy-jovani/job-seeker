@@ -13,7 +13,10 @@
 
   <div class="details-page-header">
     <h3 class="{{ status ? '' : 'only-position-title' }}">{{ (position.title || position['position'].title) | titlecase }}</h3>
-    <h3 class="position-status" *ngIf="status">{{ status }}</h3>
+    <div class="status-info" *ngIf="status">
+      <h3 class="position-status">{{ status }}</h3>
+      <h4 class="position-date">{{ statusDate }}</h4>
+    </div>
     <app-back-button></app-back-button>
   </div>
 

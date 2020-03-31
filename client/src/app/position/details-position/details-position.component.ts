@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 import * as CompanyActions from '../../company/store/company.actions';
 import * as PositionActions from '../../position/store/position.actions';
@@ -32,6 +32,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
   user: Employee | Company = null;
   allowApply: boolean;
   status: string = null;
+  statusDate: string = null;
   kind: string = null;
   closedErrors = false;
   fetchedCompany = false;
@@ -41,7 +42,6 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<fromApp.AppState>,
-    private route: ActivatedRoute,
     private chatService: ChatService,
     private router: Router) { }
 
@@ -78,6 +78,7 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
         } else { // /companies/:compInd/position
           this.checkPositionOfACompany(currState);
         }
+        console.log(this.position)
       });
   }
 
@@ -149,8 +150,14 @@ export class DetailsPositionComponent implements OnInit, OnDestroy {
                       .find(pos => pos.position._id === this.position._id);
       if (userPositionInfo) {
         this.status = userPositionInfo.status.toString();
+        this.statusDate = this.getPositionDate(userPositionInfo.date);
       }
     }
+  }
+
+  private getPositionDate(dateStr: string | Date) {
+    const date = new Date(dateStr);
+    return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
   }
 
   onApplySave(status: string) { // employee actions

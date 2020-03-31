@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 import { Employee } from 'app/employees/employee.model';
-import { Company, ApplicantStatus } from 'app/company/company.model';
+import { Company } from 'app/company/company.model';
 
 @Component({
   selector: 'app-list-position',
@@ -18,8 +18,13 @@ export class ListPositionComponent {
 
   @Output() acceptRejectEmitter = new EventEmitter<{status: string, posInd: number}>();
 
-  positionsTracker(index, item) {
+  positionsTracker(index: number, item: Position) {
     return index;
+  }
+
+  getPositionDate(dateStr: string) {
+    const date = new Date(dateStr);
+    return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
   }
 
   onAcceptReject(status: string, posInd: number) { // company actions

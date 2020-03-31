@@ -28,8 +28,13 @@ export class PositionResolverService implements Resolve<Position[]> {
                                     new Date().getTime() - positionState.lastFetch.getTime();
         if (!positionState.positions.length || timeFromLastFetchMS > environment.fetchDataMSReset) {
           this.store.dispatch(new PositionActions.FetchAllPositions());
+          return this.actions$.pipe(
+            ofType(PositionActions.SET_ALL_POSITIONS, PositionActions.POSITION_OP_FAILURE),
+            take(1)
+            );
+        } else {
+          return of(positionState.positions);
         }
-        return of(positionState.positions);
       })
     );
   }
