@@ -11,6 +11,7 @@ import * as fromApp from '../../store/app.reducer';
 import * as UserActions from './user.actions';
 import { Company } from 'app/company/company.model';
 import { Employee } from 'app/employees/employee.model';
+import { Conversation } from 'app/chat/conversation.model';
 
 const geUsertLocalStorage = () => {
   const user = JSON.parse(localStorage.getItem('userData'));
@@ -89,7 +90,25 @@ export class UserEffects {
         .pipe(
           map(res => {
             if (res['type'] === 'success') {
-              return new UserActions.SetAllConversations(res['conversations']);
+              const cons = res['conversations'].map((con: Conversation) => {
+                const userInd = con.participants.findIndex(participant =>
+                                participant.user._id === userState.user._id);
+                if (userInd !== -1) {
+                  con.participants.splice(userInd, 1);
+                }
+
+                let prevMsgDate: string = null;
+                con.messages.forEach(msg => {
+                  msg.createdAt = new Date(msg.createdAt);
+                  msg['first'] = !prevMsgDate || prevMsgDate !== msg.createdAt.toDateString() ? msg.createdAt.toDateString() : null;
+                  msg['hours'] = msg.createdAt.getHours().toString().padStart(2, '0');
+                  msg['minutes'] = msg.createdAt.getMinutes().toString().padStart(2, '0');
+                  prevMsgDate = msg.createdAt.toDateString();
+                });
+                return con;
+              });
+
+              return new UserActions.SetAllConversations(cons);
             } else {
               return new UserActions.UserFailure(res['messages']);
             }

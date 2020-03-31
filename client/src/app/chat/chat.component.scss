@@ -210,7 +210,7 @@ new message - name list
 }
 
 .name-list-container__item {
-  padding: 0 0.5rem;
+  padding: 0 1rem;
   border: 0.5px solid gray;
   border-radius: 1.5rem;
   margin: 0 0.5rem;
@@ -223,9 +223,7 @@ new message - name list
 
 .name-list-container__item-remove {
   position: relative;
-  right: 3px;
-  top: 2px;
-  float: right;
+  right: -0.5rem;
   cursor: pointer;
 }
 
@@ -267,15 +265,12 @@ new message - message form
   resize: none;
   border: none;
   outline: none;
+  padding: 1.2rem;
   flex-grow: 1;
 
   @media (max-height: 355px) {
     height: auto;
   }
-}
-
-.chat-message-content {
-  padding: 1.2rem;
 }
 
 .chat-file-preview {

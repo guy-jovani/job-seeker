@@ -29,7 +29,7 @@
       </div>
 
       <div *ngIf="!isLoading && conversations && conversations.length">
-        <div *ngFor="let con of conversations; let i=index" class="single-conversation" (click)="onFucosCon($event.currentTarget)" [attr.data-con-ind]="i">
+        <div *ngFor="let con of conversations; let i=index; trackBy: trackConversations" class="single-conversation" (click)="onFucosCon($event.currentTarget)" [attr.data-con-ind]="i">
           <ul class='conversation__participants-list'>
             <li *ngFor="let participant of con.participants.slice(0,3); let i=index" class="conversation__participants-list__item">
               {{ i !== 2 ? ( participant.user.name ?
@@ -72,7 +72,6 @@
   </div>
 
   <div class="chat" *ngIf="currConversation">
-
     <div class="title">
       Chat
     </div>

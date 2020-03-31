@@ -12,7 +12,6 @@ import { Conversation } from './conversation.model';
 import { ChatService } from './chat-socket.service';
 import * as UserActions from '../user/store/user.actions';
 import { Message } from './message.model';
-import { findReadVarNames } from '@angular/compiler/src/output/output_ast';
 
 
 @Component({
@@ -50,14 +49,8 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.userKind = userState.user ? userState.kind[0].toUpperCase() + userState.kind.slice(1) : null;
       this.conversations = userState.conversations;
       this.isLoading = userState.loading;
-
-      if (this.conversations) {
-        this.conversations.forEach(con => {
-          const userId = con.participants.findIndex(participant => participant['user']['_id'] === this.user._id);
-          if (userId !== -1) {
-            con.participants.splice(userId, 1); // removig curr user from participants list
-          }
-        });
+      if (this.currConversation && this.conversations) {
+        this.currConversation = this.conversations.find(con => con._id === this.currConversation._id);
       }
     });
     if (this.conversations) {
@@ -90,7 +83,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.file) { // update conversation in server
+    if (this.file) { // update conversation in server - file
       this.chatService.sendMessage('postAMsg', {
         ownerId: this.user._id,
         senderId: this.user._id,
@@ -107,7 +100,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       });
     }
 
-    if (form.value.messageContent) { // update conversation in server
+    if (form.value.messageContent) { // update conversation in server - string
       this.chatService.sendMessage('postAMsg', {
         ownerId: this.user._id,
         senderId: this.user._id,
@@ -123,7 +116,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
 
 
-    // localy update the conversation - only for stringMessage
+    // localy update the conversation - only for string message
     if (this.currConversation && form.value.messageContent) {
       this.store.dispatch(new UserActions.SetSingleConversation({
         conversation: this.currConversation,
@@ -134,10 +127,15 @@ export class ChatComponent implements OnInit, OnDestroy {
         }) : null
       }));
     }
+
+    // cleanup
     this.sendMessageForm.form.patchValue({
       messageContent: ''
     });
     this.file = null;
+    if (!this.currConversation) {
+      this.nameList.clear();
+    }
     const filesDiv = this.renderer.nextSibling(this.textarea.nativeElement);
     if (filesDiv.firstChild) {
       filesDiv.removeChild(filesDiv.firstChild);
@@ -177,17 +175,6 @@ export class ChatComponent implements OnInit, OnDestroy {
             ${(Math.floor(Math.random() * 255))})`)});
       }
     }
-
-    if (this.currConversation.messages.length && typeof(this.currConversation.messages[0].createdAt) === 'string') {
-      let prevMsgDate: string = null;
-      this.currConversation.messages.forEach(msg => {
-        msg.createdAt = new Date(msg.createdAt);
-        msg['first'] = !prevMsgDate || prevMsgDate !== msg.createdAt.toDateString() ? msg.createdAt.toDateString() : null;
-        msg['hours'] = msg.createdAt.getHours().toString().padStart(2, '0');
-        msg['minutes'] = msg.createdAt.getMinutes().toString().padStart(2, '0');
-        prevMsgDate = msg.createdAt.toDateString();
-      });
-    }
     this.privateMsg = this.currConversation.participants.length === 1;
   }
 
@@ -219,6 +206,10 @@ export class ChatComponent implements OnInit, OnDestroy {
     const uploadCon = this.renderer.parentNode(fileCon);
     this.renderer.removeChild(uploadCon, fileCon);
     this.file = null;
+  }
+
+  trackConversations(index: number, con: Conversation) {
+    return index;
   }
 
   getFileSize = bytes => {

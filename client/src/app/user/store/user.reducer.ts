@@ -28,6 +28,36 @@ const initialState: State = {
   lastFetchConversations: null
 };
 
+const getNewMessagesOfConversation = (stringMessage, fileMessage) => {
+  const conMsgs = [];
+
+  if (stringMessage) {
+    conMsgs.push({...stringMessage});
+  }
+  if (fileMessage) {
+    conMsgs.push({...fileMessage});
+  }
+  return conMsgs;
+};
+
+const setTimeOfNewMessagesOfConversation = (lastMsgDate, messages) => {
+  messages.forEach(msg => {
+    msg.createdAt = new Date(msg.createdAt); // will used the Date object methods
+  });
+
+  if ( lastMsgDate ) { // there are older messages
+    const sameDayMsgs = lastMsgDate.toDateString() === messages[0].createdAt.toDateString();
+    messages[0]['first'] = sameDayMsgs ? null : messages[0].createdAt.toDateString();
+  } else { // no older messages
+    messages[0]['first'] = messages[0].createdAt.toDateString();
+  }
+  messages.forEach(msg => {
+    msg['hours'] = messages[0].createdAt.getHours().toString().padStart(2, '0');
+    msg['minutes'] = messages[0].createdAt.getMinutes().toString().padStart(2, '0');
+  });
+};
+
+
 export function userReducer(state = initialState, action: UserActions.UserActions) {
   // console.log("user reducer " + action.type)
   switch (action.type) {
@@ -67,38 +97,35 @@ export function userReducer(state = initialState, action: UserActions.UserAction
         conversations: action.payload
       };
     case UserActions.SET_SINGLE_CONVERSATION:
-      const newConId = action.payload.conversation._id;
+      const conMsgs = getNewMessagesOfConversation(action.payload.stringMessage, action.payload.fileMessage);
 
-      const oldConId = state.conversations ? state.conversations.findIndex(con => con._id === newConId) : -1;
-      const updatedCons = state.conversations ? [...state.conversations] : [];
-      const conMsgs = [];
-      if (action.payload.stringMessage) {
-        conMsgs.push(action.payload.stringMessage);
-      }
-      if (action.payload.fileMessage) {
-        conMsgs.push(action.payload.fileMessage);
-      }
-      if (oldConId === -1) { // a new conversation
-        action.payload.conversation.messages = conMsgs;
-        updatedCons.push(action.payload.conversation);
-      } else { // added message to an existing conversation
-        conMsgs.forEach(msg => {
-          msg.createdAt = new Date(msg.createdAt); // will used the Date object methods
-        });
-        const oldMessagesLength = updatedCons[oldConId].messages.length;
-        if ( oldMessagesLength ) {
-          const lastMsgDate = new Date(updatedCons[oldConId].messages[oldMessagesLength - 1].createdAt);
-          conMsgs[0]['first'] =
-                lastMsgDate.toDateString() === conMsgs[0].createdAt.toDateString() ?
-                null : conMsgs[0].createdAt.toDateString() ;
-        } else { // no older messages
-          conMsgs[0]['first'] = conMsgs[0].createdAt.toDateString();
+      const newConId = action.payload.conversation._id;
+      const oldConInd = state.conversations ? state.conversations.findIndex(con => con._id === newConId) : -1;
+      const oldCon = oldConInd !== -1 ? state.conversations[oldConInd] : null;
+
+      const lastMsgDate = !oldCon ? null :
+                    new Date(oldCon.messages[oldCon.messages.length - 1].createdAt); // the msgs are sorted
+      setTimeOfNewMessagesOfConversation(lastMsgDate, conMsgs);
+      let updatedCon: Conversation, updatedCons: Conversation[];
+      if (!oldCon) { // a new conversation
+        updatedCon = { ...action.payload.conversation };
+        updatedCon.messages = conMsgs;
+        const userInd = updatedCon.participants.findIndex(participant =>
+                  participant.user._id === state.user._id);
+        if (userInd !== -1) {
+          const newParticipants = [ ...updatedCon.participants ];
+          newParticipants.splice(userInd, 1); // removing curr user
+          updatedCon.participants = newParticipants;
         }
-        conMsgs.forEach(msg => {
-          msg['hours'] = conMsgs[0].createdAt.getHours().toString().padStart(2, '0');
-          msg['minutes'] = conMsgs[0].createdAt.getMinutes().toString().padStart(2, '0');
-        });
-        updatedCons[oldConId].messages.push(...conMsgs);
+        updatedCons = [ ...state.conversations ];
+        updatedCons.push(updatedCon);
+      } else { // added message to an existing conversation
+        updatedCon = { ...oldCon };
+        const newMessages = [ ...oldCon.messages ];
+        newMessages.push(...conMsgs);
+        updatedCon.messages = newMessages;
+        updatedCons = [ ...state.conversations ];
+        updatedCons[oldConInd] = updatedCon;
       }
       return {
         ...state,
