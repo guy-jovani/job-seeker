@@ -3,7 +3,6 @@
 
 const chatController = require('./controllers/chat');
 const changeStatusOfAUserPosition = require('./utils/shared').changeStatusOfAUserPosition;
-const saveSocketFilePath = require('./utils/shared').saveSocketFilePath;
 
 let io, hostName;
 
@@ -32,9 +31,7 @@ exports.socketInitializer = socketInitializer;
 exports.socketHandler = (socket) => {
   io = socketInitializer.getIO();
   hostName = socket.handshake.headers.host;
-  // let socketUserId; // private room to each connected user
   socket.on('login', data => {
-    // socketUserId = data._id;
     console.log('login', data._id)
     socket.join(data._id);
   });

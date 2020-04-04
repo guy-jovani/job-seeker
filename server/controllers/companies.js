@@ -10,6 +10,16 @@ const checkCompanyUpdateSignupValidation = require('../utils/shared').checkCompa
 const changeStatusOfAUserPosition = require('../utils/shared').changeStatusOfAUserPosition;
 const skippedDocuments = require('../utils/shared').skippedDocuments;
 
+
+/**
+ * Send the client a company object with its positions populated with the company name.
+ * 
+ * In case of an error - moving the error handling to the express error handling middleware
+ * with a error code of 500, and an error message
+ * @param {express request object} req - the req need to have query params: 
+ *                                        {string} _id - the id of the wanted company.
+ * @param {express respond object} res
+ */
 exports.fetchSingle = async (req, res, next) => {
   try { 
     let company = await Company.findById(req.query._id).select(
@@ -28,13 +38,28 @@ exports.fetchSingle = async (req, res, next) => {
   }
 };
 
+
+/**
+ * Send the client an object of an array of all the companies (excluded the user company),
+ * based on the page the user is in, and the total number of companies.
+ * 
+ * Each company object is populated with the positions of the company,
+ * each position is populated with the name of the company.
+ * 
+ * In case of an error - moving the error handling to the express error handling middleware
+ * with a error code of 500, and an error message
+ * @param {express request object} req - the req need to have query params: 
+ *                                        {string} _id - the id of the user.
+ *                                        {string} page - the page the user is in.
+ * @param {express respond object} res
+ */
 exports.fetchCompanies = async (req, res, next) => {
   try {
     const companies = await Company.aggregate([
       { $match: { _id: { $ne: mongoose.Types.ObjectId(req.query._id) } } },
       { $skip: skippedDocuments(req.query.page) },
       { $limit: +process.env.DOCS_PER_PAGE },
-      { $project: { positions: 0, createdAt: 0, updatedAt: 0, __v: 0, password: 0 } },
+      { $project: { positions: 0, createdAt: 0, updatedAt: 0, __v: 0, password: 0, applicants: 0 } },
       { $lookup: {
         from: "positions",
         let: { companyId: "$_id" },
@@ -50,6 +75,9 @@ exports.fetchCompanies = async (req, res, next) => {
           { $project: {
             "__v": 0,
             "company.positions": 0,
+            "company.applicants": 0,
+            "company.imagesPath": 0,
+            "company.profileImagePath": 0,
             "company.password": 0,
             "company.createdAt": 0,
             "company.website": 0,
@@ -74,10 +102,19 @@ exports.fetchCompanies = async (req, res, next) => {
       total: total[0].email - 1
     });
   } catch (error) {
-    next(errorHandling.handleServerErrors(error, 500, "there was an error fetching the companies"));
+    next(errorHandling.handleServerErrors(error, 500, "There was an error fetching the companies."));
   }
 };
 
+
+/**
+ * If a file was recieved - adds its url (protcol and host) path to the body of the request 
+ * as profileImagePath property.
+ * 
+ * @param {express request object} req
+ * @param {Array} file - an array of files that will be empty or with one File object that
+ *                            have a filename property.
+ */
 const getProfileImage = (req, file) => {
   if(file){
     let url = req.protocol + '://' + req.get('host');
@@ -86,7 +123,19 @@ const getProfileImage = (req, file) => {
   } 
 };
 
-
+/**
+ * Decides if need to keep a company old images or replace them with new ones.
+ * Adds the new images paths as an array to req.body.imagesPath or,
+ * adds the old images path to req.body.imagesPath
+ * 
+ * depends if there are new images or not.
+ * 
+ * @param {express request object} req - the req need to have query params: 
+ *                           {string} oldImages - a string of current paths to the company images,
+ *                                                which every path is separated by '%%RandomjoiN&&'.
+ * @param {object} files - object that has an imagesPath property which is
+ *                                an array of paths to new images of the company.
+ */
 const getNonProfileImages = (req, files) => {
   if(files.imagesPath) { // new images for company
     let newUrls = []; 
@@ -113,12 +162,29 @@ const getNonProfileImages = (req, files) => {
   }  
 };
 
+
+/**
+ * Updates the body of the request object with new images of the company as an array of paths to them 
+ * in req.body.imagesPath, or adds the old images path to req.body.imagesPath.
+ * 
+ * Also adds to req.body.profileImagePath the new profileImage of the company (if exists).
+ * 
+ * @param {express request object} req - the req need to have query params: 
+ *                           {string} oldImages - a string of current paths to the company images,
+ *                                                which every path is separated by '%%RandomjoiN&&'.
+ */
 const updateReqImages = async (req) => {
   getNonProfileImages(req, req.files);
   getProfileImage(req, req.files.profileImagePath);
 };
 
-const getUpdateQuery = async (req) => {
+
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+
+const getUpdateQuery = async req => {
   Reflect.deleteProperty(req.body, 'imagesPath');
   updateReqImages(req);
   // get an object with keys to delete from the company document (all keys that are null)
@@ -128,7 +194,6 @@ const getUpdateQuery = async (req) => {
   if (req.body.profileImagePath === '') nullKeys['profileImagePath'] = '';
   return await getBulkArrayForUpdate(req, nullKeys);
 };
-
 
 exports.updateCompany = async (req, res, next) => {
   try { 
@@ -150,7 +215,6 @@ exports.updateCompany = async (req, res, next) => {
                             '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration -password'
                           ).populate('positions');
                         
-    // updatedCompany = updatedCompany.toObject();
     res.status(201).json({
       message: 'company updated successfully!',
       type: 'success',

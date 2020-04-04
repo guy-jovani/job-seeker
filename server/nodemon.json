@@ -6,6 +6,7 @@
     "SECERT_TOKEN_KEY": "myveryver0y9s8e7c6r5e4t3k2e1y",
     "JWT_EXPIRATION": "2h",
     "TOKEN_EXPIRATION_SECONDS": 7200,
+    "RESET_PASSWORD_TOKEN_EXPIRATION_MILI_SECONDS": 3600000,
     "PORT": 4300,
     "DB_LIMIT_RES": 10,
     "RESET_URL": "http://localhost:4200/reset-password/",

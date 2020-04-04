@@ -4,13 +4,12 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 
-// const globalVars = require('../utils/globalVars');
 const Employee = require('../models/employee');
 const Company = require('../models/company');
 const validation = require('../utils/validation');
-const handleServerErrors = require('../utils/errorHandling').handleServerErrors
-const sendMessagesResponse = require('../utils/shared').sendMessagesResponse
-const checkCompanyUpdateSignupValidation = require('../utils/shared').checkCompanyUpdateSignupValidation
+const handleServerErrors = require('../utils/errorHandling').handleServerErrors;
+const sendMessagesResponse = require('../utils/shared').sendMessagesResponse;
+const checkCompanyUpdateSignupValidation = require('../utils/shared').checkCompanyUpdateSignupValidation;
 
 
 const transporter = nodemailer.createTransport({
@@ -22,6 +21,12 @@ const transporter = nodemailer.createTransport({
 });
 
 
+/**
+ * Creates a Jason Web Token, that expires in process.env.JWT_EXPIRATION seconds
+ * with an inforamtion about the user id.
+ * @param {string} userId - A user id. 
+ * @return {string} - the JWT.
+ */
 getToken = (userId) => {
   const token = jwt.sign({
     userId: userId
@@ -30,18 +35,43 @@ getToken = (userId) => {
   return token;
 }
 
-getUserSignup = (req, password) => {
+
+/**
+ * Creates a user (Company or People) based on the email, password and name.
+ * @param {string} email - the user email
+ * @param {string} password - the user password
+ * @param {string} name - the company name (null if its a People)
+ * @return { [(Company | People), string] } - an array in which the first var is the user object, 
+ *                                             and the second is a string representing its kind ("company" | "people")
+ */
+createUserSignup = (email, password, name = null) => {
   let user, kind;
-  if(req.body.name){
-    user = new Company({ email: req.body.email, password: password, name: req.body.name });
+  if(name){
+    user = new Company({ email: email, password: password, name: name });
     kind = "company";
   } else {
-    user = new Employee({ email: req.body.email, password: password });
+    user = new Employee({ email: email, password: password });
     kind = "employee";
   }
   return [user, kind];
 };
 
+
+/**
+ * Signing a user up and upon success sending a respond to the client with the following:
+ *    {string} type - 'success' - meaning the signup succeeded
+ *    {string} token - a JWT related to the user
+ *    {string} expiresIn - the number of seconds untill the token expires
+ *    {object} user - the user object of who that signed up (Company | People)
+ *    {string} kind - representing the user kind ("company" | "people")
+ * 
+ * In case of an error - moving the error handling to the express error handling middleware
+ * with a error code of 500, and an error message
+ * @param {express request object} req - the req need to have a body with: 
+ *                                        {string} email - the email of the new user
+ *                                        {string} password - the password of the new user
+ * @param {express respond object} res
+ */
 exports.signup = async (req, res, next) => {
   try {
     req.body.email = req.body.email ? req.body.email.toLowerCase() : null;
@@ -54,14 +84,13 @@ exports.signup = async (req, res, next) => {
       return sendMessagesResponse(res, 422, companyValid.messages, 'failure');
     }
     const password = await bcrypt.hash(req.body.password, 12);
-    let [user, kind] = getUserSignup(req, password);
+    let [user, kind] = createUserSignup(req.body.email, password, req.body.name);
     user = await user.save();
 
     const token = getToken(user._id);
     user = user.toObject();
     Reflect.deleteProperty(user, 'password');
     res.status(201).json({
-      message: 'Signed up successfully!',
       type: 'success',
       token,
       expiresIn: process.env.TOKEN_EXPIRATION_SECONDS,
@@ -69,45 +98,70 @@ exports.signup = async (req, res, next) => {
       kind
     });
   } catch (error) {
-    console.log(error);
     next(handleServerErrors(error, 500, "There was an unexpected error while trying to signup."));
   }
 };
 
-getUserLogin = async (req, res) => {
-  let user = await Employee.findOne({email: req.body.email}).select('-__v')
+
+/**
+ * Get the logged user (Company or People).
+ * @param {string} email - the email of the user.
+ * @return { [(Company | People), string] } - an array in which the first var is the user object, 
+ *           and the second is a string representing its kind ("company" | "people").
+ *      people obj - with positions array populated with the position info, and the position company name 
+ *      company obj - with the positions populated,
+ *                    with applicants array populated with the people info,
+ *                    with the applicants positions populatad with the position info 
+ */
+getUserLogin = async email => {
+  let user = await Employee.findOne({email: email}).select('-__v')
                             .populate({
                               path: 'positions.position', 
-                              populate: { path: 'company', select: 'name date' }
+                              populate: { path: 'company', select: 'name' }
                             });
   let kind = "employee";
   if(!user) {
-    user = await Company.findOne({email: req.body.email}).select(
+    user = await Company.findOne({email: email}).select(
                   '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration'
                 ).populate('positions');
-    user = await Company.populate(user, { path: 'applicants.employee', select: '-__v -password'});
+    user = await Company.populate(user, { path: 'applicants.employees', select: '-__v -password'});
     user = await Company.populate(user, { path: 'applicants.positions.position', select: 'title'});
     kind = "company";
-  }
-  if(!user){ 
-
-    sendMessagesResponse(res, 401, ['The email and/or password are incorrect'], 'failure');
   }
   return [user, kind];
 };
 
+/**
+ * login a user in and upon success sending a respond to the client with the following:
+ *    {string} type - 'success' - meaning the signup succeeded
+ *    {string} token - a JWT related to the user
+ *    {string} expiresIn - the number of seconds untill the token expires
+ *    {object} user - the user object of who that signed up (Company | People)
+ *    {string} kind - representing the user kind ("company" | "people")
+ *  
+ * send the client a 401 error with a message in case the email/password are incorrect.
+ * 
+ * In case of an error - moving the error handling to the express error handling middleware
+ * with a error code of 500, and an error message
+ * @param {express request object} req - the req need to have a body with: 
+ *                                        {string} email - the email of the new user
+ *                                        {string} password - the password of the new user
+ * @param {express respond object} res
+ */
 exports.login = async (req, res, next) => {
   try {
     const routeErros = validation.handleValidationRoutesErrors(req);
     if(routeErros.type === 'failure') {
       return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
     }
-    let [user, kind] = await getUserLogin(req, res);
-    if(!user) return;
+    let [user, kind] = await getUserLogin(req.body.email, res);
+    if(!user){ 
+      return sendMessagesResponse(res, 401, ['The email and/or password are incorrect'], 'failure');
+    }
 
     const verifiedPassword = await bcrypt.compare(req.body.password, user.password);
     if(!verifiedPassword){ 
-      return sendMessagesResponse(res, 401, ['The email and/or password are incorrect'], 'failure');
+      return sendMessagesResponse(res, 401, ['The email and/or password are incorrect.'], 'failure');
     }
 
     // const nums = [];
@@ -118,7 +172,7 @@ exports.login = async (req, res, next) => {
 
     // for ( num of nums) {
     //   const password = await bcrypt.hash('111', 12);
-    //   await Employee.create({ firstName: 'e' + num,  lastName: 'e' + num, password: password, email: num + '@emp.com'});
+    //   await People.create({ firstName: 'e' + num,  lastName: 'e' + num, password: password, email: num + '@emp.com'});
     // }
     // for ( num of [13,14,15, ...nums]) {
     //   const password = await bcrypt.hash('111', 12);
@@ -129,7 +183,6 @@ exports.login = async (req, res, next) => {
     Reflect.deleteProperty(user, 'password');
     const token = getToken(user._id);
     res.status(200).json({
-      message: 'Logged in successfully!',
       type: 'success',
       token,
       expiresIn: process.env.TOKEN_EXPIRATION_SECONDS,
@@ -137,17 +190,27 @@ exports.login = async (req, res, next) => {
       kind
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     next(handleServerErrors(error, 500, "There was an unexpected error while trying to login."));
   }
 };
 
-
+/**
+ * Sending a user a link with a token to reset his password
+ * and upon success sending a respond to the client with the following:
+ *    {string} type - 'success' - meaning the email has been sent
+ *    {string} message - indicating that an email has been sent.
+ * 
+ * In case of an error - moving the error handling to the express error handling middleware
+ * with a error code of 500, and an error message
+ * @param {express request object} req - the req need to have a body with: 
+ *                                        {string} email - the email of the new user
+ * @param {express respond object} res
+ */
 exports.resetPasswordEmail = async (req, res, next) => {
   try{
     crypto.randomBytes(32, async (err, buffer) => {
       if (err) {
-        console.log(err);
         next(handleServerErrors(error, 500, "There was an unexpected error while trying to reset the password."));
       }
       const token = buffer.toString('hex');
@@ -157,7 +220,7 @@ exports.resetPasswordEmail = async (req, res, next) => {
         return sendMessagesResponse(res, 401, ['No account with that email found.'], 'failure');
       }   
       user.resetPassToken = token;
-      user.resetPassTokenExpiration = Date.now() + 3600000;
+      user.resetPassTokenExpiration = Date.now() +  process.env.RESET_PASSWORD_TOKEN_EXPIRATION_MILI_SECONDS;
       await user.save();
 
       transporter.sendMail({
@@ -173,12 +236,25 @@ exports.resetPasswordEmail = async (req, res, next) => {
       });
     });
   } catch (error) {
-    console.log(error)
     next(handleServerErrors(error, 500, "There was an unexpected error while trying to reset the password."));
   }
 }
 
-
+/**
+ * Reseting the user password
+ * and upon success sending a respond to the client with the following:
+ *    {string} type - 'success' - meaning the password had a reset.
+ *    {string} message - indicating that the password had reset successfully.
+ * 
+ * Send the client a 401 error and a message if the token is invalid.
+ * 
+ * In case of an error - moving the error handling to the express error handling middleware
+ * with a error code of 500, and an error message
+ * @param {express request object} req - the req need to have a body with: 
+ *                                        {string} token - the token of the reset operation
+ *                                        {string} password - the password of the new user
+ * @param {express respond object} res
+ */
 exports.resetToNewPassword = async (req, res, next) => {
   try {
     const routeErros = validation.handleValidationRoutesErrors(req);

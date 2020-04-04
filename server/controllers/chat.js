@@ -9,8 +9,29 @@ const saveSocketFilePath = require('../utils/shared').saveSocketFilePath;
 const socketInitializer = require('../socket').socketInitializer;
 
 
+
+/**
+ * Posting a message to conversations.
+ * 
+ * In case of an error - moving the error handling to the express error handling middleware
+ * with a error code of 500, and an error message
+ * 
+ * @param {boolean} privateMsg - true if a private conversation, false if a group one.
+ * @param {Array.<_id: string, type: string>} recipients -
+ *                  an array of the ids and type (Company | People) of the users in the conversation.
+ * @param {string} content - the content of the message (if not a file).
+ * @param {string} senderId - the id of the user that sent the message.
+ * @param {string} senderType - the type (Company | People) of the user that sent the message.
+ * @param {Buffer} bufferFile - in case of a file - the buffer of data.
+ * @param {string} fileName - the file name.
+ * @param {number} fileNumBytes - the size of the file in bytes.
+ * @returns {Array} - an array with all of the conversations relevant to the new message,
+ *                    populated with the names of the participants.
+  */
 exports.postMessage = async (privateMsg, recipients, content, senderId, senderType, bufferFile, fileName, fileNumBytes) => {
   try {
+    console.log(privateMsg, recipients, content, senderId, senderType, fileName, fileNumBytes)
+    console.log(typeof(privateMsg), typeof(recipients), typeof(content), typeof(senderId), typeof(senderType), typeof(fileName), typeof(fileNumBytes))
     let error = new Error();
     error.messages = [];
     if((!content || content.trim() === '') && !fileName) {
@@ -38,7 +59,23 @@ exports.postMessage = async (privateMsg, recipients, content, senderId, senderTy
 };
 
 
-
+/**
+ * Creates a message and assign it to the corresponding conversation.
+ * @param {object} conversation - a Conversation object.
+ * @param {string} content - the content of the message (if not a file).
+ * @param {string} senderId - the id of the user that sent the message.
+ * @param {string} senderType - the type (Company | People) of the user that sent the message.
+ * @param {Buffer} bufferFile - in case of a file - the buffer of data.
+ * @param {string} fileName - the file name.
+ * @param {number} fileNumBytes - the size of the file in bytes.
+ * @returns { creator: string,
+ *            content: string,
+ *            createdAt: string,
+ *            filePath: string,
+ *            fileName: string,
+ *            fileNumBytes: string } - the message creator id, message content, created time,
+ *                                      path to the file (if exist), file name, file size in bytes
+ */
 const addMessageToConversation = async (conversation, content, senderId, senderType, bufferFile, fileName, fileNumBytes) => {
   const message = await Message.create({
     conversation: conversation._id, 
@@ -59,8 +96,7 @@ const addMessageToConversation = async (conversation, content, senderId, senderT
 
   await message.save();
 
-  await Conversation.updateOne({ _id: conversation._id }, {
-    $push: { messages: message }});
+  await Conversation.updateOne({ _id: conversation._id }, { $push: { messages: message }});
   return {
     creator: message.creator,
     content: message.content,
@@ -71,6 +107,13 @@ const addMessageToConversation = async (conversation, content, senderId, senderT
   };
 };
 
+
+
+/**
+ * Gets the conversation based on a its participants.
+ * @param {Array} participantsIds - an array if ids.
+ * @returns {object} - a Conversation object.
+  */
 const getParticipantsCon = async participantsIds => {
   return await Conversation.aggregate([
     {
@@ -86,6 +129,34 @@ const getParticipantsCon = async participantsIds => {
   ]);
 };
 
+
+/**
+ * Populate the participants of a conversation with the names of the users.
+ * @param {Array} conversations - an array if conversations.
+ * @returns {array} - an array of Conversation object.
+ */
+const populateConversationParticipants = async conversations => {
+  return await Conversation.populate(conversations, 
+    {
+      path: 'participants.user',
+      select: [ 'name', 'firstName', 'lastName' ]
+    });
+};
+
+
+/**
+ * Creates/Updates conversation based on the message and recipients.
+ * @param {Array.<_id: string, type: string>} recipients -
+ *                  an array of the ids and type (Company | People) of the users in the conversation.
+ * @param {string} content - the content of the message (if not a file).
+ * @param {string} senderId - the id of the user that sent the message.
+ * @param {string} senderType - the type (Company | People) of the user that sent the message.
+ * @param {Buffer} bufferFile - in case of a file - the buffer of data.
+ * @param {string} fileName - the file name.
+ * @param {number} fileNumBytes - the size of the file in bytes.
+ * @returns { Array.<message: object, conversation: object, newCon: boolean> } -
+ *        the message object, the conversation object, true if its a new conversation, false if not.
+  */
 const createUpdateConversation = async (recipients, content, senderId, senderType, bufferFile, fileName, fileNumBytes) => {
   const participants = recipients.map(recipient => {
     return { user: mongoose.Types.ObjectId(recipient._id), type: recipient.type };
@@ -108,7 +179,29 @@ const createUpdateConversation = async (recipients, content, senderId, senderTyp
   return [message, conversation, newCon];
 };
 
+/**
+ * Populate the messages of a conversation.
+ * @param {Array} conversations - an array if conversations.
+ * @returns {array} - an array of Conversation object.
+  */
+const populateConversationMessages = async conversations => {
+  return await Conversation.populate(conversations, 
+    {
+      path: 'messages',
+      select: ['creator', 'content', 'createdAt', 'filePath', 'fileName', 'fileNumBytes']
+    });
+};
 
+/**
+ * Send the client an array of all the conversations he is in, populated with the messages info and
+ *  the names of all the participants.
+ * 
+ * In case of an error - moving the error handling to the express error handling middleware
+ * with a error code of 500, and an error message
+ * @param {express request object} req - the req need to have query params: 
+ *                                        {string} _id - the id of the user.
+ * @param {express respond object} res
+ */
 exports.fetchConversations = async (req, res, next) => {
   try {
     let conversations = await Conversation.aggregate([
@@ -131,19 +224,5 @@ exports.fetchConversations = async (req, res, next) => {
   }
 };
 
-const populateConversationParticipants = async conversations => {
-  return await Conversation.populate(conversations, 
-    {
-      path: 'participants.user',
-      select: [ 'name', 'firstName', 'lastName' ]
-    });
-};
 
-const populateConversationMessages = async conversations => {
-  return await Conversation.populate(conversations, 
-    {
-      path: 'messages',
-      select: ['creator', 'content', 'createdAt', 'filePath', 'fileName', 'fileNumBytes']
-    });
-};
 

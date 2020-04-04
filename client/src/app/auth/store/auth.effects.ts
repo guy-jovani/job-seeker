@@ -207,6 +207,9 @@ export class AuthEffects {
       this.store.dispatch(new PositionActions.Logout());
       this.store.dispatch(new PositionActions.Logout());
       this.store.dispatch(new UserActions.Logout());
+      this.store.dispatch(new AuthActions.AuthFailure(
+        ['You were automatically logged out due to inactivity.']
+        ));
       this.router.navigate(['/login']);
     }, expirationSeconds);
   }

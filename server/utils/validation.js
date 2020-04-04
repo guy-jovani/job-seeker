@@ -35,7 +35,7 @@ exports.companyNameExistValidation = async (name, _id = null) => {
   }
 };
 
-exports.handleValidationRoutesErrors = ( req ) => {
+exports.handleValidationRoutesErrors = req => {
   const reqErrors = validationResult(req);
   if(!reqErrors.isEmpty()){
     let messages = reqErrors.errors.reduce((prev, curr) => {

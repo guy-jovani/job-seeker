@@ -46,7 +46,7 @@ exports.fetchEmployees = async (req, res, next) => {
 
 
 
-const updateReqProfileImage = (req, res, next) => {
+const updateReqProfileImage = req => {
   if(req.file) { // new image for company 
     let url = req.protocol + '://' + req.get('host');
     url = url + '/images/' + req.file.filename;
