@@ -66,9 +66,9 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
             const applicant = this.user.applicants[+this.currUrl[1]];
             this.employee = applicant['employee'];
             this.checkJobOfUser();
-          } else {
-            if (this.invalidStateListInd(currState, 'employee')) { return; }
-            this.employee = currState['employee'][+this.currUrl[1]];
+          } else { // /employees/:empInd
+            if (this.invalidStateListInd(currState, 'employees')) { return; }
+            this.employee = currState['employees'][+this.currUrl[1]];
             this.allowEdit = false;
           }
         });
@@ -88,7 +88,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
 
   private invalidStateListInd(currState, list) {
     if (this.currUrl[1] >= currState[list].length || +this.currUrl[1] < 0) {
-      this.router.navigate(['employee']);
+      this.router.navigate(['employees']);
       return true;
     }
     return false;

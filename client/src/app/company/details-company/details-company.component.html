@@ -10,7 +10,7 @@
     <div class="company-no-profile-image" *ngIf="!company.profileImagePath">
       <span class="glyphicon glyphicon-user"></span>
     </div>
-    <h3>{{ allowEdit ? 'My Profile' : company.name | titlecase }}</h3>
+    <h3>{{ allowEdit ? 'My Profile - ' + (company.name | titlecase) : company.name | titlecase }}</h3>
     <app-back-button *ngIf='currUrl[0] !== "my-details"'></app-back-button>
   </div>
 
