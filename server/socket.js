@@ -2,7 +2,7 @@
 
 
 const chatController = require('./controllers/chat');
-const changeStatusOfAUserPosition = require('./utils/shared').changeStatusOfAUserPosition;
+const changeStatusOfAUserJob = require('./utils/shared').changeStatusOfAUserJob;
 
 let io, hostName;
 
@@ -52,9 +52,8 @@ const postAMsg = async data => {
       conversations.forEach(con => {
         const [message, conversation, newCon] = con;
         Reflect.deleteProperty(conversation, 'messages');
-        
         conversation.participants.forEach(participant => {
-          if (data.ownerId === participant.user._id.toString() && !newCon && !message.filePath) return;
+          if (data.ownerId === participant.user._id.toString() && !newCon && !message.filePath && !data.newMessage) return;
           io.to(participant.user._id).emit('posted', { 
             message, conversation, type: 'success'
           } );
@@ -71,14 +70,13 @@ const postAMsg = async data => {
 
 const updateStatus = async data => {
   try {
-    if(!data.employeeId || !data.companyId || !data.positionId || !data.ownerId ||
+    if(!data.employeeId || !data.companyId || !data.jobId || !data.ownerId ||
       (!['applied', 'saved', 'rejected', 'accepted'].includes(data.status)) ||
       (!['employee', 'company'].includes(data.kind))){
-        throw new Error('There was an error updating the status of the wanted position.');
+        throw new Error('There was an error updating the status of the wanted job.');
     } 
-    const [employee, company] = await changeStatusOfAUserPosition(data.companyId, 
-                          data.employeeId, data.positionId, data.status);
-
+    const [employee, company] = await changeStatusOfAUserJob(data.companyId, 
+                          data.employeeId, data.jobId, data.status);
     io.to(data.employeeId).emit('updatedStatus', { 
       type: 'success',
       kind: 'employee',
@@ -90,11 +88,10 @@ const updateStatus = async data => {
       kind: 'company',
       user: company
     });
-
   } catch (error) {
     console.log(error);
     io.to(data.ownerId).emit('updatedStatus', { 
-      messages: error.messages || ['There was an error updating the status of the wanted position.'],
+      messages: error.messages || ['There was an error updating the status of the wanted job.'],
       type: 'failure'
     });
   }

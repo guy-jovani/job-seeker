@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs';
 import * as fromApp from '../../store/app.reducer';
 import { Employee } from '../employee.model';
 import * as EmployeeActions from '../store/employee.actions';
-import { Company, ApplicantPosition, ApplicantStatus } from 'app/company/company.model';
+import { Company, ApplicantJob, ApplicantStatus } from 'app/company/company.model';
 import * as UserActions from '../../user/store/user.actions';
 import { ChatService } from 'app/chat/chat-socket.service';
 
@@ -21,7 +21,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   routeSub: Subscription;
   allowEdit: boolean;
   user: Company = null; // only used for company applicants. /my-applicants/:index
-  applicantPositions: ApplicantPosition[] = null; // only used for company's applicant positions. /my-applicants/:index
+  applicantJobs: ApplicantJob[] = null; // only used for company's applicant jobs. /my-applicants/:index
   isLoading = false;
   messages: string[] = [];
   currUrl: string[] = null;
@@ -65,21 +65,21 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
             this.user = currState['user'];
             const applicant = this.user.applicants[+this.currUrl[1]];
             this.employee = applicant['employee'];
-            this.checkPositionOfUser();
+            this.checkJobOfUser();
           } else {
-            if (this.invalidStateListInd(currState, 'employees')) { return; }
-            this.employee = currState['employees'][+this.currUrl[1]];
+            if (this.invalidStateListInd(currState, 'employee')) { return; }
+            this.employee = currState['employee'][+this.currUrl[1]];
             this.allowEdit = false;
           }
         });
   }
 
-  onAcceptReject(positionInfo: { status: ApplicantStatus, posInd: number }) { // company actions
-    this.store.dispatch(new UserActions.CompanyAcceptRejectPositionAttempt());
+  onAcceptReject(jobInfo: { status: ApplicantStatus, jobInd: number }) { // company actions
+    this.store.dispatch(new UserActions.CompanyAcceptRejectJobAttempt());
     this.chatService.sendMessage('updateStatus', {
-      status: positionInfo.status,
+      status: jobInfo.status,
       kind: 'company',
-      positionId: this.applicantPositions[positionInfo.posInd].position._id,
+      jobId: this.applicantJobs[jobInfo.jobInd].job._id,
       companyId: this.user._id,
       employeeId: this.employee._id,
       ownerId: this.user._id,
@@ -88,22 +88,22 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
 
   private invalidStateListInd(currState, list) {
     if (this.currUrl[1] >= currState[list].length || +this.currUrl[1] < 0) {
-      this.router.navigate(['employees']);
+      this.router.navigate(['employee']);
       return true;
     }
     return false;
   }
 
-  applicantPositionsTracker(index, item) {
+  applicantJobsTracker(index, item) {
     return index;
   }
 
-  checkPositionOfUser() {
+  checkJobOfUser() {
     if (this.selctedStatusList === 'all') {
-      this.applicantPositions = this.user.applicants[+this.currUrl[1]].positions;
+      this.applicantJobs = this.user.applicants[+this.currUrl[1]].jobs;
     } else {
-      this.applicantPositions = this.user.applicants[+this.currUrl[1]].positions
-            .filter(pos => pos.status.toString() === this.selctedStatusList);
+      this.applicantJobs = this.user.applicants[+this.currUrl[1]].jobs
+            .filter(job => job.status.toString() === this.selctedStatusList);
     }
   }
 

@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { Employee } from './employee.model';
-import { ApplicantPosition } from 'app/company/company.model';
+import { ApplicantJob } from 'app/company/company.model';
 
 import * as fromApp from '../store/app.reducer';
 import * as EmployeeActions from './store/employee.actions';
@@ -15,7 +15,7 @@ import * as EmployeeActions from './store/employee.actions';
   styleUrls: ['./employees.component.scss']
 })
 export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
-  employees: Employee[] | { positions: ApplicantPosition[], employee: Employee }[];
+  employees: Employee[] | { jobs: ApplicantJob[], employee: Employee }[];
   subscription: Subscription;
   isLoading = false;
   applicantsList = false;

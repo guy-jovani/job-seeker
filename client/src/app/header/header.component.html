@@ -3,7 +3,7 @@
 <nav class="navbar navbar-default navbar-fixed-top">
   <div class="container-fluid">
     <div class="navbar-header">
-        <a class="navbar-brand" routerLink='/'>Job Seeker</a>
+      <a class="navbar-brand" routerLink='/'>Job Seeker</a>
       <button type="button" class="navbar-toggle" (click)="collapsed = !collapsed">
         <span class="icon-bar" *ngFor="let iconBar of [1, 2, 3]"></span>
       </button>
@@ -11,10 +11,10 @@
     <div class="navbar-collapse collapse" [class.collapse]="collapsed" (window:resize)="collapsed = true">
 
       <ul class="nav navbar-nav">
-        <li routerLinkActive="active"
+        <!-- <li routerLinkActive="active"
             [routerLinkActiveOptions]="{exact: true}" *ngIf="isAuthenticated">
           <a class="navbar-link" routerLink='/'>Home</a>
-        </li>
+        </li> -->
         <li routerLinkActive="active" *ngIf="isAuthenticated">
           <a routerLink='/employees' >Employees</a>
         </li>
@@ -22,7 +22,7 @@
           <a routerLink='/companies' >Companies</a>
         </li>
         <li routerLinkActive="active" *ngIf="isAuthenticated">
-          <a routerLink='/positions' >Positions</a>
+          <a routerLink='/jobs' >Jobs</a>
         </li>
       </ul>
 
@@ -48,7 +48,7 @@
           </a>
           <ul class="dropdown-menu dropdown-menu-opened">
             <li><a style="cursor: pointer;" routerLink='/my-details'>My Details</a></li>
-            <li><a style="cursor: pointer;" routerLink='/my-positions'>My Positions</a></li>
+            <li><a style="cursor: pointer;" routerLink='/my-jobs'>My Jobs</a></li>
             <li><a style="cursor: pointer;" routerLink='/my-applicants' *ngIf="kind === 'company'">My Applicants</a></li>
           </ul>
         </li>
@@ -62,7 +62,7 @@
           <ul class="dropdown-menu dropdown-menu-opened">
             <li><a style="cursor: pointer;" (click)="onFetchEmployees()">Fetch Employees</a></li>
             <li><a style="cursor: pointer;" (click)="onFetchCompanies()">Fetch Companies</a></li>
-            <li><a style="cursor: pointer;" (click)="onFetchPositions()">Fetch Positions</a></li>
+            <li><a style="cursor: pointer;" (click)="onFetchJobs()">Fetch Jobs</a></li>
             <li><a style="cursor: pointer;" (click)="onFetchConversations()">Fetch Conversations</a></li>
           </ul>
         </li>

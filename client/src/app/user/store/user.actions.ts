@@ -5,12 +5,12 @@ import { Company } from 'app/company/company.model';
 import { Conversation } from 'app/chat/conversation.model';
 import { Message } from 'app/chat/message.model';
 import { Employee } from 'app/employees/employee.model';
-import { Position } from '../../position/position.model';
+import { Job } from '../../job/job.model';
 
 
 export const UPDATE_ACTIVE_USER = '[User] UPDATE_ACTIVE_USER';
-export const COMPANY_CREATED_POSITION = '[User] COMPANY_CREATED_POSITION';
-export const COMPANY_UPDATED_POSITION = '[User] COMPANY_UPDATED_POSITION';
+export const COMPANY_CREATED_JOB = '[User] COMPANY_CREATED_JOB';
+export const COMPANY_UPDATED_JOB = '[User] COMPANY_UPDATED_JOB';
 export const LOGOUT = '[User] LOGOUT';
 export const USER_FAILURE = '[User] USER_FAILURE';
 export const CLEAR_ERROR = '[User] CLEAR_ERROR';
@@ -19,8 +19,8 @@ export const SET_ALL_CONVERSATIONS = '[User] SET_ALL_CONVERSATIONS';
 export const SET_SINGLE_CONVERSATION = '[User] SET_SINGLE_CONVERSATION';
 export const SET_CHAT_NOTIFICATION = '[User] SET_CHAT_NOTIFICATION';
 export const REMOVE_CHAT_NOTIFICATION = '[User] REMOVE_CHAT_NOTIFICATION';
-export const EMPLOYEE_APPLY_SAVE_POSITION_ATTEMPT = '[User] EMPLOYEE_APPLY_SAVE_POSITION_ATTEMPT';
-export const COMPANY_ACCEPT_REJECT_POSITION_ATTEMPT = '[User] COMPANY_ACCEPT_REJECT_POSITION_ATTEMPT';
+export const EMPLOYEE_APPLY_SAVE_JOB_ATTEMPT = '[User] EMPLOYEE_APPLY_SAVE_JOB_ATTEMPT';
+export const COMPANY_ACCEPT_REJECT_JOB_ATTEMPT = '[User] COMPANY_ACCEPT_REJECT_JOB_ATTEMPT';
 
 
 export type UserActions = SetChatNotification
@@ -28,11 +28,11 @@ export type UserActions = SetChatNotification
                         | RemoveChatNotification
                         | SetAllConversations
                         | FetchAllConversations
-                        | CompanyUpdatedPosition
+                        | CompanyUpdatedJob
                         | ClearError
-                        | EmployeeApplySavePositionAttempt
-                        | CompanyAcceptRejectPositionAttempt
-                        | CompanyCreatedPosition
+                        | EmployeeApplySaveJobAttempt
+                        | CompanyAcceptRejectJobAttempt
+                        | CompanyCreatedJob
                         | Logout
                         | UserFailure
                         | UpdateActiveUser;
@@ -42,12 +42,12 @@ export class FetchAllConversations implements Action {
   readonly type = FETCH_ALL_CONVERSATIONS;
 }
 
-export class EmployeeApplySavePositionAttempt implements Action {
-  readonly type = EMPLOYEE_APPLY_SAVE_POSITION_ATTEMPT;
+export class EmployeeApplySaveJobAttempt implements Action {
+  readonly type = EMPLOYEE_APPLY_SAVE_JOB_ATTEMPT;
 }
 
-export class CompanyAcceptRejectPositionAttempt implements Action {
-  readonly type = COMPANY_ACCEPT_REJECT_POSITION_ATTEMPT;
+export class CompanyAcceptRejectJobAttempt implements Action {
+  readonly type = COMPANY_ACCEPT_REJECT_JOB_ATTEMPT;
 }
 
 export class UserFailure implements Action {
@@ -82,16 +82,16 @@ export class UpdateActiveUser implements Action {
   constructor(public payload: { user: Employee | Company, kind: string, redirect?: string }) {}
 }
 
-export class CompanyCreatedPosition implements Action {
-  readonly type = COMPANY_CREATED_POSITION;
+export class CompanyCreatedJob implements Action {
+  readonly type = COMPANY_CREATED_JOB;
 
-  constructor(public payload: Position) {}
+  constructor(public payload: Job) {}
 }
 
-export class CompanyUpdatedPosition implements Action {
-  readonly type = COMPANY_UPDATED_POSITION;
+export class CompanyUpdatedJob implements Action {
+  readonly type = COMPANY_UPDATED_JOB;
 
-  constructor(public payload: Position) {}
+  constructor(public payload: Job) {}
 }
 
 export class ClearError implements Action {

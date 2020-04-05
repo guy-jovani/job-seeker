@@ -2,12 +2,12 @@
 
 import { Action } from '@ngrx/store';
 import { Company } from '../company.model';
-import { Position } from 'app/position/position.model';
+import { Job } from 'app/job/job.model';
 
 export const UPDATE_SINGLE_COMPANY = '[Company] Update single company';
-export const UPDATE_SINGLE_COMPANY_POSITION = '[Company] Update single company position';
-export const UPDATE_SINGLE_COMPANY_POSITION_ATTEMPT = '[Company] Update single company position attempt';
-export const COMPANY_STATE_LOAD_SINGLE = '[POSITION] COMPANY_STATE_LOAD_SINGLE';
+export const UPDATE_SINGLE_COMPANY_JOB = '[Company] Update single company job';
+export const UPDATE_SINGLE_COMPANY_JOB_ATTEMPT = '[Company] Update single company job attempt';
+export const COMPANY_STATE_LOAD_SINGLE = '[Company] COMPANY_STATE_LOAD_SINGLE';
 export const UPDATE_SINGLE_COMPANY_IN_DB = '[Company] Update single company in db';
 export const SET_COMPANIES = '[Company] Set Companies';
 export const FETCH_COMPANIES = '[Company] Fetch companies';
@@ -24,8 +24,8 @@ export type CompanyActions = FetchCompanies
                             | CompanyStateLoadSingle
                             | UpdateSingleCompanyInDb
                             | UpdateSingleCompany
-                            | UpdateSingleCompanyPositionAttempt
-                            | UpdateSingleCompanyPosition
+                            | UpdateSingleCompanyJobAttempt
+                            | UpdateSingleCompanyJob
                             | Logout;
 
 
@@ -39,14 +39,14 @@ export class CompanyStateLoadSingle implements Action {
   readonly type = COMPANY_STATE_LOAD_SINGLE;
 }
 
-export class UpdateSingleCompanyPositionAttempt implements Action {
-  readonly type = UPDATE_SINGLE_COMPANY_POSITION_ATTEMPT;
+export class UpdateSingleCompanyJobAttempt implements Action {
+  readonly type = UPDATE_SINGLE_COMPANY_JOB_ATTEMPT;
 }
 
 export class FetchSingleCompany implements Action {
   readonly type = FETCH_SINGLE_COMPANY;
 
-  constructor(public payload: { _id: string, main: boolean, posInd?: number }) {}
+  constructor(public payload: { _id: string, main: boolean, jobInd?: number }) {}
 }
 
 export class SetCompanies implements Action {
@@ -55,10 +55,10 @@ export class SetCompanies implements Action {
   constructor(public payload: {companies: Company[], total: number}) {}
 }
 
-export class UpdateSingleCompanyPosition implements Action {
-  readonly type = UPDATE_SINGLE_COMPANY_POSITION;
+export class UpdateSingleCompanyJob implements Action {
+  readonly type = UPDATE_SINGLE_COMPANY_JOB;
 
-  constructor(public payload: Position) {}
+  constructor(public payload: Job) {}
 }
 
 export class UpdateSingleCompany implements Action {

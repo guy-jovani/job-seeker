@@ -8,8 +8,7 @@ import * as AuthActions from '../store/auth.actions';
 
 @Component({
   selector: 'app-reset-password',
-  templateUrl: './reset-password.component.html',
-  styleUrls: ['./reset-password.component.css']
+  templateUrl: './reset-password.component.html'
 })
 export class ResetPasswordComponent implements OnInit, OnDestroy {
 
@@ -17,7 +16,6 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
   errorSub: Subscription;
   messages: string[] = [];
   isLoading = false;
-  // showConfirmation = false;
 
   constructor(private store: Store<fromApp.AppState>) { }
 
@@ -32,9 +30,8 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
           } else {
             this.messages = [];
             if (this.isLoading && !authState.loading) {
-              this.messages.push('An email with a link to the reset page has been sent to you.')
+              this.messages.push('An email with a link to the reset page has been sent to you.');
             }
-            // this.showConfirmation = this.isLoading && !authState.loading; // the reset email was sent successfuly
           }
           this.isLoading = authState.loading;
         }

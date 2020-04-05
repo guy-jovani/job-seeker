@@ -1,14 +1,14 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import * as CompanyActions from '../store/company.actions';
-import * as PositionActions from '../../position/store/position.actions';
+import * as JobActions from '../../job/store/job.actions';
 import { Company } from '../company.model';
 import * as fromApp from '../../store/app.reducer';
 import { Store } from '@ngrx/store';
 import { switchMap } from 'rxjs/operators';
-import { Position } from 'app/position/position.model';
+import { Job } from 'app/job/job.model';
 
 @Component({
   selector: 'app-details-company',
@@ -22,12 +22,11 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy  {
   isLoading = false;
   currUrl: string[] = null;
   messages: string[] = [];
-  companyPositions: Position[] = null;
+  companyJobs: Job[] = null;
 
   constructor(private store: Store<fromApp.AppState>,
               private route: ActivatedRoute,
-              private router: Router,
-              private ref: ChangeDetectorRef) { }
+              private router: Router) { }
 
   ngOnInit() {
     this.routeSub = this.route.params.pipe(
@@ -38,7 +37,7 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy  {
         } else if (this.currUrl[0] === 'companies') {
           return this.store.select('company');
         } else {
-          return this.store.select('position');
+          return this.store.select('job');
         }
       }))
       .subscribe(currState => {
@@ -59,17 +58,15 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy  {
           if (this.invalidStateListInd(currState, 'companies')) { return; }
           this.company = currState['companies'][+this.currUrl[1]];
           this.allowEdit = false;
-        } else { // /positions:posInd/company
-          if (this.invalidStateListInd(currState, 'positions')) { return; }
+        } else { // /jobs/:jobInd/company
+          if (this.invalidStateListInd(currState, 'jobs')) { return; }
           this.allowEdit = false;
-          this.company = !currState['positions'] ? null : currState['positions'][+this.currUrl[1]]['company'];
+          this.company = !currState['jobs'] ? null : currState['jobs'][+this.currUrl[1]]['company'];
           if (!this.company.email) {
             this.messages = ['There was an error fetching the company'];
           }
-          this.companyPositions = this.company.positions;
+          this.companyJobs = this.company.jobs;
         }
-        // this.ref.detectChanges();
-        // this.ref.markForCheck();
       });
   }
 
@@ -77,7 +74,7 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy  {
     if (this.currUrl[0] === 'companies') {
       this.store.dispatch(new CompanyActions.ClearError());
     } else {
-      this.store.dispatch(new PositionActions.ClearError());
+      this.store.dispatch(new JobActions.ClearError());
     }
     this.messages = [];
   }

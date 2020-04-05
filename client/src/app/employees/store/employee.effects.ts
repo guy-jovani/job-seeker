@@ -62,7 +62,8 @@ export class EmployeeEffects {
       return this.http.get<Employee[]>(nodeServer + 'fetchEmployees', {
         params: {
           _id: userState.user._id,
-          page: actionData['payload']['page']
+          page: actionData['payload']['page'],
+          kind: userState.kind,
         }
       })
         .pipe(

@@ -150,13 +150,28 @@ app-back-button {
   margin-top: 2rem;
 }
 
-.position-status {
-  background-color: bisque;
+.job-status {
   border-radius: 15px;
   padding: 1px 1.5rem;
   margin: 0;
 }
 
+.job-status-accepted {
+  background-color: #53d7537d;
+}
+
+.job-status-rejected {
+  background-color: #ff4242c4;
+  color: #4f4a4a;
+}
+
+.job-status-applied {
+  background-color: bisque;
+}
+
+.job-status-saved {
+  background-color: #21a5e696;
+}
 
 
 /**************************

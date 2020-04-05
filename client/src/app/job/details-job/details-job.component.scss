@@ -1,0 +1,38 @@
+
+
+
+.only-job-title {
+  grid-column: 1/3;
+  justify-self: start;
+}
+
+.requirements-list__item {
+  list-style: decimal;
+}
+
+
+.status-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.job-date {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

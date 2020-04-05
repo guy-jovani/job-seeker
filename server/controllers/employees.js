@@ -6,7 +6,7 @@ const errorHandling = require('../utils/errorHandling')
 const getBulkArrayForUpdate = require('../utils/shared').getBulkArrayForUpdate;
 const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
 const sendMessagesResponse = require('../utils/shared').sendMessagesResponse;
-const changeStatusOfAUserPosition = require('../utils/shared').changeStatusOfAUserPosition;
+const changeStatusOfAUserJob = require('../utils/shared').changeStatusOfAUserJob;
 const skippedDocuments = require('../utils/shared').skippedDocuments;
 
 exports.fetchSingle = async (req, res, next) => {
@@ -17,7 +17,7 @@ exports.fetchSingle = async (req, res, next) => {
       employee
     });
   } catch (error) {
-    next(errorHandling.handleServerErrors(error, 500, "there was an error fetching the employee"));
+    next(errorHandling.handleServerErrors(error, 500, "There was an error fetching the employee."));
   }
 };
 
@@ -37,10 +37,10 @@ exports.fetchEmployees = async (req, res, next) => {
     res.status(200).json({
       type: 'success',
       employees,
-      total: total[0].email - 1
+      total: req.query.kind === 'employee' ? total[0].email - 1 : total[0].email
     });
   } catch (error) {
-    next(errorHandling.handleServerErrors(error, 500, "there was an error fetching the employees"));
+    next(errorHandling.handleServerErrors(error, 500, "There was an error fetching the employee."));
   }
 };
 
@@ -82,7 +82,7 @@ exports.updateEmployee = async (req, res, next) => {
     }
     let updatedEmployee = await Employee.findById(req.body._id).select(
         '-__v -password -resetPassToken -resetPassTokenExpiration').populate({
-          path: 'positions.position', 
+          path: 'jobs.job', 
           populate: { path: 'company', select: 'name' }
         });;
 
@@ -99,11 +99,11 @@ exports.updateEmployee = async (req, res, next) => {
 };
 
 
-exports.applySavePosition = async (req, res, next) => {
+exports.applySaveJob = async (req, res, next) => {
   try {
-    await changeStatusOfAUserPosition(req, res, req.body.companyId, req.body.employeeId, req.body.positionId, req.body.status, 'employee')
+    await changeStatusOfAUserJob(req, res, req.body.companyId, req.body.employeeId, req.body.jobId, req.body.status, 'employee')
   } catch (error) {
-    next(errorHandling.handleServerErrors(error, 500, `There was an error updating the status of the wanted position.`));
+    next(errorHandling.handleServerErrors(error, 500, `There was an error updating the status of the wanted job.`));
   }
 };
 

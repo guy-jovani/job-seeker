@@ -34,16 +34,16 @@ const companySchema = new Schema(
       type: String,
       required: false
     }],
-    positions: [{
+    jobs: [{
       type: Schema.Types.ObjectId, 
-      ref: 'Position',
+      ref: 'Job',
       require: false
     }],
     applicants: [{
-      positions: [{
-        position: {
+      jobs: [{
+        job: {
           type: Schema.Types.ObjectId, 
-          ref: 'Position',
+          ref: 'Job',
           require: false
         },
         status: {

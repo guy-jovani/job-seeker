@@ -15,7 +15,7 @@ export class Conversation {
     _id: string,
     type: string,
     user: {
-      _id: string, name?: string, firstName?: string, lastName?: string
+      _id: string, email: string, name?: string, firstName?: string, lastName?: string
     }
   }[];
   messages: Message[];

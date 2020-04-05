@@ -9,8 +9,7 @@ const searchRoutes = require('./routes/search');
 const authRoutes = require('./routes/auth');
 const companiesRoutes = require('./routes/companies');
 const chatRoutes = require('./routes/chat');
-const positionsRoutes = require('./routes/positions');
-const globalVars = require('./utils/globalVars');
+const jobsRoutes = require('./routes/jobs');
 const checkAuth = require('./middleware/check-auth');
 
 const app = express();
@@ -30,7 +29,7 @@ app.use('/employees', checkAuth, employeesRoutes);
 app.use('/companies', checkAuth, companiesRoutes);
 app.use('/search', checkAuth, searchRoutes);
 app.use('/chat', checkAuth, chatRoutes);
-app.use('/positions', checkAuth, positionsRoutes);
+app.use('/jobs', checkAuth, jobsRoutes);
 
 app.use((req, res, next) => {
   console.log("general url in app.js");
@@ -76,7 +75,7 @@ mongoose.connect("mongodb://" +
   }
 )
 .then(() => {
-  const server = app.listen(process.env.PORT || globalVars.PORT); // process.env for the hosting provider
+  const server = app.listen(process.env.PORT); 
   const io = require('./socket').socketInitializer.init(server);
   io.on('connection', socket => {
     console.log('connected')

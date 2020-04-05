@@ -4,7 +4,7 @@ import { Employee } from 'app/employees/employee.model';
 import * as UserActions from './user.actions';
 import { Company } from 'app/company/company.model';
 import { Conversation } from 'app/chat/conversation.model';
-import { Position } from 'app/position/position.model';
+import { Job } from 'app/job/job.model';
 
 
 
@@ -24,7 +24,7 @@ const initialState: State = {
   loading: false,
   kind: null,
   notificatios: [],
-  conversations: null,
+  conversations: [],
   lastFetchConversations: null
 };
 
@@ -62,8 +62,8 @@ export function userReducer(state = initialState, action: UserActions.UserAction
   // console.log("user reducer " + action.type)
   switch (action.type) {
     case UserActions.FETCH_ALL_CONVERSATIONS:
-    case UserActions.EMPLOYEE_APPLY_SAVE_POSITION_ATTEMPT:
-    case UserActions.COMPANY_ACCEPT_REJECT_POSITION_ATTEMPT:
+    case UserActions.EMPLOYEE_APPLY_SAVE_JOB_ATTEMPT:
+    case UserActions.COMPANY_ACCEPT_REJECT_JOB_ATTEMPT:
       return {
         ...state,
         loading: true,
@@ -102,7 +102,6 @@ export function userReducer(state = initialState, action: UserActions.UserAction
       const newConId = action.payload.conversation._id;
       const oldConInd = state.conversations ? state.conversations.findIndex(con => con._id === newConId) : -1;
       const oldCon = oldConInd !== -1 ? state.conversations[oldConInd] : null;
-
       const lastMsgDate = !oldCon ? null :
                     new Date(oldCon.messages[oldCon.messages.length - 1].createdAt); // the msgs are sorted
       setTimeOfNewMessagesOfConversation(lastMsgDate, conMsgs);
@@ -132,24 +131,24 @@ export function userReducer(state = initialState, action: UserActions.UserAction
         loading: false,
         conversations: updatedCons
       };
-    case UserActions.COMPANY_CREATED_POSITION: // ONLY FOR A COMPANY - ON CREATE POSITION
-      const updatedPositions: Position[] = [ ...(state.user as Company).positions, action.payload ];
+    case UserActions.COMPANY_CREATED_JOB: // ONLY FOR A COMPANY - ON CREATE JOB
+      const updatedJobs: Job[] = [ ...(state.user as Company).jobs, action.payload ];
       const updatedUser = {
         ...(state.user as Company),
-        positions: updatedPositions
+        jobs: updatedJobs
       };
       return {
         ...state,
         messages: null,
         user: updatedUser,
       };
-    case UserActions.COMPANY_UPDATED_POSITION: // ONLY FOR A COMPANY - ON UPDATE POSITION
-      const positions = [ ...(state.user as Company).positions ];
-      const posInd = (state.user as Company).positions.findIndex(pos => pos._id === action.payload._id);
-      positions[posInd] = { ...positions[posInd], ...action.payload };
+    case UserActions.COMPANY_UPDATED_JOB: // ONLY FOR A COMPANY - ON UPDATE JOB
+      const jobs = [ ...(state.user as Company).jobs ];
+      const jobInd = (state.user as Company).jobs.findIndex(job => job._id === action.payload._id);
+      jobs[jobInd] = { ...jobs[jobInd], ...action.payload };
       const upToDateUser: Company = {
         ...(state.user as Company),
-        positions
+        jobs
       };
       return {
         ...state,
@@ -184,7 +183,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
         user: null,
         kind: null,
         notificatios: [],
-        conversations: null,
+        conversations: [],
         lastFetchConversations: null,
       };
     default:

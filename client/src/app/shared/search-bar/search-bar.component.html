@@ -11,7 +11,7 @@
 
 <ul class="list-results hide" #listResults>
   <li *ngFor='let res of searchRes; let i=index' class="list-item" (click)="onWantedRes(i)">
-    {{  res.fullName  }}
+    {{  res.fullName || res.email }}
   </li>
   <li *ngIf="searchRes && !searchRes.length" class="list-item">No Results Found.</li>
 </ul>

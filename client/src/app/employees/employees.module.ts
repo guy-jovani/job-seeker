@@ -5,10 +5,10 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { SharedModule } from 'app/shared/shared.module';
 import { EmployeesComponent } from './employees.component';
 import { EditEmployeeComponent } from './edit-employee/edit-employee.component';
-import { ListEmployeeComponent } from './list-employee/list-employee.component';
+import { ListEmployeesComponent } from './list-employees/list-employees.component';
 import { DetailsEmployeeComponent } from './details-employee/details-employee.component';
 import { EmployeesRoutingModule } from './employees-routing.module';
-import { PositionModule } from 'app/position/position.module';
+import { JobModule } from 'app/job/job.module';
 
 
 
@@ -16,7 +16,7 @@ import { PositionModule } from 'app/position/position.module';
   declarations: [
     EmployeesComponent,
     EditEmployeeComponent,
-    ListEmployeeComponent,
+    ListEmployeesComponent,
     DetailsEmployeeComponent,
   ],
   imports: [
@@ -25,7 +25,7 @@ import { PositionModule } from 'app/position/position.module';
     SharedModule,
     ReactiveFormsModule,
     FormsModule,
-    PositionModule
+    JobModule
   ],
   exports: [
     EditEmployeeComponent,

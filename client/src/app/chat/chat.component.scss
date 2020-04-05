@@ -83,6 +83,7 @@ side menu - conversations-list
 .conversations-list-container__no-messages {
   margin: auto;
   font-size: large;
+  text-align: center;
 
   @media (max-width: 550px) {
     font-size: unset;
@@ -178,11 +179,11 @@ side menu - conversations-list
 
 /****************************
 *****************************
-new message - add people
+new message - add item
 *****************************
 ****************************/
 
-.new-message__add-people {
+.new-message__add-item {
   width: 100%;
   height: 10%;
   background-color: #f2f2f29c;
@@ -434,6 +435,7 @@ chat - messages
 }
 
 .message-content {
+  white-space: pre;
   position: relative;
 
   &::after {

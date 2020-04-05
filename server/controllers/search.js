@@ -1,9 +1,9 @@
 
 
 const mongoose = require('mongoose');
-const errorHandling = require('../utils/errorHandling')
-const Employee = require('../models/employee');
+const errorHandling = require('../utils/errorHandling');
 const Company = require('../models/company');
+const Employee = require('../models/employee');
 
 const dbMap = {
   employee: async (regexp, usedIds) => {
@@ -23,11 +23,17 @@ const dbMap = {
                 $concat: ['$firstName', ' ', '$lastName']
               }
             }
-          }
+          },
+          email: 1
         }
       },
       {
-        $match: { fullName: { $regex: regexp } }
+        $match: {
+          $or: [
+            { fullName: { $regex: regexp } },
+            { email: { $regex: regexp } }
+          ]
+        }
       },
       {
         $limit: +process.env.DB_LIMIT_RES
@@ -39,7 +45,12 @@ const dbMap = {
     const companies = await Company.aggregate([
       { $match: { _id: { $nin: usedIds } } },
       {
-        $match: { name: { $regex: regexp } }
+        $match: {
+          $or: [
+            { name: { $regex: regexp } },
+            { email: { $regex: regexp } }
+          ]
+        }
       },
       {
         $project: {

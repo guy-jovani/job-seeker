@@ -16,7 +16,7 @@
       <div class="employee-no-profile-image" *ngIf="!employee.profileImagePath">
         <span class="glyphicon glyphicon-user"></span>
       </div>
-      <div class="emp-info-header">
+      <div class="employee-info-header">
         <h3>
           {{ employee.firstName ? (employee.firstName | titlecase) : '' }}
           {{ employee.lastName ? (employee.lastName | titlecase) : '' }}
@@ -32,24 +32,24 @@
         <a class="btn btn-primary btn-sm" routerLink='edit'>Edit Details</a>
       </div>
 
-      <div class="positions-list" *ngIf="currUrl[0] === 'my-applicants'">
+      <div class="jobs-list" *ngIf="currUrl[0] === 'my-applicants'">
         <h4>Shown interest</h4>
 
         <div *ngIf="currUrl[0] === 'my-applicants'" class="select-status-list">
-          <label for="position-list">Show status list: </label>
-          <select [(ngModel)]="selctedStatusList" (ngModelChange)="checkPositionOfUser()">
+          <label for="job-list">Show status list: </label>
+          <select [(ngModel)]="selctedStatusList" (ngModelChange)="checkJobOfUser()">
             <option value="all">All</option>
             <option *ngFor="let status of availableStatus" value="{{status}}">{{ status | titlecase }}</option>
           </select>
         </div>
 
-        <app-list-position
+        <app-list-jobs
           [showStatus]='true'
-          [applicantPositions]='true'
-          [positions]='applicantPositions'
+          [applicantJobs]='true'
+          [jobs]='applicantJobs'
           (acceptRejectEmitter)="onAcceptReject($event)"
         >
-        </app-list-position>
+        </app-list-jobs>
       </div>
 
     </div>

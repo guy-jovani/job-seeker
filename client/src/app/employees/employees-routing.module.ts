@@ -16,11 +16,6 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     component: EmployeesComponent,
     resolve: [EmployeesResolverService],
-    // children: [
-    //   {
-    //     path: ':index', component: DetailsEmployeeComponent, canActivate: [DetailsEmployeeGuard]
-    //   },
-    // ]
   },
   {
     path: 'employees/:index',

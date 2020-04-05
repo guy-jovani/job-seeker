@@ -22,7 +22,7 @@ import { Message } from './message.model';
 export class ChatComponent implements OnInit, OnDestroy {
   subscription: Subscription;
   user: Employee | Company = null;
-  nameList: Map<string, { _id: string, fullName: string, type: string, nameColor?: SafeStyle }> = null;
+  nameList: Map<string, { _id: string, fullName: string, type: string, email: string, nameColor?: SafeStyle }> = null;
   messages: string[] = [];
   privateMsg = true;
   userKind: string = null;
@@ -53,13 +53,13 @@ export class ChatComponent implements OnInit, OnDestroy {
         this.currConversation = this.conversations.find(con => con._id === this.currConversation._id);
       }
     });
-    if (this.conversations) {
+    if (this.conversations.length) {
       this.store.dispatch(new UserActions.RemoveChatNotification());
     }
-    this.nameList = new Map<string, { _id: string, fullName: string, type: string }>();
+    this.nameList = new Map<string, { _id: string, fullName: string, type: string, email: string, nameColor?: SafeStyle }>();
   }
 
-  onGetNames(nameList: Map<string, { _id: string, fullName: string, type: string }>) {
+  onGetNames(nameList: Map<string, { _id: string, fullName: string, type: string, email: string, nameColor?: SafeStyle }>) {
     this.nameList = nameList;
   }
 
@@ -107,6 +107,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         senderType: this.userKind,
         content: form.value.messageContent,
         file: null,
+        newMessage: !this.currConversation,
         privateMsg: this.privateMsg,
         recipients: Array.from(this.nameList.keys()).map(key => {
           const nameObj = this.nameList.get(key);
@@ -165,7 +166,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.nameList.clear();
     for (const participant of this.currConversation.participants) {
       this.nameList.set(participant['user']['_id'], { _id: participant['user']['_id'],
-                  fullName: this.getFullName(participant.user), type: participant['type'] });
+                  fullName: this.getFullName(participant.user), type: participant['type'], email: participant['email'] });
 
       const participantNameList = this.nameList.get(participant.user._id);
       if (participantNameList) {
@@ -225,9 +226,13 @@ export class ChatComponent implements OnInit, OnDestroy {
     return gb + ' Gb';
   }
 
-  getFullName(user: { _id: string; name?: string; firstName?: string; lastName?: string; }) {
-    return user['name'] ? user['name'] :
-          ((user['firstName'] || '') + ' ' + (user['lastName'] || '')).trim();
+  getFullName(user: { _id: string; email?: string; name?: string; firstName?: string; lastName?: string; }) {
+    if (user['name']) {
+      return user['name'];
+    } else if (user['firstName'] || user['lastName']) {
+      return ((user['firstName'] || '') + ' ' + (user['lastName'] || '')).trim();
+    }
+    return user.email;
   }
 
   onClose() {

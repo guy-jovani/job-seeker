@@ -32,9 +32,7 @@
         <div *ngFor="let con of conversations; let i=index; trackBy: trackConversations" class="single-conversation" (click)="onFucosCon($event.currentTarget)" [attr.data-con-ind]="i">
           <ul class='conversation__participants-list'>
             <li *ngFor="let participant of con.participants.slice(0,3); let i=index" class="conversation__participants-list__item">
-              {{ i !== 2 ? ( participant.user.name ?
-                (participant.user.name | cut) :
-                ((participant.user.firstName || '') + ' ' + (participant.user.lastName || '')) | trim | cut ) : '' }}</li>
+              {{ i !== 2 ? getFullName(participant.user) : '' }}</li>
           </ul>
         </div>
       </div>
@@ -54,8 +52,8 @@
         New {{ privateMsg ? '' : 'Group' }} Message
     </div>
 
-    <div class="new-message__add-people">
-      <app-search-bar [placeholder]="'Type one or more names'" [search]="['employee','company']" (nameListEmitter)="onGetNames($event)"></app-search-bar>
+    <div class="new-message__add-item">
+      <app-search-bar [placeholder]="'Type one or more names'" [search]="['employee','company']" (wantedResultsEmitter)="onGetNames($event)"></app-search-bar>
     </div>
 
     <ng-container *ngTemplateOutlet="nameListTemplate; context: {removeName: true}"></ng-container>
@@ -127,7 +125,7 @@
   <div class="name-list-container">
     <ul class='name-list-container__list'>
       <li *ngFor="let name of nameList | keyvalue; let i=index" class="name-list-container__item">
-        {{ name.value.fullName }}
+        {{ name.value.fullName || name.value.email}}
         <span *ngIf="removeName" class="glyphicon glyphicon-remove name-list-container__item-remove" (click)="onRemoveName(name.value._id)"></span>
       </li>
     </ul>

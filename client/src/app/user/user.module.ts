@@ -5,7 +5,7 @@ import { CompanyModule } from 'app/company/company.module';
 import { EmployeesModule } from 'app/employees/employees.module';
 import { SharedModule } from '../shared/shared.module';
 import { UserRoutingModule } from './user-routing.module';
-import { PositionModule } from 'app/position/position.module';
+import { JobModule } from 'app/job/job.module';
 
 
 @NgModule({
@@ -18,7 +18,7 @@ import { PositionModule } from 'app/position/position.module';
     EmployeesModule,
     SharedModule,
     UserRoutingModule,
-    PositionModule
+    JobModule
   ],
   exports: [
     DetailsUserComponent,

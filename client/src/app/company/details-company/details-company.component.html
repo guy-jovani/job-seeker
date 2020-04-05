@@ -32,12 +32,12 @@
     <p *ngIf="!company.description && currUrl[0] === 'my-details'">Description: ------</p>
 
 
-    <h4 *ngIf="currUrl[0] !== 'my-details'">Positions</h4>
-    <app-list-position
+    <h4 *ngIf="currUrl[0] !== 'my-details'">Jobs</h4>
+    <app-list-jobs
       *ngIf="currUrl[0] !== 'my-details'"
-      [positions]="company.positions"
-      [companyPositions]="true">
-    </app-list-position>
+      [jobs]="company.jobs"
+      [companyJobs]="true">
+    </app-list-jobs>
 
     <div class="images-container">
       <ul class="images-container__list">

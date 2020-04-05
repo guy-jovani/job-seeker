@@ -7,7 +7,7 @@ import { filter } from 'rxjs/operators';
 import * as fromApp from './store/app.reducer';
 import * as AuthActions from './auth/store/auth.actions';
 import * as UserActions from './user/store/user.actions';
-import * as PositionActions from './position/store/position.actions';
+import * as JobActions from './job/store/job.actions';
 import * as CompanyActions from './company/store/company.actions';
 import { ChatService } from './chat/chat-socket.service';
 
@@ -73,22 +73,22 @@ export class AppComponent implements OnInit, OnDestroy {
     this.socketUpdatedStatus = this.chatService.getMessage('updatedStatus')
       .subscribe(res => {
         if (res['type'] === 'success') {
-          if (this.currUrl[0] === 'positions') {
-            this.store.dispatch(new PositionActions.ClearError());
+          if (this.currUrl[0] === 'jobs') {
+            this.store.dispatch(new JobActions.ClearError());
           } else if (this.currUrl[0] === 'companies') {
             this.store.dispatch(new CompanyActions.ClearError());
           }
           this.store.dispatch(new UserActions.UpdateActiveUser({
             user: res['user'],
             kind: res['kind'],
-            redirect: this.currUrl[0] === 'my-positions' ? 'my-positions' : ''
+            redirect: this.currUrl[0] === 'my-jobs' ? 'my-jobs' : ''
           }));
         } else {
-          if (this.currUrl[0] === 'positions') {
-            this.store.dispatch(new PositionActions.PositionOpFailure(res['messages']));
+          if (this.currUrl[0] === 'jobs') {
+            this.store.dispatch(new JobActions.JobOpFailure(res['messages']));
           } else if (this.currUrl[0] === 'companies') {
             this.store.dispatch(new CompanyActions.CompanyOpFailure(res['messages']));
-          } else { // this.currUrl[0] === 'my-positions'
+          } else { // this.currUrl[0] === 'my-jobs'
             this.store.dispatch(new UserActions.UserFailure(res['messages']));
           }
         }

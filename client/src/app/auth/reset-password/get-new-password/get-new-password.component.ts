@@ -10,8 +10,7 @@ import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-get-new-password',
-  templateUrl: './get-new-password.component.html',
-  styleUrls: ['./get-new-password.component.css']
+  templateUrl: './get-new-password.component.html'
 })
 export class GetNewPasswordComponent implements OnInit, OnDestroy {
   showPasswords = false;
@@ -57,7 +56,7 @@ export class GetNewPasswordComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  onSubmit(){
+  onSubmit() {
     const password = this.authForm.value.passwords.password;
     const confirmPassword = this.authForm.value.passwords.confirmPassword;
     this.store.dispatch(new AuthActions.ResetPassAttempt({ password, confirmPassword, token: this.token }));

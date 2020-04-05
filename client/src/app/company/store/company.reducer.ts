@@ -47,7 +47,7 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
     case CompanyActions.UPDATE_SINGLE_COMPANY_IN_DB:
     case CompanyActions.COMPANY_STATE_LOAD_SINGLE:
     case CompanyActions.FETCH_SINGLE_COMPANY:
-    case CompanyActions.UPDATE_SINGLE_COMPANY_POSITION_ATTEMPT:
+    case CompanyActions.UPDATE_SINGLE_COMPANY_JOB_ATTEMPT:
       return {
         ...state,
         loadingSingle: true
@@ -70,18 +70,18 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
         messages: null,
         loadingSingle: false
       };
-    case CompanyActions.UPDATE_SINGLE_COMPANY_POSITION:
+    case CompanyActions.UPDATE_SINGLE_COMPANY_JOB:
       const compInd = state.companies.findIndex(comp => comp._id === action.payload.company._id );
       action.payload.lastFetch = new Date();
-      const positions = [...state.companies[compInd].positions];
-      const posInd = state.companies[compInd].positions.findIndex(pos =>
-                                pos._id === action.payload._id );
-      positions[posInd] = action.payload;
+      const jobs = [...state.companies[compInd].jobs];
+      const jobInd = state.companies[compInd].jobs.findIndex(job =>
+                                job._id === action.payload._id );
+      jobs[jobInd] = action.payload;
 
       const upToDateCompanies = [ ...state.companies ];
       const upToDateCompany = {
         ...upToDateCompanies[compInd],
-        positions
+        jobs
       };
       upToDateCompanies[compInd] = upToDateCompany;
       return {

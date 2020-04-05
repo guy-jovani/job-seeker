@@ -7,7 +7,7 @@ import * as fromApp from '../store/app.reducer';
 import * as AuthActions from '../auth/store/auth.actions';
 import * as EmployeeActions from '../employees/store/employee.actions';
 import * as CompanyActions from '../company/store/company.actions';
-import * as PositionActions from '../position/store/position.actions';
+import * as JobActions from '../job/store/job.actions';
 import * as UserActions from '../user/store/user.actions';
 import { Employee } from '../employees/employee.model';
 import { Company } from 'app/company/company.model';
@@ -54,8 +54,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.store.dispatch(new EmployeeActions.Logout());
     this.store.dispatch(new CompanyActions.Logout());
     this.store.dispatch(new AuthActions.Logout());
-    this.store.dispatch(new PositionActions.Logout());
-    this.store.dispatch(new PositionActions.Logout());
+    this.store.dispatch(new JobActions.Logout());
     this.store.dispatch(new UserActions.Logout());
   }
 
@@ -71,8 +70,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.store.dispatch(new CompanyActions.FetchCompanies({page: 1}));
   }
 
-  onFetchPositions() {
-    this.store.dispatch(new PositionActions.FetchAllPositions());
+  onFetchJobs() {
+    this.store.dispatch(new JobActions.FetchAllJobs());
   }
 
   ngOnDestroy() {

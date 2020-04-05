@@ -3,19 +3,19 @@ import { RouterModule, Routes, UrlSegment } from '@angular/router';
 import { AuthGuard } from 'app/auth/auth.guard';
 import { DetailsUserComponent } from './details-user/details-user.component';
 import { EditUserComponent } from './edit-user/edit-user.component';
-import { PositionComponent } from 'app/position/position.component';
-import { EditPositionComponent } from 'app/position/edit-position/edit-position.component';
-import { DetailsPositionComponent } from 'app/position/details-position/details-position.component';
+import { JobComponent } from 'app/job/job.component';
+import { EditJobComponent } from 'app/job/edit-job/edit-job.component';
+import { DetailsJobComponent } from 'app/job/details-job/details-job.component';
 import { CompanyOnlyGuard } from 'app/company/company-only.guard';
 import { EmployeeOnlyGuard } from 'app/employees/employee-only.guard';
 import { EmployeesComponent } from 'app/employees/employees.component';
 import { DetailsEmployeeComponent } from 'app/employees/details-employee/details-employee.component';
 import { DetailsEmployeeGuard } from 'app/employees/details-employee/details-employee.guard';
-import { EmployeePositionStatus } from 'app/employees/employee.model';
+import { EmployeeJobStatus } from 'app/employees/employee.model';
 
-const employeerPositionsIndexMatcher = (url: UrlSegment[]) => {
-  return url.length === 3 && url[0].path === 'my-positions' &&
-          [...Object.keys(EmployeePositionStatus).filter(key => isNaN(+key))].includes(url[1].path) ?
+const employeerJobsIndexMatcher = (url: UrlSegment[]) => {
+  return url.length === 3 && url[0].path === 'my-jobs' &&
+          [...Object.keys(EmployeeJobStatus).filter(key => isNaN(+key))].includes(url[1].path) ?
           { consumed: url } : null;
 };
 
@@ -31,28 +31,28 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
-    path: 'my-positions',
-    component: PositionComponent,
+    path: 'my-jobs',
+    component: JobComponent,
     canActivate: [AuthGuard],
   },
   {
-    path: 'my-positions/create',
-    component: EditPositionComponent,
+    path: 'my-jobs/create',
+    component: EditJobComponent,
     canActivate: [AuthGuard, CompanyOnlyGuard]
   },
   {
-    matcher: employeerPositionsIndexMatcher,
-    component: DetailsPositionComponent,
+    matcher: employeerJobsIndexMatcher,
+    component: DetailsJobComponent,
     canActivate: [AuthGuard, EmployeeOnlyGuard]
   },
   {
-    path: 'my-positions/all/:index',
-    component: DetailsPositionComponent,
+    path: 'my-jobs/all/:index',
+    component: DetailsJobComponent,
     canActivate: [AuthGuard]
   },
   {
-    path: 'my-positions/all/:index/edit',
-    component: EditPositionComponent,
+    path: 'my-jobs/all/:index/edit',
+    component: EditJobComponent,
     canActivate: [AuthGuard, CompanyOnlyGuard]
   },
   {

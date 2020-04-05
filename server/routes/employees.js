@@ -45,9 +45,3 @@ router.post('/update', extractProfileImage, [
 module.exports = router;
 
 
-
-
-
-
-// router.post('/store', employeeController.postEmployee);
-// router.post('/delete', employeeController.deleteEmployee);

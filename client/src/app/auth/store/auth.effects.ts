@@ -10,7 +10,7 @@ import { environment } from '../../../environments/environment';
 import * as fromApp from '../../store/app.reducer';
 import * as AuthActions from './auth.actions';
 import * as UserActions from '../../user/store/user.actions';
-import * as PositionActions from '../../position/store/position.actions';
+import * as JobsActions from '../../job/store/job.actions';
 import * as EmployeeActions from '../../employees/store/employee.actions';
 import * as CompanyActions from '../../company/store/company.actions';
 import { Company } from 'app/company/company.model';
@@ -204,8 +204,7 @@ export class AuthEffects {
       this.store.dispatch(new EmployeeActions.Logout());
       this.store.dispatch(new CompanyActions.Logout());
       this.store.dispatch(new AuthActions.Logout());
-      this.store.dispatch(new PositionActions.Logout());
-      this.store.dispatch(new PositionActions.Logout());
+      this.store.dispatch(new JobsActions.Logout());
       this.store.dispatch(new UserActions.Logout());
       this.store.dispatch(new AuthActions.AuthFailure(
         ['You were automatically logged out due to inactivity.']
@@ -218,6 +217,7 @@ export class AuthEffects {
     if (res['type'] === 'success') {
       setUserLocalStorage(res['user'], res['kind'], res['token'], res['expiresIn'] * 1000);
       this.autoLogout(res['expiresIn'] * 1000);
+      this.chatService.sendMessage('login', {  _id: res['user']['_id'], msg: 'logged' } );
       this.store.dispatch(new UserActions.UpdateActiveUser({ user: res['user'], kind: res['kind'] }));
       return new AuthActions.AuthSuccess({ redirect: true, token: res['token'] });
     } else {

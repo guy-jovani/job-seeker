@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 
 const Employee = require('../models/employee');
+const Job = require('../models/job');
 const Company = require('../models/company');
 const validation = require('../utils/validation');
 const handleServerErrors = require('../utils/errorHandling').handleServerErrors;
@@ -37,12 +38,12 @@ getToken = (userId) => {
 
 
 /**
- * Creates a user (Company or People) based on the email, password and name.
+ * Creates a user (Company or Employee) based on the email, password and name.
  * @param {string} email - the user email
  * @param {string} password - the user password
- * @param {string} name - the company name (null if its a People)
- * @return { [(Company | People), string] } - an array in which the first var is the user object, 
- *                                             and the second is a string representing its kind ("company" | "people")
+ * @param {string} name - the company name (null if its a Employee)
+ * @return { [(Company | Employee), string] } - an array in which the first var is the user object, 
+ *                                             and the second is a string representing its kind ("company" | "employee")
  */
 createUserSignup = (email, password, name = null) => {
   let user, kind;
@@ -62,8 +63,8 @@ createUserSignup = (email, password, name = null) => {
  *    {string} type - 'success' - meaning the signup succeeded
  *    {string} token - a JWT related to the user
  *    {string} expiresIn - the number of seconds untill the token expires
- *    {object} user - the user object of who that signed up (Company | People)
- *    {string} kind - representing the user kind ("company" | "people")
+ *    {object} user - the user object of who that signed up (Company | Employee)
+ *    {string} kind - representing the user kind ("company" | "employee")
  * 
  * In case of an error - moving the error handling to the express error handling middleware
  * with a error code of 500, and an error message
@@ -102,30 +103,52 @@ exports.signup = async (req, res, next) => {
   }
 };
 
+const mockDB = async () => {
+  const nums = [];
+  for(let i=1; i<101; i++){
+    nums.push(i);
+  }
+
+  // for (num of nums) {
+  //   const password = await bcrypt.hash('111', 12);
+  //   await Employee.create({ firstName: 'e' + num,  lastName: 'e' + num, password: password, email: num + '@emp.com'});
+  // }
+
+  for (num of nums) {
+    const password = await bcrypt.hash('111', 12);
+    const company = await Company.create({ name: 'c' + num,  password: password, email: num + '@comp.com'});
+
+    await Job.create({ title: 'c' + num, description: 'description c' + num + ' #1', company: company._id, date: new Date() });
+    await Job.create({ title: 'c' + num, description: 'description c' + num + ' #2', company: company._id, date: new Date() });
+    await Job.create({ title: 'c' + num + 'with req', description: 'description c' + num + ' with req',
+                        requirements: [{requirement: 'req 1'}, {requirement: 'req 2'}], company: company._id, date: new Date()    });
+  }
+}
+
 
 /**
- * Get the logged user (Company or People).
+ * Get the logged user (Company or Employee).
  * @param {string} email - the email of the user.
- * @return { [(Company | People), string] } - an array in which the first var is the user object, 
- *           and the second is a string representing its kind ("company" | "people").
- *      people obj - with positions array populated with the position info, and the position company name 
- *      company obj - with the positions populated,
- *                    with applicants array populated with the people info,
- *                    with the applicants positions populatad with the position info 
+ * @return { [(Company | Employee), string] } - an array in which the first var is the user object, 
+ *           and the second is a string representing its kind ("company" | "employee").
+ *      employee obj - with jobs array populated with the job info, and the job company name 
+ *      company obj - with the jobs populated,
+ *                    with applicants array populated with the employee info,
+ *                    with the applicants jobs populatad with the job info 
  */
 getUserLogin = async email => {
   let user = await Employee.findOne({email: email}).select('-__v')
                             .populate({
-                              path: 'positions.position', 
+                              path: 'jobs.job', 
                               populate: { path: 'company', select: 'name' }
                             });
   let kind = "employee";
   if(!user) {
     user = await Company.findOne({email: email}).select(
                   '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration'
-                ).populate('positions');
-    user = await Company.populate(user, { path: 'applicants.employees', select: '-__v -password'});
-    user = await Company.populate(user, { path: 'applicants.positions.position', select: 'title'});
+                ).populate('jobs');
+    user = await Company.populate(user, { path: 'applicants.employee', select: '-__v -password'});
+    user = await Company.populate(user, { path: 'applicants.jobs.job', select: 'title'});
     kind = "company";
   }
   return [user, kind];
@@ -136,8 +159,8 @@ getUserLogin = async email => {
  *    {string} type - 'success' - meaning the signup succeeded
  *    {string} token - a JWT related to the user
  *    {string} expiresIn - the number of seconds untill the token expires
- *    {object} user - the user object of who that signed up (Company | People)
- *    {string} kind - representing the user kind ("company" | "people")
+ *    {object} user - the user object of who that signed up (Company | Employee)
+ *    {string} kind - representing the user kind ("company" | "employee")
  *  
  * send the client a 401 error with a message in case the email/password are incorrect.
  * 
@@ -159,25 +182,12 @@ exports.login = async (req, res, next) => {
       return sendMessagesResponse(res, 401, ['The email and/or password are incorrect'], 'failure');
     }
 
+    // await mockDB(); //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     const verifiedPassword = await bcrypt.compare(req.body.password, user.password);
     if(!verifiedPassword){ 
       return sendMessagesResponse(res, 401, ['The email and/or password are incorrect.'], 'failure');
     }
-
-    // const nums = [];
-
-    // for(let i=16; i<101; i++){
-    //   nums.push(i);
-    // }
-
-    // for ( num of nums) {
-    //   const password = await bcrypt.hash('111', 12);
-    //   await People.create({ firstName: 'e' + num,  lastName: 'e' + num, password: password, email: num + '@emp.com'});
-    // }
-    // for ( num of [13,14,15, ...nums]) {
-    //   const password = await bcrypt.hash('111', 12);
-    //   await Company.create({ name: 'c' + num,  password: password, email: num + '@comp.com'});
-    // }
     
     user = user.toObject();
     Reflect.deleteProperty(user, 'password');

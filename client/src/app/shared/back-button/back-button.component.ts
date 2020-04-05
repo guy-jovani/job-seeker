@@ -20,7 +20,7 @@ export class BackButtonComponent implements OnInit {
 
   onBack() {
     const currUrl: string[] = this.route.snapshot['_routerState'].url.substring(1).split('/');
-    if (currUrl[0] === 'my-positions') {
+    if (currUrl[0] === 'my-jobs') {
       currUrl.splice(-2, 2);
     } else {
       currUrl.splice(-1, 1);

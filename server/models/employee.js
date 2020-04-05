@@ -25,10 +25,10 @@ const employeeSchema = new Schema(
       type: String,
       required: false
     },
-    positions: [{
-      position: {
+    jobs: [{
+      job: {
         type: Schema.Types.ObjectId, 
-        ref: 'Position',
+        ref: 'Job',
         require: false
       },
       status: {

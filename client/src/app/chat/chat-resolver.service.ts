@@ -1,6 +1,6 @@
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Actions, ofType } from '@ngrx/effects';
+import { Actions } from '@ngrx/effects';
 import { take, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 

@@ -7,12 +7,12 @@ const errorHandling = require('../utils/errorHandling');
 const getBulkArrayForUpdate = require('../utils/shared').getBulkArrayForUpdate;
 const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
 const checkCompanyUpdateSignupValidation = require('../utils/shared').checkCompanyUpdateSignupValidation
-const changeStatusOfAUserPosition = require('../utils/shared').changeStatusOfAUserPosition;
+const changeStatusOfAUserJob = require('../utils/shared').changeStatusOfAUserjob;
 const skippedDocuments = require('../utils/shared').skippedDocuments;
 
 
 /**
- * Send the client a company object with its positions populated with the company name.
+ * Send the client a company object with its jobs populated with the company name.
  * 
  * In case of an error - moving the error handling to the express error handling middleware
  * with a error code of 500, and an error message
@@ -23,9 +23,9 @@ const skippedDocuments = require('../utils/shared').skippedDocuments;
 exports.fetchSingle = async (req, res, next) => {
   try { 
     let company = await Company.findById(req.query._id).select(
-      '_id email name website description imagesPath positions')
+      '_id email name website description imagesPath jobs')
         .populate({
-          path: 'positions', 
+          path: 'jobs', 
           populate: { path: 'company', select: 'name' }
         });
     company = company.toObject();
@@ -43,13 +43,14 @@ exports.fetchSingle = async (req, res, next) => {
  * Send the client an object of an array of all the companies (excluded the user company),
  * based on the page the user is in, and the total number of companies.
  * 
- * Each company object is populated with the positions of the company,
- * each position is populated with the name of the company.
+ * Each company object is populated with the jobs of the company,
+ * each job is populated with the name of the company.
  * 
  * In case of an error - moving the error handling to the express error handling middleware
  * with a error code of 500, and an error message
  * @param {express request object} req - the req need to have query params: 
  *                                        {string} _id - the id of the user.
+ *                                        {string} kind - the kind of the user ('employee' | 'company').
  *                                        {string} page - the page the user is in.
  * @param {express respond object} res
  */
@@ -59,9 +60,9 @@ exports.fetchCompanies = async (req, res, next) => {
       { $match: { _id: { $ne: mongoose.Types.ObjectId(req.query._id) } } },
       { $skip: skippedDocuments(req.query.page) },
       { $limit: +process.env.DOCS_PER_PAGE },
-      { $project: { positions: 0, createdAt: 0, updatedAt: 0, __v: 0, password: 0, applicants: 0 } },
+      { $project: { jobs: 0, createdAt: 0, updatedAt: 0, __v: 0, password: 0, applicants: 0 } },
       { $lookup: {
-        from: "positions",
+        from: "jobs",
         let: { companyId: "$_id" },
         pipeline: [
           { $match: { $expr: { $eq: [ "$company", "$$companyId" ] } } },
@@ -74,7 +75,7 @@ exports.fetchCompanies = async (req, res, next) => {
           { $unwind: "$company" },
           { $project: {
             "__v": 0,
-            "company.positions": 0,
+            "company.jobs": 0,
             "company.applicants": 0,
             "company.imagesPath": 0,
             "company.profileImagePath": 0,
@@ -87,7 +88,7 @@ exports.fetchCompanies = async (req, res, next) => {
             "company.email": 0, }
           }
         ],
-        as: "positions" }
+        as: "jobs" }
       }
     ]);
 
@@ -99,7 +100,7 @@ exports.fetchCompanies = async (req, res, next) => {
     res.status(200).json({
       type: 'success',
       companies,
-      total: total[0].email - 1
+      total: req.query.kind === 'company' ? total[0].email - 1 : total[0].email
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "There was an error fetching the companies."));
@@ -178,12 +179,6 @@ const updateReqImages = async (req) => {
   getProfileImage(req, req.files.profileImagePath);
 };
 
-
-//////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////
-
 const getUpdateQuery = async req => {
   Reflect.deleteProperty(req.body, 'imagesPath');
   updateReqImages(req);
@@ -213,7 +208,7 @@ exports.updateCompany = async (req, res, next) => {
     
     let updatedCompany = await Company.findById(req.body._id).select(
                             '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration -password'
-                          ).populate('positions');
+                          ).populate('jobs');
                         
     res.status(201).json({
       message: 'company updated successfully!',
@@ -226,11 +221,11 @@ exports.updateCompany = async (req, res, next) => {
 };
 
 
-exports.acceptRejectPosition = async (req, res, next) => {
+exports.acceptRejectJob = async (req, res, next) => {
   try {
-    await changeStatusOfAUserPosition(req, res, req.body.companyId, req.body.employeeId, req.body.positionId, req.body.status, 'company')
+    await changeStatusOfAUserJob(req, res, req.body.companyId, req.body.employeeId, req.body.jobId, req.body.status, 'company')
   } catch (error) {
-    next(errorHandling.handleServerErrors(error, 500, `There was an error updating the status of the wanted position.`));
+    next(errorHandling.handleServerErrors(error, 500, `There was an error updating the status of the wanted job.`));
   }
 };
 

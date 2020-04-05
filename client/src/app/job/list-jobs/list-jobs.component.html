@@ -1,0 +1,37 @@
+
+
+
+
+<ul class="list-group" *ngIf="jobs && jobs.length">
+  <li class="list-group-item {{ applicantJobs ? 'applicant-job' : '' }}"
+      *ngFor="let jobInfo of jobs; let i=index; trackBy: jobsTracker">
+
+    <ng-container *ngIf="applicantJobs; else jobsList">
+      <h4 class="job-title">{{ jobInfo.title ? jobInfo.title : jobInfo['job'].title }}</h4>
+      <p class="job-status job-status-{{ jobInfo.status }}">{{ jobInfo.status }}</p>
+      <p class="job-date">{{ getJobDate(jobInfo.date) }}</p>
+      <div class="status-action-buttons">
+        <button class="btn btn-danger btn-sm" (click)="onAcceptReject('rejected', i)"
+          *ngIf='jobInfo.status.toString() !== "rejected"'>Reject?</button>
+        <button class="btn btn-success btn-sm" (click)="onAcceptReject('accepted', i)"
+          *ngIf='jobInfo.status.toString() !== "accepted"'>Accept?</button>
+      </div>
+    </ng-container>
+
+    <ng-template #jobsList>
+      <a class="job-link" [state]="{ jobInd : i }"
+        routerLink='{{ companyJobs && jobs.length ? "job" : detailsJobUrl + i }}'>
+        <p class="job-title">{{ jobInfo.title ? jobInfo.title : jobInfo['job'].title }}</p>
+        <p class="job-date" *ngIf="jobInfo.date">{{ getJobDate(jobInfo.date) }}</p>
+        <p class="job-status job-status-{{ jobInfo.status }}" *ngIf="showStatus">{{ jobInfo.status }}</p>
+      </a>
+    </ng-template>
+  </li>
+</ul>
+<p *ngIf="!jobs || !jobs.length">There are no open jobs.</p>
+
+
+
+
+
+

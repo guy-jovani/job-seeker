@@ -34,13 +34,13 @@ const setUserLocalStorage = (user: Company | Employee,
   }
 };
 
-const updateUserPositionsLocalStorage = (position, type) => {
+const updateUserJobsLocalStorage = (job, type) => {
   const [user] = geUsertLocalStorage();
-  if (type === UserActions.CompanyCreatedPosition) {
-    user.positions.push(position);
+  if (type === UserActions.CompanyCreatedJob) {
+    user.jobs.push(job);
   } else {
-    const index = user.positions.findIndex(pos => pos._id === position._id);
-    user.positions[index] = position;
+    const index = user.jobs.findIndex(tempJob => tempJob._id === job._id);
+    user.jobs[index] = job;
   }
   setUserLocalStorage(user);
 };
@@ -67,11 +67,11 @@ export class UserEffects {
   );
 
   @Effect({dispatch: false})
-  AddUpdatePositionToUserNavigation = this.actions$.pipe(
-    ofType(UserActions.COMPANY_CREATED_POSITION, UserActions.COMPANY_UPDATED_POSITION),
-    map((actionData: UserActions.CompanyCreatedPosition | UserActions.CompanyUpdatedPosition) => {
-      updateUserPositionsLocalStorage(actionData.payload, actionData.type);
-      this.router.navigate(['../my-positions']);
+  AddUpdateJobToUserNavigation = this.actions$.pipe(
+    ofType(UserActions.COMPANY_CREATED_JOB, UserActions.COMPANY_UPDATED_JOB),
+    map((actionData: UserActions.CompanyCreatedJob | UserActions.CompanyUpdatedJob) => {
+      updateUserJobsLocalStorage(actionData.payload, actionData.type);
+      this.router.navigate(['../my-jobs']);
     })
   );
 

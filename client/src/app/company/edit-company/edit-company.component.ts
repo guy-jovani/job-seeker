@@ -133,7 +133,7 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
       newCompany.imagesPath = this.images;
     }
     if (this.profileImagePreview) {
-      newCompany.profileImagePath = this.profileImagePreview.file || this.profileImagePreview.stringFile;
+      newCompany.profileImagePath = this.profileImagePreview.file || this.profileImagePreview.stringFile || '';
     }
     this.store.dispatch(new CompanyActions.UpdateSingleCompanyInDb({
       company: newCompany, oldImagesPath: this.imagesPath.map(path => path.startsWith('http') ? path : ''), password, confirmPassword }));

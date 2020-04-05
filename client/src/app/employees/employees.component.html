@@ -6,7 +6,7 @@
   <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
   <div class="container-fluid" #containerFluid>
     <h3>Employees</h3>
-    <app-list-employee [employees]="employees" [applicantsList]="applicantsList"></app-list-employee>
+    <app-list-employees [employees]="employees" [applicantsList]="applicantsList"></app-list-employees>
     <div *ngIf="isLoading" style="text-align: center;">
       <app-loading-spinner></app-loading-spinner>
     </div>

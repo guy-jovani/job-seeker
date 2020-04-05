@@ -5,7 +5,7 @@ import { switchMap, map, catchError, withLatestFrom } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 
-import * as PositionActions from '../../position/store/position.actions';
+import * as JobActions from '../../job/store/job.actions';
 import * as CompanyActions from './company.actions';
 import * as UserActions from '../../user/store/user.actions';
 import { environment } from '../../../environments/environment';
@@ -70,7 +70,8 @@ export class CompanyEffects {
       return this.http.get(nodeServer + 'fetchCompanies', {
         params: {
           _id: userState.user._id,
-          page: actionData['payload']['page']
+          page: actionData['payload']['page'],
+          kind: userState.kind,
         }
       })
       .pipe(
@@ -106,14 +107,14 @@ export class CompanyEffects {
               return new CompanyActions.UpdateSingleCompany({company: res['company'], main: actionData.payload.main });
             } else {
               this.store.dispatch(new CompanyActions.ClearError());
-              return new PositionActions.UpdateSinglePositionCompany({company: res['company'], posInd: actionData.payload.posInd });
+              return new JobActions.UpdateSingleJobCompany({company: res['company'], jobInd: actionData.payload.jobInd });
             }
           } else {
             if (actionData.payload.main) {
               return new CompanyActions.CompanyOpFailure(res['messages']);
             } else {
               this.store.dispatch(new CompanyActions.ClearError());
-              return new PositionActions.PositionOpFailure(res['messages']);
+              return new JobActions.JobOpFailure(res['messages']);
             }
           }
         }),
@@ -122,7 +123,7 @@ export class CompanyEffects {
             return of(new CompanyActions.CompanyOpFailure(messages));
           } else {
             this.store.dispatch(new CompanyActions.ClearError());
-            return of(new PositionActions.PositionOpFailure(messages));
+            return of(new JobActions.JobOpFailure(messages));
           }
         })
       );

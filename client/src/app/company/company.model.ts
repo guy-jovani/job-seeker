@@ -1,11 +1,11 @@
 
-import { Position } from 'app/position/position.model';
+import { Job } from 'app/job/job.model';
 import { Employee } from 'app/employees/employee.model';
 
 
-export interface ApplicantPosition {
+export interface ApplicantJob {
   // _id: string; // has an id - but should never access it
-  position: Position;
+  job: Job;
   status: ApplicantStatus;
   date: Date;
 }
@@ -24,8 +24,8 @@ export class Company {
   public website?: string;
   public profileImagePath?: File | string;
   public imagesPath?: string[] | File[];
-  public positions?: Position[];
-  public applicants: { employee: Employee, positions: ApplicantPosition[] }[];
+  public jobs?: Job[];
+  public applicants: { employee: Employee, jobs: ApplicantJob[] }[];
   public lastFetch?: Date;
 
   constructor(init?: Partial<Company>) {

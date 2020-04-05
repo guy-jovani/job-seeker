@@ -1,7 +1,7 @@
-import { Position } from 'app/position/position.model';
+import { Job } from 'app/job/job.model';
 
 
-export enum EmployeePositionStatus {
+export enum EmployeeJobStatus {
   'saved', 'applied', 'rejected', 'accepted'
 }
 
@@ -10,9 +10,9 @@ export class Employee {
   public _id: string; // the underscore is because the database named it like that
   public email: string;
   public profileImagePath?: string | File;
-  public positions?: {
-    position: Position,
-    status: EmployeePositionStatus,
+  public jobs?: {
+    job: Job,
+    status: EmployeeJobStatus,
     date: Date
   }[];
   public firstName?: string;

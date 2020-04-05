@@ -3,7 +3,7 @@ const { validationResult } = require('express-validator');
 
 const Employee = require('../models/employee');
 const Company = require('../models/company');
-const Position = require('../models/position');
+const Job = require('../models/job');
 
 
 exports.userEmailExistValidation = async (email, _id = null) => {
@@ -55,13 +55,13 @@ exports.handleValidationRoutesErrors = req => {
   }
 };
 
-exports.positionTitleExistForCompanyValidation = async (title, companyId, posId = null) => {
-  const position = await Position.findOne({ 
+exports.jobTitleExistForCompanyValidation = async (title, companyId, posId = null) => {
+  const job = await Job.findOne({ 
     _id: { $ne: posId }, company: companyId, title: title 
   });
-  if(position){
+  if(job){
     return {
-      messages: ['You already have a position with that title, please choose a different one.'],
+      messages: ['You already have a job with that title, please choose a different one.'],
       type: 'failure'
     }
   }

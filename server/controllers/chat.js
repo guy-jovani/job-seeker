@@ -18,10 +18,10 @@ const socketInitializer = require('../socket').socketInitializer;
  * 
  * @param {boolean} privateMsg - true if a private conversation, false if a group one.
  * @param {Array.<_id: string, type: string>} recipients -
- *                  an array of the ids and type (Company | People) of the users in the conversation.
+ *                  an array of the ids and type (Company | Employee) of the users in the conversation.
  * @param {string} content - the content of the message (if not a file).
  * @param {string} senderId - the id of the user that sent the message.
- * @param {string} senderType - the type (Company | People) of the user that sent the message.
+ * @param {string} senderType - the type (Company | Employee) of the user that sent the message.
  * @param {Buffer} bufferFile - in case of a file - the buffer of data.
  * @param {string} fileName - the file name.
  * @param {number} fileNumBytes - the size of the file in bytes.
@@ -30,8 +30,6 @@ const socketInitializer = require('../socket').socketInitializer;
   */
 exports.postMessage = async (privateMsg, recipients, content, senderId, senderType, bufferFile, fileName, fileNumBytes) => {
   try {
-    console.log(privateMsg, recipients, content, senderId, senderType, fileName, fileNumBytes)
-    console.log(typeof(privateMsg), typeof(recipients), typeof(content), typeof(senderId), typeof(senderType), typeof(fileName), typeof(fileNumBytes))
     let error = new Error();
     error.messages = [];
     if((!content || content.trim() === '') && !fileName) {
@@ -64,7 +62,7 @@ exports.postMessage = async (privateMsg, recipients, content, senderId, senderTy
  * @param {object} conversation - a Conversation object.
  * @param {string} content - the content of the message (if not a file).
  * @param {string} senderId - the id of the user that sent the message.
- * @param {string} senderType - the type (Company | People) of the user that sent the message.
+ * @param {string} senderType - the type (Company | Employee) of the user that sent the message.
  * @param {Buffer} bufferFile - in case of a file - the buffer of data.
  * @param {string} fileName - the file name.
  * @param {number} fileNumBytes - the size of the file in bytes.
@@ -139,7 +137,7 @@ const populateConversationParticipants = async conversations => {
   return await Conversation.populate(conversations, 
     {
       path: 'participants.user',
-      select: [ 'name', 'firstName', 'lastName' ]
+      select: [ 'name', 'firstName', 'lastName', 'email' ]
     });
 };
 
@@ -147,10 +145,10 @@ const populateConversationParticipants = async conversations => {
 /**
  * Creates/Updates conversation based on the message and recipients.
  * @param {Array.<_id: string, type: string>} recipients -
- *                  an array of the ids and type (Company | People) of the users in the conversation.
+ *                  an array of the ids and type (Company | Employee) of the users in the conversation.
  * @param {string} content - the content of the message (if not a file).
  * @param {string} senderId - the id of the user that sent the message.
- * @param {string} senderType - the type (Company | People) of the user that sent the message.
+ * @param {string} senderType - the type (Company | Employee) of the user that sent the message.
  * @param {Buffer} bufferFile - in case of a file - the buffer of data.
  * @param {string} fileName - the file name.
  * @param {number} fileNumBytes - the size of the file in bytes.

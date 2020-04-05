@@ -28,10 +28,10 @@ exports.saveSocketFilePath = (buffer, uniqueName) => {
 };
 
 exports.skippedDocuments = page => {
-  // page: 1, docs: 20 => (1 - 1) * 20 + 1 => 1
-  // page: 2, docs: 20 => (2 - 1) * 20 + 1 => 21
-  // page: 3, docs: 20 => (3 - 1) * 20 + 1 => 41
-  return (page - 1) * process.env.DOCS_PER_PAGE + 1;
+  // page: 1, docs: 20 => (1 - 1) * 20 => 0
+  // page: 2, docs: 20 => (2 - 1) * 20 => 20
+  // page: 3, docs: 20 => (3 - 1) * 20 => 40
+  return (page - 1) * +process.env.DOCS_PER_PAGE;
 }
 
 exports.getNullKeysForUpdate = (req, removableKeys) => {
@@ -98,88 +98,88 @@ exports.checkCompanyUpdateSignupValidation = async (req, signup = true) => {
 };
 
 
-changeStatusOnEmployeePositions = async (employeeId, positionId, status) => {
+changeStatusOnEmployeeJobs = async (employeeId, jobId, status) => {
   let employee = await Employee.findById(employeeId);
   if(!employee) { return 404; }
-  const pos = employee.positions.find(pos => pos.position.toString() === positionId);
+  const pos = employee.jobs.find(pos => pos.job.toString() === jobId);
   if (pos) {
     pos.status = status;
     pos.date = Date.now();
   } else {
-    employee.positions.push({ position: positionId, status: status, date: Date.now() })
+    employee.jobs.push({ job: jobId, status: status, date: Date.now() })
   }
   employee = (await employee.save()).toObject();
   Reflect.deleteProperty(employee, 'password');
   Reflect.deleteProperty(employee, '__v');
   return await Employee.populate(employee, {
-                                      path: 'positions.position', 
+                                      path: 'jobs.job', 
                                       populate: { path: 'company', select: 'name' } });
 };
 
 
-const newApplicant = (status, company, employeeId, positionId) => {
+const newApplicant = (status, company, employeeId, jobId) => {
   if(status !== 'saved') {
     company.applicants.push({ 
       employee: employeeId, 
-      positions: [ { position: positionId, status: status, date: Date.now() } ] 
+      jobs: [ { job: jobId, status: status, date: Date.now() } ] 
     });
   }
 }
 
-const applicantUpdatePositionStatus = (status, company, positionId, applicantInd) => {
-  const position = company.applicants[applicantInd].positions.find(posInfo => posInfo.position.toString() === positionId); 
-  if(position){ // update position status
-    position.status = status;
-    position.date = Date.now();
-  } else { // add new position with status
-    company.applicants[applicantInd].positions.push({ position: positionId, status: status, date: Date.now() });
+const applicantUpdateJobStatus = (status, company, jobId, applicantInd) => {
+  const job = company.applicants[applicantInd].jobs.find(posInfo => posInfo.job.toString() === jobId); 
+  if(job){ // update job status
+    job.status = status;
+    job.date = Date.now();
+  } else { // add new job with status
+    company.applicants[applicantInd].jobs.push({ job: jobId, status: status, date: Date.now() });
   }
 }
 
-const removeApplicantPosition = (company, positionId, applicantInd) => {
-  let applicantPositions = company.applicants[applicantInd].positions;
-  if(applicantPositions.length > 1) { // just remove the position
-    company.applicants[applicantInd].positions = applicantPositions.filter(pos => pos.position.toString() !== positionId);
-  } else { // remove the applicant - he has no more positions for that company
+const removeApplicantJob = (company, jobId, applicantInd) => {
+  let applicantJobs = company.applicants[applicantInd].jobs;
+  if(applicantJobs.length > 1) { // just remove the job
+    company.applicants[applicantInd].jobs = applicantJobs.filter(pos => pos.job.toString() !== jobId);
+  } else { // remove the applicant - he has no more jobs for that company
     company.applicants.splice(applicantInd, 1);
   }
 }
 
-const updateApplicant = (status, company, positionId, applicantInd) => {
+const updateApplicant = (status, company, jobId, applicantInd) => {
   if(status !== 'saved') {
-    applicantUpdatePositionStatus(status, company, positionId, applicantInd);
-  } else { // need to remove the position of the applicant
-    removeApplicantPosition(company, positionId, applicantInd);
+    applicantUpdateJobStatus(status, company, jobId, applicantInd);
+  } else { // need to remove the job of the applicant
+    removeApplicantJob(company, jobId, applicantInd);
   }
 }
 
-changeStatusOnCompanyApplicantsPositions = async (companyId, employeeId, positionId, status) => {
+changeStatusOnCompanyApplicantsJobs = async (companyId, employeeId, jobId, status) => {
   let company = await Company.findById(companyId);
   if(!company) { return 404; }
   const applicantInd = company.applicants.findIndex(applicant => applicant.employee.toString() === employeeId);
 
   if (applicantInd > -1) {
-    updateApplicant(status, company, positionId, applicantInd);
+    updateApplicant(status, company, jobId, applicantInd);
   } else { // new applicant
-    newApplicant(status, company, employeeId, positionId, applicantInd);
+    newApplicant(status, company, employeeId, jobId, applicantInd);
   }
   company = (await company.save()).toObject();
   Reflect.deleteProperty(company, 'password');
   Reflect.deleteProperty(company, '__v');
-  company = await Company.populate(company, 'positions');
+  company = await Company.populate(company, 'jobs');
   company = await Company.populate(company, { path: 'applicants.employee', select: '-__v -password'});
-  company = await Company.populate(company, { path: 'applicants.positions.position', select: 'title'});
+  company = await Company.populate(company, { path: 'applicants.jobs.job', select: 'title'});
   return company;
 };
 
 
 
-exports.changeStatusOfAUserPosition = async (companyId, employeeId, positionId, status) => {
-  const employee = await changeStatusOnEmployeePositions(employeeId, positionId, status);
+exports.changeStatusOfAUserJob = async (companyId, employeeId, jobId, status) => {
+  const employee = await changeStatusOnEmployeeJobs(employeeId, jobId, status);
   if(employee === 404) { 
     return 404;
   }
-  const company = await changeStatusOnCompanyApplicantsPositions(companyId, employeeId, positionId, status);
+  const company = await changeStatusOnCompanyApplicantsJobs(companyId, employeeId, jobId, status);
   if(company === 404) {
     return 404;
   }
