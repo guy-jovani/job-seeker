@@ -134,7 +134,7 @@ exports.createWork = async (req, res, next) => {
             company: req.body.company,
             employmentType: req.body.employmentType,
             startDate: new Date(req.body.startDate),
-            endDate: req.body.endDate ? new Date(req.body.endDate) : null,
+            endDate: !req.body.present && req.body.endDate ? new Date(req.body.endDate) : null,
           } 
         } 
       },
@@ -159,6 +159,7 @@ exports.updateWork = async (req, res, next) => {
     if(routeErrors.type === 'failure') {
       return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
     }
+    
     const employeeToUpdate = await Employee.findOne({ 
                     _id: req.body._id, 'work._id': req.body.workId }).populate('jobs.job');
     
@@ -170,7 +171,7 @@ exports.updateWork = async (req, res, next) => {
       company: req.body.company,
       employmentType: req.body.employmentType,
       startDate: new Date(req.body.startDate),
-      endDate: req.body.endDate ? new Date(req.body.endDate) : null,
+      endDate: !req.body.present && req.body.endDate ? new Date(req.body.endDate) : null,
     };
     await employeeToUpdate.save();
 

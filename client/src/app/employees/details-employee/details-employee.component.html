@@ -302,7 +302,12 @@
           <button
             type="submit"
             class="btn btn-success"
-            [disabled]="!workForm.valid">
+            [disabled]="title.invalid ||
+                        company.invalid ||
+                        type.invalid ||
+                        startMonth.invalid ||
+                        startYear.invalid ||
+                        (!workForm.form.value.present && (endMonth.invalid || endYear.invalid))">
             {{ workId ? 'Update' : 'Create' }}
           </button>
         </div>
