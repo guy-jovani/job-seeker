@@ -192,9 +192,9 @@ const getUpdateQuery = async req => {
 
 exports.updateCompany = async (req, res, next) => {
   try { 
-    const routeErros = validation.handleValidationRoutesErrors(req);
-    if(routeErros.type === 'failure') {
-      return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
+    const routeErrors = validation.handleValidationRoutesErrors(req);
+    if(routeErrors.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
     }
     const companyValid = await checkCompanyUpdateSignupValidation(req, signup = false);
     if(companyValid.type === 'failure'){
@@ -203,7 +203,7 @@ exports.updateCompany = async (req, res, next) => {
 
     const bulkRes = await Company.bulkWrite(await getUpdateQuery(req));
     if(!bulkRes.result.nMatched){
-      throw new Error("trying to update a non exisitng company");
+      throw new Error("Trying to update a non existing company");
     }
     
     let updatedCompany = await Company.findById(req.body._id).select(

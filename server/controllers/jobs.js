@@ -24,9 +24,9 @@ const sendMessagesResponse = require('../utils/shared').sendMessagesResponse;
  */
 exports.create = async (req, res, next) => {
   try {
-    const routeErros = validation.handleValidationRoutesErrors(req);
-    if(routeErros.type === 'failure') {
-      return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
+    const routeErrors = validation.handleValidationRoutesErrors(req);
+    if(routeErrors.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
     }
     title = req.body.title.trim();
     const titleExist = await validation.jobTitleExistForCompanyValidation(
@@ -71,9 +71,9 @@ exports.create = async (req, res, next) => {
  */
 exports.updateJob = async (req, res, next) => {
   try {
-    const routeErros = validation.handleValidationRoutesErrors(req);
-    if(routeErros.type === 'failure') {
-      return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
+    const routeErrors = validation.handleValidationRoutesErrors(req);
+    if(routeErrors.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
     }
     title = req.body.title.trim();
     const titleExist = await validation.jobTitleExistForCompanyValidation(

@@ -17,6 +17,23 @@ input.ng-invalid.ng-touched {
   min-width: 23rem;
 }
 
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hide {
+  display: none;
+}
+
 /**************************
 ******* Forms *************
 **************************/
@@ -24,11 +41,20 @@ input.ng-invalid.ng-touched {
 .form-container {
   display: flex;
   justify-content: center;
+  height: 75vh;
+
+  .backdrop & {
+    overflow: auto;
+  }
 }
 
 .my-form {
   width: 100%;
   max-width: 60vw;
+  min-width: max-content;
+  height: max-content;
+  display: flex;
+  flex-direction: column;
 
   @media (max-width: 400px) {
     max-width: none;
@@ -144,10 +170,21 @@ app-back-button {
   }
 }
 
+.details-page-body {
+  display: flex;
+  flex-direction: column;
+}
+
 .edit-buttons-container,
 .status-buttons-container {
-  float: right;
-  margin-top: 2rem;
+  margin: 2rem 0;
+  align-self: flex-end;
+
+  &.with-delete {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+  }
 }
 
 .job-status {

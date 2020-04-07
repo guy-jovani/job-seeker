@@ -13,7 +13,7 @@ import { Company } from 'app/company/company.model';
 import { Employee } from 'app/employees/employee.model';
 import { Conversation } from 'app/chat/conversation.model';
 
-const geUsertLocalStorage = () => {
+const geUserLocalStorage = () => {
   const user = JSON.parse(localStorage.getItem('userData'));
   const kind = JSON.parse(localStorage.getItem('kind'));
   const token = JSON.parse(localStorage.getItem('token'));
@@ -35,7 +35,7 @@ const setUserLocalStorage = (user: Company | Employee,
 };
 
 const updateUserJobsLocalStorage = (job, type) => {
-  const [user] = geUsertLocalStorage();
+  const [user] = geUserLocalStorage();
   if (type === UserActions.CompanyCreatedJob) {
     user.jobs.push(job);
   } else {
@@ -52,7 +52,6 @@ export class UserEffects {
               private http: HttpClient,
               private store: Store<fromApp.AppState>,
               private router: Router) {}
-
 
 
   @Effect({dispatch: false})
@@ -120,6 +119,74 @@ export class UserEffects {
     })
   );
 
+  @Effect()
+  createWorkEmployee = this.actions$.pipe(
+    ofType(UserActions.CREATE_WORK_EMPLOYEE_IN_DB),
+    withLatestFrom(this.store.select('user')),
+    switchMap(([actionData, userState]) => {
+      return this.http.post(environment.nodeServer  + 'employees/createWork',
+                          { ...actionData['payload'] as object, _id: userState.user._id })
+        .pipe(
+          map(res => {
+            if (res['type'] === 'success') {
+              return new UserActions.UpdateActiveUser({ user: {...res['employee']}, redirect: 'my-details', kind: 'employee' });
+            } else {
+              return new UserActions.UserFailure(res['messages']);
+            }
+          }),
+          catchError(messages => {
+            return of(new UserActions.UserFailure(messages));
+          })
+        );
+    })
+  );
+
+  @Effect()
+  updateWorkEmployee = this.actions$.pipe(
+    ofType(UserActions.UPDATE_WORK_EMPLOYEE_IN_DB),
+    withLatestFrom(this.store.select('user')),
+    switchMap(([actionData, userState]) => {
+      return this.http.post(environment.nodeServer  + 'employees/updateWork',
+                          { ...actionData['payload'] as object, _id: userState.user._id })
+        .pipe(
+          map(res => {
+            if (res['type'] === 'success') {
+              return new UserActions.UpdateActiveUser({ user: {...res['employee']}, redirect: 'my-details', kind: 'employee' });
+            } else {
+              return new UserActions.UserFailure(res['messages']);
+            }
+          }),
+          catchError(messages => {
+            return of(new UserActions.UserFailure(messages));
+          })
+        );
+    })
+  );
+
+  @Effect()
+  deleteWorkEmployee = this.actions$.pipe(
+    ofType(UserActions.DELETE_WORK_EMPLOYEE_IN_DB),
+    withLatestFrom(this.store.select('user')),
+    switchMap(([actionData, userState]) => {
+      return this.http.delete(environment.nodeServer  + 'employees/deleteWork', {
+          params: {
+            workId: actionData['payload'], _id: userState.user._id
+          }
+        })
+        .pipe(
+          map(res => {
+            if (res['type'] === 'success') {
+              return new UserActions.UpdateActiveUser({ user: {...res['employee']}, redirect: 'my-details', kind: 'employee' });
+            } else {
+              return new UserActions.UserFailure(res['messages']);
+            }
+          }),
+          catchError(messages => {
+            return of(new UserActions.UserFailure(messages));
+          })
+        );
+    })
+  );
 }
 
 

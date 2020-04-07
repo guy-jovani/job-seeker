@@ -66,26 +66,25 @@ export class EmployeeEffects {
           kind: userState.kind,
         }
       })
-        .pipe(
-          map(res => {
-            if (res['type'] === 'success') {
-              return new EmployeeActions.SetEmployees({ employees: res['employees'], total: res['total']});
-            } else {
-              return new EmployeeActions.EmployeeOpFailure(res['messages']);
-            }
-          }),
-          catchError(messages => {
-            return of(new EmployeeActions.EmployeeOpFailure(messages));
-          })
-        );
+      .pipe(
+        map(res => {
+          if (res['type'] === 'success') {
+            return new EmployeeActions.SetEmployees({ employees: res['employees'], total: res['total']});
+          } else {
+            return new EmployeeActions.EmployeeOpFailure(res['messages']);
+          }
+        }),
+        catchError(messages => {
+          return of(new EmployeeActions.EmployeeOpFailure(messages));
+        })
+      );
     })
   );
 
   @Effect()
   fetchSingleEmployee = this.actions$.pipe(
     ofType(EmployeeActions.FETCH_SINGLE_EMPLOYEE),
-    withLatestFrom(this.store.select('employee')),
-    switchMap(([actionData, employeesState]) => {
+    switchMap(actionData => {
       return this.http.get<Employee>(nodeServer + 'fetchSingle', {
           params: { _id: actionData['payload'] }
         })
@@ -103,6 +102,5 @@ export class EmployeeEffects {
         );
     })
   );
-
 
 }

@@ -3,12 +3,12 @@
 
 <div class="container">
 
-  <div *ngIf="isLoading">
+  <div *ngIf="isLoading && !addWork">
     <app-loading-spinner></app-loading-spinner>
   </div>
 
-  <div class="container-fluid" *ngIf="employee && !isLoading">
-    <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
+  <div class="container-fluid" *ngIf="employee && (!isLoading || addWork)">
+    <app-message-box *ngIf="messages.length && !addWork" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
 
     <div class="details-page-header">
       <img [src]="employee.profileImagePath" class="employeeProfileImage"
@@ -17,7 +17,15 @@
         <span class="glyphicon glyphicon-user"></span>
       </div>
       <div class="employee-info-header">
-        <h3>
+        <h4 *ngIf="currUrl[0] === 'my-details'">
+          <p>
+            First Name: {{ employee.firstName || '------' }}
+          </p>
+          <p>
+            Last Name: {{ employee.lastName || '------' }}
+          </p>
+        </h4>
+        <h3 *ngIf="currUrl[0] !== 'my-details'">
           {{ employee.firstName ? (employee.firstName | titlecase) : '' }}
           {{ employee.lastName ? (employee.lastName | titlecase) : '' }}
           {{ !employee.firstName && !employee.lastName ? employee.email : '' }}
@@ -37,7 +45,7 @@
 
         <div *ngIf="currUrl[0] === 'my-applicants'" class="select-status-list">
           <label for="job-list">Show status list: </label>
-          <select [(ngModel)]="selctedStatusList" (ngModelChange)="checkJobOfUser()">
+          <select [(ngModel)]="selectedStatusList" (ngModelChange)="checkJobOfUser()">
             <option value="all">All</option>
             <option *ngFor="let status of availableStatus" value="{{status}}">{{ status | titlecase }}</option>
           </select>
@@ -52,6 +60,38 @@
         </app-list-jobs>
       </div>
 
+      <div class="experience" *ngIf='employee.work && employee.work.length || allowEdit'>
+        <div class="experience-header">
+          <h3>Experience</h3>
+          <button
+            *ngIf='currUrl[0] === "my-details"'
+            class="btn btn-info"
+            (click)="onToggleWork()">+</button>
+        </div>
+        <div class="experience-list-container">
+          <ul class="list-group">
+            <li
+              class="list-group-item"
+              *ngFor="let work of employee.work; let i=index">
+                <div class="work-header">
+                  <h4>{{ work.title }}</h4> <span>@</span> <h5>{{ work.company }}</h5>
+                </div>
+                <p *ngIf="work.employmentType">{{ work.employmentType | titlecase }}</p>
+                <div class="work-date help-block">
+                  <p>
+                    {{ monthNames[work.startDate.getMonth()] + ' ' +
+                        work.startDate.getFullYear() }}
+                  </p>
+                  <p>-</p>
+                  <p>
+                    {{ work.endDate ? monthNames[work.endDate.getMonth()] + ' ' + work.endDate.getFullYear() : 'present' }}</p>
+                </div>
+                <span *ngIf="currUrl[0] === 'my-details'" class="glyphicon glyphicon-pencil" (click)="onToggleWork(i)"></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -61,3 +101,214 @@
 
 
 
+<div class="backdrop {{ addWork ? '' : 'hide' }}" #backdrop>
+
+  <div class="container form-container add-experience-container">
+    <div *ngIf="isLoading">
+      <app-loading-spinner></app-loading-spinner>
+    </div>
+    <form (ngSubmit)="onSubmit(workForm)" #workForm="ngForm" class="my-form {{ isLoading ? 'hide' : '' }}">
+      <div class="form-title-container">
+        <h3 class="form-action-title">{{ workId ? 'Update' : 'Create' }} Experience</h3>
+      </div>
+
+      <app-message-box *ngIf="messages.length && addWork" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
+
+      <div class="form-group">
+        <label for="title">Title: * </label>
+        <input
+          placeholder="Ex: Web Developer"
+          class="form-control input-form-tag"
+          type="text"
+          name="title"
+          id="title"
+          ngModel
+          required
+          #title="ngModel"
+        >
+        <span class="help-block" *ngIf="!title.valid && title.touched">
+          Please enter a valid title.
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="type">Employment Type: </label>
+        <select
+          class="form-control input-form-tag"
+          id="type"
+          name="type"
+          ngModel
+          #type="ngModel"
+        >
+          <option value=''>-----</option>
+          <option value='full-time'>Full time</option>
+          <option value='part-time'>Part Time</option>
+          <option value='internship'>Internship</option>
+          <option value='freelance'>Freelance</option>
+          <option value='other'>Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="company">Company: *</label>
+        <input
+          placeholder="Ex: Google"
+          class="form-control input-form-tag"
+          type="text"
+          name="company"
+          id="company"
+          ngModel
+          required
+          #company="ngModel"
+        >
+        <span class="help-block" *ngIf="!company.valid && company.touched">
+          Please enter a valid company.
+        </span>
+      </div>
+
+      <div class="form-date-container">
+        <label for="start-month">Start Date: * </label>
+        <div class="form-start-date">
+          <div class="form-group">
+            <select
+              class="form-control input-form-tag"
+              id="start-month"
+              name="startMonth"
+              ngModel
+              required
+              #startMonth="ngModel"
+            >
+              <option value=''>-- Month --</option>
+              <option value='Jan'>January</option>
+              <option value='Feb'>February</option>
+              <option value='Mar'>March</option>
+              <option value='Apr'>April</option>
+              <option value='May'>May</option>
+              <option value='Jun'>June</option>
+              <option value='Jul'>July</option>
+              <option value='Aug'>August</option>
+              <option value='Sep'>September</option>
+              <option value='Oct'>October</option>
+              <option value='Nov'>November</option>
+              <option value='Dec'>December</option>
+            </select>
+            <span class="help-block" *ngIf="!startMonth.valid && startMonth.touched">
+              Please enter a valid month.
+            </span>
+          </div>
+
+          <div class="form-group">
+            <select
+              class="form-control input-form-tag"
+              id="start-year"
+              name="startYear"
+              ngModel
+              required
+              #startYear="ngModel"
+            >
+              <option value=''>-- Year --</option>
+              <option
+                *ngFor="let year of years"
+                value='{{year}}'>{{year}}</option>
+            </select>
+            <span class="help-block" *ngIf="!startYear.valid && startYear.touched">
+              Please enter a valid year.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          name="present"
+          id="present"
+          ngModel
+          #present="ngModel"
+        >
+        <label class="form-check-label" for="present">It is my present work place.  </label>
+      </div>
+
+      <div class="form-date-container {{ workForm.form.value.present ? 'hide' : '' }}">
+        <label for="end-month">End Date: * </label>
+        <div class="form-end-date">
+          <div class="form-group">
+            <select
+              class="form-control input-form-tag"
+              id="end-month"
+              name="endMonth"
+              ngModel
+              required
+              #endMonth="ngModel"
+            >
+            <option value=''>-- Month --</option>
+            <option value='Jan'>January</option>
+            <option value='Feb'>February</option>
+            <option value='Mar'>March</option>
+            <option value='Apr'>April</option>
+            <option value='May'>May</option>
+            <option value='Jun'>June</option>
+            <option value='Jul'>July</option>
+            <option value='Aug'>August</option>
+            <option value='Sep'>September</option>
+            <option value='Oct'>October</option>
+            <option value='Nov'>November</option>
+            <option value='Dec'>December</option>
+            </select>
+            <span class="help-block" *ngIf="!endMonth.valid && endMonth.touched">
+              Please enter a valid month.
+            </span>
+          </div>
+
+          <div class="form-group">
+            <select
+              class="form-control input-form-tag"
+              id="end-year"
+              name="endYear"
+              ngModel
+              required
+              #endYear="ngModel"
+            >
+              <option value=''>-- Year --</option>
+              <option
+                *ngFor="let year of years"
+                value='{{year}}'>{{year}}</option>
+            </select>
+            <span class="help-block" *ngIf="!endYear.valid && endYear.touched">
+              Please enter a valid year.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="edit-buttons-container with-delete">
+        <div>
+          <button
+            *ngIf="workId"
+            (click)="onDeleteWork()"
+            type="button"
+            class="btn btn-danger">Delete</button>
+          <button
+            type="button"
+            class="btn btn-warning"
+            (click)="onToggleWork()">
+            Cancel
+          </button>
+        </div>
+        <div>
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="!workForm.valid">
+            {{ workId ? 'Update' : 'Create' }}
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+</div>

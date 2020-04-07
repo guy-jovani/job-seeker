@@ -46,13 +46,15 @@
         </li>
       </ul>
     </div>
+
+    <hr>
+
+    <div class="edit-buttons-container" *ngIf="allowEdit">
+      <a class="btn btn-primary btn-sm" routerLink='edit'>Edit Details</a>
+    </div>
   </div>
 
-  <hr>
 
-  <div class="edit-buttons-container" *ngIf="allowEdit">
-    <a class="btn btn-primary btn-sm" routerLink='edit'>Edit Details</a>
-  </div>
 </div>
 
 

@@ -46,7 +46,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
           this.user = userState.user;
           this.kind = userState.kind;
         }
-        this.chatNotifications = !!userState.notificatios.find(notification => notification === 'chat');
+        this.chatNotifications = !!userState.notifications.find(notification => notification === 'chat');
       });
   }
 

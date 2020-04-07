@@ -117,7 +117,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
 
 
-    // localy update the conversation - only for string message
+    // locally update the conversation - only for string message
     if (this.currConversation && form.value.messageContent) {
       this.store.dispatch(new UserActions.SetSingleConversation({
         conversation: this.currConversation,
@@ -155,7 +155,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
   }
 
-  onFucosCon(conversationDiv: ElementRef) {
+  onFocusCon(conversationDiv: ElementRef) {
     this.file = null;
     if (this.conversationDiv) {
       this.renderer.removeClass(this.conversationDiv, 'active-con');

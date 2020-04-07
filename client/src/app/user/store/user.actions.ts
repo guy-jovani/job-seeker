@@ -18,6 +18,9 @@ export const FETCH_ALL_CONVERSATIONS = '[User] FETCH_ALL_CONVERSATIONS';
 export const SET_ALL_CONVERSATIONS = '[User] SET_ALL_CONVERSATIONS';
 export const SET_SINGLE_CONVERSATION = '[User] SET_SINGLE_CONVERSATION';
 export const SET_CHAT_NOTIFICATION = '[User] SET_CHAT_NOTIFICATION';
+export const CREATE_WORK_EMPLOYEE_IN_DB = '[User] CREATE_WORK_EMPLOYEE_IN_DB';
+export const UPDATE_WORK_EMPLOYEE_IN_DB = '[User] UPDATE_WORK_EMPLOYEE_IN_DB';
+export const DELETE_WORK_EMPLOYEE_IN_DB = '[User] DELETE_WORK_EMPLOYEE_IN_DB';
 export const REMOVE_CHAT_NOTIFICATION = '[User] REMOVE_CHAT_NOTIFICATION';
 export const EMPLOYEE_APPLY_SAVE_JOB_ATTEMPT = '[User] EMPLOYEE_APPLY_SAVE_JOB_ATTEMPT';
 export const COMPANY_ACCEPT_REJECT_JOB_ATTEMPT = '[User] COMPANY_ACCEPT_REJECT_JOB_ATTEMPT';
@@ -29,7 +32,10 @@ export type UserActions = SetChatNotification
                         | SetAllConversations
                         | FetchAllConversations
                         | CompanyUpdatedJob
+                        | CreateWorkEmployeeInDb
+                        | DeleteWorkEmployeeInDb
                         | ClearError
+                        | UpdateWorkEmployeeInDb
                         | EmployeeApplySaveJobAttempt
                         | CompanyAcceptRejectJobAttempt
                         | CompanyCreatedJob
@@ -38,8 +44,42 @@ export type UserActions = SetChatNotification
                         | UpdateActiveUser;
 
 
+
 export class FetchAllConversations implements Action {
   readonly type = FETCH_ALL_CONVERSATIONS;
+}
+
+export class DeleteWorkEmployeeInDb implements Action {
+  readonly type = DELETE_WORK_EMPLOYEE_IN_DB;
+
+  constructor( public payload: string ) {}
+}
+
+export class CreateWorkEmployeeInDb implements Action {
+  readonly type = CREATE_WORK_EMPLOYEE_IN_DB;
+
+  constructor( public payload: {
+    title: string,
+    company: string,
+    startDate: string,
+    present: boolean,
+    endDate: string,
+    employmentType?: string
+  } ) {}
+}
+
+export class UpdateWorkEmployeeInDb implements Action {
+  readonly type = UPDATE_WORK_EMPLOYEE_IN_DB;
+
+  constructor( public payload: {
+    workId: string,
+    title: string,
+    company: string,
+    startDate: string,
+    present: boolean,
+    endDate: string,
+    employmentType?: string
+  } ) {}
 }
 
 export class EmployeeApplySaveJobAttempt implements Action {

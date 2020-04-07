@@ -13,7 +13,7 @@ export interface State {
   messages: string[];
   loading: boolean;
   kind: string;
-  notificatios: string[];
+  notifications: string[];
   conversations: Conversation[];
   lastFetchConversations: Date;
 }
@@ -23,7 +23,7 @@ const initialState: State = {
   messages: null,
   loading: false,
   kind: null,
-  notificatios: [],
+  notifications: [],
   conversations: [],
   lastFetchConversations: null
 };
@@ -62,6 +62,9 @@ export function userReducer(state = initialState, action: UserActions.UserAction
   // console.log("user reducer " + action.type)
   switch (action.type) {
     case UserActions.FETCH_ALL_CONVERSATIONS:
+    case UserActions.UPDATE_WORK_EMPLOYEE_IN_DB:
+    case UserActions.CREATE_WORK_EMPLOYEE_IN_DB:
+    case UserActions.DELETE_WORK_EMPLOYEE_IN_DB:
     case UserActions.EMPLOYEE_APPLY_SAVE_JOB_ATTEMPT:
     case UserActions.COMPANY_ACCEPT_REJECT_JOB_ATTEMPT:
       return {
@@ -69,17 +72,17 @@ export function userReducer(state = initialState, action: UserActions.UserAction
         loading: true,
       };
     case UserActions.SET_CHAT_NOTIFICATION:
-      const setNewNotifications = [...state.notificatios];
+      const setNewNotifications = [...state.notifications];
       if (setNewNotifications.findIndex(val => val === 'chat') === -1 ) {
         setNewNotifications.push('chat');
       }
       return {
         ...state,
         loading: true,
-        notificatios: [...setNewNotifications]
+        notifications: [...setNewNotifications]
       };
     case UserActions.REMOVE_CHAT_NOTIFICATION:
-      const newNotifications = [...state.notificatios];
+      const newNotifications = [...state.notifications];
       const chatNotInd = newNotifications.findIndex(notification => notification === 'chat');
       if (chatNotInd !== -1) {
         newNotifications.splice(chatNotInd, 1);
@@ -87,7 +90,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
       return {
         ...state,
         loading: false,
-        notificatios: newNotifications
+        notifications: newNotifications
       };
     case UserActions.SET_ALL_CONVERSATIONS:
       return {
@@ -103,7 +106,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
       const oldConInd = state.conversations ? state.conversations.findIndex(con => con._id === newConId) : -1;
       const oldCon = oldConInd !== -1 ? state.conversations[oldConInd] : null;
       const lastMsgDate = !oldCon ? null :
-                    new Date(oldCon.messages[oldCon.messages.length - 1].createdAt); // the msgs are sorted
+                    new Date(oldCon.messages[oldCon.messages.length - 1].createdAt); // the messages are sorted
       setTimeOfNewMessagesOfConversation(lastMsgDate, conMsgs);
       let updatedCon: Conversation, updatedCons: Conversation[];
       if (!oldCon) { // a new conversation
@@ -162,12 +165,25 @@ export function userReducer(state = initialState, action: UserActions.UserAction
           messages: action.payload,
         };
     case UserActions.UPDATE_ACTIVE_USER:
+      const user = action.payload.kind === 'employee' ?
+                { ...action.payload.user as Employee } :
+                { ...action.payload.user as Company };
+
+      if (action.payload.kind === 'employee') {
+        user['work'] = user['work'].map(work => {
+          const newWork = { ...work };
+          newWork.startDate = new Date(newWork.startDate);
+          newWork.endDate = newWork.endDate ? new Date(newWork.endDate) : newWork.endDate;
+          return newWork;
+        });
+      }
+
       return {
         ...state,
         loading: false,
         messages: null,
         kind: action.payload.kind,
-        user: action.payload.kind === 'employee' ? action.payload.user as Employee : action.payload.user as Company
+        user
       };
     case UserActions.CLEAR_ERROR:
       return {
@@ -182,7 +198,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
         messages: null,
         user: null,
         kind: null,
-        notificatios: [],
+        notifications: [],
         conversations: [],
         lastFetchConversations: null,
       };

@@ -2,7 +2,7 @@
 
 const express = require('express')
 const router = express.Router();
-const { body } = require('express-validator');
+const { body, query } = require('express-validator');
 const extractProfileImage = require('../middleware/image-upload').extractProfileImage;
 
 
@@ -39,6 +39,76 @@ router.post('/update', extractProfileImage, [
     .exists()
     .withMessage('Something went wrong with the edit process.')
 ], employeeController.updateEmployee);
+
+router.post('/createWork', [
+  body('title')
+    .exists()
+    .notEmpty()
+    .withMessage('"Title" is a required field.'),
+  body('company')
+    .exists()
+    .notEmpty()
+    .withMessage('"Company" is a required field.'),
+  body('startDate').custom((value, { req }) => {
+    if (!value || value.trim() === '') {
+      throw new Error('"Start Date" is a required field.');
+    }
+    return true;
+  }),
+  body('endDate').custom((value, { req }) => {
+    if (!req.body.present && (!value || value.trim() === '')) {
+      throw new Error('"End Date" is a required field - unless it is your current work place.');
+    }
+    if (!req.body.present && new Date(value) < new Date(req.body.startDate)) {
+      throw new Error('"End Date" can\'t be before "Start Date".');
+    }
+    return true;
+  }),
+  body('_id')
+    .exists()
+    .withMessage('Something went wrong while trying to create the experience.')
+], employeeController.createWork);
+
+router.post('/updateWork', [
+  body('title')
+    .exists()
+    .notEmpty()
+    .withMessage('"Title" is a required field.'),
+  body('company')
+    .exists()
+    .notEmpty()
+    .withMessage('"Company" is a required field.'),
+  body('startDate').custom((value, { req }) => {
+    if (!value || value.trim() === '') {
+      throw new Error('"Start Date" is a required field.');
+    }
+    return true;
+  }),
+  body('endDate').custom((value, { req }) => {
+    if (!req.body.present && (!value || value.trim() === '')) {
+      throw new Error('"End Date" is a required field - unless it is your current work place.');
+    }
+    if (!req.body.present && new Date(value) < new Date(req.body.startDate)) {
+      throw new Error('"End Date" can\'t be before "Start Date".');
+    }
+    return true;
+  }),
+  body('_id')
+    .exists()
+    .withMessage('Something went wrong while trying to update the experience.'),
+  body('workId')
+    .exists()
+    .withMessage('Something went wrong while trying to update the experience.')
+], employeeController.updateWork);
+
+router.delete('/deleteWork', [
+  query('_id')
+    .exists()
+    .withMessage('Something went wrong while trying to delete the experience.'),
+  query('workId')
+    .exists()
+    .withMessage('Something went wrong while trying to delete the experience.')
+], employeeController.deleteWork);
 
 
 

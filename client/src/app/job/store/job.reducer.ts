@@ -76,10 +76,9 @@ export function jobReducer(state = initialState, action: JobActions.JobActions) 
         loadingSingle: false,
       };
     case JobActions.UPDATE_SINGLE_JOB_COMPANY:
-      action.payload.company.lastFetch = new Date();
       const jobWithCompany = {
         ...state.jobs[action.payload.jobInd],
-        company: action.payload.company
+        company: { ...action.payload.company, lastFetch: new Date() }
       };
       const upToDateJobs = [ ...state.jobs ];
       upToDateJobs[action.payload.jobInd] = jobWithCompany;

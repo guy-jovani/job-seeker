@@ -35,38 +35,38 @@
 
 
 <div class="crop-container hide" #cropContainer>
-    <div class="cropper">
-      <div class="cropper-start-buttons">
-        <button
-          type="button"
-          class="btn btn-primary btn-sm confirm-crop-btn"
-          (click)="onConfirmCrop()"
-          *ngIf='croppedImage && !confirmedImage'>
-          Crop OK?
-        </button>
-        <button
-          type="button"
-          class="btn btn-info btn-sm cancel-crop-btn"
-          (click)="onCancelCrop()"
-          *ngIf='croppedImage && !confirmedImage'>
-          Cancel
-        </button>
-      </div>
-
-      <image-cropper
-        [imageChangedEvent]="imageChangedEvent"
-        [maintainAspectRatio]="true"
-        [aspectRatio]="aspectRatio"
-        format="png"
-        [roundCropper]="roundCropper"
-        (imageCropped)="imageCropped($event)"
-        (loadImageFailed)="loadImageFailed()">
-      </image-cropper>
+  <div class="cropper">
+    <div class="cropper-start-buttons">
+      <button
+        type="button"
+        class="btn btn-primary btn-sm confirm-crop-btn"
+        (click)="onConfirmCrop()"
+        *ngIf='croppedImage && !confirmedImage'>
+        Crop OK?
+      </button>
+      <button
+        type="button"
+        class="btn btn-info btn-sm cancel-crop-btn"
+        (click)="onCancelCrop()"
+        *ngIf='croppedImage && !confirmedImage'>
+        Cancel
+      </button>
     </div>
 
-    <div class="cropped-container-start">
-      <img [src]="croppedImage" class="{{roundCropper ? 'preview-cropper round' : 'preview-cropper'}}" />
-    </div>
+    <image-cropper
+      [imageChangedEvent]="imageChangedEvent"
+      [maintainAspectRatio]="true"
+      [aspectRatio]="aspectRatio"
+      format="png"
+      [roundCropper]="roundCropper"
+      (imageCropped)="imageCropped($event)"
+      (loadImageFailed)="loadImageFailed()">
+    </image-cropper>
+  </div>
+
+  <div class="cropped-container-start">
+    <img [src]="croppedImage" class="{{roundCropper ? 'preview-cropper round' : 'preview-cropper'}}" />
+  </div>
 </div>
 
 

@@ -17,6 +17,14 @@ export class Employee {
   }[];
   public firstName?: string;
   public lastName?: string;
+  public work: {
+    _id?: string,
+    title: string,
+    company: string,
+    startDate: Date,
+    endDate: Date,
+    employmentType?: string
+  }[];
 
   constructor(init?: Partial<Employee>) {
     Object.assign(this, init);

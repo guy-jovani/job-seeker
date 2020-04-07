@@ -41,6 +41,29 @@ const employeeSchema = new Schema(
         required: true
        }
     }],
+    work: [{
+      title: {
+        type: String,
+        required: true
+      },
+      company: {
+        type: String,
+        required: true
+      },
+      employmentType: {
+        type: String,
+        required: false,
+        enum: ['', 'full-time', 'part-time', 'internship', 'freelance', 'other']
+      },
+      startDate: {
+        type: Date,
+        required: true,
+      },
+      endDate: {
+        type: Date,
+        required: false,
+      },
+    }],
     resetPassToken: String,
     resetPassTokenExpiration: Date,
   }
