@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewChecked, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { Company } from '../company/company.model';
@@ -14,7 +14,7 @@ import { State as UserState } from '../user/store/user.reducer';
   templateUrl: './job.component.html',
   styleUrls: ['./job.component.scss']
 })
-export class JobComponent implements OnInit, OnDestroy {
+export class JobComponent implements OnInit, OnDestroy, AfterViewChecked {
   subscription: Subscription;
   jobs: Employee['jobs'] | Company['jobs'];
   allowAdd = false;
@@ -26,6 +26,10 @@ export class JobComponent implements OnInit, OnDestroy {
   selectedList = 'all';
   detailsJobUrl = '';
   availableStatus = Object.keys(EmployeeJobStatus).filter(key => isNaN(+key));
+  lastJob: boolean; // if there are more jobs to fetch
+  page: number;
+
+  @ViewChild('container') container: ElementRef;
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -81,9 +85,33 @@ export class JobComponent implements OnInit, OnDestroy {
     }
   }
 
+  private fetchNextPage() {
+    const container = this.container.nativeElement.getBoundingClientRect();
+    if (!this.isLoading && // won't fetch in a middle of a fetch
+        !this.lastJob && // won't fetch if the last employee was fetched
+        (container.bottom <= window.innerHeight || // if the whole list is shown - so fetch
+        container.height - window.pageYOffset < window.innerHeight)) { // check if scrolled to the container
+      this.store.dispatch(new JobActions.FetchJobs({ page: this.page }));
+      this.ref.detectChanges();
+    }
+  }
+
+  ngAfterViewChecked() {
+    if (this.currUrl[0] !== 'my-applicants') {
+      this.fetchNextPage();
+    }
+  }
+
+  @HostListener('window:scroll', ['$event']) doSomething(event) {
+    this.fetchNextPage();
+  }
+
   private checkJobsFromJobsState(jobState) {
     this.isLoading = jobState['loadingAll'];
     this.jobs = jobState['jobs'];
+    this.page = jobState['page'];
+    console.log(this.page)
+    this.lastJob = this.jobs.length === jobState['total'];
   }
 
   onClose() {

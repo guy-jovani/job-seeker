@@ -10,7 +10,7 @@ import * as fromApp from '../store/app.reducer';
 import * as EmployeeActions from './store/employee.actions';
 
 @Component({
-  selector: 'app-empolyees',
+  selector: 'app-employees',
   templateUrl: './employees.component.html',
   styleUrls: ['./employees.component.scss']
 })

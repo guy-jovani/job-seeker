@@ -87,14 +87,18 @@ export class JobEffects {
   );
 
   @Effect()
-  fetchAllJobs = this.actions$.pipe(
-    ofType(JobActions.FETCH_ALL_JOBS),
+  fetchJobs = this.actions$.pipe(
+    ofType(JobActions.FETCH_JOBS),
     switchMap(actionData => {
-      return this.http.get(nodeServer + 'fetchAll')
+      return this.http.get(nodeServer + 'fetchJobs', {
+        params: {
+          page: actionData['payload']['page'],
+        }
+      })
       .pipe(
         map(res => {
           if (res['type'] === 'success') {
-            return new JobActions.SetAllJobs(res['jobs']);
+            return new JobActions.SetJobs({jobs: res['jobs'], total: res['total']});
           } else {
             return new JobActions.JobOpFailure(res['messages']);
           }

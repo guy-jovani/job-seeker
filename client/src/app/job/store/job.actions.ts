@@ -13,9 +13,9 @@ export const JOB_OP_FAILURE = '[JOB] JOB operation failed';
 export const JOB_STATE_LOAD_SINGLE = '[JOB] JOB_STATE_LOAD_SINGLE';
 export const ADD_UPDATE_SINGLE_JOB = '[JOB] Add update single JOB';
 export const UPDATE_SINGLE_JOB_IN_DB = '[JOB] Update single JOB in db';
-export const FETCH_ALL_JOBS = '[JOB] Fetch All JOBS';
+export const FETCH_JOBS = '[JOB] Fetch JOBS';
 export const FETCH_SINGLE_JOB = '[JOB] Fetch Single JOB';
-export const SET_ALL_JOBS = '[JOB] Set All JOBS';
+export const SET_JOBS = '[JOB] Set JOBS';
 export const CLEAR_ERROR = '[JOB] Clear error';
 export const LOGOUT = '[JOB] LOGOUT';
 export const UPDATE_SINGLE_JOB_COMPANY = '[JOB] UPDATE_SINGLE_JOB_COMPANY';
@@ -25,8 +25,8 @@ export const UPDATE_SINGLE_JOB_COMPANY_ATTEMPT = '[JOB] UPDATE_SINGLE_JOB_COMPAN
 export type JobActions = CreateJobInDb
                             | JobOpFailure
                             | AddUpdateSingleJob
-                            | FetchAllJobs
-                            | SetAllJobs
+                            | FetchJobs
+                            | SetJobs
                             | ClearError
                             | Logout
                             | JobStateLoadSingle
@@ -35,10 +35,10 @@ export type JobActions = CreateJobInDb
                             | FetchSingleJob;
 
 
-export class SetAllJobs implements Action {
-  readonly type = SET_ALL_JOBS;
+export class SetJobs implements Action {
+  readonly type = SET_JOBS;
 
-  constructor(public payload: Job[] ) {}
+  constructor(public payload: { jobs: Job[], total: number }) {}
 }
 
 export class ClearError implements Action {
@@ -87,8 +87,10 @@ export class UpdateSingleJobInDb implements Action {
   constructor(public payload: Job ) {}
 }
 
-export class FetchAllJobs implements Action {
-  readonly type = FETCH_ALL_JOBS;
+export class FetchJobs implements Action {
+  readonly type = FETCH_JOBS;
+
+  constructor(public payload: { page: number } ) {}
 }
 
 export class FetchSingleJob implements Action {

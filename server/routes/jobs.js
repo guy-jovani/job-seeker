@@ -36,7 +36,7 @@ router.put('/create', [
   ], jobController.create);
 
 
-router.get('/fetchAll', jobController.fetchAll);
+router.get('/fetchJobs', jobController.fetchJobs);
 
 router.get('/fetchSingle', [
   body('_id')

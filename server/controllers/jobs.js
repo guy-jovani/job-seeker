@@ -6,6 +6,7 @@ const Company = require('../models/company');
 const validation = require('../utils/validation');
 const errorHandling = require('../utils/errorHandling');
 const sendMessagesResponse = require('../utils/shared').sendMessagesResponse;
+const skippedDocuments = require('../utils/shared').skippedDocuments;
 
 
 
@@ -128,14 +129,22 @@ exports.fetchSingle = async (req, res, next) => {
  * @param {express request object} req
  * @param {express respond object} res
  */
-exports.fetchAll = async (req, res, next) => {
+exports.fetchJobs = async (req, res, next) => {
   try {
     const jobs = await Job.find()
+        .skip(skippedDocuments(req.query.page))
+        .limit(+process.env.DOCS_PER_PAGE)
         .select('_id title company description requirements date')
         .populate({ path: 'company', select: 'name' });
+
+    const total = await Job.aggregate([
+      { $count: 'title' }
+    ]);
+
     res.status(200).json({
       type: 'success',
-      jobs
+      jobs,
+      total: total[0].title
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "There was an error fetching the jobs."));

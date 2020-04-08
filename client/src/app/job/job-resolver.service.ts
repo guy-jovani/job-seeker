@@ -27,9 +27,9 @@ export class JobResolverService implements Resolve<Job[]> {
         const timeFromLastFetchMS = !jobState.lastFetch ? null :
                                     new Date().getTime() - jobState.lastFetch.getTime();
         if (!jobState.jobs.length || timeFromLastFetchMS > environment.fetchDataMSReset) {
-          this.store.dispatch(new JobActions.FetchAllJobs());
+          this.store.dispatch(new JobActions.FetchJobs({ page: jobState.page }));
           return this.actions$.pipe(
-            ofType(JobActions.SET_ALL_JOBS, JobActions.JOB_OP_FAILURE),
+            ofType(JobActions.SET_JOBS, JobActions.JOB_OP_FAILURE),
             take(1)
             );
         } else {

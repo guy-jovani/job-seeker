@@ -13,6 +13,8 @@ export interface State {
   loadingSingle: boolean;
   messages: any[];
   lastFetch: Date;
+  page: number;
+  total: number;
 }
 
 const initialState: State = {
@@ -20,7 +22,9 @@ const initialState: State = {
   messages: null,
   loadingAll: false,
   loadingSingle: false,
-  lastFetch: null
+  lastFetch: null,
+  page: 1,
+  total: null
 };
 
 export function jobReducer(state = initialState, action: JobActions.JobActions) {
@@ -32,7 +36,7 @@ export function jobReducer(state = initialState, action: JobActions.JobActions) 
         loadingAll: false,
         loadingSingle: true,
       };
-    case JobActions.FETCH_ALL_JOBS:
+    case JobActions.FETCH_JOBS:
       return {
         ...state,
         loadingAll: true,
@@ -57,13 +61,17 @@ export function jobReducer(state = initialState, action: JobActions.JobActions) 
         messages: null,
         loadingAll: false,
         jobs: [],
+        page: 1,
+        total: null,
         tempJob: null,
         lastFetch: null
       };
-    case JobActions.SET_ALL_JOBS:
+    case JobActions.SET_JOBS:
       return {
         ...state,
-        jobs: [...action.payload],
+        page: state.page + 1,
+        total: action.payload.total,
+        jobs: [ ...state.jobs, ...action.payload.jobs ],
         loadingAll: false,
         messages: null,
         lastFetch: new Date()

@@ -71,7 +71,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   onFetchJobs() {
-    this.store.dispatch(new JobActions.FetchAllJobs());
+    this.store.dispatch(new JobActions.FetchJobs({page: 1}));
   }
 
   ngOnDestroy() {
