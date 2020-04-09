@@ -59,7 +59,7 @@ export class EmployeeEffects {
     ofType(EmployeeActions.FETCH_EMPLOYEES),
     withLatestFrom(this.store.select('user')),
     switchMap(([actionData, userState]) => {
-      return this.http.get<Employee[]>(nodeServer + 'fetchEmployees', {
+      return this.http.get<{employees: Employee[], total: number}>(nodeServer + 'fetchEmployees', {
         params: {
           _id: userState.user._id,
           page: actionData['payload']['page'],
@@ -69,7 +69,12 @@ export class EmployeeEffects {
       .pipe(
         map(res => {
           if (res['type'] === 'success') {
-            return new EmployeeActions.SetEmployees({ employees: res['employees'], total: res['total']});
+            res.employees.forEach(emp => {
+              emp.work.forEach(work => {
+                work.startDate = new Date(work.startDate);
+              });
+            });
+            return new EmployeeActions.SetEmployees({ employees: res.employees, total: res['total']});
           } else {
             return new EmployeeActions.EmployeeOpFailure(res['messages']);
           }
