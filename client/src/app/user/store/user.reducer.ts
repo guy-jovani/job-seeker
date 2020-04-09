@@ -5,6 +5,7 @@ import * as UserActions from './user.actions';
 import { Company } from 'app/company/company.model';
 import { Conversation } from 'app/chat/conversation.model';
 import { Job } from 'app/job/job.model';
+import { Participant } from 'app/chat/participant.model';
 
 
 
@@ -58,6 +59,15 @@ const setTimeOfNewMessagesOfConversation = (lastMsgDate, messages) => {
 };
 
 
+
+const sortConByLastMsgDate = (a: Conversation, b: Conversation) => {
+  if (a.messages[a.messages.length - 1].createdAt < b.messages[b.messages.length - 1].createdAt) {
+    return 1;
+  }
+  return -1;
+};
+
+
 export function userReducer(state = initialState, action: UserActions.UserActions) {
   // console.log("user reducer " + action.type)
   switch (action.type) {
@@ -93,11 +103,13 @@ export function userReducer(state = initialState, action: UserActions.UserAction
         notifications: newNotifications
       };
     case UserActions.SET_ALL_CONVERSATIONS:
+      const conversations = [...action.payload];
+      conversations.sort(sortConByLastMsgDate);
       return {
         ...state,
         loading: false,
         lastFetchConversations: new Date(),
-        conversations: action.payload
+        conversations
       };
     case UserActions.SET_SINGLE_CONVERSATION:
       const conMsgs = getNewMessagesOfConversation(action.payload.stringMessage, action.payload.fileMessage);
@@ -107,28 +119,25 @@ export function userReducer(state = initialState, action: UserActions.UserAction
       const oldCon = oldConInd !== -1 ? state.conversations[oldConInd] : null;
       const lastMsgDate = !oldCon ? null :
                     new Date(oldCon.messages[oldCon.messages.length - 1].createdAt); // the messages are sorted
-      setTimeOfNewMessagesOfConversation(lastMsgDate, conMsgs);
-      let updatedCon: Conversation, updatedCons: Conversation[];
+
+      if (conMsgs.length) {
+        setTimeOfNewMessagesOfConversation(lastMsgDate, conMsgs);
+      }
+      let updatedCon: Conversation;
+      const updatedCons = [ ...state.conversations ];
       if (!oldCon) { // a new conversation
         updatedCon = { ...action.payload.conversation };
         updatedCon.messages = conMsgs;
-        const userInd = updatedCon.participants.findIndex(participant =>
-                  participant.user._id === state.user._id);
-        if (userInd !== -1) {
-          const newParticipants = [ ...updatedCon.participants ];
-          newParticipants.splice(userInd, 1); // removing curr user
-          updatedCon.participants = newParticipants;
-        }
-        updatedCons = [ ...state.conversations ];
         updatedCons.push(updatedCon);
-      } else { // added message to an existing conversation
-        updatedCon = { ...oldCon };
+      } else { // added message to an existing conversation || user read a conversation
+        updatedCon = { ...action.payload.conversation };
         const newMessages = [ ...oldCon.messages ];
         newMessages.push(...conMsgs);
         updatedCon.messages = newMessages;
-        updatedCons = [ ...state.conversations ];
+        // updatedCon.participants = [...action.payload.conversation.participants];
         updatedCons[oldConInd] = updatedCon;
       }
+      updatedCons.sort(sortConByLastMsgDate);
       return {
         ...state,
         loading: false,

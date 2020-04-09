@@ -12,6 +12,7 @@ import { Conversation } from './conversation.model';
 import { ChatService } from './chat-socket.service';
 import * as UserActions from '../user/store/user.actions';
 import { Message } from './message.model';
+import { Participant } from './participant.model';
 
 
 @Component({
@@ -35,6 +36,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   @ViewChild('sendMessageForm') sendMessageForm: NgForm;
   @ViewChild('textarea') textarea: ElementRef;
+  @ViewChild('conversationList') conversationList: ElementRef;
   @ViewChild('submitChat') submitChat: ElementRef;
   @ViewChild('inputUploadFile') inputUploadFile: ElementRef;
 
@@ -50,6 +52,11 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.conversations = userState.conversations;
       this.isLoading = userState.loading;
       if (this.currConversation && this.conversations) {
+        if (!this.currConversation.participants.find(part => part.user._id === this.user._id).read) {
+          this.chatService.sendMessage('readAMsg', { // mark con as 'read'
+            conversationId: this.currConversation._id, userId: this.user._id
+          });
+        }
         this.currConversation = this.conversations.find(con => con._id === this.currConversation._id);
       }
     });
@@ -156,17 +163,28 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   onFocusCon(conversationDiv: ElementRef) {
-    this.file = null;
-    if (this.conversationDiv) {
+    this.file = null; // reset the file in case the user changed conversations
+    if (this.conversationDiv) { // if the user had an active conversation => deactivate it
       this.renderer.removeClass(this.conversationDiv, 'active-con');
     }
-    this.conversationDiv = conversationDiv;
+    this.conversationDiv = conversationDiv; // the container of the new curr conversation
     this.renderer.addClass(this.conversationDiv, 'active-con');
     this.currConversation = this.conversations[this.conversationDiv['attributes']['data-con-ind'].value];
-    this.nameList.clear();
+    this.chatService.sendMessage('readAMsg', { // mark con as 'read'
+      conversationId: this.currConversation._id, userId: this.user._id
+    });
+
+    this.nameList.clear(); // reset the nameList for the curr conversation
     for (const participant of this.currConversation.participants) {
-      this.nameList.set(participant['user']['_id'], { _id: participant['user']['_id'],
-                  fullName: this.getFullName(participant.user), type: participant['type'], email: participant['email'] });
+      if (participant.user._id === this.user._id) { // if the participant is the curr user then skip
+        continue;
+      }
+      this.nameList.set(participant['user']['_id'], {
+                  _id: participant['user']['_id'],
+                  fullName: this.getFullName(participant.user),
+                  type: participant['type'],
+                  email: participant['email']
+      });
 
       const participantNameList = this.nameList.get(participant.user._id);
       if (participantNameList) {
@@ -176,11 +194,19 @@ export class ChatComponent implements OnInit, OnDestroy {
             ${(Math.floor(Math.random() * 255))})`)});
       }
     }
-    this.privateMsg = this.currConversation.participants.length === 1;
+    this.privateMsg = this.currConversation.participants.length === 2;
   }
 
   uploadFile() {
     this.inputUploadFile.nativeElement.click();
+  }
+
+  getParticipantsOtherThanUSer(participants: Participant[]) {
+    return participants.filter(part => part.user._id !== this.user._id).slice(0, 3);
+  }
+
+  getReadClass(participants: Participant[]) {
+    return participants.find(part => part.user._id === this.user._id)['read'] ? 'read' : 'unread';
   }
 
   onChoseFile(event) {

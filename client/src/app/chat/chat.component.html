@@ -28,11 +28,11 @@
         <app-loading-spinner></app-loading-spinner>
       </div>
 
-      <div *ngIf="!isLoading && conversations && conversations.length">
-        <div *ngFor="let con of conversations; let i=index; trackBy: trackConversations" class="single-conversation" (click)="onFocusCon($event.currentTarget)" [attr.data-con-ind]="i">
+      <div *ngIf="!isLoading && conversations && conversations.length" #conversationList>
+        <div *ngFor="let con of conversations; let i=index; trackBy: trackConversations" class="single-conversation {{ getReadClass(con.participants) }} {{ currConversation && currConversation._id === con._id ? 'active-con' : '' }}" (click)="onFocusCon($event.currentTarget)" [attr.data-con-ind]="i">
           <ul class='conversation__participants-list'>
-            <li *ngFor="let participant of con.participants.slice(0,3); let i=index" class="conversation__participants-list__item">
-              {{ i !== 2 ? getFullName(participant.user) : '' }}</li>
+            <li *ngFor="let participant of getParticipantsOtherThanUSer(con.participants); let i=index" class="conversation__participants-list__item">
+              {{ i !== 2 ? getFullName(participant['user']) : '' }}</li>
           </ul>
         </div>
       </div>
@@ -80,7 +80,7 @@
       <ul class='messages__list' appScrollToBottom>
         <li *ngFor="let msg of currConversation.messages"
               class="messages__list__item {{ msg.creator === user._id ? 'user-msg' : '' }}" [attr.data-date]=" msg['first'] ? msg['first']: ''">
-          <p *ngIf="msg.creator !== user._id && currConversation.participants.length > 1"
+          <p *ngIf="msg.creator !== user._id && !privateMsg"
             class="message message-name"
             [style.color]="nameList.get(msg.creator).nameColor['changingThisBreaksApplicationSecurity']">
               {{ nameList.get(msg.creator) ? nameList.get(msg.creator).fullName : getFullName(user) }}

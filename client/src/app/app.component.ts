@@ -18,6 +18,7 @@ import { ChatService } from './chat/chat-socket.service';
 })
 export class AppComponent implements OnInit, OnDestroy {
   socketPostedSub: Subscription;
+  socketReadSub: Subscription;
   socketReconnectSub: Subscription;
   socketUpdatedStatus: Subscription;
   userSub: Subscription;
@@ -46,6 +47,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.socketPostedSub = this.chatService.getMessage('posted').subscribe(res => {
       try {
+        console.log('posted')
         if (res['type'] === 'success') {
           const stringMessage = res['message']['content'] ? res['message'] : null;
           const fileMessage = res['message']['filePath'] ? res['message'] : null;
@@ -55,6 +57,21 @@ export class AppComponent implements OnInit, OnDestroy {
           if (this.currUrl.length === 1 && this.currUrl[0] !== 'chat') {
             this.store.dispatch(new UserActions.SetChatNotification());
           }
+        } else {
+          this.messages.push(...res['messages']);
+        }
+      } catch (error) {
+        this.messages.push('There was a problem sending the message, please refresh your page and try again');
+      }
+    });
+
+    this.socketReadSub = this.chatService.getMessage('read').subscribe(res => {
+      try {
+        console.log('read')
+        if (res['type'] === 'success') {
+          this.store.dispatch(new UserActions.SetSingleConversation({
+            conversation: res['conversation']
+          }));
         } else {
           this.messages.push(...res['messages']);
         }
@@ -105,6 +122,9 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     if (this.socketReconnectSub) {
       this.socketReconnectSub.unsubscribe();
+    }
+    if (this.socketReadSub) {
+      this.socketReadSub.unsubscribe();
     }
     if (this.socketUpdatedStatus) {
       this.socketPostedSub.unsubscribe();

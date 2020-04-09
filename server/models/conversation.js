@@ -18,6 +18,11 @@ const conversationSchema = new Schema(
         type: String,
         required: true,
         enum: ['Employee', 'Company']
+      },
+      read: {
+        type: Boolean,
+        required: true,
+        default: true
       }
     }]    
   },

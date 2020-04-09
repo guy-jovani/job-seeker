@@ -37,6 +37,7 @@ exports.socketHandler = (socket) => {
   });
 
   socket.on('postAMsg', postAMsg);
+  socket.on('readAMsg', readAMsg);
   socket.on('updateStatus', updateStatus);
 
 };
@@ -63,6 +64,22 @@ const postAMsg = async data => {
     console.log(error);
     io.to(data.ownerId).emit('posted', { // sending the error to the sender of the message
       messages: error.messages || ['There was a problem sending the message, please refresh your page and try again'],
+      type: 'failure'
+    });
+  }
+}
+
+const readAMsg = async data => {
+  try {
+    const conversation = await chatController.readMessage(data.conversationId, data.userId);
+    io.to(data.userId).emit('read', { 
+      conversation: conversation,
+      type: 'success'
+    });
+  } catch (error) {
+    console.log(error);
+    io.to(data.userId).emit('read', { // sending the error to the sender of the message
+      messages: error.messages || ['Couldn\'t read message. Please try again later.'],
       type: 'failure'
     });
   }

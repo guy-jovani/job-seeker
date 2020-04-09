@@ -10,6 +10,21 @@ const socketInitializer = require('../socket').socketInitializer;
 
 
 
+exports.readMessage = async (conversationId, userId) => {
+  try {
+    const conversation = await Conversation.findOneAndUpdate(
+      { _id: conversationId },
+      { $set: { 'participants.$[el].read': true }
+      },
+      { arrayFilters: [{ 'el.user': userId }],
+        new: true },
+    );
+    return populateConversationParticipants(conversation);
+  } catch (error) {
+    throw errorHandling.handleServerErrors(error, 500, 'Couldn\'t read message. Please try again later.');
+  }
+};
+
 /**
  * Posting a message to conversations.
  * 
@@ -75,7 +90,7 @@ exports.postMessage = async (privateMsg, recipients, content, senderId, senderTy
  *                                      path to the file (if exist), file name, file size in bytes
  */
 const addMessageToConversation = async (conversation, content, senderId, senderType, bufferFile, fileName, fileNumBytes) => {
-  const message = await Message.create({
+  let message = await Message.create({
     conversation: conversation._id, 
     creator: senderId,
     onModel: senderType
@@ -93,9 +108,17 @@ const addMessageToConversation = async (conversation, content, senderId, senderT
   }
 
   await message.save();
+  conversation = await Conversation.findOneAndUpdate(
+    { _id: conversation._id, participants: conversation.participants }, 
+    { 
+      $push: { messages: message },
+      $set: { 'participants.$[el].read': false }
+    },
+    { arrayFilters: [{ 'el.read': true, 'el.user': { $ne: mongoose.Types.ObjectId(senderId) } }],
+      new: true },
+  );
 
-  await Conversation.updateOne({ _id: conversation._id }, { $push: { messages: message }});
-  return {
+  message = {
     creator: message.creator,
     content: message.content,
     createdAt: message.createdAt,
@@ -103,6 +126,8 @@ const addMessageToConversation = async (conversation, content, senderId, senderT
     fileName: message.fileName,
     fileNumBytes: message.fileNumBytes,
   };
+
+  return [message, conversation];
 };
 
 
@@ -112,7 +137,7 @@ const addMessageToConversation = async (conversation, content, senderId, senderT
  * @param {Array} participantsIds - an array if ids.
  * @returns {object} - a Conversation object.
   */
-const getParticipantsCon = async participantsIds => {
+const getConversationBasedOnParticipants = async participantsIds => {
   return await Conversation.aggregate([
     {
       $match: {
@@ -164,7 +189,7 @@ const createUpdateConversation = async (recipients, content, senderId, senderTyp
   const participantsIds = participants.map(part => part.user);
 
   // 1. check if conversation exists
-  let conversation = await getParticipantsCon(participantsIds);
+  let conversation = await getConversationBasedOnParticipants(participantsIds);
   let newCon = true;
   if (conversation.length) { // 2. if exists - just update with new message
     conversation = conversation[0]; // only one conversation should be found
@@ -172,7 +197,8 @@ const createUpdateConversation = async (recipients, content, senderId, senderTyp
   } else { // 3. doesn't exists - create conversation
     conversation = await Conversation.create({participants: participants, onModel: senderType});
   }
-  const message = await addMessageToConversation(conversation, content, senderId, senderType, bufferFile, fileName, fileNumBytes);
+  let message;
+  [message, conversation] = await addMessageToConversation(conversation, content, senderId, senderType, bufferFile, fileName, fileNumBytes);
   conversation = await populateConversationParticipants(conversation);
   return [message, conversation, newCon];
 };

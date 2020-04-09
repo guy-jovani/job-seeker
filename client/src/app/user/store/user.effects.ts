@@ -76,7 +76,7 @@ export class UserEffects {
 
 
   @Effect()
-  fetchConversations = this.actions$.pipe(
+  fetchAllConversations = this.actions$.pipe(
     ofType(UserActions.FETCH_ALL_CONVERSATIONS),
     withLatestFrom(this.store.select('user')),
     switchMap(([actionData, userState]) => {
@@ -90,12 +90,6 @@ export class UserEffects {
           map(res => {
             if (res['type'] === 'success') {
               const cons = res['conversations'].map((con: Conversation) => {
-                const userInd = con.participants.findIndex(participant =>
-                                participant.user._id === userState.user._id);
-                if (userInd !== -1) {
-                  con.participants.splice(userInd, 1);
-                }
-
                 let prevMsgDate: string = null;
                 con.messages.forEach(msg => {
                   msg.createdAt = new Date(msg.createdAt);
