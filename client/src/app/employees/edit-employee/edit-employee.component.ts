@@ -104,6 +104,7 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
     const password = form.value.passwords.password ? form.value.passwords.password : undefined;
     const confirmPassword = form.value.passwords.confirmPassword ? form.value.passwords.confirmPassword : undefined;
 
+
     const newEmployee = new Employee({
       _id: this.employee._id, email: form.value.email
     });

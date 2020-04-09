@@ -31,10 +31,9 @@ export class EmployeeEffects {
       Object.keys(actionData.payload.employee).forEach(key => {
         employeeFormDate.append(key, actionData.payload.employee[key]);
       });
-
       if (actionData.payload['password']) {
-        employeeFormDate.append('password', actionData.payload.employee['password']);
-        employeeFormDate.append('confirmPassword', actionData.payload.employee['confirmPassword']);
+        employeeFormDate.append('password', actionData.payload['password']);
+        employeeFormDate.append('confirmPassword', actionData.payload['confirmPassword']);
       }
       employeeFormDate.append('deleteImage', actionData.payload.deleteImage.toString() );
       return this.http.post(nodeServer  + 'update', employeeFormDate)

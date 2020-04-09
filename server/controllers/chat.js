@@ -9,7 +9,16 @@ const saveSocketFilePath = require('../utils/shared').saveSocketFilePath;
 const socketInitializer = require('../socket').socketInitializer;
 
 
-
+/**
+ * Mark a conversation as read by a user.
+ * 
+ * In case of an error - moving the error handling to the express error handling middleware
+ * with a error code of 500, and an error message
+ * 
+ * @param {string} conversationId - the id of the conversation the user read
+ * @param {string} userId - the id of the user that sent the message.
+ * @returns {object} - the conversation the user read, populated with the names of the participants.
+  */
 exports.readMessage = async (conversationId, userId) => {
   try {
     const conversation = await Conversation.findOneAndUpdate(
@@ -74,6 +83,7 @@ exports.postMessage = async (privateMsg, recipients, content, senderId, senderTy
 
 /**
  * Creates a message and assign it to the corresponding conversation.
+ * Mark that conversation as unread for all its participants other than the sender.
  * @param {object} conversation - a Conversation object.
  * @param {string} content - the content of the message (if not a file).
  * @param {string} senderId - the id of the user that sent the message.
@@ -81,13 +91,15 @@ exports.postMessage = async (privateMsg, recipients, content, senderId, senderTy
  * @param {Buffer} bufferFile - in case of a file - the buffer of data.
  * @param {string} fileName - the file name.
  * @param {number} fileNumBytes - the size of the file in bytes.
- * @returns { creator: string,
+ * @returns { Array.< { creator: string,
  *            content: string,
  *            createdAt: string,
  *            filePath: string,
  *            fileName: string,
- *            fileNumBytes: string } - the message creator id, message content, created time,
- *                                      path to the file (if exist), file name, file size in bytes
+ *            fileNumBytes: string }, object > } -
+ *                              the new message info - the message creator id, message content, created time,
+ *                                          path to the file (if exist), file name, file size in bytes.
+ *                              the conversation that the message is a part of.                                      
  */
 const addMessageToConversation = async (conversation, content, senderId, senderType, bufferFile, fileName, fileNumBytes) => {
   let message = await Message.create({

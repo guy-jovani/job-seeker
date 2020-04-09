@@ -34,7 +34,7 @@ const setUserLocalStorage = (user: Company | Employee,
   }
 };
 
-const geUsertLocalStorage = () => {
+const getUserLocalStorage = () => {
   const user = JSON.parse(localStorage.getItem('userData'));
   const kind = JSON.parse(localStorage.getItem('kind'));
   const token = JSON.parse(localStorage.getItem('token'));
@@ -102,7 +102,7 @@ export class AuthEffects {
   autoLogin = this.actions$.pipe(
     ofType(AuthActions.AUTO_LOGIN),
     map(() => {
-      const [user, kind, token, expirationDate] = geUsertLocalStorage();
+      const [user, kind, token, expirationDate] = getUserLocalStorage();
       if (!user || !kind || !token || !expirationDate) {
         return { type: 'dummy' };
       }
