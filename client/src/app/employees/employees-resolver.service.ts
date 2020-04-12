@@ -26,7 +26,7 @@ export class EmployeesResolverService implements Resolve<Employee[]> {
         const timeFromLastFetchMS = !employeeState.lastFetch ? null :
                         new Date().getTime() - employeeState.lastFetch.getTime();
 
-        if (!employeeState.employees.length || timeFromLastFetchMS > environment.fetchDataMSReset) {
+        if (!employeeState.messages && !employeeState.employees.length || timeFromLastFetchMS > environment.fetchDataMSReset) {
           this.store.dispatch(new EmployeesActions.FetchEmployees({ page: employeeState.page }));
           return this.actions$.pipe(
             ofType(EmployeesActions.SET_EMPLOYEES, EmployeesActions.EMPLOYEE_OP_FAILURE),

@@ -100,7 +100,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
 
   private invalidStateListInd(currState, list) {
     if (this.currUrl[1] >= currState[list].length || +this.currUrl[1] < 0) {
-      this.router.navigate(['employees']);
+      this.router.navigate(['people']);
       return true;
     }
     return false;

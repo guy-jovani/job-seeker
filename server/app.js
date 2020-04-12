@@ -32,42 +32,45 @@ app.use('/chat', checkAuth, chatRoutes);
 app.use('/jobs', checkAuth, jobsRoutes);
 
 app.use((req, res, next) => {
-  console.log("general url in app.js");
+  console.log('general url in app.js');
   console.log(req.url);
   res.status(200).json({ // the developer is the only one that can get here
-    messages: ["invalid url"],
-    type: "failure"
+    messages: ['invalid url'],
+    type: 'failure',
   });
 });
 
 app.use((error, req, res, next) => {
-  console.log("====================================================");
-  console.log("====================================================");
-  console.log("An error cought and printed in app.js");
+  console.log('====================================================');
+  console.log('====================================================');
+  console.log('An error caught and printed in app.js');
   console.log(error);
-  if (typeof(error) !== "object"){
-    error = { messages: [error] };
+  if (typeof(error) !== 'object') {
+    error = {messages: [error]};
   }
-  if(!error.messages.includes('Tried to upload wrong mime type. Choose a different file.')) {
-    error.messages.push('Please refresh the page and try again. If the error is still happening please notify the admins.')
+  if (!error.messages.includes(
+      'Tried to upload wrong mime type. Choose a different file.') &&
+      !error.messages.includes('Auth Fail. You need to login.')) {
+    error.messages.push('Please refresh the page and try again. ' +
+                'If the error is still happening please notify the admins.');
   }
   res.status(error.statusCode || 500).json({ 
     // errors: [{
-    //   msg: 'An unknown error occured'
+    //   msg: 'An unknown error occurred'
     // }],
     messages: error.messages,
-    type: 'failure'
+    type: 'failure',
   });
 });
 
 mongoose.set('useCreateIndex', true);
 // mongoose.connect(globalVars.MONGO_DB,
-mongoose.connect("mongodb://" + 
-      process.env.MONGO_DB_USER + ":" + 
-      process.env.MONGO_DB_PASSWORD + 
-      "@cluster0-shard-00-00-i3bvx.mongodb.net:27017,cluster0-shard-00-01-i3bvx.mongodb.net:27017,cluster0-shard-00-02-i3bvx.mongodb.net:27017/" + 
-      process.env.MONGO_DB_COLLECTION + 
-      "?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority",
+mongoose.connect('mongodb://' +
+      process.env.MONGO_DB_USER + ':' +
+      process.env.MONGO_DB_PASSWORD +
+      '@cluster0-shard-00-00-i3bvx.mongodb.net:27017,cluster0-shard-00-01-i3bvx.mongodb.net:27017,cluster0-shard-00-02-i3bvx.mongodb.net:27017/' +
+      process.env.MONGO_DB_COLLECTION +
+      '?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority',
   {
     useUnifiedTopology: true,
     useNewUrlParser: true,

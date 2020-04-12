@@ -1,4 +1,4 @@
-
+const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcryptjs');
@@ -188,7 +188,59 @@ exports.changeStatusOfAUserJob = async (companyId, employeeId, jobId, status) =>
 }
 
 
+/**
+ * Creates a Jason Web Token, that expires in process.env.JWT_TOKEN_EXPIRATION_SECONDS
+ * with information about the user id, email and kind.
+ * @param {object} user - A user object (Employee | Company). 
+ * @param {string} kind - the kind of the user ('employee' | 'company'). 
+ * @return {string} - the accessToken.
+ */
+getAndCreateAccessToken = (user, kind) => {
 
+  const accessToken = jwt.sign({
+    userId: user._id,
+    kind,
+    email: user.email
+  }, process.env.SECRET_TOKEN_KEY, { expiresIn: process.env.JWT_TOKEN_EXPIRATION_SECONDS +'s' });
+
+  return accessToken;
+};
+
+exports.getAndCreateAccessToken = getAndCreateAccessToken;
+
+/**
+ * Creates a Refresh Jason Web Token - with no expiration.
+ * saves the token on the db.
+ * With information about the user id, email and kind.
+ * Saves the token to the user object in the db.
+ * 
+ * @param {object} user - A user object (Employee | Company). 
+ * @param {string} kind - the kind of the user ('employee' | 'company'). 
+ * @return {string} - the refreshToken.
+ */
+getAndCreateRefreshToken = async (user, kind) => {
+  const refreshToken = jwt.sign({
+    userId: user._id,
+    kind,
+    email: user.email
+  }, process.env.SECRET_TOKEN_KEY );
+  user.refreshToken = refreshToken;
+  await user.save();
+  return refreshToken;
+};
+
+
+/**
+ * Creates a Jason Web Token, that expires in process.env.JWT_TOKEN_EXPIRATION_SECONDS
+ * with information about the user id.
+ * @param {object} user - A user object (Employee | Company). 
+ * @param {string} kind - the kind of the user ('employee' | 'company'). 
+ * @return {Array.<{accessToken: string, refreshToken: string}>} - the accessToken and the refreshToken.
+ */
+exports.getAndCreateTokens = async (user, kind) => {
+  return [getAndCreateAccessToken(user, kind),
+          await getAndCreateRefreshToken(user, kind)];
+}
 
 
 

@@ -62,8 +62,18 @@ const companySchema = new Schema(
         required: true
       },
     }],
-    resetPassToken: String,
-    resetPassTokenExpiration: Date,
+    resetPassToken: {
+      type: String,
+      required: false
+    },
+    resetPassTokenExpiration: {
+      type: Date,
+      required: false
+    },
+    refreshToken: {
+      type: String,
+      required: false
+    },
   },
   { timestamps: true }
 );

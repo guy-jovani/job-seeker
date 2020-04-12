@@ -87,7 +87,8 @@ export class JobComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   private fetchNextPage() {
     const container = this.container.nativeElement.getBoundingClientRect();
-    if (!this.isLoading && // won't fetch in a middle of a fetch
+    if (!this.messages.length && // won't fetch in case of an error
+        !this.isLoading && // won't fetch in a middle of a fetch
         !this.lastJob && // won't fetch if the last employee was fetched
         (container.bottom <= window.innerHeight || // if the whole list is shown - so fetch
         container.height - window.pageYOffset < window.innerHeight)) { // check if scrolled to the container

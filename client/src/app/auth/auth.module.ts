@@ -24,7 +24,6 @@ import { AuthComponent } from './auth.component';
     SharedModule,
     ReactiveFormsModule,
     AuthRoutingModule,
-
   ],
 })
 export class AuthModule { }

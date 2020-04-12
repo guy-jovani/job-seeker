@@ -34,6 +34,11 @@ input.ng-invalid.ng-touched {
   display: none;
 }
 
+.loading-spinner-div {
+  display: flex;
+  justify-content: center;
+}
+
 /**************************
 ******* Forms *************
 **************************/

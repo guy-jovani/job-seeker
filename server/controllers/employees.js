@@ -7,7 +7,7 @@ const getBulkArrayForUpdate = require('../utils/shared').getBulkArrayForUpdate;
 const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
 const sendMessagesResponse = require('../utils/shared').sendMessagesResponse;
 const changeStatusOfAUserJob = require('../utils/shared').changeStatusOfAUserJob;
-const skippedDocuments = require('../utils/shared').skippedDocuments;
+const getAndCreateTokens = require('../utils/shared').getAndCreateTokens;
 
 exports.fetchSingle = async (req, res, next) => {
   try {throw "111"
@@ -24,10 +24,10 @@ exports.fetchSingle = async (req, res, next) => {
 exports.fetchEmployees = async (req, res, next) => {
   try {
     const employees = await Employee
-                              .find({_id: { $ne: req.query._id }})
-                              .skip(skippedDocuments(req.query.page))
-                              .limit(+process.env.DOCS_PER_PAGE)
-                              .select('_id email firstName lastName profileImagePath work');
+    .find({_id: {$ne: req.query._id}})
+    .skip(skippedDocuments(req.query.page))
+    .limit(+process.env.DOCS_PER_PAGE)
+    .select('_id email firstName lastName profileImagePath work');
 
     const total = await Employee.aggregate([
       { $match: { _id: { $ne: req.query._id } } },
@@ -82,14 +82,20 @@ exports.updateEmployee = async (req, res, next) => {
         '-__v -password -resetPassToken -resetPassTokenExpiration').populate({
           path: 'jobs.job', 
           populate: { path: 'company', select: 'name' }
-        });;
+        });
 
-    updatedEmployee = updatedEmployee.toObject();
-
+    let tokens;
+    if(req.body.password) {
+      tokens = await getAndCreateTokens(updatedEmployee, 'employee');
+    }
+    
     res.status(201).json({
       messages: ['employee updated successfully!'],
       type: 'success',
-      employee: updatedEmployee
+      employee: updatedEmployee,
+      accessToken: tokens ? tokens[0] : null,
+      refreshToken: tokens ? tokens[1] : null,
+      expiresInSeconds: process.env.JWT_TOKEN_EXPIRATION_SECONDS
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "There was an error updating the employee."));

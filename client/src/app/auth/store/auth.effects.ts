@@ -3,60 +3,55 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { switchMap, map, catchError, tap } from 'rxjs/operators';
+import { switchMap, map, catchError, tap, withLatestFrom } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import * as fromApp from '../../store/app.reducer';
 import * as AuthActions from './auth.actions';
 import * as UserActions from '../../user/store/user.actions';
-import * as JobsActions from '../../job/store/job.actions';
+import * as JobActions from '../../job/store/job.actions';
 import * as EmployeeActions from '../../employees/store/employee.actions';
 import * as CompanyActions from '../../company/store/company.actions';
 import { Company } from 'app/company/company.model';
 import { Employee } from 'app/employees/employee.model';
 import { ChatService } from 'app/chat/chat-socket.service';
+import { AuthAutoLogoutService } from '../auth-auto-logout.service';
 
 
 
 const nodeServer = environment.nodeServer + 'auth/';
 
-const setUserLocalStorage = (user: Company | Employee,
-                             kind: string = null,
-                             token: string = null,
-                             expirationDate: number = null) => {
-  localStorage.setItem('userData', JSON.stringify({...user}));
-  if (kind) { localStorage.setItem('kind', JSON.stringify(kind)); }
-  if (token) { localStorage.setItem('token', JSON.stringify(token)); }
-  if (expirationDate) {
-    localStorage.setItem('expirationDate',
-    JSON.stringify(new Date((new Date().getTime() + expirationDate)).toISOString()));
-  }
+const setUserSessionStorage = (user: Company | Employee,
+                               kind: string = null) => {
+  sessionStorage.setItem('userData', JSON.stringify({...user}));
+  if (kind) { sessionStorage.setItem('kind', JSON.stringify(kind)); }
 };
 
-const getUserLocalStorage = () => {
-  const user = JSON.parse(localStorage.getItem('userData'));
-  const kind = JSON.parse(localStorage.getItem('kind'));
-  const token = JSON.parse(localStorage.getItem('token'));
-  const expirationDate = JSON.parse(localStorage.getItem('expirationDate'));
-  return [user, kind, token, expirationDate];
+const getUserAndTokensSessionStorage = () => {
+  const user = JSON.parse(sessionStorage.getItem('userData'));
+  const kind = JSON.parse(sessionStorage.getItem('kind'));
+  const token = JSON.parse(sessionStorage.getItem('token'));
+  const refreshToken = JSON.parse(sessionStorage.getItem('refreshToken'));
+  const expirationDate = JSON.parse(sessionStorage.getItem('expirationDate'));
+  return [user, kind, token, expirationDate, refreshToken];
 };
 
-const removeUserLocalStorage = () => {
-  localStorage.removeItem('userData');
-  localStorage.removeItem('kind');
-  localStorage.removeItem('token');
-  localStorage.removeItem('expirationDate');
+const removeUserAndTokensSessionStorage = () => {
+  sessionStorage.removeItem('userData');
+  sessionStorage.removeItem('kind');
+  sessionStorage.removeItem('token');
+  sessionStorage.removeItem('expirationDate');
+  sessionStorage.removeItem('refreshToken');
 };
 
 @Injectable()
 export class AuthEffects {
 
-  private tokenTimer: any;
-
   constructor(private actions$: Actions,
               private http: HttpClient,
               private chatService: ChatService,
+              private authAutoLogoutService: AuthAutoLogoutService,
               private store: Store<fromApp.AppState>,
               private router: Router) {}
 
@@ -102,17 +97,18 @@ export class AuthEffects {
   autoLogin = this.actions$.pipe(
     ofType(AuthActions.AUTO_LOGIN),
     map(() => {
-      const [user, kind, token, expirationDate] = getUserLocalStorage();
-      if (!user || !kind || !token || !expirationDate) {
+      const [user, kind, token, expirationDate, refreshToken] = getUserAndTokensSessionStorage();
+      if (!user || !kind || !token || !expirationDate || !refreshToken) {
         return { type: 'dummy' };
       }
-      const expirationSeconds = new Date(expirationDate).getTime() - new Date().getTime();
-      if (expirationSeconds <= 0) { return { type: 'dummy' }; }
-      this.autoLogout(expirationSeconds);
+      const expirationMillieSeconds = new Date(expirationDate).getTime() - new Date().getTime();
+      if (expirationMillieSeconds <= 0) { return { type: 'dummy' }; }
+
       this.chatService.sendMessage('login', {  _id: user['_id'], msg: 'logged' } );
 
       this.store.dispatch(new UserActions.UpdateActiveUser({ user, kind }));
-      return new AuthActions.AuthSuccess({ redirect: false, token });
+      this.authAutoLogoutService.autoLogout(expirationMillieSeconds);
+      return new AuthActions.AuthSuccess({ redirect: false, token, expiresInSeconds: expirationMillieSeconds / 1000, refreshToken });
     }),
     catchError(messages => {
       return of(new AuthActions.AuthFailure(messages));
@@ -122,13 +118,32 @@ export class AuthEffects {
   @Effect({dispatch: false})
   logout = this.actions$.pipe(
     ofType(AuthActions.LOGOUT),
-    map(() => {
-      removeUserLocalStorage();
-      clearTimeout(this.tokenTimer);
-      this.router.navigate(['/login']);
-    }),
-    catchError(messages => {
-      return of(new AuthActions.AuthFailure(messages));
+    withLatestFrom(this.store.select('user')),
+    switchMap(([actionData, userState]) => {
+      return this.http.post(nodeServer + 'logout',
+        {
+          kind: userState.kind,
+          _id: userState.user._id
+        })
+        .pipe(
+          map(res => {
+            if (res['type'] === 'success') {
+              removeUserAndTokensSessionStorage();
+              this.store.dispatch(new EmployeeActions.Logout());
+              this.store.dispatch(new CompanyActions.Logout());
+              this.store.dispatch(new JobActions.Logout());
+              this.store.dispatch(new UserActions.Logout());
+              this.authAutoLogoutService.clearMyTimeout();
+              this.router.navigate(['/login']);
+              return { type: 'dummy' };
+            } else {
+              return new AuthActions.AuthFailure(res['messages']);
+            }
+          }),
+          catchError(messages => {
+            return of(new AuthActions.AuthFailure(messages));
+          })
+        );
     })
   );
 
@@ -199,27 +214,20 @@ export class AuthEffects {
     })
   );
 
-  private autoLogout = (expirationSeconds: number) => {
-    this.tokenTimer = setTimeout(() => {
-      this.store.dispatch(new EmployeeActions.Logout());
-      this.store.dispatch(new CompanyActions.Logout());
-      this.store.dispatch(new AuthActions.Logout());
-      this.store.dispatch(new JobsActions.Logout());
-      this.store.dispatch(new UserActions.Logout());
-      this.store.dispatch(new AuthActions.AuthFailure(
-        ['You were automatically logged out due to inactivity.']
-        ));
-      this.router.navigate(['/login']);
-    }, expirationSeconds);
-  }
+
 
   private signupLoginHandler = res => {
     if (res['type'] === 'success') {
-      setUserLocalStorage(res['user'], res['kind'], res['token'], res['expiresIn'] * 1000);
-      this.autoLogout(res['expiresIn'] * 1000);
+      setUserSessionStorage(res['user'], res['kind']);
+
       this.chatService.sendMessage('login', {  _id: res['user']['_id'], msg: 'logged' } );
       this.store.dispatch(new UserActions.UpdateActiveUser({ user: res['user'], kind: res['kind'] }));
-      return new AuthActions.AuthSuccess({ redirect: true, token: res['token'] });
+      this.authAutoLogoutService.autoLogout(res['expiresInSeconds'] * 1000);
+      return new AuthActions.AuthSuccess({
+        redirect: true,
+        token: res['accessToken'],
+        expiresInSeconds: res['expiresInSeconds'],
+        refreshToken: res['refreshToken'] });
     } else {
       return new AuthActions.AuthFailure(res['messages']);
     }

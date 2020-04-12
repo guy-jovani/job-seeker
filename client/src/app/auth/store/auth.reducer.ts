@@ -7,18 +7,44 @@ import * as AuthActions from './auth.actions';
 export interface State {
   messages: any[];
   loading: boolean;
+  refreshing: boolean;
   token: string;
+  refreshToken: string;
 }
 
 const initialState: State = {
   messages: null,
   loading: false,
-  token: null
+  refreshing: false,
+  token: null,
+  refreshToken: null
 };
 
+
+
+
+const setUserTokensSessionStorage = (
+                             token: string = null,
+                             expiresInSeconds: number = null,
+                             refreshToken: string = null) => {
+  if (token) { sessionStorage.setItem('token', JSON.stringify(token)); }
+  if (refreshToken) { sessionStorage.setItem('refreshToken', JSON.stringify(refreshToken)); }
+  if (expiresInSeconds) {
+  sessionStorage.setItem('expirationDate',
+  JSON.stringify(new Date((new Date().getTime() + expiresInSeconds)).toISOString()));
+  }
+};
+
+
+
 export function authReducer(state = initialState, action: AuthActions.AuthActions) {
-  // console.log("auth reducer " + action.type),
+  // console.log("auth reducer " + action.type)
   switch (action.type) {
+    case AuthActions.REFRESH_TOKEN_ATTEMPT:
+      return {
+        ...state,
+        refreshing: true,
+      };
     case AuthActions.SIGNUP_ATTEMPT:
     case AuthActions.LOGIN_ATTEMPT:
     case AuthActions.RESET_PASS_EMAIL_ATTEMPT:
@@ -32,14 +58,19 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
       return {
         ...state,
         loading: false,
+        refreshing: false,
         messages: action.payload,
       };
     case AuthActions.AUTH_SUCCESS:
+      setUserTokensSessionStorage(
+      action.payload.token, action.payload.expiresInSeconds * 1000, action.payload.refreshToken );
       return {
         ...state,
         loading: false,
+        refreshing: false,
         messages: null,
         token: action.payload['token'] ? action.payload['token'] : state.token,
+        refreshToken: action.payload['refreshToken'] ? action.payload['refreshToken'] : state.refreshToken,
       };
     case AuthActions.CLEAR_ERROR:
     case AuthActions.RESET_PASS_EMAIL_SUCCESS:
@@ -53,8 +84,10 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
       return {
         ...state,
         loading: false,
+        refreshing: false,
         messages: null,
-        token: null
+        token: null,
+        refreshToken: null
       };
     default:
       return state;

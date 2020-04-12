@@ -64,8 +64,18 @@ const employeeSchema = new Schema(
         required: false,
       },
     }],
-    resetPassToken: String,
-    resetPassTokenExpiration: Date,
+    resetPassToken: {
+      type: String,
+      required: false
+    },
+    resetPassTokenExpiration: {
+      type: Date,
+      required: false
+    },
+    refreshToken: {
+      type: String,
+      required: false
+    },
   }
 );
 

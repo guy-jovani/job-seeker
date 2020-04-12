@@ -19,7 +19,7 @@ export class ChatService {
       return this.socket.emit(eventName, data);
     }
      getMessage(eventName: string) {
-        return this.socket.fromEvent(eventName);
+      return this.socket.fromEvent(eventName);
     }
 }
 

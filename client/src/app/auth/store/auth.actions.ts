@@ -3,6 +3,7 @@
 import { Action } from '@ngrx/store';
 
 export const SIGNUP_ATTEMPT = '[Auth] SIGNUP_ATTEMPT';
+export const REFRESH_TOKEN_ATTEMPT = '[Auth] REFRESH_TOKEN_ATTEMPT';
 export const LOGIN_ATTEMPT = '[Auth] LOGIN_ATTEMPT';
 export const LOGOUT = '[Auth] LOGOUT';
 export const AUTH_SUCCESS = '[Auth] AUTH_SUCCESS';
@@ -18,6 +19,7 @@ export const RESET_PASS_SUCCESS = '[Auth] RESET_PASS_SUCCESS';
 export type AuthActions = SignupAttempt
                         | LoginAttempt
                         | AuthFailure
+                        | RefreshTokenAttempt
                         | AuthSuccess
                         | ClearError
                         | AutoLogin
@@ -43,6 +45,10 @@ export class ResetPassEmailAttempt implements Action {
   constructor(public payload: string) {}
 }
 
+export class RefreshTokenAttempt implements Action {
+  readonly type = REFRESH_TOKEN_ATTEMPT;
+}
+
 export class ResetPassAttempt implements Action {
   readonly type = RESET_PASS_ATTEMPT;
 
@@ -60,7 +66,7 @@ export class LoginAttempt implements Action {
 export class AuthSuccess implements Action {
   readonly type = AUTH_SUCCESS;
 
-  constructor(public payload: { redirect: boolean, token: string }) {}
+  constructor(public payload: { redirect: boolean, token: string,  expiresInSeconds: number, refreshToken?: string }) {}
 }
 
 export class AuthFailure implements Action {

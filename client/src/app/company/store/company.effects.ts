@@ -8,8 +8,10 @@ import { Store } from '@ngrx/store';
 import * as JobActions from '../../job/store/job.actions';
 import * as CompanyActions from './company.actions';
 import * as UserActions from '../../user/store/user.actions';
+import * as AuthActions from '../../auth/store/auth.actions';
 import { environment } from '../../../environments/environment';
 import * as fromApp from '../../store/app.reducer';
+import { AuthAutoLogoutService } from 'app/auth/auth-auto-logout.service';
 
 const nodeServer = environment.nodeServer + 'companies/';
 
@@ -19,6 +21,7 @@ export class CompanyEffects {
 
   constructor(private actions$: Actions,
               private http: HttpClient,
+              private authAutoLogoutService: AuthAutoLogoutService,
               private store: Store<fromApp.AppState>) {}
 
 
@@ -42,13 +45,22 @@ export class CompanyEffects {
       }
       return this.http.post(nodeServer + 'update', companyData, {
           params: {
-            oldImages: actionData.payload.oldImagesPath.join('%%RandomjoiN&&'),
+            oldImages: actionData.payload.oldImagesPath.join(environment.splitCompanyOldImagesBy),
           }
         })
         .pipe(
           map(res => {
             if (res['type'] === 'success') {
               this.store.dispatch(new CompanyActions.ClearError());
+              if (res['refreshToken']) {
+                this.store.dispatch(new AuthActions.AuthSuccess({
+                  redirect: false,
+                  token: res['accessToken'],
+                  refreshToken: res['refreshToken'],
+                  expiresInSeconds: res['expiresInSeconds'],
+                }));
+                this.authAutoLogoutService.autoLogout(res['expiresInSeconds'] * 1000);
+              }
               return new UserActions.UpdateActiveUser({ user: {...res['company']}, redirect: 'my-details', kind: 'company' });
             } else {
               return new CompanyActions.CompanyOpFailure(res['messages']);

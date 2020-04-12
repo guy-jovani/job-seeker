@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { Router, NavigationEnd } from '@angular/router';
@@ -22,10 +22,12 @@ export class AppComponent implements OnInit, OnDestroy {
   socketReconnectSub: Subscription;
   socketUpdatedStatus: Subscription;
   userSub: Subscription;
+  authSub: Subscription;
   routerSub: Subscription;
   messages: string[] = [];
   currUrl: string[];
   userId: string = null;
+  refreshing: boolean;
 
   constructor(private store: Store<fromApp.AppState>,
               private chatService: ChatService,
@@ -37,6 +39,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.userSub = this.store.select('user').subscribe(userState => {
       this.userId = userState.user ? userState.user._id : null;
+    });
+
+    this.authSub = this.store.select('auth').subscribe(authState => {
+      this.refreshing = authState.refreshing;
     });
 
     this.routerSub = this.router.events.pipe(
@@ -131,6 +137,9 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     if (this.userSub) {
       this.userSub.unsubscribe();
+    }
+    if (this.authSub) {
+      this.authSub.unsubscribe();
     }
     if (this.routerSub) {
       this.routerSub.unsubscribe();

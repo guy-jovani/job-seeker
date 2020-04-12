@@ -3,5 +3,10 @@
 
 <app-alert *ngIf="messages.length" [messages]="messages" (closeAlert)="onClose()"></app-alert>
 <app-header></app-header>
-<router-outlet></router-outlet>
+
+<div class='loading-spinner-div'>
+  <app-loading-spinner *ngIf="refreshing"></app-loading-spinner>
+</div>
+
+<router-outlet *ngIf="!refreshing"></router-outlet>
 

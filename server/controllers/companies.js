@@ -7,8 +7,9 @@ const errorHandling = require('../utils/errorHandling');
 const getBulkArrayForUpdate = require('../utils/shared').getBulkArrayForUpdate;
 const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
 const checkCompanyUpdateSignupValidation = require('../utils/shared').checkCompanyUpdateSignupValidation
-const changeStatusOfAUserJob = require('../utils/shared').changeStatusOfAUserjob;
+const changeStatusOfAUserJob = require('../utils/shared').changeStatusOfAUserJob;
 const skippedDocuments = require('../utils/shared').skippedDocuments;
+const getAndCreateTokens = require('../utils/shared').getAndCreateTokens;
 
 
 /**
@@ -109,7 +110,7 @@ exports.fetchCompanies = async (req, res, next) => {
 
 
 /**
- * If a file was recieved - adds its url (protcol and host) path to the body of the request 
+ * If a file was received - adds its url (protocol and host) path to the body of the request 
  * as profileImagePath property.
  * 
  * @param {express request object} req
@@ -133,7 +134,7 @@ const getProfileImage = (req, file) => {
  * 
  * @param {express request object} req - the req need to have query params: 
  *                           {string} oldImages - a string of current paths to the company images,
- *                                                which every path is separated by '%%RandomjoiN&&'.
+ *                                                which every path is separated by env.process.SPLIT_COMPANY_OLD_IMAGES_BY.
  * @param {object} files - object that has an imagesPath property which is
  *                                an array of paths to new images of the company.
  */
@@ -145,7 +146,7 @@ const getNonProfileImages = (req, files) => {
       url = url + '/images/' + file.filename;
       newUrls.push(url);
     });
-    const oldImages = req.query.oldImages.split('%%RandomjoiN&&');
+    const oldImages = req.query.oldImages.split(env.process.SPLIT_COMPANY_OLD_IMAGES_BY);
     let updatedImageInd = 0, updatedImages = [];
     for(const index of Object.keys(oldImages)){
       if(oldImages[index]) {
@@ -158,7 +159,7 @@ const getNonProfileImages = (req, files) => {
     }
     req.body.imagesPath = updatedImages;
   } else {
-    const keptImages = req.query.oldImages.split('%%RandomjoiN&&').filter(val => !!val);
+    const keptImages = req.query.oldImages.split(env.process.SPLIT_COMPANY_OLD_IMAGES_BY).filter(val => !!val);
     if(keptImages.length) req.body.imagesPath = keptImages;
   }  
 };
@@ -172,7 +173,7 @@ const getNonProfileImages = (req, files) => {
  * 
  * @param {express request object} req - the req need to have query params: 
  *                           {string} oldImages - a string of current paths to the company images,
- *                                                which every path is separated by '%%RandomjoiN&&'.
+ *                                                which every path is separated by env.process.SPLIT_COMPANY_OLD_IMAGES_BY.
  */
 const updateReqImages = async (req) => {
   getNonProfileImages(req, req.files);
@@ -189,6 +190,8 @@ const getUpdateQuery = async req => {
   if (req.body.profileImagePath === '') nullKeys['profileImagePath'] = '';
   return await getBulkArrayForUpdate(req, nullKeys);
 };
+
+
 
 exports.updateCompany = async (req, res, next) => {
   try { 
@@ -209,11 +212,19 @@ exports.updateCompany = async (req, res, next) => {
     let updatedCompany = await Company.findById(req.body._id).select(
                             '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration -password'
                           ).populate('jobs');
+
+    let tokens;
+    if(req.body.password) {
+      tokens = await getAndCreateTokens(updatedCompany, 'company');
+    }
                         
     res.status(201).json({
       message: 'company updated successfully!',
       type: 'success',
-      company: updatedCompany
+      company: updatedCompany,
+      accessToken: tokens ? tokens[0] : null,
+      refreshToken: tokens ? tokens[1] : null,
+      expiresInSeconds: process.env.JWT_TOKEN_EXPIRATION_SECONDS
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "There was an error updating the company."));

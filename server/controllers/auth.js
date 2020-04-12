@@ -12,6 +12,9 @@ const handleServerErrors = require('../utils/errorHandling').handleServerErrors;
 const sendMessagesResponse = require('../utils/shared').sendMessagesResponse;
 const checkCompanyUpdateSignupValidation = require('../utils/shared').checkCompanyUpdateSignupValidation;
 
+const getAndCreateAccessToken = require('../utils/shared').getAndCreateAccessToken;
+const getAndCreateTokens = require('../utils/shared').getAndCreateTokens;
+
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -23,21 +26,6 @@ const transporter = nodemailer.createTransport({
 
 
 /**
- * Creates a Jason Web Token, that expires in process.env.JWT_EXPIRATION seconds
- * with an inforamtion about the user id.
- * @param {string} userId - A user id. 
- * @return {string} - the JWT.
- */
-getToken = (userId) => {
-  const token = jwt.sign({
-    userId: userId
-  }, process.env.SECERT_TOKEN_KEY, { expiresIn: process.env.JWT_EXPIRATION });
-
-  return token;
-}
-
-
-/**
  * Creates a user (Company or Employee) based on the email, password and name.
  * @param {string} email - the user email
  * @param {string} password - the user password
@@ -45,13 +33,15 @@ getToken = (userId) => {
  * @return { [(Company | Employee), string] } - an array in which the first var is the user object, 
  *                                             and the second is a string representing its kind ("company" | "employee")
  */
-createUserSignup = (email, password, name = null) => {
+createUserSignup = async (email, password, name = null) => {
   let user, kind;
   if(name){
-    user = new Company({ email: email, password: password, name: name });
+    // user = new Company({ email: email, password: password, name: name });
+    user = await Company.create({ email: email, password: password, name: name });
     kind = "company";
   } else {
-    user = new Employee({ email: email, password: password });
+    // user = new Employee({ email: email, password: password });
+    user = await Employee.create({ email: email, password: password });
     kind = "employee";
   }
   return [user, kind];
@@ -61,8 +51,9 @@ createUserSignup = (email, password, name = null) => {
 /**
  * Signing a user up and upon success sending a respond to the client with the following:
  *    {string} type - 'success' - meaning the signup succeeded
- *    {string} token - a JWT related to the user
- *    {string} expiresIn - the number of seconds untill the token expires
+ *    {string} accessToken - a JWT related to the user
+ *    {string} refreshToken - a JWT related to the user to refresh the accessToken
+ *    {string} expiresInSeconds - the number of seconds until the token expires
  *    {object} user - the user object of who that signed up (Company | Employee)
  *    {string} kind - representing the user kind ("company" | "employee")
  * 
@@ -76,9 +67,9 @@ createUserSignup = (email, password, name = null) => {
 exports.signup = async (req, res, next) => {
   try {
     req.body.email = req.body.email ? req.body.email.toLowerCase() : null;
-    const routeErros = validation.handleValidationRoutesErrors(req);
-    if(routeErros.type === 'failure') {
-      return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
+    const routeErrors = validation.handleValidationRoutesErrors(req);
+    if(routeErrors.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
     }
     const companyValid = await checkCompanyUpdateSignupValidation(req);
     if(companyValid.type === 'failure'){
@@ -86,15 +77,15 @@ exports.signup = async (req, res, next) => {
     }
     const password = await bcrypt.hash(req.body.password, 12);
     let [user, kind] = createUserSignup(req.body.email, password, req.body.name);
-    user = await user.save();
 
-    const token = getToken(user._id);
+    const [accessToken, refreshToken] = await getAndCreateTokens(user, kind);
     user = user.toObject();
     Reflect.deleteProperty(user, 'password');
     res.status(201).json({
       type: 'success',
-      token,
-      expiresIn: process.env.TOKEN_EXPIRATION_SECONDS,
+      accessToken,
+      expiresInSeconds: process.env.JWT_TOKEN_EXPIRATION_SECONDS,
+      refreshToken,
       user,
       kind
     });
@@ -102,28 +93,6 @@ exports.signup = async (req, res, next) => {
     next(handleServerErrors(error, 500, "There was an unexpected error while trying to signup."));
   }
 };
-
-const mockDB = async () => {
-  const nums = [];
-  for(let i=1; i<101; i++){
-    nums.push(i);
-  }
-
-  // for (num of nums) {
-  //   const password = await bcrypt.hash('111', 12);
-  //   await Employee.create({ firstName: 'e' + num,  lastName: 'e' + num, password: password, email: num + '@emp.com'});
-  // }
-
-  for (num of nums) {
-    const password = await bcrypt.hash('111', 12);
-    const company = await Company.create({ name: 'c' + num,  password: password, email: num + '@comp.com'});
-
-    await Job.create({ title: 'c' + num, description: 'description c' + num + ' #1', company: company._id, date: new Date() });
-    await Job.create({ title: 'c' + num, description: 'description c' + num + ' #2', company: company._id, date: new Date() });
-    await Job.create({ title: 'c' + num + 'with req', description: 'description c' + num + ' with req',
-                        requirements: [{requirement: 'req 1'}, {requirement: 'req 2'}], company: company._id, date: new Date()    });
-  }
-}
 
 
 /**
@@ -134,7 +103,7 @@ const mockDB = async () => {
  *      employee obj - with jobs array populated with the job info, and the job company name 
  *      company obj - with the jobs populated,
  *                    with applicants array populated with the employee info,
- *                    with the applicants jobs populatad with the job info 
+ *                    with the applicants jobs populated with the job info 
  */
 getUserLogin = async email => {
   let user = await Employee.findOne({email: email}).select('-__v')
@@ -157,8 +126,9 @@ getUserLogin = async email => {
 /**
  * login a user in and upon success sending a respond to the client with the following:
  *    {string} type - 'success' - meaning the signup succeeded
- *    {string} token - a JWT related to the user
- *    {string} expiresIn - the number of seconds untill the token expires
+ *    {string} accessToken - a JWT related to the user
+ *    {string} expiresInSeconds - the number of seconds until the token expires
+ *    {string} refreshToken - a JWT related to the user to refresh the accessToken
  *    {object} user - the user object of who that signed up (Company | Employee)
  *    {string} kind - representing the user kind ("company" | "employee")
  *  
@@ -173,29 +143,28 @@ getUserLogin = async email => {
  */
 exports.login = async (req, res, next) => {
   try {
-    const routeErros = validation.handleValidationRoutesErrors(req);
-    if(routeErros.type === 'failure') {
-      return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
+    const routeErrors = validation.handleValidationRoutesErrors(req);
+    if(routeErrors.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
     }
-    let [user, kind] = await getUserLogin(req.body.email, res);
+    let [user, kind] = await getUserLogin(req.body.email);
     if(!user){ 
       return sendMessagesResponse(res, 401, ['The email and/or password are incorrect'], 'failure');
     }
-
-    // await mockDB(); //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const verifiedPassword = await bcrypt.compare(req.body.password, user.password);
     if(!verifiedPassword){ 
       return sendMessagesResponse(res, 401, ['The email and/or password are incorrect.'], 'failure');
     }
     
+    const [accessToken, refreshToken] = await getAndCreateTokens(user, kind);
     user = user.toObject();
     Reflect.deleteProperty(user, 'password');
-    const token = getToken(user._id);
     res.status(200).json({
       type: 'success',
-      token,
-      expiresIn: process.env.TOKEN_EXPIRATION_SECONDS,
+      accessToken,
+      expiresInSeconds: process.env.JWT_TOKEN_EXPIRATION_SECONDS,
+      refreshToken,
       user,
       kind
     });
@@ -230,7 +199,7 @@ exports.resetPasswordEmail = async (req, res, next) => {
         return sendMessagesResponse(res, 401, ['No account with that email found.'], 'failure');
       }   
       user.resetPassToken = token;
-      user.resetPassTokenExpiration = Date.now() +  process.env.RESET_PASSWORD_TOKEN_EXPIRATION_MILI_SECONDS;
+      user.resetPassTokenExpiration = Date.now() +  process.env.RESET_PASSWORD_TOKEN_EXPIRATION_MILLISECONDS;
       await user.save();
 
       transporter.sendMail({
@@ -241,7 +210,7 @@ exports.resetPasswordEmail = async (req, res, next) => {
       }, err => { if(err) console.log(err) }); 
 
       res.status(200).json({
-        message: 'A reset email has been sent sucssesfully!',
+        message: 'A reset email has been sent successfully!',
         type: 'success'
       });
     });
@@ -251,7 +220,7 @@ exports.resetPasswordEmail = async (req, res, next) => {
 }
 
 /**
- * Reseting the user password
+ * Resetting the user password
  * and upon success sending a respond to the client with the following:
  *    {string} type - 'success' - meaning the password had a reset.
  *    {string} message - indicating that the password had reset successfully.
@@ -267,9 +236,9 @@ exports.resetPasswordEmail = async (req, res, next) => {
  */
 exports.resetToNewPassword = async (req, res, next) => {
   try {
-    const routeErros = validation.handleValidationRoutesErrors(req);
-    if(routeErros.type === 'failure') {
-      return sendMessagesResponse(res, 422, routeErros.messages, 'failure');
+    const routeErrors = validation.handleValidationRoutesErrors(req);
+    if(routeErrors.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
     }
     const resetPassToken = req.body.token;
     const user = await Employee.findOne({ 
@@ -295,3 +264,119 @@ exports.resetToNewPassword = async (req, res, next) => {
   }
 }
 
+
+
+
+
+/**
+ * Creating a new JWT access token for the user
+ * and upon success sending a respond to the client with the following:
+ *    {string} type - 'success' - meaning the password had a reset.
+ *    {string} newAccessToken - the new token
+ *    {string} expiresInSeconds - the number of seconds till the token will get expired
+ * 
+ * Send the client a 401 error and a message if the token is invalid.
+ * 
+ * In case of an error - moving the error handling to the express error handling middleware
+ * with a error code of 500, and an error message
+ * @param {express request object} req - the req need to have a body with: 
+ *                                        {string} refreshToken - the user refresh token
+ * @param {express respond object} res
+ */
+exports.refreshToken = async (req, res, next) => {
+  try {
+    const routeErrors = validation.handleValidationRoutesErrors(req);
+    if(routeErrors.type === 'failure') {
+      return sendMessagesResponse(res, 401, routeErrors.messages, 'TokenRefreshError');
+    }
+    const refreshToken = req.body.refreshToken;
+    const payload = jwt.verify(refreshToken, process.env.SECRET_TOKEN_KEY);
+    let user;
+    if(payload.kind === 'employee') {
+      user = await Employee.findById(payload.userId);
+    } else {
+      user = await Company.findById(payload.userId);
+    }
+    const newAccessToken = getAndCreateAccessToken(user, payload.kind);
+    res.status(200).json({
+      type: 'success',
+      newAccessToken,
+      expiresInSeconds: process.env.JWT_TOKEN_EXPIRATION_SECONDS,
+    });
+  } catch (error) {
+    next(handleServerErrors(error, 403, "Auth Fail. You need to login."));
+  }
+}
+
+
+/**
+ * Deleting the refresh token from the user db
+ * and upon success sending a respond to the client with the following:
+ *    {string} type - 'success' - meaning the password had a reset.
+ * 
+ * 
+ * In case of an error - moving the error handling to the express error handling middleware
+ * with a error code of 500, and an error message
+ * @param {express request object} req - the req need to have a body with: 
+ *                                        {string} kind - the user kind ('employee' | 'company')
+ * @param {express respond object} res
+ */
+exports.logout = async (req, res, next) => {
+  try {
+    const routeErrors = validation.handleValidationRoutesErrors(req);
+    if(routeErrors.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErrors.messages, 'TokenRefreshError');
+    }
+    
+    if(req.body.kind === 'employee') {
+      await Employee.findOneAndUpdate(
+        { _id: req.body._id }, 
+        { $set: {
+          refreshToken: null
+        }});
+    } else {
+      await Company.findOneAndUpdate(
+        { _id: req.body._id }, 
+        { $set: {
+          refreshToken: null
+        }});
+    }
+
+    res.status(200).json({
+      type: 'success'
+    });
+
+  } catch (error) {
+    next(handleServerErrors(error, 500, "Something went wrong while trying to logout"));
+  }
+}
+
+
+
+
+
+
+
+
+
+const mockDB = async () => {
+  const nums = [];
+  for(let i=1; i<101; i++){
+    nums.push(i);
+  }
+
+  for (num of nums) {
+    const password = await bcrypt.hash('111', 12);
+    await Employee.create({ firstName: 'e' + num,  lastName: 'e' + num, password: password, email: num + '@emp.com'});
+  }
+
+  for (num of nums) {
+    const password = await bcrypt.hash('111', 12);
+    const company = await Company.create({ name: 'c' + num,  password: password, email: num + '@comp.com'});
+
+    await Job.create({ title: 'c' + num, description: 'description c' + num + ' #1', company: company._id, date: new Date() });
+    await Job.create({ title: 'c' + num, description: 'description c' + num + ' #2', company: company._id, date: new Date() });
+    await Job.create({ title: 'c' + num + 'with req', description: 'description c' + num + ' with req',
+                        requirements: [{requirement: 'req 1'}, {requirement: 'req 2'}], company: company._id, date: new Date()    });
+  }
+}
