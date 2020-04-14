@@ -5,7 +5,6 @@ import * as UserActions from './user.actions';
 import { Company } from 'app/company/company.model';
 import { Conversation } from 'app/chat/conversation.model';
 import { Job } from 'app/job/job.model';
-import { Participant } from 'app/chat/participant.model';
 
 
 
@@ -53,8 +52,8 @@ const setTimeOfNewMessagesOfConversation = (lastMsgDate, messages) => {
     messages[0]['first'] = messages[0].createdAt.toDateString();
   }
   messages.forEach(msg => {
-    msg['hours'] = messages[0].createdAt.getHours().toString().padStart(2, '0');
-    msg['minutes'] = messages[0].createdAt.getMinutes().toString().padStart(2, '0');
+    msg['time'] = messages[0].createdAt.getHours().toString().padStart(2, '0') + ':' +
+                    messages[0].createdAt.getMinutes().toString().padStart(2, '0');
   });
 };
 
@@ -184,6 +183,19 @@ export function userReducer(state = initialState, action: UserActions.UserAction
           newWork.startDate = new Date(newWork.startDate);
           newWork.endDate = newWork.endDate ? new Date(newWork.endDate) : newWork.endDate;
           return newWork;
+        });
+      } else {
+        user['applicants'] =
+          user['applicants'].map(applicant => {
+            const newApplicant = { ...applicant };
+            newApplicant['employee'] = { ...newApplicant['employee'] };
+            newApplicant['employee']['work'] = newApplicant['employee']['work'].map(work => {
+              const newWork = { ...work };
+              newWork.startDate = new Date(newWork.startDate);
+              newWork.endDate = newWork.endDate ? new Date(newWork.endDate) : newWork.endDate;
+              return newWork;
+            });
+            return newApplicant;
         });
       }
 

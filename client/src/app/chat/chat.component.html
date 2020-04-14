@@ -4,34 +4,40 @@
 
 <app-alert *ngIf="messages.length" [messages]="messages" (closeAlert)="onClose()"></app-alert>
 
-<div class="chat-container">
+<main class="chat-container">
 
-  <div class="side-menu">
+  <section class="side-menu">
 
-    <div class="create-messages">
+    <section class="create-messages">
       <div class="create-messages__title">
-        <p>Messages</p>
+        <h4>Messages</h4>
       </div>
       <div class="create-messages__buttons">
         <button (click)="onNewMessage(true)" type="button" class="create-messages__my-btn glyphicon glyphicon-edit">
         </button>
         <button (click)="onNewMessage(false)" type="button" class="create-messages__my-btn">
-          <span class="glyphicon glyphicon-edit"></span>
-          <span class="glyphicon glyphicon-edit"></span>
+          <i class="glyphicon glyphicon-edit"></i>
+          <i class="glyphicon glyphicon-edit"></i>
         </button>
       </div>
-    </div>
+    </section>
 
-    <div class="conversations-list-container">
+    <section class="conversations-list-container">
 
-      <div *ngIf="isLoading" style="text-align: center;">
+      <div *ngIf="isLoading" class='flex-row-center'>
         <app-loading-spinner></app-loading-spinner>
       </div>
 
       <div *ngIf="!isLoading && conversations && conversations.length" #conversationList>
-        <div *ngFor="let con of conversations; let i=index; trackBy: trackConversations" class="single-conversation {{ getReadClass(con.participants) }} {{ currConversation && currConversation._id === con._id ? 'active-con' : '' }}" (click)="onFocusCon($event.currentTarget)" [attr.data-con-ind]="i">
+        <div *ngFor="let con of conversations; let i=index; trackBy: trackConversations"
+              class="single-conversation
+                    {{ getReadClass(con.participants) }}
+                    {{ currConversation && currConversation._id === con._id ? 'active-con' : '' }}"
+              (click)="onFocusCon($event.currentTarget)"
+              [attr.data-con-ind]="i">
           <ul class='conversation__participants-list'>
-            <li *ngFor="let participant of getParticipantsOtherThanUSer(con.participants); let i=index" class="conversation__participants-list__item">
+            <li *ngFor="let participant of getParticipantsOtherThanUSer(con.participants); let i=index"
+                class="conversation__participants-list__item">
               {{ i !== 2 ? getFullName(participant['user']) : '' }}</li>
           </ul>
         </div>
@@ -41,20 +47,20 @@
         No messages yet.
       </p>
 
-    </div>
+    </section>
 
-  </div>
+  </section>
 
 
-  <div class="new-message" *ngIf="!currConversation">
+  <section class="new-message" *ngIf="!currConversation">
 
-    <div class="title">
-        New {{ privateMsg ? '' : 'Group' }} Message
-    </div>
+    <header class="title">
+      <h4>New {{ privateMsg ? '' : 'Group' }} Message</h4>
+    </header>
 
-    <div class="new-message__add-item">
+    <section class="new-message__add-item">
       <app-search-bar [placeholder]="'Type one or more names'" [search]="['employee','company']" (wantedResultsEmitter)="onGetNames($event)"></app-search-bar>
-    </div>
+    </section>
 
     <ng-container *ngTemplateOutlet="nameListTemplate; context: {removeName: true}"></ng-container>
 
@@ -67,19 +73,19 @@
         messageContent: 'new-message__message-content'
       }"></ng-container>
 
-  </div>
+  </section>
 
-  <div class="chat" *ngIf="currConversation">
-    <div class="title">
-      Chat
-    </div>
+  <section class="chat" *ngIf="currConversation">
+    <header class="title">
+      <h4>Chat</h4>
+    </header>
 
     <ng-container *ngTemplateOutlet="nameListTemplate; context: {removeName: false}"></ng-container>
 
-    <div class="messages">
+    <section class="messages">
       <ul class='messages__list' appScrollToBottom>
         <li *ngFor="let msg of currConversation.messages"
-              class="messages__list__item {{ msg.creator === user._id ? 'user-msg' : '' }}" [attr.data-date]=" msg['first'] ? msg['first']: ''">
+              class="messages__list__item {{ msg.creator === user._id ? 'user-msg' : '' }}" [attr.data-date]="msg.first ? msg.first: ''">
           <p *ngIf="msg.creator !== user._id && !privateMsg"
             class="message message-name"
             [style.color]="nameList.get(msg.creator).nameColor['changingThisBreaksApplicationSecurity']">
@@ -91,7 +97,7 @@
 
         </li>
       </ul>
-    </div>
+    </section>
 
     <ng-container *ngTemplateOutlet="submitTemplate;
       context: {
@@ -102,34 +108,34 @@
         messageContent: 'chat-message-content'
       }"></ng-container>
 
-  </div>
+  </section>
 
-</div>
+</main>
 
 
 <ng-template #chatStringMessage let-msg="msg">
-  <p class="message message-content">{{ msg.content }}<span class="message-time">{{ msg['hours'] }}:{{ msg['minutes'] }}</span></p>
+  <p class="message message-content">{{ msg.content }}<time class="message-time" [dateTime]="msg.time">{{ msg.time }}</time></p>
 </ng-template>
 
 <ng-template #chatFileMessage let-msg="msg">
-  <a href="{{msg.filePath}}" download="" target="_blank" class="message message-content">
+  <a href="{{msg.filePath}}" download="{{msg.fileName}}" target="_blank" class="message message-content">
     <span>{{ msg.fileName }}</span>
     <span>{{ getFileSize(msg.fileNumBytes) }}</span>
-    <span class="message-time">{{ msg['hours'] }}:{{ msg['minutes'] }}</span>
+    <time class="message-time" [dateTime]="msg.time">{{ msg.time }}</time>
   </a>
 </ng-template>
 
 
 
 <ng-template #nameListTemplate let-removeName="removeName">
-  <div class="name-list-container">
+  <section class="name-list-container">
     <ul class='name-list-container__list'>
       <li *ngFor="let name of nameList | keyvalue; let i=index" class="name-list-container__item">
         {{ name.value.fullName || name.value.email}}
-        <span *ngIf="removeName" class="glyphicon glyphicon-remove name-list-container__item-remove" (click)="onRemoveName(name.value._id)"></span>
+        <i *ngIf="removeName" class="glyphicon glyphicon-remove name-list-container__item-remove" (click)="onRemoveName(name.value._id)"></i>
       </li>
     </ul>
-  </div>
+  </section>
 </ng-template>
 
 <ng-template #submitTemplate let-formClass="formClass" let-inputBox="inputBox"
@@ -150,7 +156,7 @@
 
     <div class="{{submitDiv}}">
       <input type="file" class="input-upload-file" #inputUploadFile (change)='onChoseFile($event)'>
-      <span class="glyphicon glyphicon-paperclip paperclip" (click)="uploadFile()"></span>
+      <i class="glyphicon glyphicon-paperclip paperclip" (click)="uploadFile()"></i>
       <button class="submit-message__button"
         [disabled]="(!sendMessageForm.valid && !file) || !nameList.size"
         title="Ctrl + Enter"

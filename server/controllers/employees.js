@@ -8,6 +8,7 @@ const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
 const sendMessagesResponse = require('../utils/shared').sendMessagesResponse;
 const changeStatusOfAUserJob = require('../utils/shared').changeStatusOfAUserJob;
 const getAndCreateTokens = require('../utils/shared').getAndCreateTokens;
+const skippedDocuments = require('../utils/shared').skippedDocuments;
 
 exports.fetchSingle = async (req, res, next) => {
   try {throw "111"

@@ -207,7 +207,7 @@ export class DetailsJobComponent implements OnInit, OnDestroy {
     }
   }
 
-  getCompanyinfo() {
+  getCompanyInfo() {
     if (this.currUrl.length === 2 && this.currUrl[0] === 'jobs' &&
           (!this.job.company.lastFetch || environment.fetchDataMSReset <
         new Date().getTime() - this.job.company.lastFetch.getTime())) {

@@ -2,45 +2,61 @@
 
 
 
-<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+<div *ngIf="isLoading" class='flex-row-center'>
+  <app-loading-spinner></app-loading-spinner>
+</div>
 
 <div class="container" *ngIf="isLoading">
-  <app-message-box *ngIf="messages.length && !isLoading" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
+  <app-message-box
+    *ngIf="messages.length && !isLoading"
+    [messages]="messages"
+    (closeMessages)="onClose()">
+  </app-message-box>
+
   <app-back-button *ngIf="!job"></app-back-button>
 </div>
 
 <div class="container" *ngIf="job && !isLoading">
 
-  <div class="details-page-header">
+  <header class="details-page-header">
     <h3 class="{{ status ? '' : 'only-job-title' }}">{{ (job.title || job['job'].title) | titlecase }}</h3>
     <div class="status-info" *ngIf="status">
       <h3 class="job-status job-status-{{ status }}">{{ status }}</h3>
-      <h4 class="job-date">{{ statusDate }}</h4>
+      <h4 class="job-date"> <time [dateTime]="statusDate.split('/').reverse().join('/')"> {{ statusDate }} </time> </h4>
     </div>
     <app-back-button></app-back-button>
-  </div>
+  </header>
 
-  <div class="details-page-body">
-    <p *ngIf="!allowEdit && companyLink; else companyNoLink">
-      <a routerLink='company' (click)="getCompanyinfo()">
-        Comapny: {{ (companyId.name | titlecase) }}
-      </a>
-    </p>
-    <ng-template #companyNoLink><p>Comapny: {{ (companyId.name | titlecase) }}</p></ng-template>
+  <hr>
 
-    <p>Description: {{ job.description || job['job'].description }}</p>
-    <p>Date: {{ getJobDate(job.date) || getJobDate(job['job'].date) }}</p>
+  <main class="details-page-body">
+    <section>
+      <h4>Info</h4>
+      <p *ngIf="!allowEdit && companyLink; else companyNoLink">
+        <a routerLink='company' (click)="getCompanyInfo()">
+          Company: {{ (companyId.name | titlecase) }}
+        </a>
+      </p>
+      <ng-template #companyNoLink><p>Company: {{ (companyId.name | titlecase) }}</p></ng-template>
+
+      <p>Description: {{ job.description || job['job'].description }}</p>
+      <p>Date: <time [dateTime]="(getJobDate(job.date) || getJobDate(job['job'].date)).split('/').reverse().join('/')"> {{ getJobDate(job.date) || getJobDate(job['job'].date) }} </time></p>
+    </section>
 
 
-    <p>Requierments:</p>
-    <p *ngIf="!job.requirements || !job.requirements.length; else reqList">There are no prior requierments for this job.</p>
-    <ng-template #reqList>
-      <ul class="requirements-list" #reqList>
-        <li class="requirements-list__item" *ngFor="let requirement of job.requirements">
-          <p>{{ requirement.requirement | titlecase }}</p>
-        </li>
-      </ul>
-    </ng-template>
+    <section>
+      <header>
+      	<h4>Requirements:</h4>
+      </header>
+      <p *ngIf="!job.requirements || !job.requirements.length; else reqList">There are no prior requirements for this job.</p>
+      <ng-template #reqList>
+        <ul class="requirements-list" #reqList>
+          <li class="requirements-list__item" *ngFor="let requirement of job.requirements">
+            <p>{{ requirement.requirement | titlecase }}</p>
+          </li>
+        </ul>
+      </ng-template>
+    </section>
 
     <hr>
 
@@ -56,7 +72,8 @@
     <div *ngIf="allowEdit" class="edit-buttons-container">
       <a class="btn btn-primary btn-sm" routerLink='edit'>Edit job</a>
     </div>
-  </div>
+  </main>
+
 </div>
 
 

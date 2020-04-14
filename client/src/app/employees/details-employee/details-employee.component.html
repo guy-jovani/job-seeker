@@ -3,20 +3,20 @@
 
 <div class="container">
 
-  <div *ngIf="isLoading && !addWork">
+  <div *ngIf="isLoading && !addWork" class='flex-row-center'>
     <app-loading-spinner></app-loading-spinner>
   </div>
 
   <div class="container-fluid" *ngIf="employee && (!isLoading || addWork)">
     <app-message-box *ngIf="messages.length && !addWork" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
 
-    <div class="details-page-header">
+    <header class="details-page-header">
       <img [src]="employee.profileImagePath" class="employeeProfileImage"
             *ngIf="employee.profileImagePath"/>
       <div class="employee-no-profile-image" *ngIf="!employee.profileImagePath">
         <span class="glyphicon glyphicon-user"></span>
       </div>
-      <div class="employee-info-header">
+      <address class="employee-info-header">
         <h4 *ngIf="currUrl[0] === 'my-details'">
           <p>
             First Name: {{ employee.firstName || '------' }}
@@ -31,17 +31,19 @@
           {{ !employee.firstName && !employee.lastName ? employee.email : '' }}
         </h3>
         <p><a href="mailto:{{employee.email}}">{{ employee.email }}</a></p>
-      </div>
+      </address>
       <app-back-button *ngIf='currUrl[0] !== "my-details"'></app-back-button>
-    </div>
+    </header>
 
-    <div class="details-page-body">
+    <main class="details-page-body">
       <div class="edit-buttons-container" *ngIf="allowEdit">
         <a class="btn btn-primary btn-sm" routerLink='edit'>Edit Details</a>
       </div>
 
-      <div class="jobs-list" *ngIf="currUrl[0] === 'my-applicants'">
-        <h4>Shown interest</h4>
+      <section class="jobs-list" *ngIf="currUrl[0] === 'my-applicants'">
+        <header>
+          <h4>Shown interest</h4>
+        </header>
 
         <div *ngIf="currUrl[0] === 'my-applicants'" class="select-status-list">
           <label for="job-list">Show status list: </label>
@@ -58,16 +60,16 @@
           (acceptRejectEmitter)="onAcceptReject($event)"
         >
         </app-list-jobs>
-      </div>
+      </section>
 
-      <div class="experience" *ngIf='employee.work && employee.work.length || allowEdit'>
-        <div class="experience-header">
+      <section class="experience" *ngIf='employee.work && employee.work.length || allowEdit'>
+        <header class="experience-header">
           <h3>Experience</h3>
           <button
             *ngIf='currUrl[0] === "my-details"'
             class="btn btn-info"
             (click)="onToggleWork()">+</button>
-        </div>
+        </header>
         <div class="experience-list-container">
           <ul class="list-group">
             <li
@@ -90,9 +92,9 @@
             </li>
           </ul>
         </div>
-      </div>
+      </section>
 
-    </div>
+    </main>
 
   </div>
 
@@ -103,8 +105,8 @@
 
 <div class="backdrop {{ addWork ? '' : 'hide' }}" #backdrop>
 
-  <div class="container form-container add-experience-container">
-    <div *ngIf="isLoading">
+  <section class="container form-container add-experience-container">
+    <div *ngIf="isLoading" class="flex-row-center">
       <app-loading-spinner></app-loading-spinner>
     </div>
     <form (ngSubmit)="onSubmit(workForm)" #workForm="ngForm" class="my-form {{ isLoading ? 'hide' : '' }}">
@@ -314,6 +316,6 @@
       </div>
 
     </form>
-  </div>
+  </section>
 
 </div>

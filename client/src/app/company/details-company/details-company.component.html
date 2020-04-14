@@ -1,58 +1,75 @@
 
 
 
-<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+<div *ngIf="isLoading" class='flex-row-center'>
+  <app-loading-spinner></app-loading-spinner>
+</div>
+
 <div class="container" *ngIf="company && !isLoading">
 
-  <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
-  <div class="details-page-header">
+  <app-message-box
+    *ngIf="messages.length"
+    [messages]="messages"
+    (closeMessages)="onClose()">
+  </app-message-box>
+
+  <header class="details-page-header">
     <img [src]="company.profileImagePath" class="company-profile-image" *ngIf="company.profileImagePath"/>
     <div class="company-no-profile-image" *ngIf="!company.profileImagePath">
       <span class="glyphicon glyphicon-user"></span>
     </div>
     <h3>{{ allowEdit ? 'My Profile - ' + (company.name | titlecase) : company.name | titlecase }}</h3>
     <app-back-button *ngIf='currUrl[0] !== "my-details"'></app-back-button>
-  </div>
+  </header>
 
   <hr>
 
-  <div class="details-page-body" *ngIf="!isLoading && company.email">
-    <p>Email: <a href="mailto:{{company.email}}">{{ company.email }}</a></p>
+  <main class="details-page-body" *ngIf="!isLoading && company.email">
+    <section>
+      <h4>Info</h4>
+      <address>
+        <p>Email: <a href="mailto:{{company.email}}">{{ company.email }}</a></p>
 
-    <p *ngIf="company.website">Website:
-      <a target="_blank"
-        href="{{ company.website.startsWith('http://www.') ? company.website : 'http://www.' + company.website }}">
-        {{ company.website }}
-      </a>
-      <span class="glyphicon glyphicon-new-window"></span>
-    </p>
-    <p *ngIf="!company.website && currUrl[0] === 'my-details'">Website: ------</p>
+        <p *ngIf="company.website">Website:
+          <a target="_blank"
+            href="{{ company.website.startsWith('http://www.') ? company.website : 'http://www.' + company.website }}">
+            {{ company.website }}
+          </a>
+          <span class="glyphicon glyphicon-new-window"></span>
+        </p>
+        <p *ngIf="!company.website && currUrl[0] === 'my-details'">Website: ------</p>
+      </address>
 
-    <p *ngIf="company.description">Description: {{ company.description }}</p>
-    <p *ngIf="!company.description && currUrl[0] === 'my-details'">Description: ------</p>
+      <p *ngIf="company.description">Description: {{ company.description }}</p>
+      <p *ngIf="!company.description && currUrl[0] === 'my-details'">Description: ------</p>
+    </section>
 
 
-    <h4 *ngIf="currUrl[0] !== 'my-details'">Jobs</h4>
-    <app-list-jobs
-      *ngIf="currUrl[0] !== 'my-details'"
-      [jobs]="company.jobs"
-      [companyJobs]="true">
-    </app-list-jobs>
+    <section>
+      <header>
+        <h4 *ngIf="currUrl[0] !== 'my-details'">Jobs</h4>
+      </header>
+      <app-list-jobs
+        *ngIf="currUrl[0] !== 'my-details'"
+        [jobs]="company.jobs"
+        [companyJobs]="true">
+      </app-list-jobs>
+    </section>
 
-    <div class="images-container">
+    <section class="images-container">
       <ul class="images-container__list">
         <li *ngFor="let imagePath of company.imagesPath" class="images-container__list-item">
           <img class="image" [src]='imagePath'>
         </li>
       </ul>
-    </div>
+    </section>
 
     <hr>
 
     <div class="edit-buttons-container" *ngIf="allowEdit">
       <a class="btn btn-primary btn-sm" routerLink='edit'>Edit Details</a>
     </div>
-  </div>
+  </main>
 
 
 </div>

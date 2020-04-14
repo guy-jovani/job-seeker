@@ -1,33 +1,48 @@
 
 
 <div class="container" #container>
-  <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
-  <div *ngIf="allowAdd">
-    <a class="btn btn-success" routerLink='create'>
-      Add a Job
-    </a>
-  </div>
-  <div *ngIf="currUrl[0] === 'my-jobs' && !allowAdd">
-    <label for="job-list">Choose status list:</label>
-    <select [(ngModel)]="selectedList" (ngModelChange)="checkJobOfUser()">
-      <option value="all">All</option>
-      <option *ngFor="let status of availableStatus" value="{{status}}">{{ status | titlecase }}</option>
-    </select>
-  </div>
-  <div>
-    <h3>Jobs</h3>
-    <app-list-jobs
-      [showStatus]="currUrl[0] === 'my-jobs' && !allowAdd"
-      [jobs]="jobs"
-      [detailsJobUrl]="detailsJobUrl">
-    </app-list-jobs>
-    <div *ngIf="isLoading" style="text-align: center;">
-      <app-loading-spinner></app-loading-spinner>
-    </div>
-    <div *ngIf='lastJob' style="text-align: center;">
-      <p>There are no {{ jobs.length ? 'more' : '' }} jobs at the moment.</p>
-    </div>
-  </div>
+
+  <app-message-box
+    *ngIf="messages.length"
+    [messages]="messages"
+    (closeMessages)="onClose()">
+  </app-message-box>
+
+  <main>
+    <header>
+      <h3>Jobs</h3>
+      <div *ngIf="allowAdd">
+        <a class="btn btn-success" routerLink='create'>
+          Add a Job
+        </a>
+      </div>
+      <div *ngIf="currUrl[0] === 'my-jobs' && !allowAdd">
+        <label for="job-list">Choose status list:</label>
+        <select [(ngModel)]="selectedList" (ngModelChange)="checkJobOfUser()">
+          <option value="all">All</option>
+          <option *ngFor="let status of availableStatus" value="{{status}}">{{ status | titlecase }}</option>
+        </select>
+      </div>
+    </header>
+
+    <section>
+      <app-list-jobs
+        [showStatus]="currUrl[0] === 'my-jobs' && !allowAdd"
+        [jobs]="jobs"
+        [detailsJobUrl]="detailsJobUrl">
+      </app-list-jobs>
+
+      <div *ngIf="isLoading" class="flex-row-center">
+        <app-loading-spinner></app-loading-spinner>
+      </div>
+
+      <div *ngIf='lastJob' class="flex-row-center">
+        <p>There are no {{ jobs.length ? 'more' : '' }} jobs at the moment.</p>
+      </div>
+    </section>
+
+  </main>
+
 </div>
 
 

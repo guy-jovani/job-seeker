@@ -11,10 +11,6 @@
     <div class="navbar-collapse collapse" [class.collapse]="collapsed" (window:resize)="collapsed = true">
 
       <ul class="nav navbar-nav">
-        <!-- <li routerLinkActive="active"
-            [routerLinkActiveOptions]="{exact: true}" *ngIf="isAuthenticated">
-          <a class="navbar-link" routerLink='/'>Home</a>
-        </li> -->
         <li routerLinkActive="active" *ngIf="isAuthenticated">
           <a routerLink='/people' >People</a>
         </li>

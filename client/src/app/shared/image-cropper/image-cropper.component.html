@@ -3,9 +3,9 @@
 
 
 
-<div class="image-picker">
+<article class="image-picker">
 
-  <div class="main-picker">
+  <section class="main-picker">
     <div class="image-input-remove-container">
       <input type="file" class="image-picker" (change)="fileChangeEvent($event)" #filePicker/>
       <span
@@ -18,7 +18,7 @@
     <div class="cropped-container-done" *ngIf='imagePreview && (!croppedImage || confirmedImage)'>
       <img [src]="imagePreview" class="{{roundCropper ? 'preview__image round' : 'preview__image'}}" />
     </div>
-  </div>
+  </section>
 
   <div class="error-picker" *ngIf="failUpload">
     <span class="help-block">
@@ -26,7 +26,7 @@
       <p>You can only upload an image file (jpeg, png etc..).</p>
     </span>
   </div>
-</div>
+</article>
 
 
 <!-- only shows when select a file -->
@@ -34,8 +34,8 @@
 <div class="backdrop" *ngIf='croppedImage && !confirmedImage'></div>
 
 
-<div class="crop-container hide" #cropContainer>
-  <div class="cropper">
+<article class="crop-container hide" #cropContainer>
+  <section class="cropper">
     <div class="cropper-start-buttons">
       <button
         type="button"
@@ -62,12 +62,12 @@
       (imageCropped)="imageCropped($event)"
       (loadImageFailed)="loadImageFailed()">
     </image-cropper>
-  </div>
+  </section>
 
   <div class="cropped-container-start">
     <img [src]="croppedImage" class="{{roundCropper ? 'preview-cropper round' : 'preview-cropper'}}" />
   </div>
-</div>
+</article>
 
 
 

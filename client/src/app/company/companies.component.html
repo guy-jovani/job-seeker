@@ -5,16 +5,25 @@
 
 <div class="container">
   <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
-  <div class="container-fluid" #containerFluid>
-    <h3>Compenies</h3>
-    <app-list-companies [companies]="companies"></app-list-companies>
-    <div *ngIf="isLoading" style="text-align: center;">
-      <app-loading-spinner></app-loading-spinner>
-    </div>
-    <div *ngIf='lastCompany && !isLoading' style="text-align: center;">
-      <p>There are no {{ companies.length ? 'more' : '' }} companies that match your search.</p>
-    </div>
-  </div>
+  <main class="container-fluid" #containerFluid>
+
+    <section>
+      <header>
+      	<h3>Companies</h3>
+      </header>
+
+      <app-list-companies [companies]="companies"></app-list-companies>
+
+      <div *ngIf="isLoading" class='flex-row-center'>
+        <app-loading-spinner></app-loading-spinner>
+      </div>
+
+      <div *ngIf='lastCompany && !isLoading' class='flex-row-center'>
+        <p>There are no {{ companies.length ? 'more' : '' }} companies that match your search.</p>
+      </div>
+    </section>
+
+  </main>
 </div>
 
 

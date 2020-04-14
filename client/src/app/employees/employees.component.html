@@ -3,20 +3,39 @@
 
 
 <div class="container">
-  <app-message-box *ngIf="messages.length" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
-  <div class="container-fluid" #containerFluid>
-    <h3>{{ currUrl[0] === 'my-applicants' ? 'Applicants' : 'People' }}</h3>
-    <app-list-employees [employees]="employees" [applicantsList]="applicantsList"></app-list-employees>
-    <div *ngIf="isLoading" style="text-align: center;">
-      <app-loading-spinner></app-loading-spinner>
-    </div>
-    <div *ngIf='lastEmployee' style="text-align: center;">
-      <p>There are no {{ employees.length ? 'more' : '' }} people that match your search.</p>
-    </div>
-    <div *ngIf='currUrl[0] === "my-applicants" && !employees.length' style="text-align: center;">
-      <p>There are no applicants at the moment.</p>
-    </div>
-  </div>
+
+  <app-message-box
+    *ngIf="messages.length"
+    [messages]="messages"
+    (closeMessages)="onClose()">
+  </app-message-box>
+
+  <main class="container-fluid" #containerFluid>
+
+    <section>
+
+      <header>
+        <h3>{{ currUrl[0] === 'my-applicants' ? 'Applicants' : 'People' }}</h3>
+      </header>
+
+      <app-list-employees [employees]="employees" [applicantsList]="applicantsList"></app-list-employees>
+
+      <div *ngIf="isLoading" class="flex-row-center">
+        <app-loading-spinner></app-loading-spinner>
+      </div>
+
+      <div *ngIf='lastEmployee' class="flex-row-center">
+        <p>There are no {{ employees.length ? 'more' : '' }} people that match your search.</p>
+      </div>
+
+      <div *ngIf='currUrl[0] === "my-applicants" && !employees.length' class="flex-row-center">
+        <p>There are no applicants at the moment.</p>
+      </div>
+
+    </section>
+
+  </main>
+
 </div>
 
 

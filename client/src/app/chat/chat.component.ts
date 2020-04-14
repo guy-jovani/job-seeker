@@ -51,7 +51,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.userKind = userState.user ? userState.kind[0].toUpperCase() + userState.kind.slice(1) : null;
       this.conversations = userState.conversations;
       this.isLoading = userState.loading;
-      if (this.currConversation && this.conversations) {
+      if (this.currConversation && this.conversations && this.user) {
         if (!this.currConversation.participants.find(part => part.user._id === this.user._id).read) {
           this.chatService.sendMessage('readAMsg', { // mark con as 'read'
             conversationId: this.currConversation._id, userId: this.user._id
@@ -263,6 +263,11 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   onClose() {
     this.messages = [];
+  }
+
+  getRelativeFilePath(path: string) {
+    // {{getRelativeFilePath(msg.filePath)}}
+    return path.split('/').slice(3).join('/');
   }
 
   onNewMessage(privateMsg: boolean) {

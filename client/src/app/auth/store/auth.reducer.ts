@@ -5,7 +5,7 @@ import * as AuthActions from './auth.actions';
 
 
 export interface State {
-  messages: any[];
+  messages: string[];
   loading: boolean;
   refreshing: boolean;
   token: string;

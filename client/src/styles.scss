@@ -34,9 +34,13 @@ input.ng-invalid.ng-touched {
   display: none;
 }
 
-.loading-spinner-div {
+.flex-row-center {
   display: flex;
   justify-content: center;
+}
+
+address {
+  margin: 0;
 }
 
 /**************************
@@ -177,6 +181,10 @@ app-back-button {
 .details-page-body {
   display: flex;
   flex-direction: column;
+
+  hr {
+    width: 100%;
+  }
 }
 
 .edit-buttons-container,

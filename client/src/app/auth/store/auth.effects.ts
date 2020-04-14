@@ -13,37 +13,15 @@ import * as UserActions from '../../user/store/user.actions';
 import * as JobActions from '../../job/store/job.actions';
 import * as EmployeeActions from '../../employees/store/employee.actions';
 import * as CompanyActions from '../../company/store/company.actions';
-import { Company } from 'app/company/company.model';
-import { Employee } from 'app/employees/employee.model';
 import { ChatService } from 'app/chat/chat-socket.service';
 import { AuthAutoLogoutService } from '../auth-auto-logout.service';
+import { UserSessionService } from 'app/user/user-session.service';
 
 
 
 const nodeServer = environment.nodeServer + 'auth/';
 
-const setUserSessionStorage = (user: Company | Employee,
-                               kind: string = null) => {
-  sessionStorage.setItem('userData', JSON.stringify({...user}));
-  if (kind) { sessionStorage.setItem('kind', JSON.stringify(kind)); }
-};
 
-const getUserAndTokensSessionStorage = () => {
-  const user = JSON.parse(sessionStorage.getItem('userData'));
-  const kind = JSON.parse(sessionStorage.getItem('kind'));
-  const token = JSON.parse(sessionStorage.getItem('token'));
-  const refreshToken = JSON.parse(sessionStorage.getItem('refreshToken'));
-  const expirationDate = JSON.parse(sessionStorage.getItem('expirationDate'));
-  return [user, kind, token, expirationDate, refreshToken];
-};
-
-const removeUserAndTokensSessionStorage = () => {
-  sessionStorage.removeItem('userData');
-  sessionStorage.removeItem('kind');
-  sessionStorage.removeItem('token');
-  sessionStorage.removeItem('expirationDate');
-  sessionStorage.removeItem('refreshToken');
-};
 
 @Injectable()
 export class AuthEffects {
@@ -52,6 +30,7 @@ export class AuthEffects {
               private http: HttpClient,
               private chatService: ChatService,
               private authAutoLogoutService: AuthAutoLogoutService,
+              private userSessionService: UserSessionService,
               private store: Store<fromApp.AppState>,
               private router: Router) {}
 
@@ -97,7 +76,7 @@ export class AuthEffects {
   autoLogin = this.actions$.pipe(
     ofType(AuthActions.AUTO_LOGIN),
     map(() => {
-      const [user, kind, token, expirationDate, refreshToken] = getUserAndTokensSessionStorage();
+      const [user, kind, token, expirationDate, refreshToken] = this.userSessionService.getUserAndTokensSessionStorage();
       if (!user || !kind || !token || !expirationDate || !refreshToken) {
         return { type: 'dummy' };
       }
@@ -128,7 +107,7 @@ export class AuthEffects {
         .pipe(
           map(res => {
             if (res['type'] === 'success') {
-              removeUserAndTokensSessionStorage();
+              this.userSessionService.removeUserAndTokensSessionStorage();
               this.store.dispatch(new EmployeeActions.Logout());
               this.store.dispatch(new CompanyActions.Logout());
               this.store.dispatch(new JobActions.Logout());
@@ -218,7 +197,7 @@ export class AuthEffects {
 
   private signupLoginHandler = res => {
     if (res['type'] === 'success') {
-      setUserSessionStorage(res['user'], res['kind']);
+      this.userSessionService.setUserSessionStorage(res['user'], res['kind']);
 
       this.chatService.sendMessage('login', {  _id: res['user']['_id'], msg: 'logged' } );
       this.store.dispatch(new UserActions.UpdateActiveUser({ user: res['user'], kind: res['kind'] }));

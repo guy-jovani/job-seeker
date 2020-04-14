@@ -64,10 +64,11 @@ export class AppComponent implements OnInit, OnDestroy {
             this.store.dispatch(new UserActions.SetChatNotification());
           }
         } else {
-          this.messages.push(...res['messages']);
+          this.messages = [...res['messages']];
         }
       } catch (error) {
-        this.messages.push('There was a problem sending the message, please refresh your page and try again');
+        this.messages =
+            ['There was a problem sending the message, please refresh your page and try again'];
       }
     });
 
@@ -82,7 +83,8 @@ export class AppComponent implements OnInit, OnDestroy {
           this.messages.push(...res['messages']);
         }
       } catch (error) {
-        this.messages.push('There was a problem sending the message, please refresh your page and try again');
+        this.messages =
+            ['There was an unexpected problem, please refresh your page and try again'];
       }
     });
 
