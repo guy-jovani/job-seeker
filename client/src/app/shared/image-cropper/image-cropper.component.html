@@ -16,7 +16,7 @@
       </span>
     </div>
     <div class="cropped-container-done" *ngIf='imagePreview && (!croppedImage || confirmedImage)'>
-      <img [src]="imagePreview" class="{{roundCropper ? 'preview__image round' : 'preview__image'}}" />
+      <img [src]="imagePreview" alt="Preview of the cropped image." class="{{roundCropper ? 'preview__image round' : 'preview__image'}}" />
     </div>
   </section>
 
@@ -65,7 +65,7 @@
   </section>
 
   <div class="cropped-container-start">
-    <img [src]="croppedImage" class="{{roundCropper ? 'preview-cropper round' : 'preview-cropper'}}" />
+    <img [src]="croppedImage" alt="Preview of the cropped image." class="{{roundCropper ? 'preview-cropper round' : 'preview-cropper'}}" />
   </div>
 </article>
 

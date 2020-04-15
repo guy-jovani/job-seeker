@@ -141,7 +141,9 @@
 <ng-template #submitTemplate let-formClass="formClass" let-inputBox="inputBox"
                               let-submitDiv="submitDiv" let-filePreview="filePreview"
                               let-messageContent="messageContent">
+
   <form class="{{formClass}}" (ngSubmit)="onSubmit(sendMessageForm)" #sendMessageForm="ngForm">
+
     <div class="{{inputBox}}">
       <label for="messageContent"></label>
       <textarea
@@ -163,7 +165,9 @@
         #submitChat>
         Send</button>
     </div>
+
   </form>
+
 </ng-template>
 
 

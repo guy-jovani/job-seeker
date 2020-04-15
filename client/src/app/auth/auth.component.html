@@ -3,27 +3,29 @@
 
 
 <div class="container form-container">
-  <div *ngIf="isLoading" style="text-align: center;">
+  <div *ngIf="isLoading" class="flex-row-center">
     <app-loading-spinner></app-loading-spinner>
   </div>
   <form class="my-form" [formGroup]="authForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+
+    <header class="form-title-container">
+      <h3 class="form-action-title">{{ authAction !== 'login' ? "Signup" : "Login"}}</h3>
+    </header>
+
     <app-message-box
       *ngIf="messages.length"
       [messages]="messages"
       (closeMessages)="onClose()">
     </app-message-box>
 
-    <div class="form-title-container">
-      <h3 class="form-action-title">{{ authAction !== 'login' ? "Signup" : "Login"}}</h3>
-    </div>
     <div class="form-group">
-      <label for="email">Email  </label>
+      <label for="email">Email <abbr title="required" aria-label="required">*</abbr> </label>
       <input
         class="form-control input-form-tag"
         type="email"
         name="email"
         id="email"
-        placeholder="Email *"
+        placeholder="Email"
         formControlName="email"
         #email
       >
@@ -32,14 +34,15 @@
         Please enter a valid email address.
       </span>
     </div>
+
     <div class="form-group" *ngIf="authAction === 'companySignup'">
-      <label for="name">Name  </label>
+      <label for="name">Name <abbr title="required" aria-label="required">*</abbr> </label>
       <input
         class="form-control input-form-tag"
         type="name"
         name="name"
         id="name"
-        placeholder="Name *"
+        placeholder="Name"
         formControlName="name"
         #name
       >
@@ -48,16 +51,17 @@
         Please enter a valid name.
       </span>
     </div>
+
     <div formGroupName="passwords">
 
       <div class="form-group password-input-container">
-        <label for="name">Password  </label>
+        <label for="name">Password <abbr title="required" aria-label="required">*</abbr> </label>
         <input
           class="form-control input-form-tag"
           [type]="showPasswords ? 'text' : 'password'"
           name="password"
           id="password"
-          placeholder="Password *"
+          placeholder="Password"
           formControlName="password"
           #password />
         <span (click)="onTogglePasswords()"
@@ -65,7 +69,7 @@
                                         'glyphicon glyphicon-eye-open show-password-eye' }}">
         </span>
 
-        <div class="error-messages">
+        <div>
           <span *ngIf="authForm.get('passwords.password').touched &&
             !authForm.get('passwords.password').valid">
             <span class="help-block" *ngIf="authForm.get('passwords.password').errors.required">
@@ -79,13 +83,13 @@
       </div>
 
       <div class="form-group" *ngIf="authAction !== 'login'">
-        <label for="name">Confirm Password  </label>
+        <label for="name">Confirm Password <abbr title="required" aria-label="required">*</abbr> </label>
         <input
           class="form-control input-form-tag"
           [type]="showPasswords ? 'text' : 'password'"
           name="confirmPassword"
           id="confirmPassword"
-          placeholder="Confirm password *"
+          placeholder="Confirm password"
           formControlName="confirmPassword"
         >
         <span *ngIf="authForm.get('passwords.password').touched &&
@@ -98,32 +102,35 @@
         </span>
       </div>
     </div>
+
     <hr>
+
     <div class="auth-buttons">
       <button
-          type="submit"
-          class="btn btn-primary"
-          [disabled]="!authForm.valid"
-          >
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!authForm.valid"
+        >
           {{ authAction === 'login'  ? "Login" : "Signup"}}
         </button>
         <button *ngIf="authAction !== 'login'"
-        style="margin-left: 2em;"
-        type="button"
-        class="btn btn-info"
-        [routerLink]="authAction === 'companySignup' ? ['/signup'] : ['company']"
+          style="margin-left: 2em;"
+          type="button"
+          class="btn btn-info"
+          [routerLink]="authAction === 'companySignup' ? ['/signup'] : ['company']"
         >
         {{ authAction === 'companySignup'  ? "Not a Company?" : "Sign a Company"}}
       </button>
         <button *ngIf="authAction === 'login'"
-        style="margin-left: 2em;"
-        type="button"
-        class="btn btn-info btn-sm"
-        routerLink="/reset"
+          style="margin-left: 2em;"
+          type="button"
+          class="btn btn-info btn-sm"
+          routerLink="/reset"
         >
         Forgot password?
       </button>
     </div>
+
   </form>
 </div>
 

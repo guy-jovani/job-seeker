@@ -75,7 +75,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   onWantedRes(ind: number) {
-    console.log(this.searchRes[ind])
     this.wantedResults.set(this.searchRes[ind]._id, this.searchRes[ind]);
     this.searchInput.nativeElement.value = '';
     this.wantedResultsEmitter.emit(this.wantedResults);

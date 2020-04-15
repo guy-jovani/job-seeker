@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs';
 import * as fromApp from '../../store/app.reducer';
 import { Employee } from '../employee.model';
 import * as EmployeeActions from '../store/employee.actions';
-import { Company, ApplicantJob, ApplicantStatus } from 'app/company/company.model';
+import { Company, ApplicantJob, ApplicantStatus, Applicant } from 'app/company/company.model';
 import * as UserActions from '../../user/store/user.actions';
 import { ChatService } from 'app/chat/chat-socket.service';
 import { NgForm } from '@angular/forms';
@@ -223,6 +223,12 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
       this.submitted = false;
     }
     this.messages = [];
+  }
+
+  getEmployeeName(emp: Employee) {
+    const name = (emp.firstName ? emp.firstName : '') + ' ' +
+            (emp.lastName ? emp.lastName : '');
+    return name.trim() || emp.email;
   }
 
   ngOnDestroy() {

@@ -4,18 +4,19 @@
     <app-loading-spinner></app-loading-spinner>
   </div>
   <form (ngSubmit)="onSubmit(employeeForm)" [formGroup]="employeeForm" *ngIf="!isLoading" class="my-form">
+
+    <header class="form-title-container">
+      <h3 class="form-action-title">Update Details</h3>
+    </header>
+
     <app-message-box
       *ngIf="messages.length && !isLoading"
       [messages]="messages"
       (closeMessages)="onClose()">
     </app-message-box>
 
-    <div class="form-title-container">
-      <h3 class="form-action-title">Update Details</h3>
-    </div>
-
     <div class="form-group">
-      <label for="email">Email:  </label>
+      <label for="email">Email: <abbr title="required" aria-label="required">*</abbr> </label>
       <input
         placeholder="Email *"
         class="form-control input-form-tag"
@@ -33,7 +34,7 @@
     <div class="form-group">
       <label for="firstName">First Name:  </label>
       <input
-        placeholder="First Name *"
+        placeholder="First Name"
         class="form-control input-form-tag"
         type="text"
         name="firstName"
@@ -51,7 +52,7 @@
     <div class="form-group">
       <label for="lastName">Last Name:  </label>
       <input
-        placeholder="Last Name *"
+        placeholder="Last Name"
         class="form-control input-form-tag"
         type="text"
         name="lastName"
@@ -116,6 +117,9 @@
     <hr>
 
     <div class="employee-profile-image-container">
+      <header>
+        <h4>Profile Image</h4>
+      </header>
       <input type="checkbox" class="form-check-input" #deleteImage>
       <label class="form-check-label" for="deleteImage">Delete Last Uploaded Image?</label>
       <app-image-cropper
@@ -127,6 +131,7 @@
     </div>
 
     <hr>
+
     <div class="edit-buttons-container">
       <button
         type="submit"

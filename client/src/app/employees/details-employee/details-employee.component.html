@@ -8,11 +8,18 @@
   </div>
 
   <div class="container-fluid" *ngIf="employee && (!isLoading || addWork)">
-    <app-message-box *ngIf="messages.length && !addWork" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
+    <app-message-box
+      *ngIf="messages.length && !addWork"
+      [messages]="messages"
+      (closeMessages)="onClose()">
+    </app-message-box>
 
     <header class="details-page-header">
-      <img [src]="employee.profileImagePath" class="employeeProfileImage"
-            *ngIf="employee.profileImagePath"/>
+      <img
+        alt="Profile image of {{ getEmployeeName(employee) | titlecase }}."
+        [src]="employee.profileImagePath"
+        class="employee-profile-image"
+        *ngIf="employee.profileImagePath"/>
       <div class="employee-no-profile-image" *ngIf="!employee.profileImagePath">
         <span class="glyphicon glyphicon-user"></span>
       </div>
@@ -26,9 +33,7 @@
           </p>
         </h4>
         <h3 *ngIf="currUrl[0] !== 'my-details'">
-          {{ employee.firstName ? (employee.firstName | titlecase) : '' }}
-          {{ employee.lastName ? (employee.lastName | titlecase) : '' }}
-          {{ !employee.firstName && !employee.lastName ? employee.email : '' }}
+          {{ getEmployeeName(employee) | titlecase}}
         </h3>
         <p><a href="mailto:{{employee.email}}">{{ employee.email }}</a></p>
       </address>
@@ -80,13 +85,18 @@
                 </div>
                 <p *ngIf="work.employmentType">{{ work.employmentType | titlecase }}</p>
                 <div class="work-date help-block">
-                  <p>
+                  <time [dateTime]="work.startDate.getMonth() + '-' + work.startDate.getFullYear()">
                     {{ monthNames[work.startDate.getMonth()] + ' ' +
                         work.startDate.getFullYear() }}
-                  </p>
+                  </time>
                   <p>-</p>
-                  <p>
-                    {{ work.endDate ? monthNames[work.endDate.getMonth()] + ' ' + work.endDate.getFullYear() : 'present' }}</p>
+                  <time
+                    *ngIf="work.endDate"
+                    [dateTime]="work.endDate.getMonth() + '-' + work.endDate.getFullYear()">
+                    {{ monthNames[work.startDate.getMonth()] + ' ' +
+                        work.startDate.getFullYear() }}
+                  </time>
+                  <p *ngIf="!work.endDate">present</p>
                 </div>
                 <span *ngIf="currUrl[0] === 'my-details'" class="glyphicon glyphicon-pencil" (click)="onToggleWork(i)"></span>
             </li>
@@ -110,14 +120,19 @@
       <app-loading-spinner></app-loading-spinner>
     </div>
     <form (ngSubmit)="onSubmit(workForm)" #workForm="ngForm" class="my-form {{ isLoading ? 'hide' : '' }}">
-      <div class="form-title-container">
-        <h3 class="form-action-title">{{ workId ? 'Update' : 'Create' }} Experience</h3>
-      </div>
 
-      <app-message-box *ngIf="messages.length && addWork" [messages]="messages" (closeMessages)="onClose()"></app-message-box>
+      <header class="form-title-container">
+        <h3 class="form-action-title">{{ workId ? 'Update' : 'Create' }} Experience</h3>
+      </header>
+
+      <app-message-box
+        *ngIf="messages.length && addWork"
+        [messages]="messages"
+        (closeMessages)="onClose()">
+      </app-message-box>
 
       <div class="form-group">
-        <label for="title">Title: * </label>
+        <label for="title">Title: <abbr title="required" aria-label="required">*</abbr> </label>
         <input
           placeholder="Ex: Web Developer"
           class="form-control input-form-tag"
@@ -152,7 +167,7 @@
       </div>
 
       <div class="form-group">
-        <label for="company">Company: *</label>
+        <label for="company">Company: <abbr title="required" aria-label="required">*</abbr> </label>
         <input
           placeholder="Ex: Google"
           class="form-control input-form-tag"
@@ -169,7 +184,7 @@
       </div>
 
       <div class="form-date-container">
-        <label for="start-month">Start Date: * </label>
+        <label for="start-month">Start Date: <abbr title="required" aria-label="required">*</abbr> </label>
         <div class="form-start-date">
           <div class="form-group">
             <select
@@ -233,7 +248,7 @@
       </div>
 
       <div class="form-date-container {{ workForm.form.value.present ? 'hide' : '' }}">
-        <label for="end-month">End Date: * </label>
+        <label for="end-month">End Date: </label>
         <div class="form-end-date">
           <div class="form-group">
             <select

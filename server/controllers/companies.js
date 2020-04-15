@@ -144,9 +144,9 @@ const getNonProfileImages = (req, files) => {
     files.imagesPath.forEach(file => {
       let url = req.protocol + '://' + req.get('host');
       url = url + '/images/' + file.filename;
-      newUrls.push(url);
+      newUrls.push('/images/' + file.filename);
     });
-    const oldImages = req.query.oldImages.split(env.process.SPLIT_COMPANY_OLD_IMAGES_BY);
+    const oldImages = req.query.oldImages.split(process.env.SPLIT_COMPANY_OLD_IMAGES_BY);
     let updatedImageInd = 0, updatedImages = [];
     for(const index of Object.keys(oldImages)){
       if(oldImages[index]) {
@@ -159,7 +159,7 @@ const getNonProfileImages = (req, files) => {
     }
     req.body.imagesPath = updatedImages;
   } else {
-    const keptImages = req.query.oldImages.split(env.process.SPLIT_COMPANY_OLD_IMAGES_BY).filter(val => !!val);
+    const keptImages = req.query.oldImages.split(process.env.SPLIT_COMPANY_OLD_IMAGES_BY).filter(val => !!val);
     if(keptImages.length) req.body.imagesPath = keptImages;
   }  
 };
@@ -175,7 +175,7 @@ const getNonProfileImages = (req, files) => {
  *                           {string} oldImages - a string of current paths to the company images,
  *                                                which every path is separated by env.process.SPLIT_COMPANY_OLD_IMAGES_BY.
  */
-const updateReqImages = async (req) => {
+const updateReqImages = (req) => {
   getNonProfileImages(req, req.files);
   getProfileImage(req, req.files.profileImagePath);
 };
@@ -211,7 +211,7 @@ exports.updateCompany = async (req, res, next) => {
     
     let updatedCompany = await Company.findById(req.body._id).select(
                             '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration -password'
-                          ).populate('jobs');
+                          ).populate('jobs').populate('applicants.employee').populate('applicants.jobs.job');
 
     let tokens;
     if(req.body.password) {

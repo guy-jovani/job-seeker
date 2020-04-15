@@ -13,8 +13,15 @@
 
 .add-image {
   display: flex;
+  flex-direction: column;
   margin-bottom: 2rem;
   width: 100%;
+
+  div {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
 }
 
 .add-image > button {

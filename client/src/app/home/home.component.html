@@ -7,3 +7,11 @@
 <header class="flex-row center">
   <h4 class="title">Welcome to Job Seeker</h4>
 </header>
+
+
+
+<app-message-box
+  *ngIf="messages && messages.length"
+  [messages]="messages"
+  (closeMessages)="onClose()">
+</app-message-box>

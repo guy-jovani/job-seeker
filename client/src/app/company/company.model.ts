@@ -3,6 +3,11 @@ import { Job } from 'app/job/job.model';
 import { Employee } from 'app/employees/employee.model';
 
 
+export interface Applicant {
+  employee: Employee;
+  jobs: ApplicantJob[];
+}
+
 export interface ApplicantJob {
   // _id: string; // has an id - but should never access it
   job: Job;
@@ -25,7 +30,7 @@ export class Company {
   public profileImagePath?: File | string;
   public imagesPath?: string[] | File[];
   public jobs?: Job[];
-  public applicants: { employee: Employee, jobs: ApplicantJob[] }[];
+  public applicants: Applicant[];
   public lastFetch?: Date;
 
   constructor(init?: Partial<Company>) {

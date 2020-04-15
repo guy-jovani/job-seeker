@@ -28,7 +28,7 @@ export class ListJobsComponent {
     return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
   }
 
-  onAcceptReject(status: string, jobInd: number) { // company actions
+  onAcceptReject(status: string, jobInd: number) { // company action
     this.acceptRejectEmitter.emit({ status, jobInd });
   }
 

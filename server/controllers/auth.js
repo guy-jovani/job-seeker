@@ -76,7 +76,7 @@ exports.signup = async (req, res, next) => {
       return sendMessagesResponse(res, 422, companyValid.messages, 'failure');
     }
     const password = await bcrypt.hash(req.body.password, 12);
-    let [user, kind] = createUserSignup(req.body.email, password, req.body.name);
+    let [user, kind] = await createUserSignup(req.body.email, password, req.body.name);
 
     const [accessToken, refreshToken] = await getAndCreateTokens(user, kind);
     user = user.toObject();
@@ -187,7 +187,7 @@ exports.login = async (req, res, next) => {
  * @param {express respond object} res
  */
 exports.resetPasswordEmail = async (req, res, next) => {
-  try{
+  try {
     crypto.randomBytes(32, async (err, buffer) => {
       if (err) {
         next(handleServerErrors(error, 500, "There was an unexpected error while trying to reset the password."));
@@ -197,9 +197,10 @@ exports.resetPasswordEmail = async (req, res, next) => {
                     await Company.findOne({ email: req.body.email });
       if (!user) {
         return sendMessagesResponse(res, 401, ['No account with that email found.'], 'failure');
-      }   
+      }  
+      
       user.resetPassToken = token;
-      user.resetPassTokenExpiration = Date.now() +  process.env.RESET_PASSWORD_TOKEN_EXPIRATION_MILLISECONDS;
+      user.resetPassTokenExpiration = new Date(new Date().getTime() +  +process.env.RESET_PASSWORD_TOKEN_EXPIRATION_MILLISECONDS);
       await user.save();
 
       transporter.sendMail({
@@ -249,6 +250,7 @@ exports.resetToNewPassword = async (req, res, next) => {
     if (!user) {
       return sendMessagesResponse(res, 401, ['Invalid Token.'], 'failure');
     }
+
     const hashedPassword = await bcrypt.hash(req.body.password, 12);
     user.password = hashedPassword;
     user.resetPassToken = undefined;

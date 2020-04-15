@@ -9,7 +9,11 @@
     <ng-container *ngIf="applicantJobs; else jobsList">
       <h4 class="job-title">{{ jobInfo.title ? jobInfo.title : jobInfo['job'].title }}</h4>
       <p class="job-status job-status-{{ jobInfo.status }}">{{ jobInfo.status }}</p>
-      <p class="job-date">{{ getJobDate(jobInfo.date) }}</p>
+      <time
+        class="job-date"
+        [dateTime]="getJobDate(jobInfo.date).split('/').reverse().join('-')">
+        {{ getJobDate(jobInfo.date) }}
+      </time>
       <div class="status-action-buttons">
         <button class="btn btn-danger btn-sm" (click)="onAcceptReject('rejected', i)"
           *ngIf='jobInfo.status.toString() !== "rejected"'>Reject?</button>
@@ -22,7 +26,14 @@
       <a class="job-link" [state]="{ jobInd : i }"
         routerLink='{{ companyJobs && jobs.length ? "job" : detailsJobUrl + i }}'>
         <p class="job-title">{{ jobInfo.title ? jobInfo.title : jobInfo['job'].title }}</p>
-        <p class="job-date" *ngIf="jobInfo.date">{{ getJobDate(jobInfo.date) }}</p>
+
+        <time
+          *ngIf="jobInfo.date"
+          class="job-date"
+          [dateTime]="getJobDate(jobInfo.date).split('/').reverse().join('-')">
+          {{ getJobDate(jobInfo.date) }}
+        </time>
+
         <p class="job-status job-status-{{ jobInfo.status }}" *ngIf="showStatus">{{ jobInfo.status }}</p>
       </a>
     </ng-template>

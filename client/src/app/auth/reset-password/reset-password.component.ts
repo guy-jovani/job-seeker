@@ -8,7 +8,8 @@ import * as AuthActions from '../store/auth.actions';
 
 @Component({
   selector: 'app-reset-password',
-  templateUrl: './reset-password.component.html'
+  templateUrl: './reset-password.component.html',
+  styleUrls: ['../auth.component.scss']
 })
 export class ResetPasswordComponent implements OnInit, OnDestroy {
 
@@ -51,6 +52,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
     if (this.errorSub) {
       this.errorSub.unsubscribe();
     }
+    this.onClose();
   }
 
   onClose() {

@@ -13,19 +13,16 @@
     class="list-group-item"
     *ngFor="let employee of employees; let i=index">
       <img
+        alt="Profile image of {{ getEmployeeName(employee) | titlecase }}"
         *ngIf="employee.employee ? employee.employee.profileImagePath : employee.profileImagePath"
         [src]="employee.profileImagePath || employee.employee.profileImagePath"
-        class="employeeProfileImage" />
+        class="employee-profile-image" />
       <div class="employee-no-profile-image"
         *ngIf="!(employee.employee && employee.employee.profileImagePath) &&
                 !employee.profileImagePath">
         <span class="glyphicon glyphicon-user"></span>
       </div>
-      <h4>
-        {{ employee.firstName ? (employee.firstName | titlecase) : '' }}
-          {{ employee.lastName ? (employee.lastName | titlecase) : '' }}
-          {{ !employee.firstName && !employee.lastName ? employee.email || employee.employee.email : '' }}
-      </h4>
+      <h4>{{ getEmployeeName(employee) | titlecase }}</h4>
       <p class="employee-jobs" *ngIf="applicantsList">Jobs: {{ employee.jobs.length }}</p>
   </li>
 </ul>

@@ -22,7 +22,7 @@
     <h3 class="{{ status ? '' : 'only-job-title' }}">{{ (job.title || job['job'].title) | titlecase }}</h3>
     <div class="status-info" *ngIf="status">
       <h3 class="job-status job-status-{{ status }}">{{ status }}</h3>
-      <h4 class="job-date"> <time [dateTime]="statusDate.split('/').reverse().join('/')"> {{ statusDate }} </time> </h4>
+      <h4 class="job-date"> <time [dateTime]="statusDate.split('/').reverse().join('-')"> {{ statusDate }} </time> </h4>
     </div>
     <app-back-button></app-back-button>
   </header>
@@ -40,7 +40,7 @@
       <ng-template #companyNoLink><p>Company: {{ (companyId.name | titlecase) }}</p></ng-template>
 
       <p>Description: {{ job.description || job['job'].description }}</p>
-      <p>Date: <time [dateTime]="(getJobDate(job.date) || getJobDate(job['job'].date)).split('/').reverse().join('/')"> {{ getJobDate(job.date) || getJobDate(job['job'].date) }} </time></p>
+      <p>Date: <time [dateTime]="(getJobDate(job.date) || getJobDate(job['job'].date)).split('/').reverse().join('-')"> {{ getJobDate(job.date) || getJobDate(job['job'].date) }} </time></p>
     </section>
 
 

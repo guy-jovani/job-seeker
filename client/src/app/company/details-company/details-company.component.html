@@ -14,7 +14,7 @@
   </app-message-box>
 
   <header class="details-page-header">
-    <img [src]="company.profileImagePath" class="company-profile-image" *ngIf="company.profileImagePath"/>
+    <img [src]="company.profileImagePath" alt="The Company profile image." class="company-profile-image" *ngIf="company.profileImagePath"/>
     <div class="company-no-profile-image" *ngIf="!company.profileImagePath">
       <span class="glyphicon glyphicon-user"></span>
     </div>
@@ -56,10 +56,13 @@
       </app-list-jobs>
     </section>
 
-    <section class="images-container">
+    <section class="images-container" *ngIf="currUrl[0] === 'my-details' || company.imagesPath.length">
+      <header>
+        <h4>Company Images</h4>
+      </header>
       <ul class="images-container__list">
         <li *ngFor="let imagePath of company.imagesPath" class="images-container__list-item">
-          <img class="image" [src]='imagePath'>
+          <img class="company-image" alt="Company image." [src]='imagePath'/>
         </li>
       </ul>
     </section>

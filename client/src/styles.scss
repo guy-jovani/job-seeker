@@ -43,6 +43,10 @@ address {
   margin: 0;
 }
 
+hr {
+  width: 100%;
+}
+
 /**************************
 ******* Forms *************
 **************************/
@@ -125,7 +129,7 @@ input[type=password] {
   }
 }
 
-.employeeProfileImage {
+.employee-profile-image {
   border-radius: 50%;
   max-width: 15rem;
   max-height: 15rem;
@@ -181,10 +185,6 @@ app-back-button {
 .details-page-body {
   display: flex;
   flex-direction: column;
-
-  hr {
-    width: 100%;
-  }
 }
 
 .edit-buttons-container,

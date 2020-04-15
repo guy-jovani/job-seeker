@@ -10,7 +10,8 @@ import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-get-new-password',
-  templateUrl: './get-new-password.component.html'
+  templateUrl: './get-new-password.component.html',
+  styleUrls: ['../../auth.component.scss']
 })
 export class GetNewPasswordComponent implements OnInit, OnDestroy {
   showPasswords = false;
@@ -70,6 +71,7 @@ export class GetNewPasswordComponent implements OnInit, OnDestroy {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
+    this.onClose();
   }
 
   onClose() {
