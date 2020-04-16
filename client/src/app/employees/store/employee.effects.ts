@@ -65,7 +65,7 @@ export class EmployeeEffects {
         .pipe(
           map(res => {
             if (res['type'] === 'success') {
-              return new EmployeeActions.UpdateSingleEmployee({...res['employee']});
+              return new EmployeeActions.SetSingleEmployee({...res['employee']});
             } else {
               return new EmployeeActions.EmployeeOpFailure(res['messages']);
             }

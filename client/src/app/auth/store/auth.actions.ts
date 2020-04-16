@@ -10,8 +10,10 @@ export const AUTH_SUCCESS = '[Auth] AUTH_SUCCESS';
 export const AUTH_FAILURE = '[Auth] AUTH_FAILURE';
 export const CLEAR_ERROR = '[Auth] CLEAR_ERROR';
 export const AUTO_LOGIN = '[Auth] AUTO_LOGIN';
+
 export const RESET_PASS_EMAIL_ATTEMPT = '[Auth] RESET_PASS_EMAIL_ATTEMPT';
 export const RESET_PASS_EMAIL_SUCCESS = '[Auth] RESET_PASS_EMAIL_SUCCESS';
+
 export const RESET_PASS_ATTEMPT = '[Auth] RESET_PASS_ATTEMPT';
 export const RESET_PASS_SUCCESS = '[Auth] RESET_PASS_SUCCESS';
 

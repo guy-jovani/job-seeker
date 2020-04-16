@@ -9,11 +9,11 @@ import { Job } from '../job.model';
 import { Company } from 'app/company/company.model';
 
 export const JOB_STATE_LOAD_SINGLE = '[JOB] JOB_STATE_LOAD_SINGLE';
-// export const ADD_UPDATE_SINGLE_JOB = '[JOB] Add update single JOB';
 
 export const FETCH_JOBS = '[JOB] Fetch JOBS';
 export const SET_JOBS = '[JOB] Set JOBS';
-// export const FETCH_SINGLE_JOB = '[JOB] Fetch Single JOB';
+export const FETCH_SINGLE_JOB = '[JOB] Fetch Single JOB';
+export const SET_SINGLE_JOB = '[JOB] Set single JOB';
 
 export const JOB_OP_FAILURE = '[JOB] JOB operation failed';
 export const CLEAR_ERROR = '[JOB] Clear error';
@@ -24,7 +24,7 @@ export const UPDATE_SINGLE_JOB_COMPANY = '[JOB] UPDATE_SINGLE_JOB_COMPANY';
 export const UPDATE_SINGLE_JOB_COMPANY_ATTEMPT = '[JOB] UPDATE_SINGLE_JOB_COMPANY_ATTEMPT';
 
 
-export type JobActions = // | AddUpdateSingleJob
+export type JobActions = SetSingleJob
                         | FetchJobs
                         | SetJobs
                         | ClearError
@@ -32,7 +32,7 @@ export type JobActions = // | AddUpdateSingleJob
                         | JobStateLoadSingle
                         | UpdateSingleJobCompanyAttempt
                         | UpdateSingleJobCompany
-                        // | FetchSingleJob
+                        | FetchSingleJob
                         | JobOpFailure;
 
 
@@ -64,11 +64,11 @@ export class JobOpFailure implements Action {
   constructor(public payload: string[] ) {}
 }
 
-// export class AddUpdateSingleJob implements Action {
-//   readonly type = ADD_UPDATE_SINGLE_JOB;
+export class SetSingleJob implements Action {
+  readonly type = SET_SINGLE_JOB;
 
-//   constructor(public payload: { job: Job, main: boolean } ) {}
-// }
+  constructor(public payload: { job: Job, main: boolean } ) {}
+}
 
 export class UpdateSingleJobCompany implements Action {
   readonly type = UPDATE_SINGLE_JOB_COMPANY;
@@ -82,9 +82,9 @@ export class FetchJobs implements Action {
   constructor(public payload: { page: number } ) {}
 }
 
-// export class FetchSingleJob implements Action {
-//   readonly type = FETCH_SINGLE_JOB;
+export class FetchSingleJob implements Action {
+  readonly type = FETCH_SINGLE_JOB;
 
-//   constructor(public payload: { _id: string, main: boolean } ) {}
-// }
+  constructor(public payload: { _id: string, main: boolean } ) {}
+}
 

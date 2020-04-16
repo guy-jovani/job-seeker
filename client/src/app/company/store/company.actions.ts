@@ -2,17 +2,13 @@
 
 import { Action } from '@ngrx/store';
 import { Company } from '../company.model';
-import { Job } from 'app/job/job.model';
 
-export const UPDATE_SINGLE_COMPANY = '[Company] Update single company';
-
-export const UPDATE_SINGLE_COMPANY_JOB = '[Company] Update single company job';
-export const UPDATE_SINGLE_COMPANY_JOB_ATTEMPT = '[Company] Update single company job attempt';
-
-export const SET_COMPANIES = '[Company] Set Companies';
-export const FETCH_COMPANIES = '[Company] Fetch companies';
-export const COMPANY_STATE_LOAD_SINGLE = '[Company] COMPANY_STATE_LOAD_SINGLE';
 export const FETCH_SINGLE_COMPANY = '[Company] Fetch Single company';
+export const SET_SINGLE_COMPANY = '[Company] Set single company';
+export const FETCH_COMPANIES = '[Company] Fetch companies';
+export const SET_COMPANIES = '[Company] Set Companies';
+
+export const COMPANY_STATE_LOAD_SINGLE = '[Company] COMPANY_STATE_LOAD_SINGLE';
 
 export const COMPANY_OP_FAILURE = '[Company] Company operation failed';
 export const CLEAR_ERROR = '[Company] Clear error';
@@ -24,9 +20,7 @@ export type CompanyActions = FetchCompanies
                             | CompanyOpFailure
                             | ClearError
                             | CompanyStateLoadSingle
-                            | UpdateSingleCompany
-                            | UpdateSingleCompanyJobAttempt
-                            | UpdateSingleCompanyJob
+                            | SetSingleCompany
                             | Logout;
 
 
@@ -38,10 +32,6 @@ export class FetchCompanies implements Action {
 
 export class CompanyStateLoadSingle implements Action {
   readonly type = COMPANY_STATE_LOAD_SINGLE;
-}
-
-export class UpdateSingleCompanyJobAttempt implements Action {
-  readonly type = UPDATE_SINGLE_COMPANY_JOB_ATTEMPT;
 }
 
 export class FetchSingleCompany implements Action {
@@ -56,14 +46,8 @@ export class SetCompanies implements Action {
   constructor(public payload: {companies: Company[], total: number}) {}
 }
 
-export class UpdateSingleCompanyJob implements Action {
-  readonly type = UPDATE_SINGLE_COMPANY_JOB;
-
-  constructor(public payload: Job) {}
-}
-
-export class UpdateSingleCompany implements Action {
-  readonly type = UPDATE_SINGLE_COMPANY;
+export class SetSingleCompany implements Action {
+  readonly type = SET_SINGLE_COMPANY;
 
   constructor(public payload: { company: Company, main: boolean }) {}
 }

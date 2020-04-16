@@ -22,27 +22,27 @@ export class JobEffects {
               private http: HttpClient,
               private store: Store<fromApp.AppState>) {}
 
-  // @Effect()
-  // fetchSingleJob = this.actions$.pipe(
-  //   ofType(JobActions.FETCH_SINGLE_JOB),
-  //   switchMap((actionData: JobActions.FetchSingleJob) => {
-  //     return this.http.get(nodeServer + 'fetchSingle', {
-  //       params: { _id: actionData.payload._id }
-  //     })
-  //     .pipe(
-  //       map(res => {
-  //         if (res['type'] === 'success') {
-  //           return new JobActions.AddUpdateSingleJob({ job: res['job'], main: actionData.payload.main });
-  //         } else {
-  //           return new JobActions.JobOpFailure(res['messages']);
-  //         }
-  //       }),
-  //       catchError(messages => {
-  //         return of(new JobActions.JobOpFailure(messages));
-  //       })
-  //     );
-  //   })
-  // );
+  @Effect()
+  fetchSingleJob = this.actions$.pipe(
+    ofType(JobActions.FETCH_SINGLE_JOB),
+    switchMap((actionData: JobActions.FetchSingleJob) => {
+      return this.http.get(nodeServer + 'fetchSingle', {
+        params: { _id: actionData.payload._id }
+      })
+      .pipe(
+        map(res => {
+          if (res['type'] === 'success') {
+            return new JobActions.SetSingleJob({ job: res['job'], main: actionData.payload.main });
+          } else {
+            return new JobActions.JobOpFailure(res['messages']);
+          }
+        }),
+        catchError(messages => {
+          return of(new JobActions.JobOpFailure(messages));
+        })
+      );
+    })
+  );
 
   @Effect()
   fetchJobs = this.actions$.pipe(

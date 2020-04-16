@@ -63,7 +63,7 @@ export class CompanyEffects {
         map(res => {
           if (res['type'] === 'success') {
             if (actionData.payload.main) {
-              return new CompanyActions.UpdateSingleCompany({company: res['company'], main: actionData.payload.main });
+              return new CompanyActions.SetSingleCompany({company: res['company'], main: actionData.payload.main });
             } else {
               this.store.dispatch(new CompanyActions.ClearError());
               return new JobActions.UpdateSingleJobCompany({company: res['company'], jobInd: actionData.payload.jobInd });

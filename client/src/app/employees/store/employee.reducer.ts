@@ -62,7 +62,7 @@ export function employeeReducer(state = initialState, action: EmployeeActions.Em
         loadingAll: false,
         loadingSingle: false
       };
-    case EmployeeActions.UPDATE_SINGLE_EMPLOYEE:
+    case EmployeeActions.SET_SINGLE_EMPLOYEE:
       const index = state.employees.findIndex(emp => emp['_id'] === action.payload._id);
       const updatedEmployees = [...state.employees];
       const updatedEmployee = {

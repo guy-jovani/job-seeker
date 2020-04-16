@@ -24,6 +24,11 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  console.log(req.url);
+  next();
+});
+
 app.use('/auth', authRoutes);
 app.use('/employees', checkAuth, employeesRoutes);
 app.use('/companies', checkAuth, companiesRoutes);

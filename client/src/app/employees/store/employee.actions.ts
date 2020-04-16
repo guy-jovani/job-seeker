@@ -4,15 +4,17 @@ import { Action } from '@ngrx/store';
 import { Employee } from '../employee.model';
 
 
-export const UPDATE_SINGLE_EMPLOYEE = '[Employee] Update single Employee';
+export const SET_SINGLE_EMPLOYEE = '[Employee] Set single Employee';
 export const FETCH_SINGLE_EMPLOYEE = '[Employee] single One Employee';
+
 export const FETCH_EMPLOYEES = '[Employee] Fetch Employees';
 export const SET_EMPLOYEES = '[Employee] Set Employees';
+
 export const EMPLOYEE_OP_FAILURE = '[Employee] Employee operation failed';
 export const CLEAR_ERROR = '[Employee] Clear error';
 export const LOGOUT = '[Employee] LOGOUT';
 
-export type EmployeeActions = UpdateSingleEmployee
+export type EmployeeActions = SetSingleEmployee
                             | FetchSingleEmployee
                             | FetchEmployees
                             | Logout
@@ -48,8 +50,8 @@ export class FetchSingleEmployee implements Action {
   constructor( public payload: string ) {}
 }
 
-export class UpdateSingleEmployee implements Action {
-  readonly type = UPDATE_SINGLE_EMPLOYEE;
+export class SetSingleEmployee implements Action {
+  readonly type = SET_SINGLE_EMPLOYEE;
 
   constructor( public payload: Employee ) {}
 }
