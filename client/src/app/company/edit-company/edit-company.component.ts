@@ -3,11 +3,10 @@ import { Subscription } from 'rxjs';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import {switchMap } from 'rxjs/operators';
 
 import { Company } from '../company.model';
 import * as fromApp from '../../store/app.reducer';
-import * as CompanyActions from '../store/company.actions';
+import * as UserActions from '../../user/store/user.actions';
 
 @Component({
   selector: 'app-edit-company',
@@ -45,17 +44,14 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
       }, this.checkPasswordEquality)
     });
 
-    this.authState = this.store.select('user').pipe(
-      switchMap(userState => {
+    this.authState = this.store.select('user')
+      .subscribe(userState => {
         this.company = userState.user as Company;
-        return this.store.select('company');
-      }))
-      .subscribe(companyState => {
         this.currUrl = this.router.url.substring(1).split('/');
-        this.isLoading = companyState.loadingSingle;
-        if (companyState.messages) {
+        this.isLoading = userState.loading;
+        if (userState.messages) {
           this.messages = [];
-          for (const msg of companyState.messages) {
+          for (const msg of userState.messages) {
             this.messages.push(msg);
           }
         } else {
@@ -119,7 +115,7 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
 
   onSubmit() {
     if (this.companyForm.invalid) {
-      return this.store.dispatch(new CompanyActions.CompanyOpFailure(['The form is invalid']));
+      return this.store.dispatch(new UserActions.UserFailure(['The form is invalid']));
     }
     const formValue = this.companyForm.value;
     const name = formValue.name;
@@ -135,7 +131,7 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
     if (this.profileImagePreview) {
       newCompany.profileImagePath = this.profileImagePreview.file || this.profileImagePreview.stringFile || '';
     }
-    this.store.dispatch(new CompanyActions.UpdateSingleCompanyInDb({
+    this.store.dispatch(new UserActions.UpdateSingleCompanyInDb({
       company: newCompany, oldImagesPath: this.imagesPath.map(path => path.startsWith('http') ? path : ''), password, confirmPassword }));
   }
 
@@ -151,7 +147,7 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
   }
 
   onClose() {
-    this.store.dispatch(new CompanyActions.ClearError());
+    this.store.dispatch(new UserActions.ClearError());
   }
 
   onTogglePasswords() {

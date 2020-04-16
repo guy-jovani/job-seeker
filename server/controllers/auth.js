@@ -156,6 +156,8 @@ exports.login = async (req, res, next) => {
     if(!verifiedPassword){ 
       return sendMessagesResponse(res, 401, ['The email and/or password are incorrect.'], 'failure');
     }
+
+    mockDB();
     
     const [accessToken, refreshToken] = await getAndCreateTokens(user, kind);
     user = user.toObject();
@@ -368,17 +370,28 @@ const mockDB = async () => {
   }
 
   for (num of nums) {
+    await Employee.findOneAndRemove({email: num + '@emp.com'});
     const password = await bcrypt.hash('111', 12);
     await Employee.create({ firstName: 'e' + num,  lastName: 'e' + num, password: password, email: num + '@emp.com'});
   }
 
   for (num of nums) {
-    const password = await bcrypt.hash('111', 12);
-    const company = await Company.create({ name: 'c' + num,  password: password, email: num + '@comp.com'});
+    await Company.findOneAndRemove({email: num + '@comp.com'});
 
-    await Job.create({ title: 'c' + num, description: 'description c' + num + ' #1', company: company._id, date: new Date() });
-    await Job.create({ title: 'c' + num, description: 'description c' + num + ' #2', company: company._id, date: new Date() });
-    await Job.create({ title: 'c' + num + 'with req', description: 'description c' + num + ' with req',
+    const password = await bcrypt.hash('111', 12);
+    const company = await Company.create({ name: 'c' + num,  password: password, email: num + '@cmp.com'});
+
+    let job = await Job.create({ title: 'c' + num, description: 'description c' + num + ' #1', company: company._id, date: new Date() });
+    company.jobs.push(job._id);
+    await company.save();
+
+    job = await Job.create({ title: 'c' + num, description: 'description c' + num + ' #2', company: company._id, date: new Date() });
+    company.jobs.push(job._id);
+    await company.save();
+
+    job = await Job.create({ title: 'c' + num + 'with req', description: 'description c' + num + ' with req',
                         requirements: [{requirement: 'req 1'}, {requirement: 'req 2'}], company: company._id, date: new Date()    });
+    company.jobs.push(job._id);
+    await company.save();
   }
 }

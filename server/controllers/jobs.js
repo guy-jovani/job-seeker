@@ -40,6 +40,7 @@ exports.create = async (req, res, next) => {
       company: req.body.company._id, requirements: req.body.requirements, date: new Date() });
 
     job = await job.save();
+    
     await Company.findOneAndUpdate(
       { _id: req.body.company._id }, 
       { $push: {'jobs' : job._id } },

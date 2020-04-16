@@ -45,7 +45,6 @@ export function employeeReducer(state = initialState, action: EmployeeActions.Em
         loadingAll: false,
         loadingSingle: false
       };
-    case EmployeeActions.UPDATE_SINGLE_EMPLOYEE_IN_DB:
     case EmployeeActions.FETCH_SINGLE_EMPLOYEE:
       return {
         ...state,

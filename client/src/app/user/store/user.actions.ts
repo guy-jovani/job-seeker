@@ -9,21 +9,32 @@ import { Job } from '../../job/job.model';
 
 
 export const UPDATE_ACTIVE_USER = '[User] UPDATE_ACTIVE_USER';
-export const COMPANY_CREATED_JOB = '[User] COMPANY_CREATED_JOB';
-export const COMPANY_UPDATED_JOB = '[User] COMPANY_UPDATED_JOB';
 export const LOGOUT = '[User] LOGOUT';
 export const USER_FAILURE = '[User] USER_FAILURE';
 export const CLEAR_ERROR = '[User] CLEAR_ERROR';
+
+
+export const COMPANY_CREATE_JOB_IN_DB = '[User] COMPANY_CREATE_JOB_IN_DB';
+export const COMPANY_CREATED_JOB = '[User] COMPANY_CREATED_JOB';
+export const COMPANY_UPDATE_JOB_IN_DB = '[User] COMPANY Update single JOB in db';
+export const COMPANY_UPDATED_JOB = '[User] COMPANY UPDATED_JOB';
+
 export const FETCH_ALL_CONVERSATIONS = '[User] FETCH_ALL_CONVERSATIONS';
 export const SET_ALL_CONVERSATIONS = '[User] SET_ALL_CONVERSATIONS';
 export const SET_SINGLE_CONVERSATION = '[User] SET_SINGLE_CONVERSATION';
+
+export const REMOVE_CHAT_NOTIFICATION = '[User] REMOVE_CHAT_NOTIFICATION';
 export const SET_CHAT_NOTIFICATION = '[User] SET_CHAT_NOTIFICATION';
+
 export const CREATE_WORK_EMPLOYEE_IN_DB = '[User] CREATE_WORK_EMPLOYEE_IN_DB';
 export const UPDATE_WORK_EMPLOYEE_IN_DB = '[User] UPDATE_WORK_EMPLOYEE_IN_DB';
 export const DELETE_WORK_EMPLOYEE_IN_DB = '[User] DELETE_WORK_EMPLOYEE_IN_DB';
-export const REMOVE_CHAT_NOTIFICATION = '[User] REMOVE_CHAT_NOTIFICATION';
+
 export const EMPLOYEE_APPLY_SAVE_JOB_ATTEMPT = '[User] EMPLOYEE_APPLY_SAVE_JOB_ATTEMPT';
 export const COMPANY_ACCEPT_REJECT_JOB_ATTEMPT = '[User] COMPANY_ACCEPT_REJECT_JOB_ATTEMPT';
+
+export const UPDATE_SINGLE_EMPLOYEE_IN_DB = '[User] Update single Employee in DB';
+export const UPDATE_SINGLE_COMPANY_IN_DB = '[User] Update single company in db';
 
 
 export type UserActions = SetChatNotification
@@ -31,22 +42,57 @@ export type UserActions = SetChatNotification
                         | RemoveChatNotification
                         | SetAllConversations
                         | FetchAllConversations
-                        | CompanyUpdatedJob
                         | CreateWorkEmployeeInDb
                         | DeleteWorkEmployeeInDb
                         | ClearError
+                        | UpdateSingleEmployeeInDB
+                        | UpdateSingleCompanyInDb
                         | UpdateWorkEmployeeInDb
                         | EmployeeApplySaveJobAttempt
                         | CompanyAcceptRejectJobAttempt
-                        | CompanyCreatedJob
                         | Logout
                         | UserFailure
+                        | CompanyUpdateJobInDb
+                        | CompanyCreateJobInDb
+                        | CompanyUpdatedJob
+                        | CompanyCreatedJob
                         | UpdateActiveUser;
 
 
 
 export class FetchAllConversations implements Action {
   readonly type = FETCH_ALL_CONVERSATIONS;
+}
+
+
+export class CompanyCreateJobInDb implements Action {
+  readonly type = COMPANY_CREATE_JOB_IN_DB;
+
+  constructor(public payload: Job ) {}
+}
+
+export class CompanyUpdateJobInDb implements Action {
+  readonly type = COMPANY_UPDATE_JOB_IN_DB;
+
+  constructor(public payload: Job ) {}
+}
+
+export class UpdateSingleCompanyInDb implements Action {
+  readonly type = UPDATE_SINGLE_COMPANY_IN_DB;
+
+  constructor(public payload: {
+    company: Company,
+    oldImagesPath: string[],
+    password: string,
+    confirmPassword: string
+  }) {}
+}
+
+export class UpdateSingleEmployeeInDB implements Action {
+  readonly type = UPDATE_SINGLE_EMPLOYEE_IN_DB;
+
+  constructor(public payload: { employee: Employee, deleteImage: boolean,
+    password: string, confirmPassword: string }) {}
 }
 
 export class DeleteWorkEmployeeInDb implements Action {

@@ -76,6 +76,9 @@ export function userReducer(state = initialState, action: UserActions.UserAction
     case UserActions.DELETE_WORK_EMPLOYEE_IN_DB:
     case UserActions.EMPLOYEE_APPLY_SAVE_JOB_ATTEMPT:
     case UserActions.COMPANY_ACCEPT_REJECT_JOB_ATTEMPT:
+    case UserActions.UPDATE_SINGLE_EMPLOYEE_IN_DB:
+    case UserActions.UPDATE_SINGLE_COMPANY_IN_DB:
+    case UserActions.COMPANY_CREATE_JOB_IN_DB:
       return {
         ...state,
         loading: true,
@@ -154,7 +157,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
         user: updatedUser,
       };
     case UserActions.COMPANY_UPDATED_JOB: // ONLY FOR A COMPANY - ON UPDATE JOB
-      const jobs = [ ...(state.user as Company).jobs ];
+      const jobs: Job[] = [ ...(state.user as Company).jobs ];
       const jobInd = (state.user as Company).jobs.findIndex(job => job._id === action.payload._id);
       jobs[jobInd] = { ...jobs[jobInd], ...action.payload };
       const upToDateUser: Company = {

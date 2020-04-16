@@ -87,7 +87,8 @@ export class JobComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   private fetchNextPage() {
     const container = this.container.nativeElement.getBoundingClientRect();
-    if (!this.messages.length && // won't fetch in case of an error
+    if (this.currUrl[0] !== 'my-jobs' && // won't fetch for the user list
+        !this.messages.length && // won't fetch in case of an error
         !this.isLoading && // won't fetch in a middle of a fetch
         !this.lastJob && // won't fetch if the last employee was fetched
         (container.bottom <= window.innerHeight || // if the whole list is shown - so fetch

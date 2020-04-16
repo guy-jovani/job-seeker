@@ -60,13 +60,13 @@
                 [formGroupName]="i" >
 
           <div class="single-requirement">
+            <abbr title="required" aria-label="required">*</abbr>
             <input
             placeholder="Requirement"
             class="form-control input-form-tag"
             formControlName="requirement"
             type="text"
             name="requirement"/>
-            <abbr title="required" aria-label="required">*</abbr>
             <button class="btn btn-danger btn-sm" type="button" (click)="onRemoveRequirement(i)">X</button>
           </div>
           <span class="help-block" *ngIf="!getControls()[i].get('requirement').valid &&

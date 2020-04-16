@@ -6,7 +6,6 @@ import { Employee } from '../employee.model';
 
 export const UPDATE_SINGLE_EMPLOYEE = '[Employee] Update single Employee';
 export const FETCH_SINGLE_EMPLOYEE = '[Employee] single One Employee';
-export const UPDATE_SINGLE_EMPLOYEE_IN_DB = '[Employee] Update SINGLE Employee in DB';
 export const FETCH_EMPLOYEES = '[Employee] Fetch Employees';
 export const SET_EMPLOYEES = '[Employee] Set Employees';
 export const EMPLOYEE_OP_FAILURE = '[Employee] Employee operation failed';
@@ -17,7 +16,6 @@ export type EmployeeActions = UpdateSingleEmployee
                             | FetchSingleEmployee
                             | FetchEmployees
                             | Logout
-                            | UpdateSingleEmployeeInDB
                             | SetEmployees
                             | EmployeeOpFailure
                             | ClearError;
@@ -26,13 +24,6 @@ export class FetchEmployees implements Action {
   readonly type = FETCH_EMPLOYEES;
 
   constructor(public payload: { page: number } ) {}
-}
-
-export class UpdateSingleEmployeeInDB implements Action {
-  readonly type = UPDATE_SINGLE_EMPLOYEE_IN_DB;
-
-  constructor(public payload: { employee: Employee, deleteImage: boolean,
-    password: string, confirmPassword: string }) {}
 }
 
 export class SetEmployees implements Action {

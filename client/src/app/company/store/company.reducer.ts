@@ -44,7 +44,6 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
         loadingAll: false,
         loadingSingle: false
       };
-    case CompanyActions.UPDATE_SINGLE_COMPANY_IN_DB:
     case CompanyActions.COMPANY_STATE_LOAD_SINGLE:
     case CompanyActions.FETCH_SINGLE_COMPANY:
     case CompanyActions.UPDATE_SINGLE_COMPANY_JOB_ATTEMPT:

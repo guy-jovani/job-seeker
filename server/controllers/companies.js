@@ -25,11 +25,10 @@ exports.fetchSingle = async (req, res, next) => {
   try { 
     let company = await Company.findById(req.query._id).select(
       '_id email name website description imagesPath jobs')
-        .populate({
-          path: 'jobs', 
-          populate: { path: 'company', select: 'name' }
-        });
+        .populate('jobs');
+
     company = company.toObject();
+    
     res.status(200).json({
       type: 'success',
       company: company

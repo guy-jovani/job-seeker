@@ -35,7 +35,7 @@ export class UserSessionService {
 
   updateUserJobsSessionStorage = (job, type) => {
     const [user] = this.getUserAndTokensSessionStorage();
-    if (type === UserActions.CompanyCreatedJob) {
+    if (type === UserActions.COMPANY_CREATED_JOB) {
       user.jobs.push(job);
     } else {
       const index = user.jobs.findIndex(tempJob => tempJob._id === job._id);

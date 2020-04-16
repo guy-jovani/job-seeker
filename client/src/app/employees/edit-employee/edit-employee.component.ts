@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 import * as fromApp from '../../store/app.reducer';
-import * as EmployeeActions from '../store/employee.actions';
+import * as UserActions from '../../user/store/user.actions';
 import { Employee } from '../employee.model';
 
 
@@ -44,24 +44,21 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
       }, this.checkPasswordEquality)
     });
 
-    this.userSub = this.store.select('user').pipe(
-      switchMap(userState => {
-        this.employee = userState.user as Employee;
-        return this.store.select('employee');
-      }))
+    this.userSub = this.store.select('user')
       .subscribe(
-        employeeState => {
+        userState => {
+          this.employee = userState.user as Employee;
           this.currUrl = this.router.url.substring(1).split('/');
-          this.isLoading = employeeState.loadingSingle;
-          if (employeeState.messages) {
+          this.isLoading = userState.loading;
+          if (userState.messages) {
             this.messages = [];
-            for (const msg of employeeState.messages) {
+            for (const msg of userState.messages) {
               this.messages.push(msg);
             }
           } else {
             this.messages = [];
           }
-          if (this.employee) {
+          if (this.employee) { // in case the user logged out
             this.initForm();
           }
       });
@@ -97,7 +94,7 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
 
   onSubmit(form: FormGroup) {
     if (form.invalid) {
-      return this.store.dispatch(new EmployeeActions.EmployeeOpFailure(['The form is invalid']));
+      return this.store.dispatch(new UserActions.UserFailure(['The form is invalid']));
     }
     const firstName = form.value.firstName ? form.value.firstName : undefined;
     const lastName = form.value.lastName ? form.value.lastName : undefined;
@@ -111,7 +108,7 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
     if (firstName) { newEmployee.firstName = firstName; }
     if (lastName) { newEmployee.lastName = lastName; }
     if ( this.profileImage.file ) { newEmployee.profileImagePath = this.profileImage.file; }
-    this.store.dispatch(new EmployeeActions.UpdateSingleEmployeeInDB({
+    this.store.dispatch(new UserActions.UpdateSingleEmployeeInDB({
               employee: newEmployee, deleteImage: this.deleteImage.nativeElement.checked,
               password, confirmPassword }));
   }
@@ -128,7 +125,7 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
   }
 
   onClose() {
-    this.store.dispatch(new EmployeeActions.ClearError());
+    this.store.dispatch(new UserActions.ClearError());
   }
 
   onTogglePasswords() {

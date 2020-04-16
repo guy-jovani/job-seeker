@@ -9,8 +9,10 @@ import { of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import * as fromApp from '../../store/app.reducer';
 import * as UserActions from './user.actions';
+import * as AuthActions from '../../auth/store/auth.actions';
 import { Conversation } from 'app/chat/conversation.model';
 import { UserSessionService } from '../user-session.service';
+import { AuthAutoLogoutService } from 'app/auth/auth-auto-logout.service';
 
 
 @Injectable()
@@ -18,13 +20,14 @@ export class UserEffects {
 
   constructor(private actions$: Actions,
               private http: HttpClient,
+              private authAutoLogoutService: AuthAutoLogoutService,
               private store: Store<fromApp.AppState>,
               private userSessionService: UserSessionService,
               private router: Router) {}
 
 
   @Effect({dispatch: false})
-  activeUserChangesNavigation = this.actions$.pipe(
+  updateActiveUserNavigation = this.actions$.pipe(
     ofType(UserActions.UPDATE_ACTIVE_USER),
     map((actionData: UserActions.UpdateActiveUser) => {
       this.userSessionService.setUserSessionStorage(actionData.payload.user);
@@ -35,7 +38,7 @@ export class UserEffects {
   );
 
   @Effect({dispatch: false})
-  AddUpdateJobToUserNavigation = this.actions$.pipe(
+  createUpdateJobToUserNavigation = this.actions$.pipe(
     ofType(UserActions.COMPANY_CREATED_JOB, UserActions.COMPANY_UPDATED_JOB),
     map((actionData: UserActions.CompanyCreatedJob | UserActions.CompanyUpdatedJob) => {
       this.userSessionService.updateUserJobsSessionStorage(actionData.payload, actionData.type);
@@ -43,6 +46,9 @@ export class UserEffects {
     })
   );
 
+  /*****************
+   * Chat Actions
+  *******************/
 
   @Effect()
   fetchAllConversations = this.actions$.pipe(
@@ -81,6 +87,10 @@ export class UserEffects {
         );
     })
   );
+
+  /*****************
+   * Employee Actions
+  *******************/
 
   @Effect()
   createWorkEmployee = this.actions$.pipe(
@@ -150,6 +160,143 @@ export class UserEffects {
         );
     })
   );
+
+  @Effect()
+  updateActiveEmployee = this.actions$.pipe(
+    ofType(UserActions.UPDATE_SINGLE_EMPLOYEE_IN_DB),
+    switchMap((actionData: UserActions.UpdateSingleEmployeeInDB) => {
+      const employeeFormDate = new FormData();
+      Object.keys(actionData.payload.employee).forEach(key => {
+        employeeFormDate.append(key, actionData.payload.employee[key]);
+      });
+      if (actionData.payload['password']) {
+        employeeFormDate.append('password', actionData.payload['password']);
+        employeeFormDate.append('confirmPassword', actionData.payload['confirmPassword']);
+      }
+      employeeFormDate.append('deleteImage', actionData.payload.deleteImage.toString() );
+      return this.http.post(environment.nodeServer  + 'employees/update', employeeFormDate)
+        .pipe(
+          map(res => {
+            if (res['type'] === 'success') {
+              if (res['refreshToken']) {
+                this.store.dispatch(new AuthActions.AuthSuccess({
+                  redirect: false,
+                  token: res['accessToken'],
+                  refreshToken: res['refreshToken'],
+                  expiresInSeconds: res['expiresInSeconds'],
+                }));
+                this.authAutoLogoutService.autoLogout(res['expiresInSeconds'] * 1000);
+              }
+              return new UserActions.UpdateActiveUser({ user: {...res['employee']}, redirect: 'my-details', kind: 'employee' });
+            } else {
+              return new UserActions.UserFailure(res['messages']);
+            }
+          }),
+          catchError(messages => {
+            return of(new UserActions.UserFailure(messages));
+          })
+        );
+    })
+  );
+
+  /*****************
+   * Company Actions
+  *******************/
+
+  @Effect()
+  createSingleJobInDb = this.actions$.pipe(
+    ofType(UserActions.COMPANY_CREATE_JOB_IN_DB),
+    switchMap(actionData => {
+      return this.http.put(environment.nodeServer + 'jobs/create', actionData['payload'])
+      .pipe(
+        map(res => {
+          if (res['type'] === 'success') {
+            return new UserActions.CompanyCreatedJob(res['job']);
+          } else {
+            return new UserActions.UserFailure(res['messages']);
+          }
+        }),
+        catchError(messages => {
+          return of(new UserActions.UserFailure(messages));
+        })
+      );
+    })
+  );
+
+  @Effect()
+  updateSingleJobInDb = this.actions$.pipe(
+    ofType(UserActions.COMPANY_UPDATE_JOB_IN_DB),
+    switchMap(actionData => {
+      return this.http.post(environment.nodeServer + 'jobs/update', actionData['payload'])
+      .pipe(
+        map(res => {
+          if (res['type'] === 'success') {
+            return new UserActions.CompanyUpdatedJob(res['job']);
+          } else {
+            return new UserActions.UserFailure(res['messages']);
+          }
+        }),
+        catchError(messages => {
+          return of(new UserActions.UserFailure(messages));
+        })
+      );
+    })
+  );
+
+  @Effect()
+  updateActiveCompany = this.actions$.pipe(
+    ofType(UserActions.UPDATE_SINGLE_COMPANY_IN_DB),
+    switchMap((actionData: UserActions.UpdateSingleCompanyInDb) => {
+      const companyData = this.getCompanyUpdateFormData(actionData);
+
+      return this.http.post(environment.nodeServer + 'companies/update', companyData, {
+          params: {
+            oldImages: actionData.payload.oldImagesPath.join(environment.splitCompanyOldImagesBy),
+          }
+        })
+        .pipe(
+          map(res => {
+            if (res['type'] === 'success') {
+              this.store.dispatch(new UserActions.ClearError());
+              if (res['refreshToken']) {
+                this.store.dispatch(new AuthActions.AuthSuccess({
+                  redirect: false,
+                  token: res['accessToken'],
+                  refreshToken: res['refreshToken'],
+                  expiresInSeconds: res['expiresInSeconds'],
+                }));
+                this.authAutoLogoutService.autoLogout(res['expiresInSeconds'] * 1000);
+              }
+              return new UserActions.UpdateActiveUser({ user: {...res['company']}, redirect: 'my-details', kind: 'company' });
+            } else {
+              return new UserActions.UserFailure(res['messages']);
+            }
+          }),
+          catchError(messages => {
+            return of(new UserActions.UserFailure(messages));
+          })
+        );
+      }
+    )
+  );
+
+  private getCompanyUpdateFormData = (actionData: UserActions.UpdateSingleCompanyInDb) => {
+    const companyData = new FormData();
+    Object.keys(actionData.payload.company).forEach(key => {
+      if (key === 'imagesPath') {
+        actionData.payload.company[key].forEach(imageFile => {
+          companyData.append(key, imageFile);
+        });
+      } else {
+        companyData.append(key, actionData.payload.company[key]);
+      }
+    });
+    if (actionData.payload['password']) {
+      companyData.append('password', actionData.payload['password']);
+      companyData.append('confirmPassword', actionData.payload['confirmPassword']);
+    }
+    return companyData;
+  }
 }
 
 

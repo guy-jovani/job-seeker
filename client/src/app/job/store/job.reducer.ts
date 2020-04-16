@@ -29,7 +29,6 @@ const initialState: State = {
 
 export function jobReducer(state = initialState, action: JobActions.JobActions) {
   switch (action.type) {
-    case JobActions.CREATE_JOB_IN_DB:
     case JobActions.JOB_STATE_LOAD_SINGLE:
       return {
         ...state,
@@ -41,7 +40,7 @@ export function jobReducer(state = initialState, action: JobActions.JobActions) 
         ...state,
         loadingAll: true,
       };
-    case JobActions.FETCH_SINGLE_JOB:
+    // case JobActions.FETCH_SINGLE_JOB:
     case JobActions.UPDATE_SINGLE_JOB_COMPANY_ATTEMPT:
       return {
         ...state,
@@ -96,24 +95,24 @@ export function jobReducer(state = initialState, action: JobActions.JobActions) 
         loadingSingle: false,
         jobs: upToDateJobs
       };
-    case JobActions.ADD_UPDATE_SINGLE_JOB:
-      const jobInd = state.jobs.findIndex(job => job._id === action.payload.job._id);
-      const updatedJobs = [...state.jobs];
-      const updatedJob = {
-          ...action.payload.job
-        };
-      if (jobInd > -1) {
-        updatedJobs[jobInd] = updatedJob;
-      } else {
-        updatedJobs.push(updatedJob);
-      }
-      return {
-        ...state,
-        messages: null,
-        jobs: [ ...updatedJobs],
-        loadingAll: false,
-        loadingSingle: false,
-      };
+    // case JobActions.ADD_UPDATE_SINGLE_JOB:
+    //   const jobInd = state.jobs.findIndex(job => job._id === action.payload.job._id);
+    //   const updatedJobs = [...state.jobs];
+    //   const updatedJob = {
+    //       ...action.payload.job
+    //     };
+    //   if (jobInd > -1) {
+    //     updatedJobs[jobInd] = updatedJob;
+    //   } else {
+    //     updatedJobs.push(updatedJob);
+    //   }
+    //   return {
+    //     ...state,
+    //     messages: null,
+    //     jobs: [ ...updatedJobs],
+    //     loadingAll: false,
+    //     loadingSingle: false,
+    //   };
     default:
       return state;
   }

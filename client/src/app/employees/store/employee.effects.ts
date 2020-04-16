@@ -8,11 +8,8 @@ import { of } from 'rxjs';
 
 import * as fromApp from '../../store/app.reducer';
 import * as EmployeeActions from './employee.actions';
-import * as UserActions from '../../user/store/user.actions';
-import * as AuthActions from '../../auth/store/auth.actions';
 import { Employee } from '../employee.model';
 import { environment } from '../../../environments/environment';
-import { AuthAutoLogoutService } from 'app/auth/auth-auto-logout.service';
 
 const nodeServer = environment.nodeServer + 'employees/';
 
@@ -22,48 +19,9 @@ export class EmployeeEffects {
 
   constructor(private actions$: Actions,
               private http: HttpClient,
-              private authAutoLogoutService: AuthAutoLogoutService,
               private store: Store<fromApp.AppState>) {}
 
 
-  @Effect()
-  updateActiveEmployee = this.actions$.pipe(
-    ofType(EmployeeActions.UPDATE_SINGLE_EMPLOYEE_IN_DB),
-    switchMap((actionData: EmployeeActions.UpdateSingleEmployeeInDB) => {
-      const employeeFormDate = new FormData();
-      Object.keys(actionData.payload.employee).forEach(key => {
-        employeeFormDate.append(key, actionData.payload.employee[key]);
-      });
-      if (actionData.payload['password']) {
-        employeeFormDate.append('password', actionData.payload['password']);
-        employeeFormDate.append('confirmPassword', actionData.payload['confirmPassword']);
-      }
-      employeeFormDate.append('deleteImage', actionData.payload.deleteImage.toString() );
-      return this.http.post(nodeServer  + 'update', employeeFormDate)
-        .pipe(
-          map(res => {
-            if (res['type'] === 'success') {
-              this.store.dispatch(new EmployeeActions.ClearError());
-              if (res['refreshToken']) {
-                this.store.dispatch(new AuthActions.AuthSuccess({
-                  redirect: false,
-                  token: res['accessToken'],
-                  refreshToken: res['refreshToken'],
-                  expiresInSeconds: res['expiresInSeconds'],
-                }));
-                this.authAutoLogoutService.autoLogout(res['expiresInSeconds'] * 1000);
-              }
-              return new UserActions.UpdateActiveUser({ user: {...res['employee']}, redirect: 'my-details', kind: 'employee' });
-            } else {
-              return new EmployeeActions.EmployeeOpFailure(res['messages']);
-            }
-          }),
-          catchError(messages => {
-            return of(new EmployeeActions.EmployeeOpFailure(messages));
-          })
-        );
-    })
-  );
 
   @Effect()
   fetchEmployees = this.actions$.pipe(

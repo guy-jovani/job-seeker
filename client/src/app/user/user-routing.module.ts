@@ -13,7 +13,7 @@ import { DetailsEmployeeComponent } from 'app/employees/details-employee/details
 import { DetailsEmployeeGuard } from 'app/employees/details-employee/details-employee.guard';
 import { EmployeeJobStatus } from 'app/employees/employee.model';
 
-const employeerJobsIndexMatcher = (url: UrlSegment[]) => {
+const employerJobsIndexMatcher = (url: UrlSegment[]) => {
   return url.length === 3 && url[0].path === 'my-jobs' &&
           [...Object.keys(EmployeeJobStatus).filter(key => isNaN(+key))].includes(url[1].path) ?
           { consumed: url } : null;
@@ -41,7 +41,7 @@ const routes: Routes = [
     canActivate: [AuthGuard, CompanyOnlyGuard]
   },
   {
-    matcher: employeerJobsIndexMatcher,
+    matcher: employerJobsIndexMatcher,
     component: DetailsJobComponent,
     canActivate: [AuthGuard, EmployeeOnlyGuard]
   },
