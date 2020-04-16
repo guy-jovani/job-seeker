@@ -36,6 +36,8 @@ export const COMPANY_ACCEPT_REJECT_JOB_ATTEMPT = '[User] COMPANY_ACCEPT_REJECT_J
 export const UPDATE_SINGLE_EMPLOYEE_IN_DB = '[User] Update single Employee in DB';
 export const UPDATE_SINGLE_COMPANY_IN_DB = '[User] Update single company in db';
 
+export const CHANGE_USER_PASSWORD = '[User] CHANGE_USER_PASSWORD';
+
 
 export type UserActions = SetChatNotification
                         | SetSingleConversation
@@ -52,6 +54,7 @@ export type UserActions = SetChatNotification
                         | CompanyAcceptRejectJobAttempt
                         | Logout
                         | UserFailure
+                        | ChangeUserPassword
                         | CompanyUpdateJobInDb
                         | CompanyCreateJobInDb
                         | CompanyUpdatedJob
@@ -64,11 +67,21 @@ export class FetchAllConversations implements Action {
   readonly type = FETCH_ALL_CONVERSATIONS;
 }
 
-
 export class CompanyCreateJobInDb implements Action {
   readonly type = COMPANY_CREATE_JOB_IN_DB;
 
   constructor(public payload: Job ) {}
+}
+
+export class ChangeUserPassword implements Action {
+  readonly type = CHANGE_USER_PASSWORD;
+
+  constructor(public payload: {
+    currPassword: string,
+    newPassword: string,
+    confirmNewPassword: string,
+    kind: string
+  } ) {}
 }
 
 export class CompanyUpdateJobInDb implements Action {
@@ -82,17 +95,14 @@ export class UpdateSingleCompanyInDb implements Action {
 
   constructor(public payload: {
     company: Company,
-    oldImagesPath: string[],
-    password: string,
-    confirmPassword: string
+    oldImagesPath: string[]
   }) {}
 }
 
 export class UpdateSingleEmployeeInDB implements Action {
   readonly type = UPDATE_SINGLE_EMPLOYEE_IN_DB;
 
-  constructor(public payload: { employee: Employee, deleteImage: boolean,
-    password: string, confirmPassword: string }) {}
+  constructor(public payload: { employee: Employee, deleteImage: boolean }) {}
 }
 
 export class DeleteWorkEmployeeInDb implements Action {

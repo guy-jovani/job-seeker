@@ -45,11 +45,6 @@ exports.getNullKeysForUpdate = (req, removableKeys) => {
 
 exports.getBulkArrayForUpdate = async (req, nullKeys) => { 
   let bulkArr = [];
-  if(req.body.password) {
-    const password = await bcrypt.hash(req.body.password, 12);
-    req.body.password = password;
-  }
-
   bulkArr.push({ updateOne: { // updating the fields
     filter: { _id: req.body._id },
     update: { $set: { ...req.body } }
@@ -202,7 +197,6 @@ getAndCreateAccessToken = (user, kind) => {
     kind,
     email: user.email
   }, process.env.SECRET_TOKEN_KEY, { expiresIn: process.env.JWT_TOKEN_EXPIRATION_SECONDS +'s' });
-
   return accessToken;
 };
 

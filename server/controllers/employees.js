@@ -7,7 +7,6 @@ const getBulkArrayForUpdate = require('../utils/shared').getBulkArrayForUpdate;
 const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
 const sendMessagesResponse = require('../utils/shared').sendMessagesResponse;
 const changeStatusOfAUserJob = require('../utils/shared').changeStatusOfAUserJob;
-const getAndCreateTokens = require('../utils/shared').getAndCreateTokens;
 const skippedDocuments = require('../utils/shared').skippedDocuments;
 
 exports.fetchSingle = async (req, res, next) => {
@@ -84,19 +83,10 @@ exports.updateEmployee = async (req, res, next) => {
           path: 'jobs.job', 
           populate: { path: 'company', select: 'name' }
         });
-
-    let tokens;
-    if(req.body.password) {
-      tokens = await getAndCreateTokens(updatedEmployee, 'employee');
-    }
     
     res.status(201).json({
-      messages: ['employee updated successfully!'],
       type: 'success',
-      employee: updatedEmployee,
-      accessToken: tokens ? tokens[0] : null,
-      refreshToken: tokens ? tokens[1] : null,
-      expiresInSeconds: process.env.JWT_TOKEN_EXPIRATION_SECONDS
+      employee: updatedEmployee
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "There was an error updating the employee."));
@@ -220,9 +210,6 @@ exports.deleteWork = async (req, res, next) => {
     next(errorHandling.handleServerErrors(error, 500, "There was an error trying to delete the experience."));
   }
 };
-
-
-
 
 
 

@@ -17,7 +17,7 @@ router.put('/signup',
       .withMessage('The password need to be more than 3 characters long.'),
     body('confirmPassword').custom((value, { req }) => {
       if (value !== req.body.password) {
-        throw new Error('Password confirmation does not match password');
+        throw new Error('Password confirmation does not match password.');
       }
       return true;
     })
@@ -82,5 +82,36 @@ router.post('/resetToNewPassword',
     })
   ], 
   authController.resetToNewPassword);
+
+router.post('/changePassword', [
+  body('currPassword')
+    .exists()
+    .not()
+    .isEmpty()
+    .withMessage('Please provide your current password.'),
+  body('newPassword')
+    .exists()
+    .not()
+    .isEmpty()
+    .withMessage('Please provide your new password.'),
+  body('newPassword')
+    .isLength(3)
+    .withMessage('The password need to be more than 3 characters long.'),
+  body('confirmNewPassword').custom((value, { req }) => {
+    if (value !== req.body.newPassword) {
+      throw new Error('Password confirmation does not match password.');
+    }
+    return true;
+  }),
+  body('kind').custom(value => {
+    if (value !== 'employee' && value !== 'company') {
+      throw new Error('Something went wrong while trying to change the password.');
+    }
+    return true;
+  }),
+  body('_id')
+    .exists()
+    .withMessage('Something went wrong while trying to change the password.'),
+], authController.changePassword);
 
 module.exports = router;

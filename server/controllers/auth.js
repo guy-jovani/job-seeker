@@ -1,4 +1,4 @@
-
+const mongoose = require('mongoose');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -147,18 +147,15 @@ exports.login = async (req, res, next) => {
     if(routeErrors.type === 'failure') {
       return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
     }
+    
     let [user, kind] = await getUserLogin(req.body.email);
     if(!user){ 
       return sendMessagesResponse(res, 401, ['The email and/or password are incorrect'], 'failure');
     }
-
     const verifiedPassword = await bcrypt.compare(req.body.password, user.password);
     if(!verifiedPassword){ 
       return sendMessagesResponse(res, 401, ['The email and/or password are incorrect.'], 'failure');
     }
-
-    mockDB();
-    
     const [accessToken, refreshToken] = await getAndCreateTokens(user, kind);
     user = user.toObject();
     Reflect.deleteProperty(user, 'password');
@@ -357,7 +354,57 @@ exports.logout = async (req, res, next) => {
 
 
 
+/**
+ * Changing the user password,
+ * and upon success sending a respond to the client with the following:
+ *    {string} type - 'success' - meaning the password had a reset.
+ *    {string} accessToken - a new access token
+ *    {string} refreshToken - a new refresh token
+ *    {string} expiresInSeconds - the number of seconds till the access token will get expired
+ * 
+ * In case of an error - moving the error handling to the express error handling middleware
+ * with a error code of 500, and an error message
+ * @param {express request object} req - the req need to have a body with: 
+ *                                        {string} kind - the user kind ('employee' | 'company')
+ * @param {express respond object} res
+ */
+exports.changePassword = async (req, res, next) => {
+  try {
+    const routeErrors = validation.handleValidationRoutesErrors(req);
+    if(routeErrors.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
+    }
 
+    let user;
+    if(req.body.kind === 'employee') {
+      user = await Employee.findById(req.body._id);
+    } else {
+      user = await Company.findById(req.body._id);
+    }
+    if(!user){
+      return sendMessagesResponse(res, 422, ['Something went wrong while trying to change the password.'], 'failure');
+    }
+
+    const verifiedPassword = await bcrypt.compare(req.body.currPassword, user.password);
+    if(!verifiedPassword){ 
+      return sendMessagesResponse(res, 401, ['You didn\'t type your current password correctly. Please try again.'], 'failure');
+    }
+    user.password = await bcrypt.hash(req.body.newPassword, 12);
+    await user.save();
+
+    const tokens = await getAndCreateTokens(user, req.body.kind);
+
+    res.status(201).json({
+      type: 'success',
+      accessToken: tokens ? tokens[0] : null,
+      refreshToken: tokens ? tokens[1] : null,
+      expiresInSeconds: process.env.JWT_TOKEN_EXPIRATION_SECONDS
+    });
+
+  } catch (error) {
+    next(handleServerErrors(error, 500, `There was an error trying to change the password.`));
+  }
+};
 
 
 

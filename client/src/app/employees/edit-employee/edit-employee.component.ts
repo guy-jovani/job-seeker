@@ -3,7 +3,6 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 
 import * as fromApp from '../../store/app.reducer';
 import * as UserActions from '../../user/store/user.actions';
@@ -20,7 +19,6 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
   isLoading = false;
   employeeForm: FormGroup;
   employee: Employee;
-  showPasswords = false;
   messages: string[] = [];
   currUrl: string[] = null;
   profileImage: { file: File, stringFile: string } = { file: null, stringFile: '' };
@@ -38,10 +36,6 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
       email: new FormControl(null, [Validators.required, Validators.email]),
       firstName: new FormControl(null, [Validators.minLength(2)]),
       lastName: new FormControl(null, [Validators.minLength(2)]),
-      passwords: new FormGroup({
-        password: new FormControl(null, [Validators.minLength(3)]),
-        confirmPassword: new FormControl(null, [])
-      }, this.checkPasswordEquality)
     });
 
     this.userSub = this.store.select('user')
@@ -64,12 +58,7 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
       });
   }
 
-  checkPasswordEquality(control: FormControl): {[s: string]: boolean} {
-    if (control.get('password').value !== control.get('confirmPassword').value) {
-      return { equality: true };
-    }
-    return null;
-  }
+
 
   onCroppedEvent(images: { file: File, stringFile: string }) {
     this.profileImage = images;
@@ -81,10 +70,6 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
       email: this.employee.email,
       firstName: this.employee.firstName || '',
       lastName: this.employee.lastName || '',
-      passwords: {
-        password: '',
-        confirmPassword: '',
-      },
     });
 
     if (this.employee.profileImagePath) {
@@ -98,9 +83,6 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
     }
     const firstName = form.value.firstName ? form.value.firstName : undefined;
     const lastName = form.value.lastName ? form.value.lastName : undefined;
-    const password = form.value.passwords.password ? form.value.passwords.password : undefined;
-    const confirmPassword = form.value.passwords.confirmPassword ? form.value.passwords.confirmPassword : undefined;
-
 
     const newEmployee = new Employee({
       _id: this.employee._id, email: form.value.email
@@ -109,8 +91,7 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
     if (lastName) { newEmployee.lastName = lastName; }
     if ( this.profileImage.file ) { newEmployee.profileImagePath = this.profileImage.file; }
     this.store.dispatch(new UserActions.UpdateSingleEmployeeInDB({
-              employee: newEmployee, deleteImage: this.deleteImage.nativeElement.checked,
-              password, confirmPassword }));
+              employee: newEmployee, deleteImage: this.deleteImage.nativeElement.checked }));
   }
 
   onCancel() {
@@ -126,9 +107,5 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
 
   onClose() {
     this.store.dispatch(new UserActions.ClearError());
-  }
-
-  onTogglePasswords() {
-    this.showPasswords = !this.showPasswords;
   }
 }

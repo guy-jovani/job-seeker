@@ -18,7 +18,6 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
   company: Company;
   companyForm: FormGroup;
   isLoading = false;
-  showPasswords = false;
   messages: string[] = [];
   currUrl: string[] = null;
   images: File[] = null;
@@ -38,10 +37,6 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
       description: new FormControl(null),
       website: new FormControl(null),
       deleteImage: new FormControl(false),
-      passwords: new FormGroup({
-        password: new FormControl(null, [Validators.minLength(3)]),
-        confirmPassword: new FormControl(null, [])
-      }, this.checkPasswordEquality)
     });
 
     this.authState = this.store.select('user')
@@ -63,23 +58,12 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
       });
   }
 
-  checkPasswordEquality(control: FormControl): {[s: string]: boolean} {
-    if (control.get('password').value !== control.get('confirmPassword').value) {
-      return { equality: true };
-    }
-    return null;
-  }
-
   initForm() {
     this.companyForm.setValue({
       name: this.company.name,
       email: this.company.email,
       description: this.company.description || '',
       website: this.company.website || '',
-      passwords: {
-        password: '',
-        confirmPassword: '',
-      },
       deleteImage: false,
     });
     this.images = [];
@@ -120,8 +104,6 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
     const formValue = this.companyForm.value;
     const name = formValue.name;
     const email = formValue.email;
-    const password = formValue.passwords.password ? formValue.passwords.password : undefined;
-    const confirmPassword = formValue.passwords.confirmPassword ? formValue.passwords.confirmPassword : undefined;
     const newCompany = new Company({_id: this.company._id, name, email});
     if (formValue.description) { newCompany.description = formValue.description; }
     if (formValue.website) { newCompany.website = formValue.website; }
@@ -132,7 +114,7 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
       newCompany.profileImagePath = this.profileImagePreview.file || this.profileImagePreview.stringFile || '';
     }
     this.store.dispatch(new UserActions.UpdateSingleCompanyInDb({
-      company: newCompany, oldImagesPath: this.imagesPath.map(path => path.startsWith('http') ? path : ''), password, confirmPassword }));
+      company: newCompany, oldImagesPath: this.imagesPath.map(path => path.startsWith('http') ? path : '') }));
   }
 
   onCancel() {
@@ -148,9 +130,5 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
 
   onClose() {
     this.store.dispatch(new UserActions.ClearError());
-  }
-
-  onTogglePasswords() {
-    this.showPasswords = !this.showPasswords;
   }
 }

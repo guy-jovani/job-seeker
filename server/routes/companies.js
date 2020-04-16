@@ -36,6 +36,8 @@ router.post('/update', extractCompanyImages,
   companyController.updateCompany);
 
 
+
+
 module.exports = router;
   
 

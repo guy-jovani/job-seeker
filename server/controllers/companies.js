@@ -9,7 +9,6 @@ const getNullKeysForUpdate = require('../utils/shared').getNullKeysForUpdate;
 const checkCompanyUpdateSignupValidation = require('../utils/shared').checkCompanyUpdateSignupValidation
 const changeStatusOfAUserJob = require('../utils/shared').changeStatusOfAUserJob;
 const skippedDocuments = require('../utils/shared').skippedDocuments;
-const getAndCreateTokens = require('../utils/shared').getAndCreateTokens;
 
 
 /**
@@ -211,19 +210,10 @@ exports.updateCompany = async (req, res, next) => {
     let updatedCompany = await Company.findById(req.body._id).select(
                             '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration -password'
                           ).populate('jobs').populate('applicants.employee').populate('applicants.jobs.job');
-
-    let tokens;
-    if(req.body.password) {
-      tokens = await getAndCreateTokens(updatedCompany, 'company');
-    }
                         
     res.status(201).json({
-      message: 'company updated successfully!',
       type: 'success',
-      company: updatedCompany,
-      accessToken: tokens ? tokens[0] : null,
-      refreshToken: tokens ? tokens[1] : null,
-      expiresInSeconds: process.env.JWT_TOKEN_EXPIRATION_SECONDS
+      company: updatedCompany
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "There was an error updating the company."));
@@ -238,6 +228,7 @@ exports.acceptRejectJob = async (req, res, next) => {
     next(errorHandling.handleServerErrors(error, 500, `There was an error updating the status of the wanted job.`));
   }
 };
+
 
 
 

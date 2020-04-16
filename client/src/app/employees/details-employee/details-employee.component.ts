@@ -10,7 +10,7 @@ import * as EmployeeActions from '../store/employee.actions';
 import { Company, ApplicantJob, ApplicantStatus, Applicant } from 'app/company/company.model';
 import * as UserActions from '../../user/store/user.actions';
 import { ChatService } from 'app/chat/chat-socket.service';
-import { NgForm } from '@angular/forms';
+import { NgForm, FormGroup, FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-details-employee',
@@ -29,15 +29,21 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   selectedStatusList = 'all';
   closedMessages = false;
   addWork = false;
-  submitted = false;
+  submittedWork = false;
   workId: string = null;
   availableStatus = Object.keys(ApplicantStatus).filter(key => isNaN(+key));
   years = Array(new Date().getFullYear() - 1970 + 1).fill(0).map((val, i) => new Date().getFullYear() - i);
   monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+  showNewPasswords = false;
+  showCurrPassword = false;
+  changePassword = false;
+  submittedPassword = false;
+  changePasswordForm: FormGroup;
+
+
   @ViewChild('workForm') workForm: NgForm;
-  @ViewChild('backdrop') backdrop: ElementRef;
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -46,6 +52,14 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
     private router: Router) { }
 
   ngOnInit() {
+    this.changePasswordForm = new FormGroup({
+      currentPassword: new FormControl(null, [Validators.minLength(3), Validators.required]),
+      passwords: new FormGroup({
+        newPassword: new FormControl(null, [Validators.minLength(3), Validators.required]),
+        confirmNewPassword: new FormControl(null, [Validators.required])
+      }, this.checkPasswordEquality)
+    });
+
     this.routeSub = this.route.params
       .pipe(
         switchMap(() => {
@@ -59,19 +73,24 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
         .subscribe(currState => {
           this.currUrl = this.router.url.substring(1).split('/');
           if (currState.messages) {
-            this.messages = [];
-            for (const msg of currState.messages) {
-              this.messages.push(msg);
-            }
+            this.messages = [...currState.messages];
           } else {
             this.messages = [];
           }
           this.isLoading = currState['loadingSingle'] || currState['loading'];
+
           if (this.currUrl[0] === 'my-details') {
             if (!currState['user']) { return; }
             this.employee = currState['user'] as Employee;
             this.allowEdit = true;
-            this.addWork = this.submitted && (!!this.messages.length || this.closedMessages || this.isLoading);
+
+            this.addWork = this.submittedWork && (!!this.messages.length || this.closedMessages || this.isLoading);
+            this.submittedWork = this.addWork;
+
+            this.changePassword = this.submittedPassword && (!!this.messages.length || this.closedMessages || this.isLoading);
+            this.submittedPassword = this.changePassword;
+
+            this.closedMessages = false;
           } else if (this.currUrl[0] === 'my-applicants') {
             if (!currState['user']) { return; }
             this.user = currState['user'];
@@ -128,10 +147,9 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
     }
   }
 
-  onSubmit(form: NgForm) {
+  onSubmitWork(form: NgForm) {
     this.messages = [];
-    this.submitted = true;
-    this.closedMessages = false;
+    this.submittedWork = true;
     const controls = form.form.controls;
     if (controls.title.status === 'INVALID') {
       this.messages.push('The "Title" field is required.');
@@ -176,8 +194,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
 
   onDeleteWork() {
     this.messages = [];
-    this.submitted = true;
-    this.closedMessages = false;
+    this.submittedWork = true;
     this.store.dispatch(new UserActions.DeleteWorkEmployeeInDb(this.workId));
   }
 
@@ -220,7 +237,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
     }
     this.addWork = !this.addWork;
     if (!this.addWork) {
-      this.submitted = false;
+      this.submittedWork = false;
     }
     this.messages = [];
   }
@@ -229,6 +246,45 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
     const name = (emp.firstName ? emp.firstName : '') + ' ' +
             (emp.lastName ? emp.lastName : '');
     return name.trim() || emp.email;
+  }
+
+  checkPasswordEquality(control: FormControl): {[s: string]: boolean} {
+    if (control.get('newPassword').value !== control.get('confirmNewPassword').value) {
+      return { equality: true };
+    }
+    return null;
+  }
+
+  onToggleNewPasswords() {
+    this.showNewPasswords = !this.showNewPasswords;
+  }
+
+  onToggleCurrPassword() {
+    this.showCurrPassword = !this.showCurrPassword;
+  }
+
+  onSubmitChangePassword() {
+    if (this.changePasswordForm.invalid) {
+      return this.store.dispatch(new UserActions.UserFailure(['The form is invalid']));
+    }
+    const formValue = this.changePasswordForm.value;
+    const currPassword = formValue.currentPassword;
+    const newPassword = formValue.passwords.newPassword;
+    const confirmNewPassword = formValue.passwords.confirmNewPassword;
+    this.submittedPassword = true;
+    this.store.dispatch(new UserActions.ChangeUserPassword({
+      currPassword, newPassword, confirmNewPassword, kind: 'employee' }));
+  }
+
+  onTogglePasswordChange() {
+    this.changePassword = !this.changePassword;
+    this.showNewPasswords = false;
+    this.showCurrPassword = false;
+    this.submittedPassword = this.changePassword;
+    this.changePasswordForm.reset();
+    if (this.messages.length) {
+      this.store.dispatch(new UserActions.ClearError());
+    }
   }
 
   ngOnDestroy() {

@@ -9,7 +9,6 @@ import * as fromApp from '../../store/app.reducer';
 import { environment } from '../../../environments/environment';
 
 import * as JobActions from './job.actions';
-import * as UserActions from '../../user/store/user.actions';
 import { of } from 'rxjs';
 
 const nodeServer = environment.nodeServer + 'jobs/';

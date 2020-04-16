@@ -30,6 +30,16 @@ input.ng-invalid.ng-touched {
   align-items: center;
 }
 
+.front-drop {
+  position: fixed;
+  max-width: 70vw;
+  max-height: 65vh;
+  padding: 16px;
+  z-index: 100;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .26);
+}
+
 .hide {
   display: none;
 }
@@ -196,6 +206,10 @@ app-back-button {
     display: flex;
     width: 100%;
     justify-content: space-around;
+  }
+
+  a, button {
+    margin-left: 1rem;
   }
 }
 

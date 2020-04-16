@@ -67,53 +67,6 @@
       </span>
     </div>
 
-    <div formGroupName="passwords" class="form-group">
-      <div class="form-group password-input-container">
-        <label for="name">Password  </label>
-        <input
-          placeholder="Password"
-          class="form-control input-form-tag"
-          [type]="showPasswords ? 'text' : 'password'"
-          name="password"
-          id="password"
-          formControlName="password"
-          #password
-        >
-        <span (click)="onTogglePasswords()"
-              class="{{ showPasswords ? 'glyphicon glyphicon-eye-close show-password-eye' :
-                                        'glyphicon glyphicon-eye-open show-password-eye' }}">
-        </span>
-        <span *ngIf="employeeForm.get('passwords.password').touched &&
-                        !employeeForm.get('passwords.password').valid">
-          <span class="help-block" *ngIf="employeeForm.get('passwords.password').errors.required">
-            The password field is required.
-          </span>
-          <span class="help-block" *ngIf="employeeForm.get('passwords.password').errors.minlength">
-              The password must be of at least 3 characters long.
-          </span>
-        </span>
-      </div>
-      <div>
-        <label for="name">Confirm Password  </label>
-        <input
-          placeholder="Confirm Password"
-          class="form-control input-form-tag"
-          [type]="showPasswords ? 'text' : 'password'"
-          name="confirmPassword"
-          id="confirmPassword"
-          formControlName="confirmPassword"
-        >
-        <span *ngIf="employeeForm.get('passwords.password').touched &&
-                employeeForm.get('passwords.confirmPassword').touched &&
-                employeeForm.get('passwords.password').valid &&
-                !employeeForm.get('passwords').valid">
-          <span class="help-block" *ngIf="employeeForm.get('passwords').errors.equality">
-            The passwords fields must be identical.
-          </span>
-        </span>
-      </div>
-    </div>
-
     <hr>
 
     <div class="employee-profile-image-container">

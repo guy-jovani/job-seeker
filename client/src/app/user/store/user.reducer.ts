@@ -79,6 +79,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
     case UserActions.UPDATE_SINGLE_EMPLOYEE_IN_DB:
     case UserActions.UPDATE_SINGLE_COMPANY_IN_DB:
     case UserActions.COMPANY_CREATE_JOB_IN_DB:
+    case UserActions.CHANGE_USER_PASSWORD:
       return {
         ...state,
         loading: true,

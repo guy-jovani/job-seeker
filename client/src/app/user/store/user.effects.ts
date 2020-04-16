@@ -25,6 +25,43 @@ export class UserEffects {
               private userSessionService: UserSessionService,
               private router: Router) {}
 
+  /*****************
+   * User Actions
+  *******************/
+
+  @Effect()
+  changeUserPassword = this.actions$.pipe(
+    ofType(UserActions.CHANGE_USER_PASSWORD),
+    withLatestFrom(this.store.select('user')),
+    switchMap( ( [actionData, userState] ) =>  {
+      return this.http.post(environment.nodeServer  + 'auth/changePassword', {
+        currPassword: actionData['payload']['currPassword'],
+        newPassword: actionData['payload']['newPassword'],
+        confirmNewPassword: actionData['payload']['confirmNewPassword'],
+        kind: actionData['payload']['kind'],
+        _id: userState.user._id
+      })
+      .pipe(
+        map(res => {
+          if (res['type'] === 'success') {
+            this.authAutoLogoutService.autoLogout(res['expiresInSeconds'] * 1000);
+            this.store.dispatch(new UserActions.ClearError());
+            return new AuthActions.AuthSuccess({
+              redirect: false,
+              token: res['accessToken'],
+              refreshToken: res['refreshToken'],
+              expiresInSeconds: res['expiresInSeconds'],
+            });
+          } else {
+            return new UserActions.UserFailure(res['messages']);
+          }
+        }),
+        catchError(messages => {
+          return of(new UserActions.UserFailure(messages));
+        })
+      );
+    })
+  );
 
   @Effect({dispatch: false})
   updateActiveUserNavigation = this.actions$.pipe(
@@ -165,15 +202,7 @@ export class UserEffects {
   updateActiveEmployee = this.actions$.pipe(
     ofType(UserActions.UPDATE_SINGLE_EMPLOYEE_IN_DB),
     switchMap((actionData: UserActions.UpdateSingleEmployeeInDB) => {
-      const employeeFormDate = new FormData();
-      Object.keys(actionData.payload.employee).forEach(key => {
-        employeeFormDate.append(key, actionData.payload.employee[key]);
-      });
-      if (actionData.payload['password']) {
-        employeeFormDate.append('password', actionData.payload['password']);
-        employeeFormDate.append('confirmPassword', actionData.payload['confirmPassword']);
-      }
-      employeeFormDate.append('deleteImage', actionData.payload.deleteImage.toString() );
+      const employeeFormDate = this.getEmployeeUpdateFormData(actionData);
       return this.http.post(environment.nodeServer  + 'employees/update', employeeFormDate)
         .pipe(
           map(res => {
@@ -291,11 +320,16 @@ export class UserEffects {
         companyData.append(key, actionData.payload.company[key]);
       }
     });
-    if (actionData.payload['password']) {
-      companyData.append('password', actionData.payload['password']);
-      companyData.append('confirmPassword', actionData.payload['confirmPassword']);
-    }
     return companyData;
+  }
+
+  private getEmployeeUpdateFormData = (actionData: UserActions.UpdateSingleEmployeeInDB) => {
+    const employeeFormDate = new FormData();
+    Object.keys(actionData.payload.employee).forEach(key => {
+      employeeFormDate.append(key, actionData.payload.employee[key]);
+    });
+    employeeFormDate.append('deleteImage', actionData.payload.deleteImage.toString() );
+    return employeeFormDate;
   }
 }
 

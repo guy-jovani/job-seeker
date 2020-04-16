@@ -1,14 +1,14 @@
 
 
 
-<div *ngIf="isLoading" class='flex-row-center'>
+<div *ngIf="isLoading && !changePassword" class='flex-row-center'>
   <app-loading-spinner></app-loading-spinner>
 </div>
 
-<div class="container" *ngIf="company && !isLoading">
+<div class="container" *ngIf="company && (!isLoading || changePassword)">
 
   <app-message-box
-    *ngIf="messages.length"
+    *ngIf="messages.length && !changePassword"
     [messages]="messages"
     (closeMessages)="onClose()">
   </app-message-box>
@@ -24,7 +24,7 @@
 
   <hr>
 
-  <main class="details-page-body" *ngIf="!isLoading && company.email">
+  <main class="details-page-body">
     <section>
       <h4>Info</h4>
       <address>
@@ -71,6 +71,7 @@
 
     <div class="edit-buttons-container" *ngIf="allowEdit">
       <a class="btn btn-primary btn-sm" routerLink='edit'>Edit Details</a>
+      <button type="button" (click)="onTogglePasswordChange()" class="btn btn-primary btn-sm">Change Password</button>
     </div>
   </main>
 
@@ -79,8 +80,125 @@
 
 
 
+<div class="backdrop {{ changePassword ? '' : 'hide' }}">
 
+  <section class="container form-container front-drop">
+    <div *ngIf="isLoading && changePassword" class="flex-row-center">
+      <app-loading-spinner></app-loading-spinner>
+    </div>
 
+    <form (ngSubmit)="onSubmitChangePassword()" [formGroup]="changePasswordForm" *ngIf="!isLoading && changePassword" class="my-form">
+
+      <header class="form-title-container">
+        <h3 class="form-action-title">Change Password</h3>
+      </header>
+
+      <app-message-box
+        *ngIf="messages.length && !isLoading && changePassword"
+        [messages]="messages"
+        (closeMessages)="onClose()">
+      </app-message-box>
+
+      <hr>
+
+      <div class="form-group password-input-container">
+        <label for="name">Current Password <abbr title="required" aria-label="required">*</abbr> </label>
+        <input
+          placeholder="Type your current password"
+          class="form-control input-form-tag"
+          [type]="showCurrPassword ? 'text' : 'password'"
+          name="currentPassword"
+          id="currentPassword"
+          formControlName="currentPassword"
+          #currentPassword
+        >
+        <span (click)="onToggleCurrPassword()"
+              class="{{ showCurrPassword ? 'glyphicon glyphicon-eye-close show-password-eye' :
+                                        'glyphicon glyphicon-eye-open show-password-eye' }}">
+        </span>
+        <span *ngIf="changePasswordForm.get('currentPassword').touched &&
+                        !changePasswordForm.get('currentPassword').valid">
+          <span class="help-block" *ngIf="changePasswordForm.get('currentPassword').errors.required">
+            The current password field is required.
+          </span>
+          <span class="help-block" *ngIf="changePasswordForm.get('currentPassword').errors.minlength">
+              The current password must be of at least 3 characters long.
+          </span>
+        </span>
+      </div>
+
+      <div formGroupName="passwords" class="form-group">
+
+        <div class="form-group password-input-container">
+          <label for="name">New Password <abbr title="required" aria-label="required">*</abbr> </label>
+          <input
+            placeholder="Type your new password"
+            class="form-control input-form-tag"
+            [type]="showNewPasswords ? 'text' : 'password'"
+            name="newPassword"
+            id="newPassword"
+            formControlName="newPassword"
+            #newPassword
+          >
+          <span (click)="onToggleNewPasswords()"
+                class="{{ showNewPasswords ? 'glyphicon glyphicon-eye-close show-password-eye' :
+                                          'glyphicon glyphicon-eye-open show-password-eye' }}">
+          </span>
+          <span *ngIf="changePasswordForm.get('passwords.newPassword').touched &&
+                          !changePasswordForm.get('passwords.newPassword').valid">
+            <span class="help-block" *ngIf="changePasswordForm.get('passwords.newPassword').errors.required">
+              The new password field is required.
+            </span>
+            <span class="help-block" *ngIf="changePasswordForm.get('passwords.newPassword').errors.minlength">
+                The new password must be of at least 3 characters long.
+            </span>
+          </span>
+        </div>
+
+        <div>
+          <label for="name">Confirm New Password <abbr title="required" aria-label="required">*</abbr> </label>
+          <input
+            class="form-control input-form-tag"
+            placeholder="Repeat your new password"
+            [type]="showNewPasswords ? 'text' : 'password'"
+            name="confirmNewPassword"
+            id="confirmNewPassword"
+            formControlName="confirmNewPassword"
+          >
+          <span *ngIf="changePasswordForm.get('passwords.newPassword').touched &&
+                  changePasswordForm.get('passwords.confirmNewPassword').touched &&
+                  changePasswordForm.get('passwords.newPassword').valid &&
+                  !changePasswordForm.get('passwords').valid">
+            <span class="help-block" *ngIf="changePasswordForm.get('passwords').errors.equality">
+              The new passwords fields must be identical.
+            </span>
+          </span>
+        </div>
+
+      </div>
+
+      <hr>
+
+      <div class="edit-buttons-container">
+        <button
+          type="submit"
+          class="btn btn-success"
+          [disabled]="!changePasswordForm.valid">
+          Change
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="onTogglePasswordChange()">
+          Cancel
+        </button>
+      </div>
+
+    </form>
+
+  </section>
+
+</div>
 
 
 
