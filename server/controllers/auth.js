@@ -94,7 +94,6 @@ exports.signup = async (req, res, next) => {
   }
 };
 
-
 /**
  * Get the logged user (Company or Employee).
  * @param {string} email - the email of the user.

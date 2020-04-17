@@ -2,14 +2,37 @@
 
 const express = require('express')
 const router = express.Router();
-const { body } = require('express-validator');
+const { body, query } = require('express-validator');
 
 const extractCompanyImages = require('../middleware/image-upload').extractCompanyImages;
 const companyController = require('../controllers/companies');
 
 
-router.get('/fetchCompanies', companyController.fetchCompanies  );
-router.get('/fetchSingle', companyController.fetchSingle);
+router.get('/fetchCompanies', [
+  query('_id')
+    .exists()
+    .not()
+    .isEmpty()
+    .withMessage('Something went wrong while trying to get the companies. Please try again later.'),
+  query('page')
+    .isInt({ gt: 0 })
+    .withMessage('The "page" field should be a positive number.'),
+  query('kind').custom((value, { req }) => {
+    if (value !== 'employee' && value !== 'company') {
+      throw new Error('Invalid value of \'kind\' field.');
+    }
+    return true;
+  })
+], companyController.fetchCompanies  );
+
+
+router.get('/fetchSingle', [
+  query('_id')
+    .exists()
+    .not()
+    .isEmpty()
+    .withMessage('Something went wrong while trying to get the company. Please try again later.'),
+], companyController.fetchSingle);
 
 router.post('/update', extractCompanyImages,
   [
@@ -21,6 +44,11 @@ router.post('/update', extractCompanyImages,
     body('email')
       .isEmail()
       .withMessage('Please provide a valid email.'),
+    query('oldImages')
+      .optional()
+      .exists()
+      .isString()
+      .withMessage('The "oldImages" should be a string.'),
     body('password')
       .exists()
       .optional()

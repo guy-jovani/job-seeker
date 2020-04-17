@@ -13,6 +13,7 @@ import * as AuthActions from '../../auth/store/auth.actions';
 import { Conversation } from 'app/chat/conversation.model';
 import { UserStorageService } from '../user-storage.service';
 import { AuthAutoLogoutService } from 'app/auth/auth-auto-logout.service';
+import { Work } from 'app/employees/employee.model';
 
 
 @Injectable()
@@ -78,7 +79,7 @@ export class UserEffects {
   createUpdateJobToUserNavigation = this.actions$.pipe(
     ofType(UserActions.COMPANY_CREATED_JOB, UserActions.COMPANY_UPDATED_JOB),
     map((actionData: UserActions.CompanyCreatedJob | UserActions.CompanyUpdatedJob) => {
-      this.userStorageService.updateUserJobsStorage(actionData.payload, actionData.type);
+      this.userStorageService.createdUpdateUserJobStorage(actionData.payload, actionData.type);
       this.router.navigate(['../my-jobs']);
     })
   );
@@ -139,7 +140,11 @@ export class UserEffects {
         .pipe(
           map(res => {
             if (res['type'] === 'success') {
-              return new UserActions.UpdateActiveUser({ user: {...res['employee']}, redirect: 'my-details', kind: 'employee' });
+              res['work']['startDate'] = new Date(res['work']['startDate']);
+              res['work']['endDate'] = res['work']['endDate'] ?
+                        new Date(res['work']['endDate']) : res['work']['endDate'];
+              this.userStorageService.CRUDEmployeeWorkStorage(res['work'], UserActions.CREATED_WORK_EMPLOYEE);
+              return new UserActions.CreatedWorkEmployee(res['work']);
             } else {
               return new UserActions.UserFailure(res['messages']);
             }
@@ -161,7 +166,13 @@ export class UserEffects {
         .pipe(
           map(res => {
             if (res['type'] === 'success') {
-              return new UserActions.UpdateActiveUser({ user: {...res['employee']}, redirect: 'my-details', kind: 'employee' });
+              res['updatedWork']['startDate'] = new Date(res['updatedWork']['startDate']);
+              res['updatedWork']['endDate'] =
+                        res['updatedWork']['endDate'] ?
+                        new Date(res['updatedWork']['endDate']) : res['updatedWork']['endDate'];
+
+              this.userStorageService.CRUDEmployeeWorkStorage(res['updatedWork'], UserActions.UPDATED_WORK_EMPLOYEE);
+              return new UserActions.UpdatedWorkEmployee( res['updatedWork']);
             } else {
               return new UserActions.UserFailure(res['messages']);
             }
@@ -180,13 +191,16 @@ export class UserEffects {
     switchMap(([actionData, userState]) => {
       return this.http.delete(environment.nodeServer  + 'employees/deleteWork', {
           params: {
-            workId: actionData['payload'], _id: userState.user._id
+            workId: actionData['payload'],
+            _id: userState.user._id
           }
         })
         .pipe(
           map(res => {
             if (res['type'] === 'success') {
-              return new UserActions.UpdateActiveUser({ user: {...res['employee']}, redirect: 'my-details', kind: 'employee' });
+              this.userStorageService.CRUDEmployeeWorkStorage(
+                  new Work({_id: res['deletedWorkID']}), UserActions.UPDATED_WORK_EMPLOYEE);
+              return new UserActions.DeletedWorkEmployee(res['deletedWorkID']);
             } else {
               return new UserActions.UserFailure(res['messages']);
             }

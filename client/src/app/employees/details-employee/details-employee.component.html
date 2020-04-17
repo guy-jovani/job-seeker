@@ -109,8 +109,8 @@
                   <time
                     *ngIf="work.endDate"
                     [dateTime]="work.endDate.getMonth() + '-' + work.endDate.getFullYear()">
-                    {{ monthNames[work.startDate.getMonth()] + ' ' +
-                        work.startDate.getFullYear() }}
+                    {{ monthNames[work.endDate.getMonth()] + ' ' +
+                        work.endDate.getFullYear() }}
                   </time>
                   <p *ngIf="!work.endDate">present</p>
                 </div>

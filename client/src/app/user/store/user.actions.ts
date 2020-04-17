@@ -4,7 +4,7 @@ import { Action } from '@ngrx/store';
 import { Company } from 'app/company/company.model';
 import { Conversation } from 'app/chat/conversation.model';
 import { Message } from 'app/chat/message.model';
-import { Employee } from 'app/employees/employee.model';
+import { Employee, Work } from 'app/employees/employee.model';
 import { Job } from '../../job/job.model';
 
 
@@ -27,8 +27,11 @@ export const REMOVE_CHAT_NOTIFICATION = '[User] REMOVE_CHAT_NOTIFICATION';
 export const SET_CHAT_NOTIFICATION = '[User] SET_CHAT_NOTIFICATION';
 
 export const CREATE_WORK_EMPLOYEE_IN_DB = '[User] CREATE_WORK_EMPLOYEE_IN_DB';
+export const CREATED_WORK_EMPLOYEE = '[User] CREATED_WORK_EMPLOYEE';
 export const UPDATE_WORK_EMPLOYEE_IN_DB = '[User] UPDATE_WORK_EMPLOYEE_IN_DB';
+export const UPDATED_WORK_EMPLOYEE = '[User] UPDATED_WORK_EMPLOYEE';
 export const DELETE_WORK_EMPLOYEE_IN_DB = '[User] DELETE_WORK_EMPLOYEE_IN_DB';
+export const DELETED_WORK_EMPLOYEE = '[User] DELETED_WORK_EMPLOYEE';
 
 export const EMPLOYEE_APPLY_SAVE_JOB_ATTEMPT = '[User] EMPLOYEE_APPLY_SAVE_JOB_ATTEMPT';
 export const COMPANY_ACCEPT_REJECT_JOB_ATTEMPT = '[User] COMPANY_ACCEPT_REJECT_JOB_ATTEMPT';
@@ -50,10 +53,13 @@ export type UserActions = SetChatNotification
                         | UpdateSingleEmployeeInDB
                         | UpdateSingleCompanyInDb
                         | UpdateWorkEmployeeInDb
+                        | UpdatedWorkEmployee
                         | EmployeeApplySaveJobAttempt
                         | CompanyAcceptRejectJobAttempt
                         | Logout
+                        | CreatedWorkEmployee
                         | UserFailure
+                        | DeletedWorkEmployee
                         | ChangeUserPassword
                         | CompanyUpdateJobInDb
                         | CompanyCreateJobInDb
@@ -111,6 +117,12 @@ export class DeleteWorkEmployeeInDb implements Action {
   constructor( public payload: string ) {}
 }
 
+export class DeletedWorkEmployee implements Action {
+  readonly type = DELETED_WORK_EMPLOYEE;
+
+  constructor( public payload: string ) {}
+}
+
 export class CreateWorkEmployeeInDb implements Action {
   readonly type = CREATE_WORK_EMPLOYEE_IN_DB;
 
@@ -136,6 +148,18 @@ export class UpdateWorkEmployeeInDb implements Action {
     endDate: string,
     employmentType?: string
   } ) {}
+}
+
+export class UpdatedWorkEmployee implements Action {
+  readonly type = UPDATED_WORK_EMPLOYEE;
+
+  constructor( public payload: Work ) {}
+}
+
+export class CreatedWorkEmployee implements Action {
+  readonly type = CREATED_WORK_EMPLOYEE;
+
+  constructor( public payload: Work ) {}
 }
 
 export class EmployeeApplySaveJobAttempt implements Action {

@@ -29,12 +29,14 @@ exports.create = async (req, res, next) => {
     if(routeErrors.type === 'failure') {
       return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
     }
+
     title = req.body.title.trim();
     const titleExist = await validation.jobTitleExistForCompanyValidation(
       title, req.body.company._id, req.body._id );
     if(titleExist.type === 'failure'){
       return sendMessagesResponse(res, 422, titleExist.messages, 'failure');
     }
+    
     let job = new Job({ 
       title: title, description: req.body.description, 
       company: req.body.company._id, requirements: req.body.requirements, date: new Date() });

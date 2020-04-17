@@ -105,7 +105,13 @@ exports.applySaveJob = async (req, res, next) => {
 
 const sortWorkByEndDate = work => {
   work.sort((first, second) => {
-    if (!first.endDate) { // means a currently work
+    if ((!first.endDate && !second.endDate) ||
+        (first.endDate && second.endDate &&
+          first.endDate.getTime() === second.endDate.getTime())) { // means a current work for both
+      return first.startDate < second.startDate ? 1 : -1;
+    }
+
+    if (!first.endDate) {
       return -1;
     }
 
@@ -123,6 +129,7 @@ exports.createWork = async (req, res, next) => {
     if(routeErrors.type === 'failure') {
       return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
     } 
+
     const employeeToUpdate = await Employee.findOneAndUpdate(
       { _id: req.body._id }, 
       { $push: {
@@ -131,19 +138,16 @@ exports.createWork = async (req, res, next) => {
             company: req.body.company,
             employmentType: req.body.employmentType,
             startDate: new Date(req.body.startDate),
-            endDate: !req.body.present && req.body.endDate ? new Date(req.body.endDate) : null,
+            endDate: !req.body.present && !!req.body.endDate ? new Date(req.body.endDate) : null,
           } 
         } 
       },
       { new: true }
-    ).populate('jobs.job');
+    )
 
-    sortWorkByEndDate(employeeToUpdate.work)
-    
     res.status(201).json({
-      messages: ['employee updated successfully!'],
       type: 'success',
-      employee: employeeToUpdate
+      work: employeeToUpdate.work[employeeToUpdate.work.length - 1]
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "There was an error trying to create the experience."));
@@ -158,25 +162,23 @@ exports.updateWork = async (req, res, next) => {
     }
     
     const employeeToUpdate = await Employee.findOne({ 
-                    _id: req.body._id, 'work._id': req.body.workId }).populate('jobs.job');
+                    _id: req.body._id, 'work._id': req.body.workId });
     
     const workToUpdateInd = employeeToUpdate.work.findIndex(work => work._id.toString() === req.body.workId);
 
-    employeeToUpdate.work[workToUpdateInd] = { 
+    const updatedWork = employeeToUpdate.work[workToUpdateInd] = { 
       _id: req.body.workId,
       title: req.body.title,
       company: req.body.company,
       employmentType: req.body.employmentType,
       startDate: new Date(req.body.startDate),
-      endDate: !req.body.present && req.body.endDate ? new Date(req.body.endDate) : null,
+      endDate: !req.body.present && !!req.body.endDate ? new Date(req.body.endDate) : null,
     };
     await employeeToUpdate.save();
-
-    sortWorkByEndDate(employeeToUpdate.work);
     
-    res.status(201).json({
+    res.status(201).json({ 
       type: 'success',
-      employee: employeeToUpdate
+      updatedWork
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "There was an error trying to update the experience."));
@@ -189,7 +191,8 @@ exports.deleteWork = async (req, res, next) => {
     if(routeErrors.type === 'failure') {
       return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
     } 
-    const employeeToUpdate = await Employee.findOneAndUpdate(
+    
+    await Employee.findOneAndUpdate(
       { _id: req.query._id }, 
       { $pull: {
           'work' : { 
@@ -199,12 +202,10 @@ exports.deleteWork = async (req, res, next) => {
       },
       { new: true }
     ).populate('jobs.job');
-
-    sortWorkByEndDate(employeeToUpdate.work);
     
     res.status(201).json({
       type: 'success',
-      employee: employeeToUpdate
+      deletedWorkID: req.query.workId
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "There was an error trying to delete the experience."));

@@ -1,4 +1,4 @@
-import { Employee } from 'app/employees/employee.model';
+import { Employee, Work } from 'app/employees/employee.model';
 
 
 import * as UserActions from './user.actions';
@@ -63,6 +63,24 @@ const sortConByLastMsgDate = (a: Conversation, b: Conversation) => {
   if (a.messages[a.messages.length - 1].createdAt < b.messages[b.messages.length - 1].createdAt) {
     return 1;
   }
+  return -1;
+};
+
+const sortWorkByEndDate = (a: Work, b: Work) => {
+  if ((!a.endDate && !b.endDate) ||
+      (a.endDate && b.endDate &&
+        a.endDate.getTime() === b.endDate.getTime())) { // means a current work for both
+    return a.startDate < b.startDate ? 1 : -1;
+  }
+
+  if (!a.endDate) {
+    return -1;
+  }
+
+  if (!b.endDate || a.endDate < b.endDate) {
+    return 1;
+  }
+
   return -1;
 };
 
@@ -159,16 +177,66 @@ export function userReducer(state = initialState, action: UserActions.UserAction
       };
     case UserActions.COMPANY_UPDATED_JOB: // ONLY FOR A COMPANY - ON UPDATE JOB
       const jobs: Job[] = [ ...(state.user as Company).jobs ];
-      const jobInd = (state.user as Company).jobs.findIndex(job => job._id === action.payload._id);
+      const jobInd = jobs.findIndex(job => job._id === action.payload._id);
       jobs[jobInd] = { ...jobs[jobInd], ...action.payload };
-      const upToDateUser: Company = {
+      const upToDateCompanyUser: Company = {
         ...(state.user as Company),
         jobs
       };
       return {
         ...state,
         messages: null,
-        user: upToDateUser,
+        user: upToDateCompanyUser,
+      };
+    case UserActions.CREATED_WORK_EMPLOYEE: // ONLY FOR AN EMPLOYEE - ON CREATE WORK
+      const createdWorks = [ ...(state.user as Employee).work, action.payload ];
+
+      createdWorks.sort(sortWorkByEndDate);
+
+      const createEmployeeUser: Employee = {
+        ...(state.user as Employee),
+        work: [...createdWorks]
+      };
+
+      return {
+        ...state,
+        messages: null,
+        loading: false,
+        user: createEmployeeUser,
+      };
+    case UserActions.UPDATED_WORK_EMPLOYEE: // ONLY FOR AN EMPLOYEE - ON UPDATE WORK
+      const updatedWorks = [ ...(state.user as Employee).work ];
+      const updatedWorkInd = updatedWorks.findIndex(currWork => currWork._id === action.payload._id);
+      updatedWorks[updatedWorkInd] = { ...updatedWorks[updatedWorkInd], ...action.payload };
+      updatedWorks.sort(sortWorkByEndDate);
+
+      const updateEmployeeUser: Employee = {
+        ...(state.user as Employee),
+        work: [...updatedWorks]
+      };
+
+      return {
+        ...state,
+        messages: null,
+        loading: false,
+        user: updateEmployeeUser,
+      };
+    case UserActions.DELETED_WORK_EMPLOYEE: // ONLY FOR AN EMPLOYEE - ON DELETE WORK
+      const deletedWorks = [ ...(state.user as Employee).work ];
+      const deletedWorkInd = deletedWorks.findIndex(currWork => currWork._id === action.payload);
+
+      deletedWorks.splice(deletedWorkInd, 1);
+
+      const deletedWorkEmployeeUser: Employee = {
+        ...(state.user as Employee),
+        work: [...deletedWorks]
+      };
+
+      return {
+        ...state,
+        messages: null,
+        loading: false,
+        user: deletedWorkEmployeeUser,
       };
     case UserActions.USER_FAILURE:
         return {
@@ -188,6 +256,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
           newWork.endDate = newWork.endDate ? new Date(newWork.endDate) : newWork.endDate;
           return newWork;
         });
+        user['work'].sort(sortWorkByEndDate);
       } else {
         user['applicants'] =
           user['applicants'].map(applicant => {

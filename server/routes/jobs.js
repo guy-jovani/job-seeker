@@ -1,5 +1,5 @@
 
-const { body } = require('express-validator');
+const { body, query } = require('express-validator');
 const express = require('express')
 const router = express.Router();
 
@@ -36,10 +36,14 @@ router.put('/create', [
   ], jobController.create);
 
 
-router.get('/fetchJobs', jobController.fetchJobs);
+router.get('/fetchJobs', [
+  query('page')
+    .isInt({ gt: 0 })
+    .withMessage('The "page" field should be a positive number.')
+], jobController.fetchJobs);
 
 router.get('/fetchSingle', [
-  body('_id')
+  query('_id')
     .exists()
     .not()
     .isEmpty()

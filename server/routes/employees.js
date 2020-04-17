@@ -8,8 +8,30 @@ const extractProfileImage = require('../middleware/image-upload').extractProfile
 
 const employeeController = require('../controllers/employees');
 
-router.get('/fetchEmployees', employeeController.fetchEmployees);
-router.get('/fetchSingle', employeeController.fetchSingle);
+router.get('/fetchEmployees', [
+  query('_id')
+    .exists()
+    .not()
+    .isEmpty()
+    .withMessage('Something went wrong while trying to get the wanted people. Please try again later.'),
+  query('page')
+    .isInt({ gt: 0 })
+    .withMessage('The "page" field should be a positive number.'),
+  query('kind').custom((value, { req }) => {
+    if (value !== 'employee' && value !== 'company') {
+      throw new Error('Invalid value of \'kind\' field.');
+    }
+    return true;
+  })
+], employeeController.fetchEmployees);
+
+router.get('/fetchSingle', [
+  query('_id')
+    .exists()
+    .not()
+    .isEmpty()
+    .withMessage('Something went wrong while trying to get the wanted person. Please try again later.'),
+],  employeeController.fetchSingle);
 
 router.post('/update', extractProfileImage, [
   body('email')

@@ -8,7 +8,7 @@ import { of } from 'rxjs';
 
 import * as fromApp from '../../store/app.reducer';
 import * as EmployeeActions from './employee.actions';
-import { Employee } from '../employee.model';
+import { Employee, Work } from '../employee.model';
 import { environment } from '../../../environments/environment';
 
 const nodeServer = environment.nodeServer + 'employees/';
@@ -41,7 +41,9 @@ export class EmployeeEffects {
             res.employees.forEach(emp => {
               emp.work.forEach(work => {
                 work.startDate = new Date(work.startDate);
+                work.endDate = work.endDate ? new Date(work.endDate) : null;
               });
+              emp.work.sort(this.sortWorkByEndDate);
             });
             return new EmployeeActions.SetEmployees({ employees: res.employees, total: res['total']});
           } else {
@@ -55,26 +57,44 @@ export class EmployeeEffects {
     })
   );
 
-  @Effect()
-  fetchSingleEmployee = this.actions$.pipe(
-    ofType(EmployeeActions.FETCH_SINGLE_EMPLOYEE),
-    switchMap(actionData => {
-      return this.http.get<Employee>(nodeServer + 'fetchSingle', {
-          params: { _id: actionData['payload'] }
-        })
-        .pipe(
-          map(res => {
-            if (res['type'] === 'success') {
-              return new EmployeeActions.SetSingleEmployee({...res['employee']});
-            } else {
-              return new EmployeeActions.EmployeeOpFailure(res['messages']);
-            }
-          }),
-          catchError(messages => {
-            return of(new EmployeeActions.EmployeeOpFailure(messages));
-          })
-        );
-    })
-  );
+  // @Effect()
+  // fetchSingleEmployee = this.actions$.pipe(
+  //   ofType(EmployeeActions.FETCH_SINGLE_EMPLOYEE),
+  //   switchMap(actionData => {
+  //     return this.http.get<Employee>(nodeServer + 'fetchSingle', {
+  //         params: { _id: actionData['payload'] }
+  //       })
+  //       .pipe(
+  //         map(res => {
+  //           if (res['type'] === 'success') {
+  //             return new EmployeeActions.SetSingleEmployee({...res['employee']});
+  //           } else {
+  //             return new EmployeeActions.EmployeeOpFailure(res['messages']);
+  //           }
+  //         }),
+  //         catchError(messages => {
+  //           return of(new EmployeeActions.EmployeeOpFailure(messages));
+  //         })
+  //       );
+  //   })
+  // );
+
+  private sortWorkByEndDate = (a: Work, b: Work) => {
+    if ((!a.endDate && !b.endDate) ||
+        (a.endDate && b.endDate &&
+          a.endDate.getTime() === b.endDate.getTime())) { // means a current work for both
+      return a.startDate < b.startDate ? 1 : -1;
+    }
+
+    if (!a.endDate) {
+      return -1;
+    }
+
+    if (!b.endDate || a.endDate < b.endDate) {
+      return 1;
+    }
+
+    return -1;
+  };
 
 }

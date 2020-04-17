@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 
 import * as UserActions from './store/user.actions';
 import { Company } from 'app/company/company.model';
-import { Employee } from 'app/employees/employee.model';
+import { Employee, Work } from 'app/employees/employee.model';
+import { Job } from 'app/job/job.model';
 
 @Injectable({
   providedIn: 'root'
@@ -33,14 +34,28 @@ export class UserStorageService {
     localStorage.removeItem('refreshToken');
   }
 
-  updateUserJobsStorage = (job, type) => {
+  createdUpdateUserJobStorage = (job: Job, type: string) => {
     const [user] = this.getUserAndTokensStorage();
     if (type === UserActions.COMPANY_CREATED_JOB) {
       user.jobs.push(job);
-    } else {
+    } else { // updated
       const index = user.jobs.findIndex(tempJob => tempJob._id === job._id);
       user.jobs[index] = job;
     }
+    this.setUserStorage(user);
+  }
+
+  CRUDEmployeeWorkStorage = (crudWork: Work, type: string) => {
+    const [user] = this.getUserAndTokensStorage();
+    const index = user.work.findIndex((work: Work) => work._id === crudWork._id);
+    if (type === UserActions.UPDATED_WORK_EMPLOYEE) {
+      user.work[index] = crudWork;
+    } else if (type === UserActions.CREATED_WORK_EMPLOYEE) {
+      user.work.push(crudWork);
+    } else { // deleted
+      user.jobs.splice(index, 1);
+    }
+
     this.setUserStorage(user);
   }
 }

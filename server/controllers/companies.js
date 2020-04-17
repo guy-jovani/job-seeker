@@ -55,6 +55,11 @@ exports.fetchSingle = async (req, res, next) => {
  */
 exports.fetchCompanies = async (req, res, next) => {
   try {
+    const routeErrors = validation.handleValidationRoutesErrors(req);
+    if(routeErrors.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
+    }
+    
     const companies = await Company.aggregate([
       { $match: { _id: { $ne: mongoose.Types.ObjectId(req.query._id) } } },
       { $skip: skippedDocuments(req.query.page) },
