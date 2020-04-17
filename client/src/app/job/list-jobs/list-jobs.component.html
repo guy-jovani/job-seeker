@@ -39,7 +39,8 @@
     </ng-template>
   </li>
 </ul>
-<p *ngIf="!jobs || !jobs.length">There are no open jobs.</p>
+<p *ngIf="!applicantJobs && (!jobs || !jobs.length)">There are no open jobs.</p>
+<p *ngIf="applicantJobs && (!jobs || !jobs.length)">There are no applicants for your requested status.</p>
 
 
 

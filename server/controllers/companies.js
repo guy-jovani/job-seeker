@@ -24,7 +24,7 @@ exports.fetchSingle = async (req, res, next) => {
   try { 
     let company = await Company.findById(req.query._id).select(
       '_id email name website description imagesPath jobs')
-        .populate('jobs');
+        .populate({ path: 'jobs', select: '-__v'});
 
     company = company.toObject();
     
@@ -59,7 +59,7 @@ exports.fetchCompanies = async (req, res, next) => {
       { $match: { _id: { $ne: mongoose.Types.ObjectId(req.query._id) } } },
       { $skip: skippedDocuments(req.query.page) },
       { $limit: +process.env.DOCS_PER_PAGE },
-      { $project: { jobs: 0, createdAt: 0, updatedAt: 0, __v: 0, password: 0, applicants: 0 } },
+      { $project: { jobs: 0, createdAt: 0, updatedAt: 0, __v: 0, password: 0, applicants: 0, refreshToken: 0 } },
       { $lookup: {
         from: "jobs",
         let: { companyId: "$_id" },
@@ -75,6 +75,7 @@ exports.fetchCompanies = async (req, res, next) => {
           { $project: {
             "__v": 0,
             "company.jobs": 0,
+            "company.refreshToken": 0,
             "company.applicants": 0,
             "company.imagesPath": 0,
             "company.profileImagePath": 0,
@@ -208,8 +209,10 @@ exports.updateCompany = async (req, res, next) => {
     }
     
     let updatedCompany = await Company.findById(req.body._id).select(
-                            '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration -password'
-                          ).populate('jobs').populate('applicants.employee').populate('applicants.jobs.job');
+                            '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration -password -refreshToken'
+                          ).populate('jobs')
+                          .populate({path: 'applicants.employee', select: '-__v -password -refreshToken -jobs'})
+                          .populate({path: 'applicants.jobs.job', select: '-__v'});
                         
     res.status(201).json({
       type: 'success',

@@ -11,7 +11,7 @@ import * as fromApp from '../../store/app.reducer';
 import * as UserActions from './user.actions';
 import * as AuthActions from '../../auth/store/auth.actions';
 import { Conversation } from 'app/chat/conversation.model';
-import { UserSessionService } from '../user-session.service';
+import { UserStorageService } from '../user-storage.service';
 import { AuthAutoLogoutService } from 'app/auth/auth-auto-logout.service';
 
 
@@ -22,7 +22,7 @@ export class UserEffects {
               private http: HttpClient,
               private authAutoLogoutService: AuthAutoLogoutService,
               private store: Store<fromApp.AppState>,
-              private userSessionService: UserSessionService,
+              private userStorageService: UserStorageService,
               private router: Router) {}
 
   /*****************
@@ -67,7 +67,7 @@ export class UserEffects {
   updateActiveUserNavigation = this.actions$.pipe(
     ofType(UserActions.UPDATE_ACTIVE_USER),
     map((actionData: UserActions.UpdateActiveUser) => {
-      this.userSessionService.setUserSessionStorage(actionData.payload.user);
+      this.userStorageService.setUserStorage(actionData.payload.user);
       if (actionData.payload.redirect) {
         this.router.navigate([actionData.payload.redirect]);
       }
@@ -78,7 +78,7 @@ export class UserEffects {
   createUpdateJobToUserNavigation = this.actions$.pipe(
     ofType(UserActions.COMPANY_CREATED_JOB, UserActions.COMPANY_UPDATED_JOB),
     map((actionData: UserActions.CompanyCreatedJob | UserActions.CompanyUpdatedJob) => {
-      this.userSessionService.updateUserJobsSessionStorage(actionData.payload, actionData.type);
+      this.userStorageService.updateUserJobsStorage(actionData.payload, actionData.type);
       this.router.navigate(['../my-jobs']);
     })
   );

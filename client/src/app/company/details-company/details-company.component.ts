@@ -80,9 +80,9 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy  {
           this.allowEdit = false;
           this.company = !currState['jobs'] ? null : currState['jobs'][+this.currUrl[1]]['company'];
           if (!this.company.email) {
-            this.messages = ['There was an error fetching the company'];
+            this.messages = ['Company not found. Please go back and try again later.'];
+            this.companyJobs = this.company.jobs;
           }
-          this.companyJobs = this.company.jobs;
         }
       });
   }

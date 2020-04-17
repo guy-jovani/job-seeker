@@ -6,9 +6,9 @@
   <app-loading-spinner></app-loading-spinner>
 </div>
 
-<div class="container" *ngIf="isLoading">
+<div class="container" *ngIf="!isLoading">
   <app-message-box
-    *ngIf="messages.length && !isLoading"
+    *ngIf="messages.length"
     [messages]="messages"
     (closeMessages)="onClose()">
   </app-message-box>
@@ -30,6 +30,7 @@
   <hr>
 
   <main class="details-page-body">
+
     <section>
       <h4>Info</h4>
       <p *ngIf="!allowEdit && companyLink; else companyNoLink">
@@ -42,7 +43,6 @@
       <p>Description: {{ job.description || job['job'].description }}</p>
       <p>Date: <time [dateTime]="(getJobDate(job.date) || getJobDate(job['job'].date)).split('/').reverse().join('-')"> {{ getJobDate(job.date) || getJobDate(job['job'].date) }} </time></p>
     </section>
-
 
     <section>
       <header>

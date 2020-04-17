@@ -23,14 +23,14 @@ const initialState: State = {
 
 
 
-const setUserTokensSessionStorage = (
+const setUserTokensStorage = (
                              token: string = null,
                              expiresInSeconds: number = null,
                              refreshToken: string = null) => {
-  if (token) { sessionStorage.setItem('token', JSON.stringify(token)); }
-  if (refreshToken) { sessionStorage.setItem('refreshToken', JSON.stringify(refreshToken)); }
+  if (token) { localStorage.setItem('token', JSON.stringify(token)); }
+  if (refreshToken) { localStorage.setItem('refreshToken', JSON.stringify(refreshToken)); }
   if (expiresInSeconds) {
-  sessionStorage.setItem('expirationDate',
+  localStorage.setItem('expirationDate',
   JSON.stringify(new Date((new Date().getTime() + expiresInSeconds)).toISOString()));
   }
 };
@@ -62,7 +62,7 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
         messages: action.payload,
       };
     case AuthActions.AUTH_SUCCESS:
-      setUserTokensSessionStorage(
+      setUserTokensStorage(
       action.payload.token, action.payload.expiresInSeconds * 1000, action.payload.refreshToken );
       return {
         ...state,

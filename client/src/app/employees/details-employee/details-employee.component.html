@@ -3,11 +3,11 @@
 
 <div class="container">
 
-  <div *ngIf="isLoading && !addWork && !changePassword" class='flex-row-center'>
+  <div *ngIf="isLoading && !addWork && !changePassword && !submitAcceptReject" class='flex-row-center'>
     <app-loading-spinner></app-loading-spinner>
   </div>
 
-  <div class="container-fluid" *ngIf="employee && (!isLoading || addWork || changePassword)">
+  <div class="container-fluid" *ngIf="employee && (!isLoading || addWork || changePassword || submitAcceptReject)">
     <app-message-box
       *ngIf="messages.length && !addWork && !changePassword"
       [messages]="messages"
@@ -46,20 +46,29 @@
         <button type="button" (click)="onTogglePasswordChange()" class="btn btn-primary btn-sm">Change Password</button>
       </div>
 
+      <!--
+        user jobs
+      -->
+
       <section class="jobs-list" *ngIf="currUrl[0] === 'my-applicants'">
         <header>
-          <h4>Shown interest</h4>
+          <h4>Jobs Applied</h4>
         </header>
 
         <div *ngIf="currUrl[0] === 'my-applicants'" class="select-status-list">
           <label for="job-list">Show status list: </label>
-          <select [(ngModel)]="selectedStatusList" (ngModelChange)="checkJobOfUser()">
+          <select [(ngModel)]="selectedStatusList" (ngModelChange)="checkJobOfApplicant()">
             <option value="all">All</option>
             <option *ngFor="let status of availableStatus" value="{{status}}">{{ status | titlecase }}</option>
           </select>
         </div>
 
+        <div *ngIf="isLoading && submitAcceptReject" class='flex-row-center'>
+          <app-loading-spinner></app-loading-spinner>
+        </div>
+
         <app-list-jobs
+          *ngIf="!submitAcceptReject"
           [showStatus]='true'
           [applicantJobs]='true'
           [jobs]='applicantJobs'
@@ -68,7 +77,12 @@
         </app-list-jobs>
       </section>
 
+      <!--
+        employee/user work/experience
+      -->
+
       <section class="experience" *ngIf='employee.work && employee.work.length || allowEdit'>
+
         <header class="experience-header">
           <h3>Experience</h3>
           <button
@@ -76,6 +90,7 @@
             class="btn btn-info"
             (click)="onToggleWork()">+</button>
         </header>
+
         <div class="experience-list-container">
           <ul class="list-group">
             <li
@@ -103,6 +118,7 @@
             </li>
           </ul>
         </div>
+
       </section>
 
     </main>
@@ -111,7 +127,9 @@
 
 </div>
 
-
+<!--
+  create/update work
+ -->
 
 
 <div class="backdrop {{ addWork ? '' : 'hide' }}">
@@ -341,7 +359,9 @@
 
 
 
-
+<!--
+  change password
+ -->
 
 <div class="backdrop {{ changePassword ? '' : 'hide' }}">
 

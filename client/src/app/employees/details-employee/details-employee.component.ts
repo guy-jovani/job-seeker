@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs';
 import * as fromApp from '../../store/app.reducer';
 import { Employee } from '../employee.model';
 import * as EmployeeActions from '../store/employee.actions';
-import { Company, ApplicantJob, ApplicantStatus, Applicant } from 'app/company/company.model';
+import { Company, ApplicantJob, ApplicantStatus } from 'app/company/company.model';
 import * as UserActions from '../../user/store/user.actions';
 import { ChatService } from 'app/chat/chat-socket.service';
 import { NgForm, FormGroup, FormControl, Validators } from '@angular/forms';
@@ -30,6 +30,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   closedMessages = false;
   addWork = false;
   submittedWork = false;
+  submitAcceptReject = false;
   workId: string = null;
   availableStatus = Object.keys(ApplicantStatus).filter(key => isNaN(+key));
   years = Array(new Date().getFullYear() - 1970 + 1).fill(0).map((val, i) => new Date().getFullYear() - i);
@@ -96,7 +97,8 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
             this.user = currState['user'];
             const applicant = this.user.applicants[+this.currUrl[1]];
             this.employee = applicant['employee'];
-            this.checkJobOfUser();
+            this.submitAcceptReject = this.isLoading ? this.submitAcceptReject : false;
+            this.checkJobOfApplicant();
           } else { // /employees/:empInd
             if (this.invalidStateListInd(currState, 'employees')) { return; }
             this.employee = currState['employees'][+this.currUrl[1]];
@@ -106,6 +108,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   }
 
   onAcceptReject(jobInfo: { status: ApplicantStatus, jobInd: number }) { // company actions
+    this.submitAcceptReject = true;
     this.store.dispatch(new UserActions.CompanyAcceptRejectJobAttempt());
     this.chatService.sendMessage('updateStatus', {
       status: jobInfo.status,
@@ -129,7 +132,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
     return index;
   }
 
-  checkJobOfUser() {
+  checkJobOfApplicant() {
     if (this.selectedStatusList === 'all') {
       this.applicantJobs = this.user.applicants[+this.currUrl[1]].jobs;
     } else {

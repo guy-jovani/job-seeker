@@ -5,7 +5,17 @@
   <app-loading-spinner></app-loading-spinner>
 </div>
 
-<div class="container" *ngIf="company && (!isLoading || changePassword)">
+<div class="container" *ngIf="!isLoading && !company.email">
+  <app-message-box
+    *ngIf="messages.length"
+    [messages]="messages"
+    (closeMessages)="onClose()">
+  </app-message-box>
+
+  <app-back-button *ngIf="!company.email"></app-back-button>
+</div>
+
+<div class="container" *ngIf="company.email && (!isLoading || changePassword)">
 
   <app-message-box
     *ngIf="messages.length && !changePassword"
@@ -64,6 +74,7 @@
         <li *ngFor="let imagePath of company.imagesPath" class="images-container__list-item">
           <img class="company-image" alt="Company image." [src]='imagePath'/>
         </li>
+        <li *ngIf="!company.imagesPath.length">You have to images to present.</li>
       </ul>
     </section>
 

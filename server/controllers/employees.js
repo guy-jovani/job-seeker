@@ -79,7 +79,7 @@ exports.updateEmployee = async (req, res, next) => {
       throw new Error("Trying to update a non existing employee.");
     }
     let updatedEmployee = await Employee.findById(req.body._id).select(
-        '-__v -password -resetPassToken -resetPassTokenExpiration').populate({
+        '-__v -password -resetPassToken -resetPassTokenExpiration -refreshToken').populate({
           path: 'jobs.job', 
           populate: { path: 'company', select: 'name' }
         });

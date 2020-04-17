@@ -247,7 +247,8 @@ exports.fetchConversations = async (req, res, next) => {
             $in: [mongoose.Types.ObjectId(req.query._id)]
           }
         }
-      }
+      },
+      { $project: { __v: 0, createdAt: 0, updatedAt: 0 } }
     ]);
     conversations = await populateConversationParticipants(conversations);
     conversations = await populateConversationMessages(conversations);

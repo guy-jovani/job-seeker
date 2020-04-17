@@ -15,7 +15,7 @@ import * as EmployeeActions from '../../employees/store/employee.actions';
 import * as CompanyActions from '../../company/store/company.actions';
 import { ChatService } from 'app/chat/chat-socket.service';
 import { AuthAutoLogoutService } from '../auth-auto-logout.service';
-import { UserSessionService } from 'app/user/user-session.service';
+import { UserStorageService } from 'app/user/user-storage.service';
 
 
 
@@ -30,7 +30,7 @@ export class AuthEffects {
               private http: HttpClient,
               private chatService: ChatService,
               private authAutoLogoutService: AuthAutoLogoutService,
-              private userSessionService: UserSessionService,
+              private userStorageService: UserStorageService,
               private store: Store<fromApp.AppState>,
               private router: Router) {}
 
@@ -76,7 +76,7 @@ export class AuthEffects {
   autoLogin = this.actions$.pipe(
     ofType(AuthActions.AUTO_LOGIN),
     map(() => {
-      const [user, kind, token, expirationDate, refreshToken] = this.userSessionService.getUserAndTokensSessionStorage();
+      const [user, kind, token, expirationDate, refreshToken] = this.userStorageService.getUserAndTokensStorage();
       if (!user || !kind || !token || !expirationDate || !refreshToken) {
         return { type: 'dummy' };
       }
@@ -107,7 +107,7 @@ export class AuthEffects {
         .pipe(
           map(res => {
             if (res['type'] === 'success') {
-              this.userSessionService.removeUserAndTokensSessionStorage();
+              this.userStorageService.removeUserAndTokensStorage();
               this.store.dispatch(new EmployeeActions.Logout());
               this.store.dispatch(new CompanyActions.Logout());
               this.store.dispatch(new JobActions.Logout());
@@ -197,7 +197,7 @@ export class AuthEffects {
 
   private signupLoginHandler = res => {
     if (res['type'] === 'success') {
-      this.userSessionService.setUserSessionStorage(res['user'], res['kind']);
+      this.userStorageService.setUserStorage(res['user'], res['kind']);
 
       this.chatService.sendMessage('login', {  _id: res['user']['_id'], msg: 'logged' } );
       this.store.dispatch(new UserActions.UpdateActiveUser({ user: res['user'], kind: res['kind'] }));

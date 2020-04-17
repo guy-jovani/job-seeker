@@ -34,7 +34,7 @@ export class DetailsJobComponent implements OnInit, OnDestroy {
   status: string = null;
   statusDate: string = null;
   kind: string = null;
-  closedErrors = false;
+  closedErrors = false; // if the user dismiss the error message box
   fetchedCompany = false;
   companyId: {_id: string, name: string} = null;
 
@@ -62,10 +62,7 @@ export class DetailsJobComponent implements OnInit, OnDestroy {
       ).subscribe(currState => {
         this.currUrl = this.router.url.substring(1).split('/');
         if (currState.messages) {
-          this.messages = [];
-          for (const msg of currState.messages) {
-            this.messages.push(msg);
-          }
+          this.messages = [...currState.messages];
           this.closedErrors = false;
         } else {
           this.messages = [];
@@ -109,11 +106,14 @@ export class DetailsJobComponent implements OnInit, OnDestroy {
 
   private checkJobOfACompany(companyState) {
     if (this.invalidStateListInd(companyState['companies'], +this.currUrl[1])) { return; }
+
     this.companyLink = false;
+
     this.job = !companyState['companies'] ? null :
     companyState['companies'][+this.currUrl[1]]['jobs'][window.history.state['jobInd']];
+
     if (!this.job) {
-      this.messages = !this.closedErrors ? ['There was a problem fetching the job.'] : [];
+      this.messages = !this.closedErrors ? ['Job not found. Please go back and try again later.'] : [];
     } else {
       this.companyId = { _id: this.job.company._id, name: this.job.company.name };
       this.allowedApplySave();

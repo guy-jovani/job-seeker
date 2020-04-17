@@ -114,9 +114,9 @@ getUserLogin = async email => {
   let kind = "employee";
   if(!user) {
     user = await Company.findOne({email: email}).select(
-                  '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration'
-                ).populate('jobs');
-    user = await Company.populate(user, { path: 'applicants.employee', select: '-__v -password'});
+                '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration -refreshToken'
+            ).populate({ path: 'jobs', select: '-__v' });
+    user = await Company.populate(user, { path: 'applicants.employee', select: '-__v -password -refreshToken -jobs'});
     user = await Company.populate(user, { path: 'applicants.jobs.job', select: 'title'});
     kind = "company";
   }
@@ -157,8 +157,11 @@ exports.login = async (req, res, next) => {
       return sendMessagesResponse(res, 401, ['The email and/or password are incorrect.'], 'failure');
     }
     const [accessToken, refreshToken] = await getAndCreateTokens(user, kind);
+
     user = user.toObject();
     Reflect.deleteProperty(user, 'password');
+    Reflect.deleteProperty(user, 'refreshToken');
+    Reflect.deleteProperty(user, 'updatedAt');
     res.status(200).json({
       type: 'success',
       accessToken,
@@ -357,7 +360,7 @@ exports.logout = async (req, res, next) => {
 /**
  * Changing the user password,
  * and upon success sending a respond to the client with the following:
- *    {string} type - 'success' - meaning the password had a reset.
+ *    {string} type - 'success' - meaning the password had change.
  *    {string} accessToken - a new access token
  *    {string} refreshToken - a new refresh token
  *    {string} expiresInSeconds - the number of seconds till the access token will get expired
@@ -365,7 +368,11 @@ exports.logout = async (req, res, next) => {
  * In case of an error - moving the error handling to the express error handling middleware
  * with a error code of 500, and an error message
  * @param {express request object} req - the req need to have a body with: 
+ *                                        {string} _id - the id of the user
  *                                        {string} kind - the user kind ('employee' | 'company')
+ *                                        {string} currPassword - the current password of the user
+ *                                        {string} newPassword - the new password of the user
+ *                                        {string} confirmNewPassword - the new password confirm of the user
  * @param {express respond object} res
  */
 exports.changePassword = async (req, res, next) => {
