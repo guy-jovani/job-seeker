@@ -20,8 +20,6 @@ import { CompanyModule } from './company/company.module';
 import { SharedModule } from './shared/shared.module';
 import { CoreModule } from './core.module';
 import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
-import { ChatModule } from './chat/chat.module';
 
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { environment } from 'environments/environment';
@@ -50,8 +48,6 @@ import { UserEffects } from './user/store/user.effects';
     CompanyModule,
     SharedModule,
     CoreModule,
-    ChatModule,
-    AuthModule,
     UserModule,
     JobModule,
     AppRoutingModule,

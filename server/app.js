@@ -3,6 +3,7 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const compression = require('compression');
 
 const employeesRoutes = require('./routes/employees');
 const searchRoutes = require('./routes/search');
@@ -13,9 +14,17 @@ const jobsRoutes = require('./routes/jobs');
 const checkAuth = require('./middleware/check-auth');
 
 const app = express();
+app.use(compression(
+  {
+    filter: (req, res) => {
+      return true;
+    }
+  }
+));
 
 app.use(bodyParser.json());
 app.use('/images', express.static(path.join(__dirname, 'images')));
+
 app.use('/files', express.static(path.join(__dirname, 'files')));
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');

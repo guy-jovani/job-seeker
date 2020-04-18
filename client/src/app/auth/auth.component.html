@@ -117,7 +117,7 @@
           style="margin-left: 2em;"
           type="button"
           class="btn btn-info"
-          [routerLink]="authAction === 'companySignup' ? ['/signup'] : ['company']"
+          [routerLink]="authAction === 'companySignup' ? ['/auth/signup'] : ['company']"
         >
         {{ authAction === 'companySignup'  ? "Not a Company?" : "Sign a Company"}}
       </button>
@@ -125,7 +125,7 @@
           style="margin-left: 2em;"
           type="button"
           class="btn btn-info btn-sm"
-          routerLink="/reset"
+          routerLink="/auth/reset"
         >
         Forgot password?
       </button>

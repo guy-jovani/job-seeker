@@ -7,7 +7,9 @@ import { ChatResolverService } from './chat-resolver.service';
 
 const routes: Routes = [
   {
-    path: 'chat', canActivate: [AuthGuard], component: ChatComponent,
+    path: '',
+    canActivate: [AuthGuard],
+    component: ChatComponent,
     resolve: [ChatResolverService]
   },
 ];

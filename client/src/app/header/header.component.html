@@ -24,10 +24,10 @@
 
       <ul class="nav navbar-nav navbar-right">
         <li routerLinkActive="active" *ngIf="!isAuthenticated">
-          <a routerLink='/signup' >SignUp</a>
+          <a routerLink='/auth/signup' >SignUp</a>
         </li>
         <li routerLinkActive="active" *ngIf="!isAuthenticated">
-          <a routerLink='/login' >Login</a>
+          <a routerLink='/auth/login' >Login</a>
         </li>
         <li class="chat-item-list" routerLinkActive="active" *ngIf="isAuthenticated">
           <a routerLink='/chat' class="glyphicon glyphicon-envelope">

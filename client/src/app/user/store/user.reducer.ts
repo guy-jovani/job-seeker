@@ -172,6 +172,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
       };
       return {
         ...state,
+        loading: false,
         messages: null,
         user: updatedUser,
       };

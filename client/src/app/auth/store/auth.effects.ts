@@ -113,7 +113,7 @@ export class AuthEffects {
               this.store.dispatch(new JobActions.Logout());
               this.store.dispatch(new UserActions.Logout());
               this.authAutoLogoutService.clearMyTimeout();
-              this.router.navigate(['/login']);
+              this.router.navigate(['/auth/login']);
               return { type: 'dummy' };
             } else {
               return new AuthActions.AuthFailure(res['messages']);
@@ -141,7 +141,7 @@ export class AuthEffects {
   redirectResetPassSuccess = this.actions$.pipe(
     ofType(AuthActions.RESET_PASS_SUCCESS),
     tap((actionData: AuthActions.ResetPassSuccess) => {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/auth/login']);
     })
   );
 
