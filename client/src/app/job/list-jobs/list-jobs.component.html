@@ -1,9 +1,15 @@
 
 
-
-
 <ul class="list-group" *ngIf="jobs && jobs.length">
-  <li class="list-group-item {{ applicantJobs ? 'applicant-job' : '' }}"
+  <li class="list-group-item list-title">
+    <h4>Title</h4>
+    <h4 *ngIf="applicantJobs || !!detailsJobUrl === showStatus && !generalCompany">
+      {{ applicantJobs ? 'Status' : 'Company' }}
+    </h4>
+    <h4>Published</h4>
+    <h4 *ngIf="applicantJobs || showStatus">{{ applicantJobs ? 'Status' : 'Actions' }}</h4>
+  </li>
+  <li class="list-group-item {{ applicantJobs ? 'applicant-job' : 'general-job' }}"
       *ngFor="let jobInfo of jobs; let i=index; trackBy: jobsTracker">
 
     <ng-container *ngIf="applicantJobs; else jobsList">
@@ -24,8 +30,9 @@
 
     <ng-template #jobsList>
       <a class="job-link" [state]="{ jobInd : i }"
-        routerLink='{{ companyJobs && jobs.length ? "job" : detailsJobUrl + i }}'>
+        routerLink='{{ generalCompany && jobs.length ? "job" : detailsJobUrl + i }}'>
         <p class="job-title">{{ jobInfo.title ? jobInfo.title : jobInfo['job'].title }}</p>
+        <p class="job-company" *ngIf= "!!detailsJobUrl === showStatus && !generalCompany">{{ jobInfo.company ? jobInfo.company.name : jobInfo['job'].company.name }}</p>
 
         <time
           *ngIf="jobInfo.date"
@@ -37,10 +44,14 @@
         <p class="job-status job-status-{{ jobInfo.status }}" *ngIf="showStatus">{{ jobInfo.status }}</p>
       </a>
     </ng-template>
+
   </li>
 </ul>
+
 <p *ngIf="!applicantJobs && (!jobs || !jobs.length)">There are no open jobs.</p>
 <p *ngIf="applicantJobs && (!jobs || !jobs.length)">There are no applicants for your requested status.</p>
+
+
 
 
 

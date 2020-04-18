@@ -37,7 +37,7 @@ input.ng-invalid.ng-touched {
   padding: 16px;
   z-index: 100;
   background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .26);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
 }
 
 .hide {
@@ -55,6 +55,12 @@ address {
 
 hr {
   width: 100%;
+}
+
+.list-group-item {
+  &:hover {
+    background-color: #efefef;
+  }
 }
 
 /**************************
@@ -110,10 +116,9 @@ hr {
   cursor: pointer;
 }
 
-input[type=password] {
+input[type="password"] {
   padding-right: 4rem;
 }
-
 
 /**************************
 ****** Details Pages ******
@@ -133,7 +138,10 @@ input[type=password] {
 
   @media (max-width: 400px) {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(0.75fr, max-content) minmax(3fr, max-content) minmax(1fr, max-content);
+    grid-template-rows: minmax(0.75fr, max-content) minmax(3fr, max-content) minmax(
+        1fr,
+        max-content
+      );
     row-gap: 1rem;
     justify-items: start;
   }
@@ -208,7 +216,8 @@ app-back-button {
     justify-content: space-around;
   }
 
-  a, button {
+  a,
+  button {
     margin-left: 1rem;
   }
 }
@@ -235,7 +244,6 @@ app-back-button {
 .job-status-saved {
   background-color: #21a5e696;
 }
-
 
 /**************************
 ****** List Pages ******
@@ -293,32 +301,3 @@ app-back-button {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

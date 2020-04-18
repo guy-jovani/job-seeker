@@ -68,7 +68,7 @@ export class UserEffects {
   updateActiveUserNavigation = this.actions$.pipe(
     ofType(UserActions.UPDATE_ACTIVE_USER),
     map((actionData: UserActions.UpdateActiveUser) => {
-      this.userStorageService.setUserStorage(actionData.payload.user);
+      this.userStorageService.setUserStorage(actionData.payload.user, actionData.payload.kind);
       if (actionData.payload.redirect) {
         this.router.navigate([actionData.payload.redirect]);
       }
@@ -79,7 +79,7 @@ export class UserEffects {
   createUpdateJobToUserNavigation = this.actions$.pipe(
     ofType(UserActions.COMPANY_CREATED_JOB, UserActions.COMPANY_UPDATED_JOB),
     map((actionData: UserActions.CompanyCreatedJob | UserActions.CompanyUpdatedJob) => {
-      this.userStorageService.createdUpdateUserJobStorage(actionData.payload, actionData.type);
+      this.userStorageService.createdUpdateUserCompanyStorage(actionData.payload, actionData.type);
       this.router.navigate(['../my-jobs']);
     })
   );

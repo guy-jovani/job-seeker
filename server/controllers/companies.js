@@ -214,11 +214,9 @@ exports.updateCompany = async (req, res, next) => {
     }
     
     let updatedCompany = await Company.findById(req.body._id).select(
-                            '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration -password -refreshToken'
-                          ).populate('jobs')
-                          .populate({path: 'applicants.employee', select: '-__v -password -refreshToken -jobs'})
-                          .populate({path: 'applicants.jobs.job', select: '-__v'});
-                        
+                            '-__v -createdAt -updatedAt -resetPassToken -resetPassTokenExpiration -password -refreshToken -jobs -applicants'
+                          );
+                          
     res.status(201).json({
       type: 'success',
       company: updatedCompany

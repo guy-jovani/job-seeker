@@ -79,12 +79,9 @@ exports.updateEmployee = async (req, res, next) => {
       throw new Error("Trying to update a non existing employee.");
     }
     let updatedEmployee = await Employee.findById(req.body._id).select(
-        '-__v -password -resetPassToken -resetPassTokenExpiration -refreshToken').populate({
-          path: 'jobs.job', 
-          populate: { path: 'company', select: 'name' }
-        });
+        '-__v -password -resetPassToken -resetPassTokenExpiration -refreshToken -jobs -work');
     
-    res.status(201).json({
+    res.status(200).json({
       type: 'success',
       employee: updatedEmployee
     });
@@ -102,26 +99,6 @@ exports.applySaveJob = async (req, res, next) => {
   }
 };
 
-
-const sortWorkByEndDate = work => {
-  work.sort((first, second) => {
-    if ((!first.endDate && !second.endDate) ||
-        (first.endDate && second.endDate &&
-          first.endDate.getTime() === second.endDate.getTime())) { // means a current work for both
-      return first.startDate < second.startDate ? 1 : -1;
-    }
-
-    if (!first.endDate) {
-      return -1;
-    }
-
-    if (!second.endDate || first.endDate < second.endDate) {
-      return 1;
-    }
-
-    return -1;
-  });
-};
 
 exports.createWork = async (req, res, next) => {
   try {

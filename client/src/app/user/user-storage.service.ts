@@ -10,11 +10,11 @@ import { Job } from 'app/job/job.model';
 })
 export class UserStorageService {
 
-  setUserStorage = (user: Company | Employee, kind: string = null) => {
-    localStorage.setItem('userData', JSON.stringify({ ...user }));
-    if (kind) {
-      localStorage.setItem('kind', JSON.stringify(kind));
-    }
+  setUserStorage = (user: Company | Employee, kind: string) => {
+    const storedUser = JSON.parse(localStorage.getItem('userData'));
+
+    localStorage.setItem('userData', JSON.stringify({ ...storedUser, ...user }));
+    localStorage.setItem('kind', JSON.stringify(kind));
   }
 
   getUserAndTokensStorage = () => {
@@ -34,7 +34,7 @@ export class UserStorageService {
     localStorage.removeItem('refreshToken');
   }
 
-  createdUpdateUserJobStorage = (job: Job, type: string) => {
+  createdUpdateUserCompanyStorage = (job: Job, type: string) => {
     const [user] = this.getUserAndTokensStorage();
     if (type === UserActions.COMPANY_CREATED_JOB) {
       user.jobs.push(job);
@@ -42,7 +42,7 @@ export class UserStorageService {
       const index = user.jobs.findIndex(tempJob => tempJob._id === job._id);
       user.jobs[index] = job;
     }
-    this.setUserStorage(user);
+    this.setUserStorage(user, 'company');
   }
 
   CRUDEmployeeWorkStorage = (crudWork: Work, type: string) => {
@@ -56,6 +56,6 @@ export class UserStorageService {
       user.jobs.splice(index, 1);
     }
 
-    this.setUserStorage(user);
+    this.setUserStorage(user, 'employee');
   }
 }

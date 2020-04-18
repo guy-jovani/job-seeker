@@ -11,11 +11,11 @@ import { Job } from '../job.model';
 })
 export class ListJobsComponent {
 
-  @Input() showStatus = false; // true for user of kind employee
-  @Input() companyJobs = false;
-  @Input() applicantJobs = false;
-  @Input() detailsJobUrl = '';
-  @Input() jobs: Employee['jobs'] | Company['jobs'] = null;
+  @Input() showStatus = false; // should be true only for user of kind employee
+  @Input() generalCompany = false; // if jobs of a general company
+  @Input() applicantJobs = false; // should be true only for user of kind company
+  @Input() detailsJobUrl = ''; // on a user jobs page => the status list the user is looking at
+  @Input() jobs: Employee['jobs'] | Job[] = null;
 
   @Output() acceptRejectEmitter = new EventEmitter<{status: string, jobInd: number}>();
 

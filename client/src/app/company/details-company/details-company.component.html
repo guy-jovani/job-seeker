@@ -55,14 +55,13 @@
     </section>
 
 
-    <section>
+    <section *ngIf="currUrl[0] !== 'my-details'">
       <header>
-        <h4 *ngIf="currUrl[0] !== 'my-details'">Jobs</h4>
+        <h4>Jobs</h4>
       </header>
       <app-list-jobs
-        *ngIf="currUrl[0] !== 'my-details'"
         [jobs]="company.jobs"
-        [companyJobs]="true">
+        [generalCompany]="true">
       </app-list-jobs>
     </section>
 

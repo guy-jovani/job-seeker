@@ -2,7 +2,7 @@ import { Employee, Work } from 'app/employees/employee.model';
 
 
 import * as UserActions from './user.actions';
-import { Company } from 'app/company/company.model';
+import { Company, Applicant } from 'app/company/company.model';
 import { Conversation } from 'app/chat/conversation.model';
 import { Job } from 'app/job/job.model';
 
@@ -86,7 +86,7 @@ const sortWorkByEndDate = (a: Work, b: Work) => {
 
 
 export function userReducer(state = initialState, action: UserActions.UserActions) {
-  // console.log("user reducer " + action.type)
+  // console.log('user reducer ' + action.type)
   switch (action.type) {
     case UserActions.FETCH_ALL_CONVERSATIONS:
     case UserActions.UPDATE_WORK_EMPLOYEE_IN_DB:
@@ -246,11 +246,11 @@ export function userReducer(state = initialState, action: UserActions.UserAction
         };
     case UserActions.UPDATE_ACTIVE_USER:
       const user = action.payload.kind === 'employee' ?
-                { ...action.payload.user as Employee } :
-                { ...action.payload.user as Company };
+                { ...state.user as Employee, ...action.payload.user as Employee } :
+                { ...state.user as Company, ...action.payload.user as Company };
 
       if (action.payload.kind === 'employee') {
-        user['work'] = user['work'].map(work => {
+        user['work'] = user['work'].map((work: Work) => {
           const newWork = { ...work };
           newWork.startDate = new Date(newWork.startDate);
           newWork.endDate = newWork.endDate ? new Date(newWork.endDate) : newWork.endDate;
@@ -259,15 +259,16 @@ export function userReducer(state = initialState, action: UserActions.UserAction
         user['work'].sort(sortWorkByEndDate);
       } else {
         user['applicants'] =
-          user['applicants'].map(applicant => {
+          user['applicants'].map((applicant: Applicant) => {
             const newApplicant = { ...applicant };
-            newApplicant['employee'] = { ...newApplicant['employee'] };
-            newApplicant['employee']['work'] = newApplicant['employee']['work'].map(work => {
+            newApplicant.employee = { ...newApplicant.employee };
+            newApplicant.employee.work = newApplicant.employee.work.map(work => {
               const newWork = { ...work };
               newWork.startDate = new Date(newWork.startDate);
               newWork.endDate = newWork.endDate ? new Date(newWork.endDate) : newWork.endDate;
               return newWork;
             });
+            newApplicant.employee.work.sort(sortWorkByEndDate);
             return newApplicant;
         });
       }
