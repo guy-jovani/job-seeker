@@ -10,6 +10,26 @@ const authRoutesMatcher = (url: UrlSegment[]) => {
             { consumed: [] } : null;
 };
 
+const userRoutesMatcher = (url: UrlSegment[]) => {
+  return ['my-details', 'my-jobs', 'my-applicants'].includes(url[0].path) ?
+            { consumed: [] } : null;
+};
+
+const companyRoutesMatcher = (url: UrlSegment[]) => {
+  return ['companies'].includes(url[0].path) ?
+            { consumed: [] } : null;
+};
+
+const employeeRoutesMatcher = (url: UrlSegment[]) => {
+  return ['people'].includes(url[0].path) ?
+            { consumed: [] } : null;
+};
+
+const jobRoutesMatcher = (url: UrlSegment[]) => {
+  return ['jobs'].includes(url[0].path) ?
+            { consumed: [] } : null;
+};
+
 const routes: Routes = [
   {
     path: '', pathMatch: 'full',
@@ -22,6 +42,22 @@ const routes: Routes = [
   {
     matcher: authRoutesMatcher,
     loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule)
+  },
+  {
+    matcher: companyRoutesMatcher,
+    loadChildren: () => import('./company/company.module').then(m => m.CompanyModule)
+  },
+  {
+    matcher: jobRoutesMatcher,
+    loadChildren: () => import('./job/job.module').then(m => m.JobModule)
+  },
+  {
+    matcher: employeeRoutesMatcher,
+    loadChildren: () => import('./employees/employees.module').then(m => m.EmployeesModule)
+  },
+  {
+    matcher: userRoutesMatcher,
+    loadChildren: () => import('./user/user.module').then(m => m.UserModule)
   },
   {
     path: '**', component: ErrorsComponent
