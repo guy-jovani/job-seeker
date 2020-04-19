@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -9,6 +9,7 @@ import { ActivatedRoute } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 
 @Component({
+  selector: 'app-auth',
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss']
 })
@@ -18,31 +19,12 @@ export class AuthComponent implements OnInit, OnDestroy {
   errorSub: Subscription;
   messages: string[] = [];
   isLoading = false;
-  authAction: string;
+  @Input() authAction: string;
 
   constructor(private store: Store<fromApp.AppState>,
               private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.errorSub = this.route.data.pipe(
-      switchMap(data => {
-        this.authAction = data.authAction;
-        return this.store.select('auth');
-      })
-    ).subscribe(
-      authState => {
-        this.isLoading = authState.loading;
-        if (authState.messages) {
-          this.messages = [];
-          for (const msg of authState.messages) {
-            this.messages.push(msg);
-          }
-        } else {
-          this.messages = [];
-        }
-      }
-    );
-
     this.authForm = new FormGroup({
       email: new FormControl(null, [Validators.required, Validators.email]),
       passwords: new FormGroup({
@@ -50,15 +32,32 @@ export class AuthComponent implements OnInit, OnDestroy {
       })
     });
 
-    if (this.authAction === 'companySignup') {
-      this.authForm.addControl('name', new FormControl(null, [Validators.required]));
-    }
+    this.errorSub = this.route.data.pipe(
+      switchMap(data => {
+        this.authAction = data.authAction;
+        return this.store.select('auth');
+      })
+    ).subscribe(
+      authState => {
+        if (this.authAction === 'companySignup') {
+          this.authForm.addControl('name', new FormControl(null, [Validators.required]));
+        }
 
-    if (this.authAction !== 'login') {
-      (this.authForm.controls['passwords'] as FormGroup).addControl('confirmPassword', new FormControl(null, [Validators.required]));
-      (this.authForm.controls['passwords'] as FormGroup).setValidators(this.checkPasswordEquality);
-      (this.authForm.controls['passwords'] as FormGroup).updateValueAndValidity();
-    }
+        if (this.authAction !== 'login') {
+          (this.authForm.controls['passwords'] as FormGroup).addControl('confirmPassword', new FormControl(null, [Validators.required]));
+          (this.authForm.controls['passwords'] as FormGroup).setValidators(this.checkPasswordEquality);
+          (this.authForm.controls['passwords'] as FormGroup).updateValueAndValidity();
+        }
+        this.isLoading = authState.loading;
+        if (authState.messages) {
+          this.messages = [...authState.messages];
+        } else {
+          this.messages = [];
+        }
+      }
+    );
+
+
   }
 
   checkPasswordEquality(control: FormControl): {[s: string]: boolean} {

@@ -16,7 +16,7 @@ import { AuthComponent } from './auth.component';
   declarations: [
     AuthComponent,
     ResetPasswordComponent,
-    GetNewPasswordComponent
+    GetNewPasswordComponent,
   ],
   imports: [
     SharedModule,

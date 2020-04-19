@@ -25,7 +25,7 @@ export class AuthAutoLogoutService {
       this.store.dispatch(new AuthActions.AuthFailure(
         ['Your session ended.']
         ));
-      this.router.navigate(['/auth/login']);
+      this.router.navigate(['/login']);
     }, expirationMillieSeconds + environment.autoLogoutPassJWTExpirationMS);
   }
 

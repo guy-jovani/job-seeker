@@ -1,7 +1,6 @@
 
 
 
-
 <div class="container form-container">
   <div *ngIf="isLoading" class="flex-row-center">
     <app-loading-spinner></app-loading-spinner>
@@ -117,7 +116,7 @@
           style="margin-left: 2em;"
           type="button"
           class="btn btn-info"
-          [routerLink]="authAction === 'companySignup' ? ['/auth/signup'] : ['company']"
+          [routerLink]="authAction === 'companySignup' ? ['/signup'] : ['company']"
         >
         {{ authAction === 'companySignup'  ? "Not a Company?" : "Sign a Company"}}
       </button>
@@ -125,7 +124,7 @@
           style="margin-left: 2em;"
           type="button"
           class="btn btn-info btn-sm"
-          routerLink="/auth/reset"
+          routerLink="/reset"
         >
         Forgot password?
       </button>

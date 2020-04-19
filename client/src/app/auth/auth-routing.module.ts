@@ -1,12 +1,10 @@
 import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
 
-import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { GetNewPasswordComponent } from './reset-password/get-new-password/get-new-password.component';
 import { AuthComponent } from './auth.component';
 import { NotLoggedGuard } from './not-logged.guard';
-
-
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 
 const routes: Routes = [

@@ -1,13 +1,18 @@
 import { NgModule } from '@angular/core';
 
-import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
+import { Routes, RouterModule, PreloadAllModules, UrlSegment } from '@angular/router';
 import { ErrorsComponent } from './errors/errors.component';
 import { HomeComponent } from './home/home.component';
 
 
+const authRoutesMatcher = (url: UrlSegment[]) => {
+  return ['login', 'reset', 'reset-password', 'signup'].includes(url[0].path) ?
+            { consumed: [] } : null;
+};
+
 const routes: Routes = [
   {
-    path: '',
+    path: '', pathMatch: 'full',
     component: HomeComponent,
   },
   {
@@ -15,7 +20,7 @@ const routes: Routes = [
     loadChildren: () => import('./chat/chat.module').then(m => m.ChatModule)
   },
   {
-    path: 'auth',
+    matcher: authRoutesMatcher,
     loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule)
   },
   {
