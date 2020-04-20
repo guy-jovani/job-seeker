@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const path = require('path');
-const bcrypt = require('bcryptjs');
 const validation = require('../utils/validation');
 const Employee = require('../models/employee');
 const Company = require('../models/company');

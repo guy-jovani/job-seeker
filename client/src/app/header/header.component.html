@@ -48,7 +48,7 @@
             <li><a style="cursor: pointer;" routerLink='/my-applicants' *ngIf="kind === 'company'">My Applicants</a></li>
           </ul>
         </li>
-        <li class="dropdown dropdown-menu-right" *ngIf="isAuthenticated" appDropdown>
+        <li class="dropdown dropdown-menu-right" *ngIf="isAuthenticated && !production" appDropdown>
           <a
             style="cursor: pointer;"
             class="dropdown-toggle">

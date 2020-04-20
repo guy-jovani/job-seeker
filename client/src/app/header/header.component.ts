@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
-
+import { environment } from '../../environments/environment';
 import * as fromApp from '../store/app.reducer';
 import * as AuthActions from '../auth/store/auth.actions';
 import * as EmployeeActions from '../employees/store/employee.actions';
@@ -12,7 +13,6 @@ import * as UserActions from '../user/store/user.actions';
 import { Employee } from '../employees/employee.model';
 import { Company } from 'app/company/company.model';
 import { Router, NavigationStart } from '@angular/router';
-import { filter } from 'rxjs/operators';
 
 
 @Component({
@@ -28,6 +28,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   user: Employee | Company = null;
   chatNotifications = false;
   kind: string;
+  production = environment.production;
 
   constructor(private store: Store<fromApp.AppState>,
               private router: Router) { }

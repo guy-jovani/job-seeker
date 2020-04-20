@@ -148,7 +148,7 @@ const getNonProfileImages = (req, files) => {
     files.imagesPath.forEach(file => {
       let url = req.protocol + '://' + req.get('host');
       url = url + '/images/' + file.filename;
-      newUrls.push('/images/' + file.filename);
+      newUrls.push(url);
     });
     const oldImages = req.query.oldImages.split(process.env.SPLIT_COMPANY_OLD_IMAGES_BY);
     let updatedImageInd = 0, updatedImages = [];

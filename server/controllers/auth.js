@@ -420,15 +420,20 @@ const mockDB = async () => {
   for(let i=1; i<101; i++){
     nums.push(i);
   }
+  const password1 = await bcrypt.hash('111', 12);
+  const password2 = await bcrypt.hash('111', 12);
+  await Employee.create({ firstName: 'test', password: password1, email: 'test@test.com'});
+  await Company.create({ name: 'comp',  password: password2, email: 'comp@comp.com'});
+
 
   for (num of nums) {
-    await Employee.findOneAndRemove({email: num + '@emp.com'});
+    // await Employee.findOneAndRemove({email: num + '@emp.com'});
     const password = await bcrypt.hash('111', 12);
     await Employee.create({ firstName: 'e' + num,  lastName: 'e' + num, password: password, email: num + '@emp.com'});
   }
 
   for (num of nums) {
-    await Company.findOneAndRemove({email: num + '@comp.com'});
+    // await Company.findOneAndRemove({email: num + '@comp.com'});
 
     const password = await bcrypt.hash('111', 12);
     const company = await Company.create({ name: 'c' + num,  password: password, email: num + '@cmp.com'});
