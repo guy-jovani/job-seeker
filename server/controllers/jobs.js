@@ -36,7 +36,7 @@ exports.create = async (req, res, next) => {
     if(titleExist.type === 'failure'){
       return sendMessagesResponse(res, 422, titleExist.messages, 'failure');
     }
-    
+
     let job = new Job({ 
       title: title, description: req.body.description, 
       company: req.body.company._id, requirements: req.body.requirements, date: new Date() });

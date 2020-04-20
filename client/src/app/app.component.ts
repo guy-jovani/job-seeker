@@ -53,7 +53,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.socketPostedSub = this.chatService.getMessage('posted').subscribe(res => {
       try {
-        console.log('posted')
         if (res['type'] === 'success') {
           const stringMessage = res['message']['content'] ? res['message'] : null;
           const fileMessage = res['message']['filePath'] ? res['message'] : null;
@@ -74,7 +73,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.socketReadSub = this.chatService.getMessage('read').subscribe(res => {
       try {
-        console.log('read')
         if (res['type'] === 'success') {
           this.store.dispatch(new UserActions.SetSingleConversation({
             conversation: res['conversation']

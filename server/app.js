@@ -1,9 +1,13 @@
 
 const path = require('path');
+const fs = require('fs');
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const compression = require('compression');
+const helmet = require('helmet');
+const morgan = require('morgan');
 
 const employeesRoutes = require('./routes/employees');
 const searchRoutes = require('./routes/search');
@@ -14,15 +18,20 @@ const jobsRoutes = require('./routes/jobs');
 const checkAuth = require('./middleware/check-auth');
 
 const app = express();
-app.use(compression(
-  {
-    filter: (req, res) => {
-      return true;
-    }
-  }
-));
+
+
+app.use(compression());
+app.use(helmet());
+
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, 'access.log'),
+  { flags: 'a' }
+);
+app.use(morgan('combined', { stream: accessLogStream }));
 
 app.use(bodyParser.json());
+
+
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use('/files', express.static(path.join(__dirname, 'files')));
@@ -30,11 +39,6 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, authorization');
-  next();
-});
-
-app.use((req, res, next) => {
-  console.log(req.url);
   next();
 });
 
@@ -49,7 +53,7 @@ app.use((req, res, next) => {
   console.log('general url in app.js');
   console.log(req.url);
   res.status(200).json({ // the developer is the only one that can get here
-    messages: ['invalid url'],
+    messages: ['Invalid url.'],
     type: 'failure',
   });
 });
@@ -59,6 +63,7 @@ app.use((error, req, res, next) => {
   console.log('====================================================');
   console.log('An error caught and printed in app.js');
   console.log(error);
+
   if (typeof(error) !== 'object') {
     error = {messages: [error]};
   }
@@ -69,16 +74,12 @@ app.use((error, req, res, next) => {
                 'If the error is still happening please notify the admins.');
   }
   res.status(error.statusCode || 500).json({ 
-    // errors: [{
-    //   msg: 'An unknown error occurred'
-    // }],
     messages: error.messages,
     type: 'failure',
   });
 });
 
 mongoose.set('useCreateIndex', true);
-// mongoose.connect(globalVars.MONGO_DB,
 mongoose.connect('mongodb://' +
       process.env.MONGO_DB_USER + ':' +
       process.env.MONGO_DB_PASSWORD +

@@ -86,7 +86,6 @@ const sortWorkByEndDate = (a: Work, b: Work) => {
 
 
 export function userReducer(state = initialState, action: UserActions.UserActions) {
-  // console.log('user reducer ' + action.type)
   switch (action.type) {
     case UserActions.FETCH_ALL_CONVERSATIONS:
     case UserActions.UPDATE_WORK_EMPLOYEE_IN_DB:

@@ -171,7 +171,6 @@ exports.login = async (req, res, next) => {
       kind
     });
   } catch (error) {
-    // console.log(error);
     next(handleServerErrors(error, 500, "There was an unexpected error while trying to login."));
   }
 };
@@ -263,7 +262,6 @@ exports.resetToNewPassword = async (req, res, next) => {
       type: 'success'
     });
   } catch (error) {
-    console.log(error)
     next(handleServerErrors(error, 500, "There was an unexpected error while trying to reset the password."));
   }
 }

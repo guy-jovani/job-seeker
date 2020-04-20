@@ -38,7 +38,6 @@ const setUserTokensStorage = (
 
 
 export function authReducer(state = initialState, action: AuthActions.AuthActions) {
-  // console.log("auth reducer " + action.type)
   switch (action.type) {
     case AuthActions.REFRESH_TOKEN_ATTEMPT:
       return {
