@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Router } from '@angular/router';
 
 import * as AuthActions from './store/auth.actions';
 
@@ -15,17 +14,13 @@ export class AuthAutoLogoutService {
 
   tokenTimer: any;
 
-  constructor(private store: Store<fromApp.AppState>,
-              private router: Router) { }
+  constructor(private store: Store<fromApp.AppState>) { }
 
   autoLogout = (expirationMillieSeconds: number) => {
     clearTimeout(this.tokenTimer);
     this.tokenTimer = setTimeout(() => {
       this.store.dispatch(new AuthActions.Logout());
-      this.store.dispatch(new AuthActions.AuthFailure(
-        ['Your session ended.']
-        ));
-      this.router.navigate(['/login']);
+      this.store.dispatch(new AuthActions.AuthFailure(['Your session ended.']));
     }, expirationMillieSeconds + environment.autoLogoutPassJWTExpirationMS);
   }
 
