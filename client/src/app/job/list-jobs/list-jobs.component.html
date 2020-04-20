@@ -31,7 +31,7 @@
     <ng-template #jobsList>
       <a class="job-link" [state]="{ jobInd : i }"
         routerLink='{{ generalCompany && jobs.length ? "job" : detailsJobUrl + i }}'>
-        <p class="job-title">{{ jobInfo.title ? jobInfo.title : jobInfo['job'].title }}</p>
+        <h4 class="job-title">{{ jobInfo.title ? jobInfo.title : jobInfo['job'].title }}</h4>
         <p class="job-company" *ngIf= "!!detailsJobUrl === showStatus && !generalCompany">{{ jobInfo.company ? jobInfo.company.name : jobInfo['job'].company.name }}</p>
 
         <time

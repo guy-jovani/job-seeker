@@ -1,3 +1,4 @@
+
 .name-list-container__list,
 .conversation__participants-list,
 .messages__list {
@@ -14,12 +15,20 @@
   flex-wrap: nowrap; // default
   align-items: stretch; // default
   justify-content: center;
-  margin: 0 2rem;
+  margin: auto;
   height: calc(100vh - 120px); // minus body margin
   width: calc(100vw - 4rem); // minus owns margin
   min-height: 21.7rem;
   min-width: 40rem;
   border: 1px solid #8080805e;
+
+  @media (min-width: 1280px) {
+    max-width: 1024px;
+  }
+
+  @media (min-width: 1920px) {
+    max-width: 1700px;
+  }
 }
 
 /****************************

@@ -4,6 +4,14 @@
 ******* General ***********
 **************************/
 
+html {
+  height: 100%;
+}
+
+body {
+  height: calc(100% - 120px);
+}
+
 body {
   margin-top: 70px;
   margin-bottom: 50px;
@@ -165,13 +173,6 @@ input[type="password"] {
   width: 15rem;
   height: 15rem;
   font-size: 6rem;
-}
-
-.employee-no-profile-image {
-  @include center-with-border();
-  width: 15rem;
-  height: 15rem;
-  font-size: 6rem;
   border-radius: 50%;
 }
 
@@ -289,7 +290,7 @@ app-back-button {
       height: 7.2rem;
     }
 
-    .employeeProfileImage {
+    .employee-profile-image {
       width: 10rem;
       height: 10rem;
     }
