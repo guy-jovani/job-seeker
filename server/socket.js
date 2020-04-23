@@ -47,7 +47,14 @@ exports.socketHandler = (socket) => {
 
 const postAMsg = async data => {
   try {
-    const buffer = data.file ? Buffer.from(data.file) : null;
+    let buffer;
+    if (process.env.NODE_ENV === 'production' || true) {
+      buffer = data.file;
+    } else {
+      buffer = data.file ? Buffer.from(data.file) : null;
+    }
+    console.log(data)
+    console.log(buffer)
     const conversations = await chatController.postMessage(
       data.privateMsg, data.recipients, data.content, data.senderId, data.senderType, buffer, data.fileName, data.fileNumBytes);
       conversations.forEach(con => {

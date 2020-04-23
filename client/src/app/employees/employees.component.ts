@@ -59,7 +59,7 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
           this.page = currState['page'];
           this.isLoading = currState['loadingAll'];
           this.employees = currState['employees'];
-          this.lastEmployee = this.employees.length === currState['total'];
+          this.lastEmployee = this.employees.length >= currState['total'];
         }
       });
   }

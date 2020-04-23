@@ -1,5 +1,6 @@
 import { Component, Input, ViewChild, ElementRef, Renderer2, Output, EventEmitter } from '@angular/core';
 import { ImageCroppedEvent } from 'ngx-image-cropper';
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-image-cropper',
@@ -11,6 +12,7 @@ export class ImageCropperComponent {
   croppedImage: any = '';
   confirmedImage = false;
   failUpload = false;
+  fileSizeError = false;
 
   @Input() roundCropper: boolean;
   @Input() imagePreview = '';
@@ -25,9 +27,17 @@ export class ImageCropperComponent {
   fileChangeEvent(event: any): void {
     this.imageChangedEvent = event;
     if (event.target.files.length) {
-      this.renderer.removeClass(this.cropContainer.nativeElement, 'hide');
       this.confirmedImage = false;
       this.failUpload = false;
+      if (event.target.files[0].size > environment.uploadFileSizeLimitBytes) {
+        this.fileSizeError = true;
+        this.imageChangedEvent = null;
+        this.croppedImage = null;
+        this.imagePreview = null;
+      } else {
+        this.fileSizeError = false;
+        this.renderer.removeClass(this.cropContainer.nativeElement, 'hide');
+      }
     }
   }
 

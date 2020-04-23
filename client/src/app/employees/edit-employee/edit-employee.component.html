@@ -73,14 +73,22 @@
       <header>
         <h4>Profile Image</h4>
       </header>
-      <input type="checkbox" class="form-check-input" #deleteImage>
-      <label class="form-check-label" for="deleteImage">Delete Last Uploaded Image?</label>
+      <div>
+        <input type="checkbox" id="deleteImage" class="form-check-input" #deleteImage>
+        <label class="form-check-label" for="deleteImage">Delete Last Uploaded Image?</label>
+      </div>
       <app-image-cropper
         (confirmedImageEvent)="onCroppedEvent($event)"
         [aspectRatio]="1 / 1"
         [roundCropper]='true'
         [imagePreview]="profileImage.stringFile">
       </app-image-cropper>
+      <progress
+        *ngIf="profileImage.stringFile || uploadProfilePercent"
+        max="100"
+        value="{{ uploadProfilePercent }}">
+        {{ uploadProfilePercent }}
+      </progress>
     </div>
 
     <hr>

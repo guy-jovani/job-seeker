@@ -152,8 +152,22 @@
         required
         name="messageContent"
         class="{{messageContent}}"
-        placeholder="Type your message here"></textarea>
-      <div class="{{filePreview}}"></div>
+        placeholder="Type your{{ privateMsg ? '' : ' group' }} message here"></textarea>
+
+      <div class="{{filePreview}}" *ngIf="file || errorFile">
+        <div class="file-message-container" *ngIf="!uploadFilePercent">
+          <span *ngIf="errorFile">File is too big (The limit is 2MB).</span>
+          <span *ngIf="!errorFile">{{ file.name }}</span>
+          <span *ngIf="!errorFile">{{ getFileSize(file.size) }}</span>
+          <span class="glyphicon glyphicon-remove" (click)="removeFile()"></span>
+        </div>
+        <progress
+          *ngIf="!errorFile && uploadFilePercent"
+          max="100"
+          value="{{ uploadFilePercent }}">
+          {{ uploadFilePercent }}
+        </progress>
+      </div>
     </div>
 
     <div class="{{submitDiv}}">

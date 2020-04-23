@@ -19,8 +19,7 @@ export class AuthAutoLogoutService {
   autoLogout = (expirationMillieSeconds: number) => {
     clearTimeout(this.tokenTimer);
     this.tokenTimer = setTimeout(() => {
-      this.store.dispatch(new AuthActions.Logout());
-      this.store.dispatch(new AuthActions.AuthFailure(['Your session ended.']));
+      this.store.dispatch(new AuthActions.Logout(true));
     }, expirationMillieSeconds + environment.autoLogoutPassJWTExpirationMS);
   }
 

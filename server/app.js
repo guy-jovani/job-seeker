@@ -1,13 +1,11 @@
 
 const path = require('path');
-const fs = require('fs');
 
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const compression = require('compression');
 const helmet = require('helmet');
-const morgan = require('morgan');
 
 const employeesRoutes = require('./routes/employees');
 const searchRoutes = require('./routes/search');
@@ -23,14 +21,8 @@ const app = express();
 app.use(compression());
 app.use(helmet());
 
-const accessLogStream = fs.createWriteStream(
-  path.join(__dirname, 'access.log'),
-  { flags: 'a' }
-);
-app.use(morgan('combined', { stream: accessLogStream }));
 
 app.use(bodyParser.json());
-
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 

@@ -20,10 +20,13 @@
     </div>
   </section>
 
-  <div class="error-picker" *ngIf="failUpload">
-    <span class="help-block">
+  <div class="error-picker" *ngIf="failUpload || fileSizeError">
+    <span class="help-block" *ngIf="!fileSizeError">
       <p>There was a problem uploading the image.</p>
       <p>You can only upload an image file (jpeg, png etc..).</p>
+    </span>
+    <span class="help-block" *ngIf="fileSizeError">
+      <p>File is too big (The limit is 2MB).</p>
     </span>
   </div>
 </article>

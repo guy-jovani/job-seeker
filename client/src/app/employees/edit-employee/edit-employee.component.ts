@@ -7,6 +7,8 @@ import { Subscription } from 'rxjs';
 import * as fromApp from '../../store/app.reducer';
 import * as UserActions from '../../user/store/user.actions';
 import { Employee } from '../employee.model';
+import { environment } from 'environments/environment';
+import { AngularFireStorage } from '@angular/fire/storage';
 
 
 @Component({
@@ -22,13 +24,16 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
   messages: string[] = [];
   currUrl: string[] = null;
   profileImage: { file: File, stringFile: string } = { file: null, stringFile: '' };
+  uploadProfilePercent: number;
+  production = environment.production;
 
   @ViewChild('deleteImage') deleteImage: ElementRef;
 
   constructor(
     private store: Store<fromApp.AppState>,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private storage: AngularFireStorage
   ) {}
 
   ngOnInit() {
@@ -75,9 +80,10 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
     if (this.employee.profileImagePath) {
       this.profileImage = { file: null, stringFile: this.employee.profileImagePath as string };
     }
+    this.uploadProfilePercent = this.employee.profileImagePath ? 100 : null;
   }
 
-  onSubmit(form: FormGroup) {
+  async onSubmit(form: FormGroup) {
     if (form.invalid) {
       return this.store.dispatch(new UserActions.UserFailure(['The form is invalid']));
     }
@@ -89,9 +95,46 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
     });
     if (firstName) { newEmployee.firstName = firstName; }
     if (lastName) { newEmployee.lastName = lastName; }
-    if ( this.profileImage.file ) { newEmployee.profileImagePath = this.profileImage.file; }
+
+    if ( this.profileImage.file ) {
+      newEmployee.profileImagePath = this.production ?
+                await this.uploadProductionProfileImage() : this.profileImage.file;
+    }
+
+
     this.store.dispatch(new UserActions.UpdateSingleEmployeeInDB({
               employee: newEmployee, deleteImage: this.deleteImage.nativeElement.checked }));
+  }
+
+  private async uploadProductionProfileImage() {
+    let imageFBUrl: string;
+    if (this.profileImage.file) {
+      const uniqueName = this.getImageUniqueName(this.profileImage.file.name);
+      imageFBUrl = await this.fireBaseUpload(this.profileImage.file, uniqueName);
+      return imageFBUrl;
+    } else {
+      return this.profileImage.stringFile || '';
+    }
+  }
+
+  private getImageUniqueName(name: string) {
+    return name.split('.')[0] + '-' +
+      new Date().toISOString().replace(/:/g, '-') + '.' +
+      name.split('.')[1];
+  }
+
+  async fireBaseUpload(image: File, name: string) {
+    if (image) {
+      const fileRef = this.storage.ref(environment.imagesFolder + name);
+      const task = this.storage.upload(environment.imagesFolder + name, image);
+
+      task.percentageChanges().subscribe(pre => {
+        this.uploadProfilePercent = pre;
+      });
+
+      await task.snapshotChanges().toPromise();
+      return await fileRef.getDownloadURL().toPromise();
+    }
   }
 
   onCancel() {

@@ -4,9 +4,11 @@
 <app-alert *ngIf="messages && messages.length" [messages]="messages" (closeAlert)="onClose()"></app-alert>
 <app-header></app-header>
 
-<div class='loading-spinner-div' *ngIf="refreshing">
+<div class="backdrop" *ngIf="refreshing">
+  <div class='flex-row-center'>
   <app-loading-spinner></app-loading-spinner>
+  </div>
 </div>
 
-<router-outlet *ngIf="!refreshing"></router-outlet>
+<router-outlet></router-outlet>
 

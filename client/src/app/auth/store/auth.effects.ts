@@ -113,7 +113,10 @@ export class AuthEffects {
               this.store.dispatch(new JobActions.Logout());
               this.store.dispatch(new UserActions.Logout());
               this.authAutoLogoutService.clearMyTimeout();
-              this.router.navigate(['/login']);
+              if (actionData['payload']) {
+                this.router.navigate(['/login']);
+                this.store.dispatch(new AuthActions.AuthFailure(['Your session ended.']));
+              }
               return { type: 'dummy' };
             } else {
               return new AuthActions.AuthFailure(res['messages']);

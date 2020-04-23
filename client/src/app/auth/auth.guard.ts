@@ -2,10 +2,10 @@ import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router, UrlTr
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
-import * as fromApp from '../store/app.reducer';
 import { map, take } from 'rxjs/operators';
 
-
+import * as fromApp from '../store/app.reducer';
+import * as AuthActions from './store/auth.actions';
 
 @Injectable({providedIn: 'root'})
 export class AuthGuard implements CanActivate {
@@ -23,7 +23,8 @@ export class AuthGuard implements CanActivate {
             if (isAuth) {
               return true;
             } else {
-              return this.router.createUrlTree(['/signup']);
+              this.store.dispatch(new AuthActions.AuthFailure(['You need to log in for that.']))
+              return this.router.createUrlTree(['/login']);
             }
           })
         );

@@ -11,6 +11,7 @@ import { Store } from '@ngrx/store';
 import { switchMap } from 'rxjs/operators';
 import { Job } from 'app/job/job.model';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-details-company',

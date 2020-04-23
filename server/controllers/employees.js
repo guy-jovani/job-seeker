@@ -51,6 +51,9 @@ const updateReqProfileImage = req => {
     req.body.profileImagePath = url;
     return true;
   }
+  if (process.env.NODE_ENV === 'production') {
+    return true;
+  }
   return false;
 }
 
@@ -59,7 +62,6 @@ const getUpdateQuery = async (req) => {
   const employeeRemovableKeys = ['firstName', 'lastName']; 
   const nullKeys = getNullKeysForUpdate(req, employeeRemovableKeys);
   if(req.body.deleteImage === 'true' && !newProfileImage) nullKeys.profileImagePath = ''; 
-
   return await getBulkArrayForUpdate(req, nullKeys);
 };
 

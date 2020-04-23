@@ -107,12 +107,16 @@ const addMessageToConversation = async (conversation, content, senderId, senderT
     creator: senderId,
     onModel: senderType
   });
+  console.log(bufferFile)
 
   if(bufferFile) {
-    const uniqueName = getSocketFileUniqueName(fileName);
-    saveSocketFilePath(bufferFile, uniqueName);
-    message.filePath = 
-        getSocketFileUrl(uniqueName, socketInitializer.getHostName());
+    if (process.env.NODE_ENV === 'production') {
+      message.filePath = bufferFile;
+    } else {
+      const uniqueName = getSocketFileUniqueName(fileName);
+      saveSocketFilePath(bufferFile, uniqueName);
+      message.filePath = getSocketFileUrl(uniqueName, socketInitializer.getHostName());
+    }
     message.fileName = fileName;
     message.fileNumBytes = fileNumBytes;
   } else {

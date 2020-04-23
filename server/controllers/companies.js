@@ -96,9 +96,9 @@ exports.fetchCompanies = async (req, res, next) => {
         as: "jobs" }
       }
     ]);
-
+    
     const total = await Company.aggregate([
-      { $match: { _id: { $ne: mongoose.Types.ObjectId(req.query._id) } } },
+      { $match: { _id: { $ne: req.query._id } } },
       { $count: 'email' }
     ]);
 
@@ -143,13 +143,17 @@ const getProfileImage = (req, file) => {
  *                                an array of paths to new images of the company.
  */
 const getNonProfileImages = (req, files) => {
-  if(files.imagesPath) { // new images for company
-    let newUrls = []; 
-    files.imagesPath.forEach(file => {
-      let url = req.protocol + '://' + req.get('host');
-      url = url + '/images/' + file.filename;
-      newUrls.push(url);
-    });
+  if(files.imagesPath || req.body.firebaseImagesUrl) { 
+    const newUrls = []; 
+    if (process.env.NODE_ENV === 'production') {
+      newUrls.push(...req.body.firebaseImagesUrl.split(process.env.SPLIT_COMPANY_OLD_IMAGES_BY));
+    } else {
+      files.imagesPath.forEach(file => {
+        const url = req.protocol + '://' + req.get('host');
+        url = url + '/images/' + file.filename;
+        newUrls.push(url);
+      });
+    }
     const oldImages = req.query.oldImages.split(process.env.SPLIT_COMPANY_OLD_IMAGES_BY);
     let updatedImageInd = 0, updatedImages = [];
     for(const index of Object.keys(oldImages)){
@@ -164,7 +168,7 @@ const getNonProfileImages = (req, files) => {
     req.body.imagesPath = updatedImages;
   } else {
     const keptImages = req.query.oldImages.split(process.env.SPLIT_COMPANY_OLD_IMAGES_BY).filter(val => !!val);
-    if(keptImages.length) req.body.imagesPath = keptImages;
+    req.body.imagesPath = keptImages;
   }  
 };
 

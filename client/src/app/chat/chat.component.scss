@@ -60,6 +60,7 @@ side menu - create messages
   border-bottom: 1px solid #8080805e;
   justify-content: space-between;
   align-items: center;
+  min-height: 4.5rem;
 }
 
 .create-messages__title,
@@ -265,6 +266,7 @@ new message - message form
   height: 80%;
   background-color: #f2f2f29c;
   border-top: 1px solid #8080805e;
+  border-bottom: 1px solid #8080805e;
   min-height: 8rem;
   flex-grow: 1;
 
@@ -292,9 +294,16 @@ new message - message form
 }
 
 .chat-file-preview {
+  progress {
+    width: 100%;
+  }
 }
 
 .new-message__file-preview {
+  progress {
+    width: 100%;
+  }
+
   &::after {
     content: "";
     border-bottom: 1px solid #8080805e;
@@ -452,7 +461,6 @@ chat - messages
 }
 
 .message-content {
-  white-space: pre;
   position: relative;
 
   &::after {

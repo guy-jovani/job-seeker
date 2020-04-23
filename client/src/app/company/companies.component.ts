@@ -50,7 +50,7 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewChecked {
           }
         }
         this.companies = companyState.companies;
-        this.lastCompany = this.companies.length === companyState.total;
+        this.lastCompany = this.companies.length >= companyState.total;
       });
   }
 

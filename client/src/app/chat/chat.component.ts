@@ -13,6 +13,8 @@ import { ChatService } from './chat-socket.service';
 import * as UserActions from '../user/store/user.actions';
 import { Message } from './message.model';
 import { Participant } from './participant.model';
+import { environment } from 'environments/environment';
+import { AngularFireStorage } from '@angular/fire/storage';
 
 
 @Component({
@@ -33,6 +35,9 @@ export class ChatComponent implements OnInit, OnDestroy {
   isLoading = false;
   keyMap = {};
   file: File;
+  errorFile: boolean = null;
+  uploadFilePercent: number;
+  production = environment.production;
 
   @ViewChild('sendMessageForm') sendMessageForm: NgForm;
   @ViewChild('textarea') textarea: ElementRef;
@@ -43,7 +48,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   constructor(private renderer: Renderer2,
               private chatService: ChatService,
               private sanitizer: DomSanitizer,
-              private store: Store<fromApp.AppState>) { }
+              private store: Store<fromApp.AppState>,
+              private storage: AngularFireStorage) { }
 
   ngOnInit() {
     this.subscription = this.store.select('user').subscribe(userState => {
@@ -75,7 +81,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.nameList.delete(_id);
   }
 
-  onSubmit(form: NgForm) {
+  async onSubmit(form: NgForm) {
     if (this.textarea) {
       this.textarea.nativeElement.focus();
     }
@@ -91,12 +97,18 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
 
     if (this.file) { // update conversation in server - file
+      let fileFBUrl: string;
+      if (this.production) {
+        fileFBUrl = await this.uploadProductionFile();
+        console.log(fileFBUrl)
+      }
+
       this.chatService.sendMessage('postAMsg', {
         ownerId: this.user._id,
         senderId: this.user._id,
         senderType: this.userKind,
         content: null,
-        file: this.file,
+        file: this.production ? fileFBUrl : this.file,
         fileName: this.file.name,
         fileNumBytes: this.file.size,
         privateMsg: this.privateMsg,
@@ -211,27 +223,48 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   onChoseFile(event) {
     this.file = event.target.files[0];
-    const divFile = this.renderer.createElement('div');
-    const fileName = this.renderer.createElement('span');
-    const fileSize = this.renderer.createElement('span');
-    const remove = this.renderer.createElement('span');
-    fileName.innerText = this.file.name;
-    fileSize.innerText = this.getFileSize(this.file.size);
-    this.renderer.appendChild(divFile, fileName);
-    this.renderer.appendChild(divFile, fileSize);
-    this.renderer.appendChild(divFile, remove);
-
-    this.renderer.addClass(divFile, 'file-message-container');
-    this.renderer.addClass(remove, 'glyphicon');
-    this.renderer.addClass(remove, 'glyphicon-remove');
-    this.renderer.appendChild(this.renderer.nextSibling(this.textarea.nativeElement), divFile);
-    this.renderer.listen(remove, 'click', this.removeFile.bind(this));
+    this.uploadFilePercent = 0;
+    if (this.file.size >= 500000) {
+      this.errorFile = true;
+      this.file = null;
+    } else {
+      this.errorFile = false;
+    }
   }
 
-  removeFile(event) {
-    const fileCon = this.renderer.parentNode(event.target);
-    const uploadCon = this.renderer.parentNode(fileCon);
-    this.renderer.removeChild(uploadCon, fileCon);
+  private async uploadProductionFile() {
+    let fileFBUrl: string;
+    if (this.file) {
+      const uniqueName = this.getImageUniqueName(this.file.name);
+      fileFBUrl = await this.fireBaseUpload(this.file, uniqueName);
+      return fileFBUrl;
+    }
+    return null;
+  }
+
+  private getImageUniqueName(name: string) {
+    return name.split('.')[0] + '-' +
+      new Date().toISOString().replace(/:/g, '-') + '.' +
+      name.split('.')[1];
+  }
+
+  async fireBaseUpload(file: File, name: string) {
+    if (file) {
+      const fileRef = this.storage.ref(environment.filesFolder + name);
+      const task = this.storage.upload(environment.filesFolder + name, file);
+
+      task.percentageChanges().subscribe(pre => {
+        this.uploadFilePercent = pre;
+        console.log(pre)
+      });
+
+      await task.snapshotChanges().toPromise();
+      return await fileRef.getDownloadURL().toPromise();
+    }
+  }
+
+  removeFile() {
+    this.errorFile = false;
     this.file = null;
   }
 
@@ -240,15 +273,15 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   getFileSize = bytes => {
-    const kb = Math.floor(bytes / 1000);
-    if (kb < 1000) {
+    const kb = Math.floor(bytes / 1024);
+    if (kb < 1024) {
       return kb + ' Kb';
     }
-    const mb = Math.floor(kb / 1000);
-    if (mb < 1000) {
+    const mb = Math.floor(kb / 1024);
+    if (mb < 1024) {
       return mb + ' Mb';
     }
-    const gb = Math.floor(mb / 1000);
+    const gb = Math.floor(mb / 1024);
     return gb + ' Gb';
   }
 

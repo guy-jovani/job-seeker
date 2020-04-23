@@ -245,9 +245,24 @@ export function userReducer(state = initialState, action: UserActions.UserAction
           messages: action.payload,
         };
     case UserActions.UPDATE_ACTIVE_USER:
-      const user = action.payload.kind === 'employee' ?
-                { ...state.user as Employee, ...action.payload.user as Employee } :
-                { ...state.user as Company, ...action.payload.user as Company };
+      let user;
+      if (state.user) {
+        user = action.payload.kind === 'employee' ?
+          {
+            work: (state.user as Employee).work,
+            jobs: (state.user as Employee).jobs,
+            ...action.payload.user as Employee
+          } :
+          {
+            jobs: (state.user as Company).jobs,
+            applicants: (state.user as Company).applicants,
+            ...action.payload.user as Company
+          };
+      } else {
+        user = action.payload.kind === 'employee' ?
+            { ...action.payload.user as Employee } :
+            { ...action.payload.user as Company };
+      }
 
       if (action.payload.kind === 'employee') {
         user['work'] = user['work'].map((work: Work) => {

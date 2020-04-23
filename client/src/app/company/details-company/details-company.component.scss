@@ -9,19 +9,23 @@ a {
 .images-container {
   width: 100%;
   max-width: 100vw;
-  max-height: 28rem;
+  max-height: 30.5rem;
   margin: 3rem 0;
+
+  header {
+    max-height: 2.5rem;
+  }
 
   @media (max-width: 450px) and (min-width: 410px) {
     min-height: 32rem;
   }
 
   @media (min-width: 992px) {
-    max-height: 40rem;
+    max-height: 42.5rem;
   }
 
   @media (min-width: 1200px) {
-    max-height: 46rem;
+    max-height: 48.5rem;
   }
 }
 
@@ -35,26 +39,54 @@ a {
   margin: 0;
   justify-content: center;
   min-width: 20rem;
+  max-height: 28rem;
+
+  @media (min-width: 992px) {
+    max-height: 42.5rem;
+  }
+
+  @media (min-width: 1200px) {
+    max-height: 48.5rem;
+  }
+}
+
+@mixin two-lines-images-height() {
+  max-height: 14rem;
+  @media (min-width: 992px) {
+    max-height: 20rem;
+  }
+
+  @media (min-width: 1200px) {
+    max-height: 23rem;
+  }
+
+  ~ .images-container__list-item {
+    @media (min-width: 992px) {
+      max-height: 20rem;
+    }
+
+    @media (min-width: 1200px) {
+      max-height: 23rem;
+    }
+  }
 }
 
 .images-container__list-item {
   width: 100%;
-  height: 100%;
   overflow: hidden;
   background-color: black;
 
   &:first-child {
-    &:nth-last-child(2n) {
+    &:nth-last-child(-n+4) {
       width: 50%;
-
       ~ .images-container__list-item {
         width: 50%;
       }
     }
 
-    &:nth-last-child(3n),
-    &:nth-last-child(5) {
+    &:nth-last-child(n+5) {
       width: 33%;
+
       @media (max-width: 450px) {
         width: 50%;
       }
@@ -67,26 +99,10 @@ a {
       }
     }
 
-    &:nth-last-child(4),
-    &:nth-last-child(5),
-    &:nth-last-child(6) {
-      max-height: 14rem;
-      @media (min-width: 992px) {
-        max-height: 20rem;
-      }
-
-      @media (min-width: 1200px) {
-        max-height: 23rem;
-      }
-
+    &:nth-last-child(n+3) {
+      @include two-lines-images-height();
       ~ .images-container__list-item {
-        @media (min-width: 992px) {
-          max-height: 20rem;
-        }
-
-        @media (min-width: 1200px) {
-          max-height: 23rem;
-        }
+        @include two-lines-images-height();
       }
     }
   }
@@ -101,6 +117,8 @@ a {
   max-height: 28rem;
   min-width: 10rem;
   min-height: 10rem;
+  color: white;
+  font-weight: bold;
 
   &:hover {
     transform: scale(1);

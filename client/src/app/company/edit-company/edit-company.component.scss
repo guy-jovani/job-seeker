@@ -1,8 +1,4 @@
 
-.company-profile-image-container {
-  display: flex;
-  flex-direction: column;
-}
 
 .company-images-container {
   margin: 2rem 0;
@@ -30,9 +26,13 @@
 
 .cropper-component {
   width: 50%;
+  display: flex;
+  flex-direction: column;
 }
 
-
+progress {
+  align-self: center;
+}
 
 @media (max-width: 650px) {
   .cropper-component {

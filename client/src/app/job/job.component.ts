@@ -51,10 +51,7 @@ export class JobComponent implements OnInit, OnDestroy, AfterViewChecked {
       ).subscribe(currState => {
         this.currUrl = this.router.url.substring(1).split('/');
         if (currState.messages) {
-          this.messages = [];
-          for (const msg of currState.messages) {
-            this.messages.push(msg);
-          }
+          this.messages = [...currState.messages];
         } else {
           this.messages = [];
         }
@@ -112,7 +109,7 @@ export class JobComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.isLoading = jobState['loadingAll'];
     this.jobs = jobState['jobs'];
     this.page = jobState['page'];
-    this.lastJob = this.jobs.length === jobState['total'];
+    this.lastJob = this.jobs.length >= jobState['total'];
   }
 
   onClose() {

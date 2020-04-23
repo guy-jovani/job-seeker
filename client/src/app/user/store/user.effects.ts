@@ -334,6 +334,9 @@ export class UserEffects {
         companyData.append(key, actionData.payload.company[key]);
       }
     });
+    if (environment.production) {
+      companyData.append('firebaseImagesUrl', actionData.payload.firebaseImagesUrl.join(environment.splitCompanyOldImagesBy));
+    }
     return companyData;
   }
 

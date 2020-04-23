@@ -127,6 +127,15 @@ hr {
 input[type="password"] {
   padding-right: 4rem;
 }
+.employee-profile-image-container,
+.company-profile-image-container {
+  display: flex;
+  flex-direction: column;
+
+  .cropper-component {
+    align-self: center;
+  }
+}
 
 /**************************
 ****** Details Pages ******

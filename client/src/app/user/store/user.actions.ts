@@ -101,7 +101,8 @@ export class UpdateSingleCompanyInDb implements Action {
 
   constructor(public payload: {
     company: Company,
-    oldImagesPath: string[]
+    oldImagesPath: string[],
+    firebaseImagesUrl?: string[]
   }) {}
 }
 

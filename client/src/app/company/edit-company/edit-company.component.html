@@ -29,6 +29,12 @@
         [aspectRatio]="16 / 9"
         [imagePreview]="profileImagePreview ? profileImagePreview.stringFile : ''">
       </app-image-cropper>
+      <progress
+        *ngIf="profileImagePreview.stringFile || uploadProfilePercent"
+        max="100"
+        value="{{ uploadProfilePercent }}">
+        {{ uploadProfilePercent }}
+        </progress>
     </div>
 
     <div class="form-group">
@@ -101,13 +107,21 @@
           <span class="help-block">(Up to 6).</span>
         </div>
       </header>
-      <app-image-cropper
-        *ngFor="let imagePath of imagesPath; let i=index; trackBy: trackImagesPath"
+      <div
         class="cropper-component"
-        (confirmedImageEvent)="onCroppedEvent($event, i)"
-        [aspectRatio]="16 / 9"
-        [imagePreview]="imagePath">
-      </app-image-cropper>
+        *ngFor="let imagePath of imagesPath; let i=index; trackBy: trackImagesPath">
+        <app-image-cropper
+          (confirmedImageEvent)="onCroppedEvent($event, i)"
+          [aspectRatio]="16 / 9"
+          [imagePreview]="imagePath">
+        </app-image-cropper>
+        <progress
+          *ngIf="imagePath"
+          max="100"
+          value="{{ uploadImagesPercent[i] }}">
+          {{ uploadImagesPercent[i] }}
+        </progress>
+      </div>
     </section>
 
     <hr>
