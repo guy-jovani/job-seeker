@@ -1,7 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 import { Employee } from 'app/employees/employee.model';
-import { Company } from 'app/company/company.model';
 import { Job } from '../job.model';
 
 @Component({

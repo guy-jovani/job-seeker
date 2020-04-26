@@ -75,6 +75,9 @@ router.post('/createWork', [
     if (!value || value.trim() === '') {
       throw new Error('"Start Date" is a required field.');
     }
+    if (new Date(value) > new Date()) {
+      throw new Error('"Start Date" can\'t be in the future.');
+    }
     return true;
   }),
   body('endDate').custom((value, { req }) => {
@@ -103,6 +106,10 @@ router.post('/updateWork', [
   body('startDate').custom((value, { req }) => {
     if (!value || value.trim() === '') {
       throw new Error('"Start Date" is a required field.');
+    }
+    
+    if (new Date(value) > new Date()) {
+      throw new Error('"Start Date" can\'t be in the future.');
     }
     return true;
   }),

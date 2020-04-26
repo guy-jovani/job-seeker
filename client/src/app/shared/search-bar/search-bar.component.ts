@@ -17,7 +17,11 @@ import { take } from 'rxjs/operators';
 export class SearchBarComponent implements OnInit, OnDestroy {
   subscription: Subscription;
   user: Employee | Company = null;
-  searchRes: Employee[] | Company[] = null;
+  searchRes: {
+    _id: string,
+    type: string,
+    [field: string]: string
+  }[] = null;
   wantedResults: Map<string, {}> = null;
   messages: string[] = [];
 
@@ -25,8 +29,9 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') searchInput: ElementRef;
 
   @Input() placeholder: string = null;
-  // tslint:disable-next-line: no-input-rename
-  @Input('search') searchDB: string[] = null;
+  @Input() searchDBs: string[] = null;
+  @Input() searchFields: string[] = null;
+  @Input() distinctResults = 'false';
 
   @Output() wantedResultsEmitter = new EventEmitter<Map<string, {}>>();
 
@@ -48,14 +53,22 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     if (!value) {
       return this.renderer2.addClass(this.listRes.nativeElement, 'hide');
     }
+
+    // usedIds are for the server to know which documents he should ignore since it already retrieved them
+    // in case of a request for a distinct request the field will be the values of the field that was retrieved
     const usedIds = Array.from( this.wantedResults.keys() );
-    usedIds.push(this.user._id);
+    if (this.distinctResults === 'false') {
+      usedIds.push(this.user._id);
+    }
+
     this.http
       .get(nodeServer, {
         params: {
-          fullName: value,
-          usedIds: usedIds.join(','),
-          searchDB: this.searchDB.join(',')
+          query: value,
+          distinct: this.distinctResults,
+          usedIds: usedIds.join(environment.splitSearchQueryBy),
+          searchDBs: this.searchDBs.join(environment.splitSearchQueryBy),
+          searchFields: this.searchFields.join(environment.splitSearchQueryBy)
         }
       })
       .pipe(take(1))

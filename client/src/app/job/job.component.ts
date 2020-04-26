@@ -28,6 +28,7 @@ export class JobComponent implements OnInit, OnDestroy, AfterViewChecked {
   availableStatus = Object.keys(EmployeeJobStatus).filter(key => isNaN(+key));
   lastJob: boolean; // if there are more jobs to fetch
   page: number;
+  searchQuery: { title?: string, company?: string, published: string } = { published: 'all' };
 
   @ViewChild('container') container: ElementRef;
 
@@ -90,7 +91,7 @@ export class JobComponent implements OnInit, OnDestroy, AfterViewChecked {
         !this.lastJob && // won't fetch if the last employee was fetched
         (container.bottom <= window.innerHeight || // if the whole list is shown - so fetch
         container.height - window.pageYOffset < window.innerHeight)) { // check if scrolled to the container
-      this.store.dispatch(new JobActions.FetchJobs({ page: this.page }));
+      this.store.dispatch(new JobActions.FetchJobs());
       this.ref.detectChanges();
     }
   }
@@ -111,6 +112,32 @@ export class JobComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.page = jobState['page'];
     this.lastJob = this.jobs.length >= jobState['total'];
   }
+
+  onSearchField(searchMap: Map<string, {
+    _id: string,
+    field: string,
+    type: string
+  }>) {
+    const value = searchMap.entries().next().value[1];
+    if (value.type === 'Job') {
+      this.searchQuery.title = value.title;
+    } else {
+      this.searchQuery.company = value.name;
+    }
+  }
+
+  onRemoveSearchField(field: string) {
+    if (field === 'title') {
+      this.searchQuery.title = null;
+    } else {
+      this.searchQuery.company = null;
+    }
+  }
+
+  onSearch() {
+    this.store.dispatch(new JobActions.FetchJobs({ search: { ...this.searchQuery } }));
+  }
+
 
   onClose() {
     this.store.dispatch(new JobActions.ClearError());

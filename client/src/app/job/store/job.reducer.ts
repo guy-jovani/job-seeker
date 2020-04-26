@@ -15,6 +15,7 @@ export interface State {
   lastFetch: Date;
   page: number;
   total: number;
+  searchQuery: { title?: string, company?: string, published: string };
 }
 
 const initialState: State = {
@@ -24,7 +25,8 @@ const initialState: State = {
   loadingSingle: false,
   lastFetch: null,
   page: 1,
-  total: null
+  total: null,
+  searchQuery: { published: 'all' }
 };
 
 export function jobReducer(state = initialState, action: JobActions.JobActions) {
@@ -36,8 +38,27 @@ export function jobReducer(state = initialState, action: JobActions.JobActions) 
         loadingSingle: true,
       };
     case JobActions.FETCH_JOBS:
+      const searchQuery = { ...state.searchQuery };
+      let jobs = [ ...state.jobs ];
+      let fetchPage = state.page;
+      if (action.payload) {
+        jobs = action.payload.search.title !== searchQuery.title ? [] : jobs;
+        fetchPage = action.payload.search.title !== searchQuery.title ? 1 : fetchPage;
+        searchQuery['title'] = action.payload.search.title;
+
+        jobs = action.payload.search.company !== searchQuery.company ? [] : jobs;
+        fetchPage = action.payload.search.company !== searchQuery.company ? 1 : fetchPage;
+        searchQuery['company'] = action.payload.search.company;
+
+        jobs = action.payload.search.published !== searchQuery.published ? [] : jobs;
+        fetchPage = action.payload.search.published !== searchQuery.published ? 1 : fetchPage;
+        searchQuery['published'] = action.payload.search.published;
+      }
       return {
         ...state,
+        searchQuery,
+        jobs,
+        page: fetchPage,
         loadingAll: true,
       };
     case JobActions.FETCH_SINGLE_JOB:
@@ -63,12 +84,15 @@ export function jobReducer(state = initialState, action: JobActions.JobActions) 
         page: 1,
         total: null,
         tempJob: null,
-        lastFetch: null
+        lastFetch: null,
+        searchQuery: null
       };
     case JobActions.SET_JOBS:
+      const setPage = action.payload.jobs.length ? state.page + 1  : state.page;
+
       return {
         ...state,
-        page: state.page + 1,
+        page: setPage,
         total: action.payload.total,
         jobs: [ ...state.jobs, ...action.payload.jobs ],
         loadingAll: false,

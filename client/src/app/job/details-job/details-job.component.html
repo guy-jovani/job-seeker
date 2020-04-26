@@ -21,7 +21,7 @@
   <header class="details-page-header">
     <h3 class="{{ status ? '' : 'only-job-title' }}">{{ (job.title || job['job'].title) | titlecase }}</h3>
     <div class="status-info" *ngIf="status">
-      <h3 class="job-status job-status-{{ status }}">{{ status }}</h3>
+      <h3 class="job-status job-status-{{ status }}">{{ status | titlecase }}</h3>
       <h4 class="job-date"> <time [dateTime]="statusDate.split('/').reverse().join('-')"> {{ statusDate }} </time> </h4>
     </div>
     <app-back-button></app-back-button>

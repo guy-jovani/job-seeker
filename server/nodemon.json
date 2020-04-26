@@ -12,7 +12,8 @@
     "RESET_URL": "http://localhost:4200/reset-password/",
     "DOCS_PER_PAGE": 10,
     "REQ_PROTOCOL": "http://",
-    "SPLIT_COMPANY_OLD_IMAGES_BY": "%%RandomjoiN&&"
+    "SPLIT_COMPANY_OLD_IMAGES_BY": "%%RandomjoiN&&",
+    "SPLIT_SEARCH_QUERY": ","
   }
 }
 

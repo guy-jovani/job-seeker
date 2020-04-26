@@ -7,14 +7,24 @@
 
 
 <app-alert *ngIf="messages.length" [messages]="messages" (closeAlert)="onClose()"></app-alert>
-<input type="search" class="search-bar" placeholder="{{placeholder}}" (input)="onSearchChange($event.target.value)" (focus)="onSearchChange($event.target.value)" #searchInput>
 
-<ul class="list-results hide" #listResults>
-  <li *ngFor='let res of searchRes; let i=index' class="list-item" (click)="onWantedRes(i)">
-    {{  res.fullName || res.email }}
-  </li>
-  <li *ngIf="searchRes && !searchRes.length" class="list-item">No Results Found.</li>
-</ul>
+<div class="search-container">
+  <input
+    type="search"
+    class="form-control search-input"
+    placeholder="{{ placeholder }}"
+    (input)="onSearchChange($event.target.value)"
+    (focus)="onSearchChange($event.target.value)"
+    #searchInput
+  >
+
+  <ul class="search-results hide" #listResults>
+    <li *ngFor='let res of searchRes; let i=index' class="search-item" (click)="onWantedRes(i)">
+      {{  res['name'] || res['email'] || res['title'] }}
+    </li>
+    <li *ngIf="searchRes && !searchRes.length" class="search-item">No Results Found.</li>
+  </ul>
+</div>
 
 
 

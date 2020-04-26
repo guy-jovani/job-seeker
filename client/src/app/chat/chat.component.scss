@@ -206,8 +206,6 @@ new message - add item
   height: 10%;
   background-color: #f2f2f29c;
   min-height: 3rem;
-  border-top: 1px solid #8080805e;
-  border-bottom: 1px solid #8080805e;
 }
 
 /****************************
@@ -238,12 +236,6 @@ new message - name list
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.name-list-container__item-remove {
-  position: relative;
-  right: -0.5rem;
-  cursor: pointer;
 }
 
 /****************************

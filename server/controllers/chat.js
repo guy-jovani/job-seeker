@@ -107,7 +107,6 @@ const addMessageToConversation = async (conversation, content, senderId, senderT
     creator: senderId,
     onModel: senderType
   });
-  console.log(bufferFile)
 
   if(bufferFile) {
     if (process.env.NODE_ENV === 'production') {

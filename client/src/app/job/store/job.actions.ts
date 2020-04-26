@@ -79,7 +79,7 @@ export class UpdateSingleJobCompany implements Action {
 export class FetchJobs implements Action {
   readonly type = FETCH_JOBS;
 
-  constructor(public payload: { page: number } ) {}
+  constructor(public payload?: { search: { title?: string, company?: string, published?: string } } ) {}
 }
 
 export class FetchSingleJob implements Action {

@@ -36,6 +36,11 @@ exports.socketHandler = (socket) => {
     socket.join(data._id);
   });
 
+  socket.on('logout', data => {
+    console.log('logout', data._id)
+    socket.leave(data._id);
+  });
+
   socket.on('postAMsg', postAMsg);
   socket.on('readAMsg', readAMsg);
   socket.on('updateStatus', updateStatus);
@@ -48,13 +53,11 @@ exports.socketHandler = (socket) => {
 const postAMsg = async data => {
   try {
     let buffer;
-    if (process.env.NODE_ENV === 'production' || true) {
+    if (process.env.NODE_ENV === 'production') {
       buffer = data.file;
     } else {
       buffer = data.file ? Buffer.from(data.file) : null;
     }
-    console.log(data)
-    console.log(buffer)
     const conversations = await chatController.postMessage(
       data.privateMsg, data.recipients, data.content, data.senderId, data.senderType, buffer, data.fileName, data.fileNumBytes);
       conversations.forEach(con => {
@@ -101,12 +104,16 @@ const updateStatus = async data => {
     } 
     const [employee, company] = await changeStatusOfAUserJob(data.companyId, 
                           data.employeeId, data.jobId, data.status);
+
+    console.log(data)
+    console.log(data.employeeId)
     io.to(data.employeeId).emit('updatedStatus', { 
       type: 'success',
       kind: 'employee',
       user: employee
     });
     
+    console.log(data.companyId)
     io.to(data.companyId).emit('updatedStatus', { 
       type: 'success',
       kind: 'company',

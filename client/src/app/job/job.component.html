@@ -25,8 +25,61 @@
       </div>
     </header>
 
+    <section class="search-job-container" *ngIf="currUrl[0] === 'jobs'">
+
+      <div class="search-fields">
+        <div class="search-for-field">
+          <h5>Title: </h5>
+          <app-search-bar
+            *ngIf="!searchQuery.title"
+            [placeholder]="'Type a job title'"
+            [searchDBs]="['job']"
+            [searchFields]="['title']"
+            [distinctResults]="true"
+            (wantedResultsEmitter)="onSearchField($event)">
+          </app-search-bar>
+          <p *ngIf="searchQuery.title" class="search-for-field-result">
+            {{ searchQuery.title }}
+            <i class="glyphicon glyphicon-remove" (click)="onRemoveSearchField('title')"></i>
+          </p>
+        </div>
+
+        <div class="search-for-field">
+          <h5>Company: </h5>
+          <app-search-bar
+            *ngIf="!searchQuery.company"
+            [placeholder]="'Type a company name'"
+            [searchDBs]="['company']"
+            [searchFields]="['name']"
+            (wantedResultsEmitter)="onSearchField($event)">
+          </app-search-bar>
+          <p *ngIf="searchQuery.company" class="search-for-field-result">
+            {{ searchQuery.company }}
+            <i class="glyphicon glyphicon-remove" (click)="onRemoveSearchField('company')"></i>
+          </p>
+        </div>
+
+        <div class="search-for-field">
+          <h5>Published: </h5>
+          <select [(ngModel)]="searchQuery.published">
+            <option value="">-- Last Published --</option>
+            <option value="day">Last Day</option>
+            <option value="week">Last Week</option>
+            <option value="month">Last Month</option>
+            <option value="all">All</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn btn-info" (click)="onSearch()">
+        Search
+      </button>
+
+    </section>
+
     <section>
       <app-list-jobs
+        *ngIf="!(isLoading && currUrl[0] === 'jobs' && !jobs.length)"
         [showStatus]="currUrl[0] === 'my-jobs' && !allowAdd"
         [jobs]="jobs"
         [detailsJobUrl]="detailsJobUrl">
@@ -36,8 +89,8 @@
         <app-loading-spinner></app-loading-spinner>
       </div>
 
-      <div *ngIf='lastJob' class="flex-row-center">
-        <p>There are no {{ jobs.length ? 'more' : '' }} jobs at the moment.</p>
+      <div *ngIf='lastJob && !isLoading && jobs.length' class="flex-row-center">
+        <p>There are no more jobs at the moment.</p>
       </div>
     </section>
 

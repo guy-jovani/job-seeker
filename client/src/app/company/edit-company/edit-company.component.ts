@@ -105,6 +105,7 @@ export class EditCompanyComponent implements OnInit, OnDestroy {
       this.uploadImagesPercent[ind] = 0;
     } else {
       this.profileImagePreview = images;
+      this.uploadProfilePercent = 0;
     }
   }
 

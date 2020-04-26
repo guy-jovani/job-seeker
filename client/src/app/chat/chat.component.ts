@@ -58,7 +58,8 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.conversations = userState.conversations;
       this.isLoading = userState.loading;
       if (this.currConversation && this.conversations && this.user) {
-        if (!this.currConversation.participants.find(part => part.user._id === this.user._id).read) {
+        if (!this.conversations.find(con => con._id === this.currConversation._id)
+              .participants.find(part => part.user._id === this.user._id).read) {
           this.chatService.sendMessage('readAMsg', { // mark con as 'read'
             conversationId: this.currConversation._id, userId: this.user._id
           });
@@ -100,7 +101,6 @@ export class ChatComponent implements OnInit, OnDestroy {
       let fileFBUrl: string;
       if (this.production) {
         fileFBUrl = await this.uploadProductionFile();
-        console.log(fileFBUrl)
       }
 
       this.chatService.sendMessage('postAMsg', {
@@ -213,8 +213,8 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.inputUploadFile.nativeElement.click();
   }
 
-  getParticipantsOtherThanUSer(participants: Participant[]) {
-    return participants.filter(part => part.user._id !== this.user._id).slice(0, 3);
+  getParticipantsOtherThanUser(participants: Participant[]) {
+    return participants.filter(part => part.user._id !== this.user._id);
   }
 
   getReadClass(participants: Participant[]) {

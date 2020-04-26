@@ -140,8 +140,7 @@
       <app-loading-spinner></app-loading-spinner>
     </div>
 
-    <form (ngSubmit)="onSubmitWork(workForm)" #workForm="ngForm" class="my-form {{ isLoading ? 'hide' : '' }}">
-
+    <form  (ngSubmit)="onSubmitWork()" [formGroup]="workForm" class="my-form {{ isLoading ? 'hide' : '' }}">
       <header class="form-title-container">
         <h3 class="form-action-title">{{ workId ? 'Update' : 'Create' }} Experience</h3>
       </header>
@@ -160,11 +159,9 @@
           type="text"
           name="title"
           id="title"
-          ngModel
-          required
-          #title="ngModel"
+          formControlName="title"
         >
-        <span class="help-block" *ngIf="!title.valid && title.touched">
+        <span class="help-block" *ngIf="workForm.get('title').touched && !workForm.get('title').valid">
           Please enter a valid title.
         </span>
       </div>
@@ -175,8 +172,7 @@
           class="form-control input-form-tag"
           id="type"
           name="type"
-          ngModel
-          #type="ngModel"
+          formControlName="type"
         >
           <option value=''>-----</option>
           <option value='full-time'>Full time</option>
@@ -195,16 +191,14 @@
           type="text"
           name="company"
           id="company"
-          ngModel
-          required
-          #company="ngModel"
+          formControlName="company"
         >
-        <span class="help-block" *ngIf="!company.valid && company.touched">
+        <span class="help-block" *ngIf="workForm.get('company').touched && !workForm.get('company').valid">
           Please enter a valid company.
         </span>
       </div>
 
-      <div class="form-date-container">
+      <div formGroupName="startDate" class="form-date-container">
         <label for="start-month">Start Date: <abbr title="required" aria-label="required">*</abbr> </label>
         <div class="form-start-date">
           <div class="form-group">
@@ -212,9 +206,7 @@
               class="form-control input-form-tag"
               id="start-month"
               name="startMonth"
-              ngModel
-              required
-              #startMonth="ngModel"
+              formControlName="startMonth"
             >
               <option value=''>-- Month --</option>
               <option value='Jan'>January</option>
@@ -230,7 +222,7 @@
               <option value='Nov'>November</option>
               <option value='Dec'>December</option>
             </select>
-            <span class="help-block" *ngIf="!startMonth.valid && startMonth.touched">
+            <span class="help-block" *ngIf="workForm.get('startDate.startMonth').touched && !workForm.get('startDate.startMonth').valid">
               Please enter a valid month.
             </span>
           </div>
@@ -240,20 +232,25 @@
               class="form-control input-form-tag"
               id="start-year"
               name="startYear"
-              ngModel
-              required
-              #startYear="ngModel"
+              formControlName="startYear"
             >
               <option value=''>-- Year --</option>
               <option
                 *ngFor="let year of years"
                 value='{{year}}'>{{year}}</option>
             </select>
-            <span class="help-block" *ngIf="!startYear.valid && startYear.touched">
+            <span class="help-block" *ngIf="workForm.get('startDate.startYear').touched && !workForm.get('startDate.startYear').valid">
               Please enter a valid year.
             </span>
           </div>
         </div>
+        <span class="help-block"
+              *ngIf="workForm.get('startDate').touched &&
+              !workForm.get('startDate').valid &&
+              workForm.get('startDate').errors &&
+              workForm.get('startDate').errors.startDateInFuture">
+          Start date can't be in the future.
+        </span>
       </div>
 
       <div class="form-group">
@@ -262,13 +259,12 @@
           type="checkbox"
           name="present"
           id="present"
-          ngModel
-          #present="ngModel"
+          formControlName="present"
         >
         <label class="form-check-label" for="present">It is my present work place.  </label>
       </div>
 
-      <div class="form-date-container {{ workForm.form.value.present ? 'hide' : '' }}">
+      <div formGroupName="endDate" class="form-date-container {{ workForm.get('present').value ? 'hide' : '' }}">
         <label for="end-month">End Date: </label>
         <div class="form-end-date">
           <div class="form-group">
@@ -276,9 +272,7 @@
               class="form-control input-form-tag"
               id="end-month"
               name="endMonth"
-              ngModel
-              required
-              #endMonth="ngModel"
+              formControlName="endMonth"
             >
             <option value=''>-- Month --</option>
             <option value='Jan'>January</option>
@@ -294,7 +288,7 @@
             <option value='Nov'>November</option>
             <option value='Dec'>December</option>
             </select>
-            <span class="help-block" *ngIf="!endMonth.valid && endMonth.touched">
+            <span class="help-block" *ngIf="workForm.get('endDate.endMonth').touched && !workForm.get('endDate.endMonth').valid">
               Please enter a valid month.
             </span>
           </div>
@@ -304,20 +298,25 @@
               class="form-control input-form-tag"
               id="end-year"
               name="endYear"
-              ngModel
-              required
-              #endYear="ngModel"
+              formControlName="endYear"
             >
               <option value=''>-- Year --</option>
               <option
                 *ngFor="let year of years"
                 value='{{year}}'>{{year}}</option>
             </select>
-            <span class="help-block" *ngIf="!endYear.valid && endYear.touched">
+            <span class="help-block" *ngIf="workForm.get('endDate.endYear').touched && !workForm.get('endDate.endYear').valid">
               Please enter a valid year.
             </span>
           </div>
         </div>
+        <span class="help-block"
+              *ngIf="workForm.touched &&
+              !workForm.valid &&
+              workForm.errors &&
+              workForm.errors.endDateBeforeStart">
+          End date can't be before the start date.
+        </span>
       </div>
 
       <hr>
@@ -340,12 +339,7 @@
           <button
             type="submit"
             class="btn btn-success"
-            [disabled]="title.invalid ||
-                        company.invalid ||
-                        type.invalid ||
-                        startMonth.invalid ||
-                        startYear.invalid ||
-                        (!workForm.form.value.present && (endMonth.invalid || endYear.invalid))">
+            [disabled]="!workForm.valid && false">
             {{ workId ? 'Update' : 'Create' }}
           </button>
         </div>

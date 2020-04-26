@@ -13,7 +13,6 @@ import * as UserActions from '../user/store/user.actions';
 import { Employee } from '../employees/employee.model';
 import { Company } from 'app/company/company.model';
 import { Router, NavigationStart } from '@angular/router';
-import { UserStorageService } from 'app/user/user-storage.service';
 
 
 @Component({
@@ -32,15 +31,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
   production = environment.production;
 
   constructor(private store: Store<fromApp.AppState>,
-              private router: Router,
-              private userStorage: UserStorageService) { }
+              private router: Router) { }
 
   ngOnInit() {
     this.routerSub = this.router.events.pipe(
       filter(event => event instanceof NavigationStart)
     ).subscribe(routerObj => {
       this.collapsed = true;
-      const [, , , expirationDate] = this.userStorage.getUserAndTokensStorage();
     });
 
     this.subscription = this.store.select('user')
@@ -71,7 +68,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   onFetchJobs() {
-    this.store.dispatch(new JobActions.FetchJobs({page: 1}));
+    this.store.dispatch(new JobActions.FetchJobs());
   }
 
   ngOnDestroy() {

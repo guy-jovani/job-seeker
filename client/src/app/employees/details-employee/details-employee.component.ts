@@ -10,7 +10,7 @@ import * as EmployeeActions from '../store/employee.actions';
 import { Company, ApplicantJob, ApplicantStatus } from 'app/company/company.model';
 import * as UserActions from '../../user/store/user.actions';
 import { ChatService } from 'app/chat/chat-socket.service';
-import { NgForm, FormGroup, FormControl, Validators } from '@angular/forms';
+import { NgForm, FormGroup, FormControl, Validators, AbstractControl, FormBuilder } from '@angular/forms';
 
 @Component({
   selector: 'app-details-employee',
@@ -27,15 +27,17 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   messages: string[] = [];
   currUrl: string[] = null;
   selectedStatusList = 'all';
-  closedMessages = false;
-  addWork = false;
-  submittedWork = false;
   submitAcceptReject = false;
-  workId: string = null;
   availableStatus = Object.keys(ApplicantStatus).filter(key => isNaN(+key));
+  closedMessages = false;
+
   years = Array(new Date().getFullYear() - 1970 + 1).fill(0).map((val, i) => new Date().getFullYear() - i);
   monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  addWork = false;
+  submittedWork = false;
+  workForm: FormGroup;
+  workId: string = null;
 
   showNewPasswords = false;
   showCurrPassword = false;
@@ -43,13 +45,11 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   submittedPassword = false;
   changePasswordForm: FormGroup;
 
-
-  @ViewChild('workForm') workForm: NgForm;
-
   constructor(
     private store: Store<fromApp.AppState>,
     private route: ActivatedRoute,
     private chatService: ChatService,
+    private formBuilder: FormBuilder,
     private router: Router) { }
 
   ngOnInit() {
@@ -60,6 +60,21 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
         confirmNewPassword: new FormControl(null, [Validators.required])
       }, this.checkPasswordEquality)
     });
+
+    this.workForm = new FormGroup({
+      title: new FormControl(null, [Validators.required]),
+      type: new FormControl(null, [Validators.required]),
+      company: new FormControl(null, [Validators.required]),
+      present: new FormControl(null, []),
+      startDate: new FormGroup({
+        startMonth: new FormControl('', [Validators.required]),
+        startYear: new FormControl('', [Validators.required]),
+      }, [Validators.required, this.checkWorkStartDate]),
+      endDate: new FormGroup({
+        endMonth: new FormControl('', [Validators.required]),
+        endYear: new FormControl('', [Validators.required]),
+      })
+    }, [this.checkWorkEndDate]);
 
     this.routeSub = this.route.params
       .pipe(
@@ -107,6 +122,23 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
         });
   }
 
+  checkWorkStartDate(control: FormControl): {[s: string]: boolean} {
+    if (new Date('01 ' + control.get('startMonth').value + ' '
+    + control.get('startYear').value) > new Date()) {
+      return { startDateInFuture: true };
+    }
+    return null;
+  }
+  checkWorkEndDate(control: FormControl): {[s: string]: boolean} {
+    if (new Date('01 ' + control.get('endDate.endMonth').value + ' ' + control.get('endDate.endYear').value) <
+        new Date('01 ' + control.get('startDate.startMonth').value +
+        ' ' + control.get('startDate.startYear').value)) {
+      return { endDateBeforeStart: true };
+    }
+    return null;
+  }
+
+
   onAcceptReject(jobInfo: { status: ApplicantStatus, jobInd: number }) { // company actions
     this.submitAcceptReject = true;
     this.store.dispatch(new UserActions.CompanyAcceptRejectJobAttempt());
@@ -150,40 +182,21 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
     }
   }
 
-  onSubmitWork(form: NgForm) {
+  onSubmitWork() {
     this.messages = [];
     this.submittedWork = true;
-    const controls = form.form.controls;
-    if (controls.title.status === 'INVALID') {
-      this.messages.push('The "Title" field is required.');
+    if (this.workForm.invalid) {
+      return this.store.dispatch(new UserActions.UserFailure(['The form is invalid']));
     }
-    if (controls.company.status === 'INVALID') {
-      this.messages.push('The "Company" field is required.');
-    }
-    if (controls.startMonth.status === 'INVALID') {
-      this.messages.push('The "Start Date" field is required.');
-    }
-    if (!controls.present.value && controls.endMonth.status === 'INVALID') {
-      this.messages.push('The "End Date" field is required - unless it is your current work place.');
-    }
-    if (!controls.present.value &&
-        controls.endMonth.status === 'VALID' && controls.startMonth.status === 'VALID' &&
-        new Date('01 ' + form.value.startMonth + ' ' + form.value.startYear) >
-        new Date('01 ' + form.value.endMonth + ' ' + form.value.endYear)) {
-      this.messages.push('The "End Date" can\'t be before "Start Date".');
-    }
-
-    if (this.messages.length) {
-      return;
-    }
-
+    const formValue = this.workForm.value;
     const work = {
-      title: form.value.title,
-      company: form.value.company,
-      present: form.value.present,
-      startDate: form.value.startMonth + ' ' + form.value.startYear,
-      endDate: form.value.present ? null : (form.value.endMonth || '') + ' ' + (form.value.endYear || ''),
-      employmentType: form.value.type
+      title: formValue.title,
+      company: formValue.company,
+      present: formValue.present,
+      startDate: formValue.startDate.startMonth + ' ' + formValue.startDate.startYear,
+      endDate: formValue.present ? null : (formValue.endDate.endMonth || '') + ' ' +
+                (formValue.endDate.endYear || ''),
+      employmentType: formValue.type
     };
 
     if (this.workId) {
@@ -204,38 +217,48 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   onToggleWork(ind?: number) {
     if (ind || ind === 0) {
       this.workId = this.employee.work[ind]._id;
-      this.workForm.form.patchValue({
+      this.workForm.patchValue({
         title: this.employee.work[ind].title,
         type: this.employee.work[ind].employmentType || '',
         company: this.employee.work[ind].company,
-        startMonth: this.monthNames[this.employee.work[ind].startDate.getMonth()],
-        startYear: this.employee.work[ind].startDate.getFullYear()
+        startDate: {
+          startMonth: this.monthNames[this.employee.work[ind].startDate.getMonth()],
+          startYear: this.employee.work[ind].startDate.getFullYear()
+        }
       });
       const endDate = this.employee.work[ind].endDate;
       if (endDate) {
-        this.workForm.form.patchValue({
+        this.workForm.patchValue({
           present: false,
-          endMonth: this.monthNames[endDate.getMonth()],
-          endYear: endDate.getFullYear(),
+          endDate: {
+            endMonth: this.monthNames[endDate.getMonth()],
+            endYear: endDate.getFullYear(),
+          }
         });
       } else {
-        this.workForm.form.patchValue({
+        this.workForm.patchValue({
           present: true,
-          endMonth: '',
-          endYear: '',
+          endDate: {
+            endMonth: '',
+            endYear: '',
+          }
         });
       }
     } else {
       this.workId = null;
       this.workForm.reset();
-      this.workForm.form.patchValue({
+      this.workForm.patchValue({
         title: '',
         type: '',
         company: '',
-        startMonth: '',
-        startYear: '',
-        endMonth: '',
-        endYear: '',
+        startDate: {
+          startMonth: '',
+          startYear: ''
+        },
+        endDate: {
+          endMonth: '',
+          endYear: ''
+        }
       });
     }
     this.addWork = !this.addWork;

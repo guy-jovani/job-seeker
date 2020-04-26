@@ -1,12 +1,14 @@
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { switchMap, map, catchError } from 'rxjs/operators';
+import { switchMap, map, catchError, withLatestFrom } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 
+import * as fromApp from '../../store/app.reducer';
 import * as JobActions from './job.actions';
+import { Store } from '@ngrx/store';
 
 const nodeServer = environment.nodeServer + 'jobs/';
 
@@ -15,6 +17,7 @@ const nodeServer = environment.nodeServer + 'jobs/';
 export class JobEffects {
 
   constructor(private actions$: Actions,
+              private store: Store<fromApp.AppState>,
               private http: HttpClient) {}
 
   @Effect()
@@ -42,11 +45,14 @@ export class JobEffects {
   @Effect()
   fetchJobs = this.actions$.pipe(
     ofType(JobActions.FETCH_JOBS),
-    switchMap(actionData => {
+    withLatestFrom(this.store.select('job')),
+    switchMap(([actionData, jobState]) => {
+      const body = { page: jobState['page'].toString() };
+      if (jobState['searchQuery']) {
+        body['searchQuery'] = JSON.stringify(jobState['searchQuery']);
+      }
       return this.http.get(nodeServer + 'fetchJobs', {
-        params: {
-          page: actionData['payload']['page'],
-        }
+        params: body
       })
       .pipe(
         map(res => {

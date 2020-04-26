@@ -83,7 +83,7 @@ export class AuthEffects {
       const expirationMillieSeconds = new Date(expirationDate).getTime() - new Date().getTime();
       if (expirationMillieSeconds <= 0) { return { type: 'dummy' }; }
 
-      this.chatService.sendMessage('login', {  _id: user['_id'], msg: 'logged' } );
+      this.chatService.sendMessage('login', {  _id: user['_id'] } );
 
       this.store.dispatch(new UserActions.UpdateActiveUser({ user, kind }));
       this.authAutoLogoutService.autoLogout(expirationMillieSeconds);
@@ -113,8 +113,9 @@ export class AuthEffects {
               this.store.dispatch(new JobActions.Logout());
               this.store.dispatch(new UserActions.Logout());
               this.authAutoLogoutService.clearMyTimeout();
+              this.chatService.sendMessage('logout', {  _id: userState['user']['_id'] } );
+              this.router.navigate(['/login']);
               if (actionData['payload']) {
-                this.router.navigate(['/login']);
                 this.store.dispatch(new AuthActions.AuthFailure(['Your session ended.']));
               }
               return { type: 'dummy' };
@@ -202,7 +203,7 @@ export class AuthEffects {
     if (res['type'] === 'success') {
       this.userStorageService.setUserStorage(res['user'], res['kind']);
 
-      this.chatService.sendMessage('login', {  _id: res['user']['_id'], msg: 'logged' } );
+      this.chatService.sendMessage('login', {  _id: res['user']['_id'] } );
       this.store.dispatch(new UserActions.UpdateActiveUser({ user: res['user'], kind: res['kind'] }));
       this.authAutoLogoutService.autoLogout(res['expiresInSeconds'] * 1000);
       return new AuthActions.AuthSuccess({

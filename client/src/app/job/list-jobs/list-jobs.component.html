@@ -13,8 +13,8 @@
       *ngFor="let jobInfo of jobs; let i=index; trackBy: jobsTracker">
 
     <ng-container *ngIf="applicantJobs; else jobsList">
-      <h4 class="job-title">{{ jobInfo.title ? jobInfo.title : jobInfo['job'].title }}</h4>
-      <p class="job-status job-status-{{ jobInfo.status }}">{{ jobInfo.status }}</p>
+      <h4 class="job-title">{{ jobInfo.title ? (jobInfo.title | titlecase) : (jobInfo['job'].title | titlecase) }}</h4>
+      <p class="job-status job-status-{{ jobInfo.status }}">{{ jobInfo.status | titlecase }}</p>
       <time
         class="job-date"
         [dateTime]="getJobDate(jobInfo.date).split('/').reverse().join('-')">
@@ -31,8 +31,8 @@
     <ng-template #jobsList>
       <a class="job-link" [state]="{ jobInd : i }"
         routerLink='{{ generalCompany && jobs.length ? "job" : detailsJobUrl + i }}'>
-        <h4 class="job-title">{{ jobInfo.title ? jobInfo.title : jobInfo['job'].title }}</h4>
-        <p class="job-company" *ngIf= "!!detailsJobUrl === showStatus && !generalCompany">{{ jobInfo.company ? jobInfo.company.name : jobInfo['job'].company.name }}</p>
+        <h4 class="job-title">{{ jobInfo.title ? (jobInfo.title | titlecase) : (jobInfo['job'].title | titlecase) }}</h4>
+        <p class="job-company" *ngIf= "!!detailsJobUrl === showStatus && !generalCompany">{{ jobInfo.company ? (jobInfo.company.name | titlecase) : (jobInfo['job'].company.name | titlecase) }}</p>
 
         <time
           *ngIf="jobInfo.date"
@@ -41,16 +41,17 @@
           {{ getJobDate(jobInfo.date) }}
         </time>
 
-        <p class="job-status job-status-{{ jobInfo.status }}" *ngIf="showStatus">{{ jobInfo.status }}</p>
+        <p class="job-status job-status-{{ jobInfo.status }}" *ngIf="showStatus">{{ jobInfo.status | titlecase }}</p>
       </a>
     </ng-template>
 
   </li>
 </ul>
 
-<p *ngIf="!applicantJobs && (!jobs || !jobs.length)">There are no open jobs.</p>
-<p *ngIf="applicantJobs && (!jobs || !jobs.length)">There are no applicants for your requested status.</p>
-
+<div *ngIf="!jobs || !jobs.length" class="flex-row-center">
+  <p *ngIf="applicantJobs">There are no jobs for your requested status.</p>
+  <p *ngIf='!applicantJobs' >There are no jobs at the moment.</p>
+</div>
 
 
 

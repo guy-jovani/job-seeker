@@ -30,7 +30,7 @@
         [imagePreview]="profileImagePreview ? profileImagePreview.stringFile : ''">
       </app-image-cropper>
       <progress
-        *ngIf="profileImagePreview.stringFile || uploadProfilePercent"
+        *ngIf="profileImagePreview.stringFile"
         max="100"
         value="{{ uploadProfilePercent }}">
         {{ uploadProfilePercent }}

@@ -67,6 +67,7 @@ export class EditEmployeeComponent implements OnInit, OnDestroy {
 
   onCroppedEvent(images: { file: File, stringFile: string }) {
     this.profileImage = images;
+    this.uploadProfilePercent = 0;
   }
 
 

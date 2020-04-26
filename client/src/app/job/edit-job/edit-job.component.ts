@@ -123,7 +123,7 @@ export class EditJobComponent implements OnInit, OnDestroy {
   }
 
   onClose() {
-    this.store.dispatch(new JobActions.ClearError());
+    this.store.dispatch(new UserActions.ClearError());
   }
 
 }

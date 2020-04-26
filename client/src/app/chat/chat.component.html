@@ -36,7 +36,7 @@
               (click)="onFocusCon($event.currentTarget)"
               [attr.data-con-ind]="i">
           <ul class='conversation__participants-list'>
-            <li *ngFor="let participant of getParticipantsOtherThanUSer(con.participants); let i=index"
+            <li *ngFor="let participant of getParticipantsOtherThanUser(con.participants).slice(0, 3); let i=index"
                 class="conversation__participants-list__item">
               {{ i !== 2 ? getFullName(participant['user']) : '' }}</li>
           </ul>
@@ -59,10 +59,18 @@
     </header>
 
     <section class="new-message__add-item">
-      <app-search-bar [placeholder]="'Type one or more names'" [search]="['employee','company']" (wantedResultsEmitter)="onGetNames($event)"></app-search-bar>
+      <app-search-bar
+        [placeholder]="'Type one or more names'"
+        [searchDBs]="['employee','company']"
+        [searchFields]="['name','email']"
+        (wantedResultsEmitter)="onGetNames($event)">
+      </app-search-bar>
     </section>
 
-    <ng-container *ngTemplateOutlet="nameListTemplate; context: {removeName: true}"></ng-container>
+    <ng-container
+      *ngTemplateOutlet="nameListTemplate;
+          context: { removeName: true, nameListObject: nameList }">
+    </ng-container>
 
     <ng-container *ngTemplateOutlet="submitTemplate;
       context: {
@@ -80,7 +88,13 @@
       <h4>Chat</h4>
     </header>
 
-    <ng-container *ngTemplateOutlet="nameListTemplate; context: {removeName: false}"></ng-container>
+    <ng-container
+      *ngTemplateOutlet="nameListTemplate;
+          context: {
+            removeName: false,
+            nameListObject: getParticipantsOtherThanUser(currConversation.participants)
+          }">
+    </ng-container>
 
     <section class="messages">
       <ul class='messages__list' appScrollToBottom>
@@ -127,12 +141,12 @@
 
 
 
-<ng-template #nameListTemplate let-removeName="removeName">
+<ng-template #nameListTemplate let-removeName="removeName" let-nameListObject="nameListObject">
   <section class="name-list-container">
     <ul class='name-list-container__list'>
-      <li *ngFor="let name of nameList | keyvalue; let i=index" class="name-list-container__item">
-        {{ name.value.fullName || name.value.email}}
-        <i *ngIf="removeName" class="glyphicon glyphicon-remove name-list-container__item-remove" (click)="onRemoveName(name.value._id)"></i>
+      <li *ngFor="let name of nameListObject | keyvalue; let i=index" class="name-list-container__item">
+        {{ removeName ? name.value.name || name.value.email : getFullName(name.value['user'])}}
+        <i *ngIf="removeName" class="glyphicon glyphicon-remove" (click)="onRemoveName(name.value._id)"></i>
       </li>
     </ul>
   </section>

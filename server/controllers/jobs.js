@@ -79,7 +79,7 @@ exports.updateJob = async (req, res, next) => {
     if(routeErrors.type === 'failure') {
       return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
     }
-    title = req.body.title.trim();
+    title = req.body.title.trim().toLowerCase();
     const titleExist = await validation.jobTitleExistForCompanyValidation(
       title, req.body.company._id, req.body._id );
     if(titleExist.type === 'failure'){
@@ -123,6 +123,11 @@ exports.fetchSingle = async (req, res, next) => {
 };
 
 
+getPrevDays = days => {
+  const today = new Date();
+  const lastDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - days);
+  return lastDate;
+};
 
 /**
  * Send the client an object of an array of all the jobs populated with their company name.
@@ -134,20 +139,77 @@ exports.fetchSingle = async (req, res, next) => {
  */
 exports.fetchJobs = async (req, res, next) => {
   try {
-    const jobs = await Job.find()
-        .skip(skippedDocuments(req.query.page))
-        .limit(+process.env.DOCS_PER_PAGE)
-        .select('_id title company description requirements date')
-        .populate({ path: 'company', select: 'name' });
-
+    let jobQuery = {};
+    if (req.query.searchQuery) {
+      const search = JSON.parse(req.query.searchQuery);
+      if(search.title) {
+        jobQuery['title'] = search.title;
+      }
+      if(search.company) {
+        jobQuery['company.name'] = search.company;
+      }
+      if (search.published) {
+        switch(search.published) {
+          case 'day':
+            jobQuery['date'] = { '$gt': getPrevDays(1) };
+            break;
+          case 'week':
+            jobQuery['date'] = { '$gt': getPrevDays(7) };
+            break;
+          case 'month':
+            jobQuery['date'] = { '$gt': getPrevDays(30) };
+            break;
+        }
+      }
+    }
+    
+    const jobs = await Job.aggregate([
+        { $lookup:
+            { from: 'companies',
+              localField:'company',
+              foreignField: '_id',
+              as: 'company'
+            }
+        },
+        { $match: jobQuery },
+        { $skip: skippedDocuments(req.query.page) },
+        { $limit: +process.env.DOCS_PER_PAGE },
+        { $project: {
+            "title": 1,
+            "description": 1,
+            "requirements": 1,
+            "date": 1,
+            "company": { "$arrayElemAt": [ "$company", 0 ] },
+          }
+        },
+        { $project: {
+          "title": 1,
+          "description": 1,
+          "requirements": 1,
+          "date": 1,
+          "company.name": 1,
+          "company._id": 1,
+          'total': 1,
+          },
+        }
+      ]);
+    
     const total = await Job.aggregate([
+      { $lookup:
+        { from: 'companies',
+          localField:'company',
+          foreignField: '_id',
+          as: 'company'
+        }
+      },
+      { $match: jobQuery },
       { $count: 'title' }
     ]);
-
+    
     res.status(200).json({
       type: 'success',
       jobs,
-      total: total[0].title
+      total: total[0] ? total[0].title : 0
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "There was an error fetching the jobs."));

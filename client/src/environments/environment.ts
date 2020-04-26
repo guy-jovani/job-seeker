@@ -6,8 +6,9 @@ export const environment = {
   production: false,
   fetchDataMSReset: 30 * 60 * 1000, // 30 min in milliseconds
   nodeServer: 'http://localhost:4300/',
-  autoLogoutPassJWTExpirationMS: 5 * 60 * 1000, // 5 min in milliseconds
+  autoLogoutPassJWTExpirationMS: 30 * 60 * 1000, // 30 min in milliseconds
   splitCompanyOldImagesBy: '%%RandomjoiN&&',
+  splitSearchQueryBy: ',',
   firebaseAPIKey: 'AIzaSyC546Xc5G1RCnmz3atF4BQ4NtEkD9XkkfY',
   firebaseAuthDomain: 'jobseeker-68c66.firebaseapp.com',
   firebaseStorageBucket: 'gs://jobseeker-68c66.appspot.com',

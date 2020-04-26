@@ -1,6 +1,6 @@
 
 const { validationResult } = require('express-validator');
-
+const mongoose = require('mongoose');
 const Employee = require('../models/employee');
 const Company = require('../models/company');
 const Job = require('../models/job');
@@ -55,11 +55,12 @@ exports.handleValidationRoutesErrors = req => {
   }
 };
 
-exports.jobTitleExistForCompanyValidation = async (title, companyId, posId = null) => {
-  const job = await Job.findOne({ 
-    _id: { $ne: posId }, company: companyId, title: title 
+exports.jobTitleExistForCompanyValidation = async (title, companyId, jobId = null) => {
+  const jobs = await Job.find({ 
+    _id: { $ne: mongoose.Types.ObjectId(jobId) }, company: companyId, title: title 
   });
-  if(job){
+
+  if(jobs.length){
     return {
       messages: ['You already have a job with that title, please choose a different one.'],
       type: 'failure'

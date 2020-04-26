@@ -446,7 +446,7 @@ const mockDB = async () => {
     company.jobs.push(job._id);
     await company.save();
 
-    job = await Job.create({ title: 'c' + num + 'with req', description: 'description c' + num + ' with req',
+    job = await Job.create({ title: 'c' + num + ' with req', description: 'description c' + num + ' with req',
                         requirements: [{requirement: 'req 1'}, {requirement: 'req 2'}], company: company._id, date: new Date()    });
     company.jobs.push(job._id);
     await company.save();
