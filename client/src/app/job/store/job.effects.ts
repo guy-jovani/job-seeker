@@ -9,6 +9,7 @@ import { environment } from '../../../environments/environment';
 import * as fromApp from '../../store/app.reducer';
 import * as JobActions from './job.actions';
 import { Store } from '@ngrx/store';
+import { UserStorageService } from 'app/user/user-storage.service';
 
 const nodeServer = environment.nodeServer + 'jobs/';
 
@@ -18,6 +19,7 @@ export class JobEffects {
 
   constructor(private actions$: Actions,
               private store: Store<fromApp.AppState>,
+              private userStorageService: UserStorageService,
               private http: HttpClient) {}
 
   @Effect()
@@ -50,6 +52,7 @@ export class JobEffects {
       const body = { page: jobState['page'].toString() };
       if (jobState['searchQuery']) {
         body['searchQuery'] = JSON.stringify(jobState['searchQuery']);
+        this.userStorageService.setUserSearchQueries(body['searchQuery'], 'job');
       }
       return this.http.get(nodeServer + 'fetchJobs', {
         params: body

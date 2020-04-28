@@ -67,6 +67,11 @@ export function jobReducer(state = initialState, action: JobActions.JobActions) 
         ...state,
         loadingSingle: true
       };
+    case JobActions.SET_SEARCH_QUERY_JOB:
+      return {
+        ...state,
+        searchQuery: action.search
+      };
     case JobActions.CLEAR_ERROR:
       return {
         ...state,
@@ -85,7 +90,7 @@ export function jobReducer(state = initialState, action: JobActions.JobActions) 
         total: null,
         tempJob: null,
         lastFetch: null,
-        searchQuery: null
+        searchQuery: { published: 'all' }
       };
     case JobActions.SET_JOBS:
       const setPage = action.payload.jobs.length ? state.page + 1  : state.page;

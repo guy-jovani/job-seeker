@@ -108,6 +108,7 @@ export class JobComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   private checkJobsFromJobsState(jobState) {
     this.isLoading = jobState['loadingAll'];
+    this.searchQuery = {...jobState['searchQuery']};
     this.jobs = jobState['jobs'];
     this.page = jobState['page'];
     this.lastJob = this.jobs.length >= jobState['total'];

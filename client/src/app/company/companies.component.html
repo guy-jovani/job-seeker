@@ -12,6 +12,60 @@
       	<h3>Companies</h3>
       </header>
 
+      <section class="search-company-container" *ngIf="currUrl[0] === 'companies'">
+
+        <div class="search-fields">
+
+          <div class="search-for-field">
+            <h5>Name: </h5>
+            <app-search-bar
+              *ngIf="!searchQuery.name"
+              [placeholder]="'Ex: Joe Frazier, frazier@gmail.com'"
+              [searchDBs]="['company']"
+              [searchFields]="['name', 'email']"
+              (wantedResultsEmitter)="onSearchField($event)">
+            </app-search-bar>
+            <p *ngIf="searchQuery.name" class="search-for-field-result">
+              {{ searchQuery.name }}
+            </p>
+            <i *ngIf="searchQuery.name" class="glyphicon glyphicon-remove" (click)="onRemoveSearchField('name')"></i>
+          </div>
+
+          <div class="search-for-field">
+            <h5>Job: </h5>
+            <app-search-bar
+              *ngIf="!searchQuery.job"
+              [placeholder]="'Ex: Web Developer'"
+              [searchDBs]="['company']"
+              [distinctResults]="true"
+              [searchFields]="['jobs.title']"
+              (wantedResultsEmitter)="onSearchField($event)">
+            </app-search-bar>
+            <p *ngIf="searchQuery.job" class="search-for-field-result">
+              {{ searchQuery.job }}
+            </p>
+            <i *ngIf="searchQuery.job" class="glyphicon glyphicon-remove" (click)="onRemoveSearchField('job')"></i>
+          </div>
+
+          <div class="search-for-field">
+            <h5>Published: </h5>
+            <select [(ngModel)]="searchQuery.published">
+              <option value="">-- Last Published --</option>
+              <option value="day">Last Day</option>
+              <option value="week">Last Week</option>
+              <option value="month">Last Month</option>
+              <option value="all">All</option>
+            </select>
+          </div>
+
+        </div>
+
+        <button class="btn btn-info" (click)="onSearch()">
+          Search
+        </button>
+
+      </section>
+
       <app-list-companies [companies]="companies"></app-list-companies>
 
       <div *ngIf="isLoading" class='flex-row-center'>

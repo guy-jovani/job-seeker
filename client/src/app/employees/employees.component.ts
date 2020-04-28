@@ -23,6 +23,7 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
   currUrl: string[] = null;
   lastEmployee: boolean; // if there are more employees to fetch
   page: number;
+  searchQuery: { name?: string, company?: string, work?: string } = {};
 
   @ViewChild('containerFluid') containerFluid: ElementRef;
 
@@ -44,10 +45,7 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
       ).subscribe(currState => {
         this.currUrl = this.router.url.substring(1).split('/');
         if (currState.messages) {
-          this.messages = [];
-          for (const msg of currState.messages) {
-            this.messages.push(msg);
-          }
+          this.messages = [...currState.messages];
         } else {
           this.messages = [];
         }
@@ -56,6 +54,7 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
           this.applicantsList = true;
           this.employees = currState['user'] ? currState['user'].applicants : null;
         } else { // /employees
+          this.searchQuery = { ...currState['searchQuery'] };
           this.page = currState['page'];
           this.isLoading = currState['loadingAll'];
           this.employees = currState['employees'];
@@ -71,7 +70,7 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
         !this.lastEmployee && // won't fetch if the last employee was fetched
         (container.bottom <= window.innerHeight || // if the whole list is shown - so fetch
         container.height - window.pageYOffset < window.innerHeight)) { // check if scrolled to the container
-      this.store.dispatch(new EmployeeActions.FetchEmployees({ page: this.page }));
+      this.store.dispatch(new EmployeeActions.FetchEmployees());
       this.ref.detectChanges();
     }
   }
@@ -86,9 +85,38 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.fetchNextPage();
   }
 
+  onSearchField(searchMap: Map<string, {
+    _id: string,
+    field: string,
+    type: string
+  }>) {
+    const value = searchMap.entries().next().value[1];
+    if (value.name) {
+      this.searchQuery.name = value.name;
+    } else if (value['work.title']) {
+      this.searchQuery.work = value['work.title'];
+    } else {
+      this.searchQuery.company = value['work.company'];
+    }
+  }
+
+  onRemoveSearchField(field: string) {
+    if (field === 'name') {
+      this.searchQuery.name = null;
+    } else if (field === 'company') {
+      this.searchQuery.company = null;
+    } else {
+      this.searchQuery.work = null;
+    }
+  }
+
+  onSearch() {
+    this.store.dispatch(new EmployeeActions.FetchEmployees({ search: { ...this.searchQuery } }));
+  }
+
   onClose() {
     this.store.dispatch(new EmployeeActions.ClearError());
-    }
+  }
 
   ngOnDestroy() {
     if (this.subscription) {

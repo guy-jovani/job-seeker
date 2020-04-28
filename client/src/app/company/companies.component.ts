@@ -25,6 +25,8 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewChecked {
   currUrl: string[] = null;
   page: number;
   lastCompany: boolean; // if there are more companies to fetch
+  searchQuery: { name?: string, job?: string, published: string } = { published: 'all' };
+
 
   @ViewChild('containerFluid') containerFluid: ElementRef;
 
@@ -41,14 +43,12 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.page = companyState.page;
         if (this.currUrl[this.currUrl.length - 1] === 'companies') {
           if (companyState.messages) {
-            this.messages = [];
-            for (const msg of companyState.messages) {
-              this.messages.push(msg);
-            }
+            this.messages = [ ...companyState.messages ];
           } else {
             this.messages = [];
           }
         }
+        this.searchQuery = { ...companyState['searchQuery'] };
         this.companies = companyState.companies;
         this.lastCompany = this.companies.length >= companyState.total;
       });
@@ -61,7 +61,7 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewChecked {
         !this.lastCompany && // won't fetch if the last company was fetched
         (container.bottom <= window.innerHeight || // if the whole list is shown - so fetch
         container.height - window.pageYOffset < window.innerHeight)) { // check if scrolled to the container
-      this.store.dispatch(new CompanyActions.FetchCompanies({ page: this.page }));
+      this.store.dispatch(new CompanyActions.FetchCompanies());
       this.ref.detectChanges();
     }
   }
@@ -72,6 +72,31 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   @HostListener('window:scroll', ['$event']) doSomething(event) {
     this.fetchNextPage();
+  }
+
+  onSearchField(searchMap: Map<string, {
+    _id: string,
+    field: string,
+    type: string
+  }>) {
+    const value = searchMap.entries().next().value[1];
+    if (value.name) {
+      this.searchQuery.name = value.name;
+    } else {
+      this.searchQuery.job = value['jobs.title'];
+    }
+  }
+
+  onRemoveSearchField(field: string) {
+    if (field === 'name') {
+      this.searchQuery.name = null;
+    } else {
+      this.searchQuery.job = null;
+    }
+  }
+
+  onSearch() {
+    this.store.dispatch(new CompanyActions.FetchCompanies({ search: { ...this.searchQuery } }));
   }
 
   onClose() {

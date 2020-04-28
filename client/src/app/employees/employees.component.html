@@ -18,13 +18,72 @@
         <h3>{{ currUrl[0] === 'my-applicants' ? 'Applicants' : 'People' }}</h3>
       </header>
 
+      <section class="search-employee-container" *ngIf="currUrl[0] === 'people'">
+
+        <div class="search-fields">
+
+          <div class="search-for-field">
+            <h5>Name: </h5>
+            <app-search-bar
+              *ngIf="!searchQuery.name"
+              [placeholder]="'Ex: Joe Frazier, frazier@gmail.com'"
+              [searchDBs]="['employee']"
+              [searchFields]="['name', 'email']"
+              (wantedResultsEmitter)="onSearchField($event)">
+            </app-search-bar>
+            <p *ngIf="searchQuery.name" class="search-for-field-result">
+              {{ searchQuery.name }}
+            </p>
+            <i *ngIf="searchQuery.name" class="glyphicon glyphicon-remove" (click)="onRemoveSearchField('name')"></i>
+          </div>
+
+          <div class="search-for-field">
+            <h5>Company: </h5>
+            <app-search-bar
+              *ngIf="!searchQuery.company"
+              [placeholder]="'Company name employing person'"
+              [searchDBs]="['employee']"
+              [distinctResults]="true"
+              [searchFields]="['work.company']"
+              (wantedResultsEmitter)="onSearchField($event)">
+            </app-search-bar>
+            <p *ngIf="searchQuery.company" class="search-for-field-result">
+              {{ searchQuery.company }}
+            </p>
+            <i *ngIf="searchQuery.company" class="glyphicon glyphicon-remove" (click)="onRemoveSearchField('company')"></i>
+          </div>
+
+          <div class="search-for-field">
+            <h5>Experience: </h5>
+            <app-search-bar
+              *ngIf="!searchQuery.work"
+              [placeholder]="'Ex: Web Developer '"
+              [searchDBs]="['employee']"
+              [searchFields]="['work.title']"
+              [distinctResults]="true"
+              (wantedResultsEmitter)="onSearchField($event)">
+            </app-search-bar>
+            <p *ngIf="searchQuery.work" class="search-for-field-result">
+              {{ searchQuery.work }}
+            </p>
+            <i *ngIf="searchQuery.work" class="glyphicon glyphicon-remove" (click)="onRemoveSearchField('work')"></i>
+          </div>
+
+        </div>
+
+        <button class="btn btn-info" (click)="onSearch()">
+          Search
+        </button>
+
+      </section>
+
       <app-list-employees [employees]="employees" [applicantsList]="applicantsList"></app-list-employees>
 
       <div *ngIf="isLoading" class="flex-row-center">
         <app-loading-spinner></app-loading-spinner>
       </div>
 
-      <div *ngIf='lastEmployee' class="flex-row-center">
+      <div *ngIf='lastEmployee && !isLoading' class="flex-row-center">
         <p>There are no {{ employees.length ? 'more' : '' }} people that match your search.</p>
       </div>
 

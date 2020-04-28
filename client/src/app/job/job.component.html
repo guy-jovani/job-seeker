@@ -40,8 +40,8 @@
           </app-search-bar>
           <p *ngIf="searchQuery.title" class="search-for-field-result">
             {{ searchQuery.title }}
-            <i class="glyphicon glyphicon-remove" (click)="onRemoveSearchField('title')"></i>
           </p>
+          <i *ngIf="searchQuery.title" class="glyphicon glyphicon-remove" (click)="onRemoveSearchField('title')"></i>
         </div>
 
         <div class="search-for-field">
@@ -55,8 +55,8 @@
           </app-search-bar>
           <p *ngIf="searchQuery.company" class="search-for-field-result">
             {{ searchQuery.company }}
-            <i class="glyphicon glyphicon-remove" (click)="onRemoveSearchField('company')"></i>
           </p>
+          <i *ngIf="searchQuery.company" class="glyphicon glyphicon-remove" (click)="onRemoveSearchField('company')"></i>
         </div>
 
         <div class="search-for-field">
@@ -90,7 +90,7 @@
       </div>
 
       <div *ngIf='lastJob && !isLoading && jobs.length' class="flex-row-center">
-        <p>There are no more jobs at the moment.</p>
+        <p>There are no more jobs that match your search.</p>
       </div>
     </section>
 

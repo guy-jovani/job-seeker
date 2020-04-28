@@ -13,6 +13,7 @@ export interface State {
   lastFetch: Date;
   page: number;
   total: number;
+  searchQuery: { name?: string, company?: string, work?: string };
 }
 
 const initialState: State = {
@@ -22,18 +23,21 @@ const initialState: State = {
   loadingSingle: false,
   lastFetch: null,
   page: 1,
-  total: null
+  total: null,
+  searchQuery: {}
 };
 
 export function employeeReducer(state = initialState, action: EmployeeActions.EmployeeActions) {
   switch (action.type) {
     case EmployeeActions.SET_EMPLOYEES:
+      const setPage = action.payload.employees.length ? state.page + 1  : state.page;
+
       return {
         ...state,
         employees: [ ...state.employees, ...action.payload.employees ],
         messages: null,
         loadingAll: false,
-        page: state.page + 1,
+        page: setPage,
         total: action.payload.total,
         loadingSingle: false,
         lastFetch: new Date()
@@ -50,9 +54,34 @@ export function employeeReducer(state = initialState, action: EmployeeActions.Em
         ...state,
         loadingSingle: true,
       };
-    case EmployeeActions.FETCH_EMPLOYEES:
+    case EmployeeActions.SET_SEARCH_QUERY_EMPLOYEE:
       return {
         ...state,
+        searchQuery: action.search
+      };
+    case EmployeeActions.FETCH_EMPLOYEES:
+      const searchQuery = { ...state.searchQuery };
+      let employees = [ ...state.employees ];
+      let fetchPage = state.page;
+      if (action.payload) {
+        employees = action.payload.search.name !== searchQuery.name ? [] : employees;
+        fetchPage = action.payload.search.name !== searchQuery.name ? 1 : fetchPage;
+        searchQuery['name'] = action.payload.search.name;
+
+        employees = action.payload.search.company !== searchQuery.company ? [] : employees;
+        fetchPage = action.payload.search.company !== searchQuery.company ? 1 : fetchPage;
+        searchQuery['company'] = action.payload.search.company;
+
+        employees = action.payload.search.work !== searchQuery.work ? [] : employees;
+        fetchPage = action.payload.search.work !== searchQuery.work ? 1 : fetchPage;
+        searchQuery['work'] = action.payload.search.work;
+      }
+
+      return {
+        ...state,
+        searchQuery,
+        employees,
+        page: fetchPage,
         loadingAll: true,
       };
     case EmployeeActions.CLEAR_ERROR:
@@ -86,6 +115,7 @@ export function employeeReducer(state = initialState, action: EmployeeActions.Em
         lastFetch: null,
         page: 1,
         total: null,
+        searchQuery: {}
       };
     default:
       return state;

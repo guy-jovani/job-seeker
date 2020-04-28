@@ -10,6 +10,7 @@ import * as fromApp from '../../store/app.reducer';
 import * as EmployeeActions from './employee.actions';
 import { Employee, Work } from '../employee.model';
 import { environment } from '../../../environments/environment';
+import { UserStorageService } from 'app/user/user-storage.service';
 
 const nodeServer = environment.nodeServer + 'employees/';
 
@@ -19,6 +20,7 @@ export class EmployeeEffects {
 
   constructor(private actions$: Actions,
               private http: HttpClient,
+              private userStorageService: UserStorageService,
               private store: Store<fromApp.AppState>) {}
 
 
@@ -26,14 +28,19 @@ export class EmployeeEffects {
   @Effect()
   fetchEmployees = this.actions$.pipe(
     ofType(EmployeeActions.FETCH_EMPLOYEES),
-    withLatestFrom(this.store.select('user')),
-    switchMap(([actionData, userState]) => {
+    withLatestFrom(this.store.select('user'), this.store.select('employee')),
+    switchMap(([actionData, userState, employeeState]) => {
+      const body = {
+        page: employeeState['page'].toString(),
+        _id: userState.user._id,
+        kind: userState.kind
+      };
+      if (employeeState['searchQuery']) {
+        body['searchQuery'] = JSON.stringify(employeeState['searchQuery']);
+        this.userStorageService.setUserSearchQueries(body['searchQuery'], 'employee');
+      }
       return this.http.get<{employees: Employee[], total: number}>(nodeServer + 'fetchEmployees', {
-        params: {
-          _id: userState.user._id,
-          page: actionData['payload']['page'],
-          kind: userState.kind,
-        }
+        params: body
       })
       .pipe(
         map(res => {
@@ -95,6 +102,6 @@ export class EmployeeEffects {
     }
 
     return -1;
-  };
+  }
 
 }

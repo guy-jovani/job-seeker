@@ -63,16 +63,16 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
 
     this.workForm = new FormGroup({
       title: new FormControl(null, [Validators.required]),
-      type: new FormControl(null, [Validators.required]),
+      type: new FormControl(null),
       company: new FormControl(null, [Validators.required]),
-      present: new FormControl(null, []),
+      present: new FormControl(true, []),
       startDate: new FormGroup({
         startMonth: new FormControl('', [Validators.required]),
         startYear: new FormControl('', [Validators.required]),
       }, [Validators.required, this.checkWorkStartDate]),
       endDate: new FormGroup({
-        endMonth: new FormControl('', [Validators.required]),
-        endYear: new FormControl('', [Validators.required]),
+        endMonth: new FormControl(''),
+        endYear: new FormControl(''),
       })
     }, [this.checkWorkEndDate]);
 
@@ -130,6 +130,12 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
     return null;
   }
   checkWorkEndDate(control: FormControl): {[s: string]: boolean} {
+    if (!control.get('present').value && !control.get('endDate.endMonth').value) {
+      return { endMonthRequired: true };
+    }
+    if (!control.get('present').value && !control.get('endDate.endYear').value) {
+      return { endYearRequired: true };
+    }
     if (new Date('01 ' + control.get('endDate.endMonth').value + ' ' + control.get('endDate.endYear').value) <
         new Date('01 ' + control.get('startDate.startMonth').value +
         ' ' + control.get('startDate.startYear').value)) {
@@ -186,7 +192,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
     this.messages = [];
     this.submittedWork = true;
     if (this.workForm.invalid) {
-      return this.store.dispatch(new UserActions.UserFailure(['The form is invalid']));
+      return this.store.dispatch(new UserActions.UserFailure(['The form is invalid.']));
     }
     const formValue = this.workForm.value;
     const work = {
@@ -248,6 +254,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
       this.workId = null;
       this.workForm.reset();
       this.workForm.patchValue({
+        present: true,
         title: '',
         type: '',
         company: '',

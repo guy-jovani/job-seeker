@@ -19,8 +19,8 @@
   >
 
   <ul class="search-results hide" #listResults>
-    <li *ngFor='let res of searchRes; let i=index' class="search-item" (click)="onWantedRes(i)">
-      {{  res['name'] || res['email'] || res['title'] }}
+    <li *ngFor='let res of showSearchResult(); let i=index' class="search-item" (click)="onWantedRes(i)">
+      {{  res }}
     </li>
     <li *ngIf="searchRes && !searchRes.length" class="search-item">No Results Found.</li>
   </ul>

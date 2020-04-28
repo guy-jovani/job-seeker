@@ -65,13 +65,18 @@ header {
 }
 
 .search-for-field-result {
-  padding: 0 1rem;
+  padding: 0 2rem;
   border: 0.5px solid gray;
   border-radius: 1.5rem;
   margin: 0 0.5rem;
   text-align: center;
   background: #f2f2f29c;
   display: flex;
+  width: 100%;
   align-items: center;
   justify-content: center;
+}
+
+.glyphicon-remove {
+  right: 2.5rem;
 }

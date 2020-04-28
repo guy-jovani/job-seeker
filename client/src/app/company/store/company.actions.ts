@@ -3,6 +3,8 @@
 import { Action } from '@ngrx/store';
 import { Company } from '../company.model';
 
+export const SET_SEARCH_QUERY_COMPANY = '[Company] SET_SEARCH_QUERY_COMPANY';
+
 export const FETCH_SINGLE_COMPANY = '[Company] Fetch Single company';
 export const SET_SINGLE_COMPANY = '[Company] Set single company';
 export const FETCH_COMPANIES = '[Company] Fetch companies';
@@ -20,6 +22,7 @@ export type CompanyActions = FetchCompanies
                             | CompanyOpFailure
                             | ClearError
                             | CompanyStateLoadSingle
+                            | SetSearchQueryCompany
                             | SetSingleCompany
                             | Logout;
 
@@ -27,7 +30,13 @@ export type CompanyActions = FetchCompanies
 export class FetchCompanies implements Action {
   readonly type = FETCH_COMPANIES;
 
-  constructor(public payload: { page: number } ) {}
+  constructor(public payload?: { search: { name?: string, job?: string, published: string } } ) {}
+}
+
+export class SetSearchQueryCompany implements Action {
+  readonly type = SET_SEARCH_QUERY_COMPANY;
+
+  constructor(public search: { name?: string, job?: string, published: string } ) {}
 }
 
 export class CompanyStateLoadSingle implements Action {

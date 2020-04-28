@@ -56,7 +56,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   onFetchEmployees() {
-    this.store.dispatch(new EmployeeActions.FetchEmployees({page: 1}));
+    this.store.dispatch(new EmployeeActions.FetchEmployees());
   }
 
   onFetchConversations() {
@@ -64,7 +64,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   onFetchCompanies() {
-    this.store.dispatch(new CompanyActions.FetchCompanies({page: 1}));
+    this.store.dispatch(new CompanyActions.FetchCompanies());
   }
 
   onFetchJobs() {

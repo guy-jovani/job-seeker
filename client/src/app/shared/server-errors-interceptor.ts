@@ -30,6 +30,8 @@ export class ServerErrorsInterceptor implements HttpInterceptor {
           catchError((error: HttpErrorResponse) => {
             if (error.status === 401 && error.error['type'] === 'TokenExpiredError' ) { // JWT expired
               return this.handleJWTExpiration(authState.refreshToken, req, next);
+            } else if (error.status === 403) {
+              this.store.dispatch(new AuthActions.Logout());
             }
             return throwError(error['error']['messages']);
           })

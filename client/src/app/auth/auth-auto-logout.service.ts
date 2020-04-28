@@ -19,6 +19,9 @@ export class AuthAutoLogoutService {
   autoLogout = (expirationMillieSeconds: number) => {
     clearTimeout(this.tokenTimer);
     this.tokenTimer = setTimeout(() => {
+      console.log('1111111111111111111111111111')
+      console.log('1111111111111111111111111111')
+      console.log('1111111111111111111111111111')
       this.store.dispatch(new AuthActions.Logout(true));
     }, expirationMillieSeconds + environment.autoLogoutPassJWTExpirationMS);
   }

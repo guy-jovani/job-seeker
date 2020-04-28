@@ -24,7 +24,7 @@ export class CompanyResolverService implements Resolve<Company[]> {
         const timeFromLastFetchMS = !companyState.lastFetch ? null :
                                     new Date().getTime() - companyState.lastFetch.getTime();
         if (!companyState.messages && !companyState.companies.length || timeFromLastFetchMS > environment.fetchDataMSReset) {
-          this.store.dispatch(new CompanyActions.FetchCompanies({ page: companyState.page }));
+          this.store.dispatch(new CompanyActions.FetchCompanies());
           return this.actions$.pipe(
             ofType(CompanyActions.SET_COMPANIES, CompanyActions.COMPANY_OP_FAILURE),
             take(1)

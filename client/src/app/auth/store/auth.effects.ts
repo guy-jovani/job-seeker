@@ -85,6 +85,11 @@ export class AuthEffects {
 
       this.chatService.sendMessage('login', {  _id: user['_id'] } );
 
+      this.store.dispatch(new EmployeeActions.SetSearchQueryEmployee(
+        this.userStorageService.getUserSearchQueries('employee')));
+      this.store.dispatch(new JobActions.SetSearchQueryJob(
+        this.userStorageService.getUserSearchQueries('job')));
+
       this.store.dispatch(new UserActions.UpdateActiveUser({ user, kind }));
       this.authAutoLogoutService.autoLogout(expirationMillieSeconds);
       return new AuthActions.AuthSuccess({ redirect: false, token, expiresInSeconds: expirationMillieSeconds / 1000, refreshToken });

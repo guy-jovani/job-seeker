@@ -31,7 +31,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   @Input() placeholder: string = null;
   @Input() searchDBs: string[] = null;
   @Input() searchFields: string[] = null;
-  @Input() distinctResults = 'false';
+  @Input() distinctResults = false;
 
   @Output() wantedResultsEmitter = new EventEmitter<Map<string, {}>>();
 
@@ -54,10 +54,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       return this.renderer2.addClass(this.listRes.nativeElement, 'hide');
     }
 
-    // usedIds are for the server to know which documents he should ignore since it already retrieved them
-    // in case of a request for a distinct request the field will be the values of the field that was retrieved
+    // usedIds are for the server to know which documents he should ignore since it already retrieved them.
+    // In case of a request for a distinct request the field will be the values of the field that was retrieved
     const usedIds = Array.from( this.wantedResults.keys() );
-    if (this.distinctResults === 'false') {
+    if (!this.distinctResults) {
       usedIds.push(this.user._id);
     }
 
@@ -65,7 +65,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       .get(nodeServer, {
         params: {
           query: value,
-          distinct: this.distinctResults,
+          distinct: this.distinctResults.toString(),
           usedIds: usedIds.join(environment.splitSearchQueryBy),
           searchDBs: this.searchDBs.join(environment.splitSearchQueryBy),
           searchFields: this.searchFields.join(environment.splitSearchQueryBy)
@@ -91,6 +91,15 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.wantedResults.set(this.searchRes[ind]._id, this.searchRes[ind]);
     this.searchInput.nativeElement.value = '';
     this.wantedResultsEmitter.emit(this.wantedResults);
+  }
+
+
+  showSearchResult() {
+    return this.searchRes ? this.searchRes.map(res => {
+      return res[this.searchFields.find(sf => {
+        return res[sf];
+      })];
+    }) : [];
   }
 
   @HostListener('document:click', ['$event']) toggleOpen(event: Event) {

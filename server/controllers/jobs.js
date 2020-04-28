@@ -123,12 +123,6 @@ exports.fetchSingle = async (req, res, next) => {
 };
 
 
-getPrevDays = days => {
-  const today = new Date();
-  const lastDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - days);
-  return lastDate;
-};
-
 /**
  * Send the client an object of an array of all the jobs populated with their company name.
  * 
@@ -139,6 +133,11 @@ getPrevDays = days => {
  */
 exports.fetchJobs = async (req, res, next) => {
   try {
+    const routeErrors = validation.handleValidationRoutesErrors(req);
+    if(routeErrors.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
+    }
+    
     let jobQuery = {};
     if (req.query.searchQuery) {
       const search = JSON.parse(req.query.searchQuery);
@@ -164,35 +163,35 @@ exports.fetchJobs = async (req, res, next) => {
     }
     
     const jobs = await Job.aggregate([
-        { $lookup:
-            { from: 'companies',
-              localField:'company',
-              foreignField: '_id',
-              as: 'company'
-            }
-        },
-        { $match: jobQuery },
-        { $skip: skippedDocuments(req.query.page) },
-        { $limit: +process.env.DOCS_PER_PAGE },
-        { $project: {
-            "title": 1,
-            "description": 1,
-            "requirements": 1,
-            "date": 1,
-            "company": { "$arrayElemAt": [ "$company", 0 ] },
+      { $lookup:
+          { from: 'companies',
+            localField:'company',
+            foreignField: '_id',
+            as: 'company'
           }
-        },
-        { $project: {
+      },
+      { $match: jobQuery },
+      { $skip: skippedDocuments(req.query.page) },
+      { $limit: +process.env.DOCS_PER_PAGE },
+      { $project: {
           "title": 1,
           "description": 1,
           "requirements": 1,
           "date": 1,
-          "company.name": 1,
-          "company._id": 1,
-          'total': 1,
-          },
+          "company": { "$arrayElemAt": [ "$company", 0 ] },
         }
-      ]);
+      },
+      { $project: {
+        "title": 1,
+        "description": 1,
+        "requirements": 1,
+        "date": 1,
+        "company.name": 1,
+        "company._id": 1,
+        'total': 1,
+        },
+      }
+    ]);
     
     const total = await Job.aggregate([
       { $lookup:

@@ -105,15 +105,12 @@ const updateStatus = async data => {
     const [employee, company] = await changeStatusOfAUserJob(data.companyId, 
                           data.employeeId, data.jobId, data.status);
 
-    console.log(data)
-    console.log(data.employeeId)
     io.to(data.employeeId).emit('updatedStatus', { 
       type: 'success',
       kind: 'employee',
       user: employee
     });
     
-    console.log(data.companyId)
     io.to(data.companyId).emit('updatedStatus', { 
       type: 'success',
       kind: 'company',

@@ -8,6 +8,8 @@ import { Action } from '@ngrx/store';
 import { Job } from '../job.model';
 import { Company } from 'app/company/company.model';
 
+export const SET_SEARCH_QUERY_JOB = '[JOB] SET_SEARCH_QUERY_JOB';
+
 export const JOB_STATE_LOAD_SINGLE = '[JOB] JOB_STATE_LOAD_SINGLE';
 
 export const FETCH_JOBS = '[JOB] Fetch JOBS';
@@ -33,6 +35,7 @@ export type JobActions = SetSingleJob
                         | UpdateSingleJobCompanyAttempt
                         | UpdateSingleJobCompany
                         | FetchSingleJob
+                        | SetSearchQueryJob
                         | JobOpFailure;
 
 
@@ -80,6 +83,12 @@ export class FetchJobs implements Action {
   readonly type = FETCH_JOBS;
 
   constructor(public payload?: { search: { title?: string, company?: string, published?: string } } ) {}
+}
+
+export class SetSearchQueryJob implements Action {
+  readonly type = SET_SEARCH_QUERY_JOB;
+
+  constructor(public search: { title?: string, company?: string, published?: string } ) {}
 }
 
 export class FetchSingleJob implements Action {

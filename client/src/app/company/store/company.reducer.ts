@@ -13,6 +13,7 @@ export interface State {
   lastFetch: Date;
   page: number;
   total: number;
+  searchQuery: { name?: string, job?: string, published: string };
 }
 
 const initialState: State = {
@@ -22,18 +23,21 @@ const initialState: State = {
   loadingSingle: false,
   lastFetch: null,
   page: 1,
-  total: null
+  total: null,
+  searchQuery: { published: 'all' }
 };
 
 export function companyReducer(state = initialState, action: CompanyActions.CompanyActions) {
   switch (action.type) {
     case CompanyActions.SET_COMPANIES:
+      const setPage = action.payload.companies.length ? state.page + 1  : state.page;
+
       return {
         ...state,
         companies: [...state.companies, ...action.payload.companies],
         loadingAll: false,
         messages: null,
-        page: state.page + 1,
+        page: setPage,
         total: action.payload.total,
         lastFetch: new Date()
       };
@@ -51,9 +55,35 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
         loadingSingle: true
       };
     case CompanyActions.FETCH_COMPANIES:
+      const searchQuery = { ...state.searchQuery };
+      let companies = [ ...state.companies ];
+      let fetchPage = state.page;
+
+      if (action.payload) {
+        companies = action.payload.search.name !== searchQuery.name ? [] : companies;
+        fetchPage = action.payload.search.name !== searchQuery.name ? 1 : fetchPage;
+        searchQuery['name'] = action.payload.search.name;
+
+        companies = action.payload.search.job !== searchQuery.job ? [] : companies;
+        fetchPage = action.payload.search.job !== searchQuery.job ? 1 : fetchPage;
+        searchQuery['job'] = action.payload.search.job;
+
+        companies = action.payload.search.published !== searchQuery.published ? [] : companies;
+        fetchPage = action.payload.search.published !== searchQuery.published ? 1 : fetchPage;
+        searchQuery['published'] = action.payload.search.published;
+      }
+
       return {
         ...state,
+        searchQuery,
+        companies,
+        page: fetchPage,
         loadingAll: true,
+      };
+    case CompanyActions.SET_SEARCH_QUERY_COMPANY:
+      return {
+        ...state,
+        searchQuery: action.search
       };
     case CompanyActions.SET_SINGLE_COMPANY:
       const index = state.companies.findIndex(comp => comp._id === action.payload.company._id );
@@ -85,7 +115,8 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
         tempCompany: null,
         lastFetch: null,
         page: 1,
-        total: null
+        total: null,
+        searchQuery: { published: 'all' }
       };
     default:
       return state;

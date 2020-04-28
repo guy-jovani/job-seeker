@@ -37,6 +37,11 @@ exports.fetchSingle = async (req, res, next) => {
   }
 };
 
+getPrevDays = days => {
+  const today = new Date();
+  const lastDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - days);
+  return lastDate;
+};
 
 /**
  * Send the client an object of an array of all the companies (excluded the user company),
@@ -59,53 +64,80 @@ exports.fetchCompanies = async (req, res, next) => {
     if(routeErrors.type === 'failure') {
       return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
     }
+    console.log(req.query)
+    let companyQuery = { _id: { $ne: mongoose.Types.ObjectId(req.query._id) } };
+    if (req.query.searchQuery) {
+      const search = JSON.parse(req.query.searchQuery);
+      if(search.name) {
+        companyQuery['name'] = search.name;
+      }
+      if(search.job) {
+        companyQuery['jobs.title'] = search.job;
+      }
+      if (search.published) {
+        switch(search.published) {
+          case 'day':
+            companyQuery['jobs.date'] = { '$gt': getPrevDays(1) };
+            break;
+          case 'week':
+            companyQuery['jobs.date'] = { '$gt': getPrevDays(7) };
+            break;
+          case 'month':
+            companyQuery['jobs.date'] = { '$gt': getPrevDays(30) };
+            break;
+        }
+      }
+    }
+
+    const lookupJobs = { $lookup: {
+      from: "jobs",
+      let: { companyId: "$_id" },
+      pipeline: [
+        { $match: { $expr: { $eq: [ "$company", "$$companyId" ] } } },
+        { $lookup: {
+          from: "companies",
+          localField: "company",
+          foreignField: "_id",
+          as: "company" }
+        },
+        { $unwind: "$company" },
+        { $project: {
+          "__v": 0,
+          "company.jobs": 0,
+          "company.refreshToken": 0,
+          "company.applicants": 0,
+          "company.imagesPath": 0,
+          "company.profileImagePath": 0,
+          "company.password": 0,
+          "company.createdAt": 0,
+          "company.website": 0,
+          "company.updatedAt": 0,
+          "company.description": 0,
+          "company.__v": 0,
+          "company.email": 0, }
+        }
+      ],
+      as: "jobs" }
+    };
     
     const companies = await Company.aggregate([
-      { $match: { _id: { $ne: mongoose.Types.ObjectId(req.query._id) } } },
+      lookupJobs,
+      { $match: companyQuery },
       { $skip: skippedDocuments(req.query.page) },
       { $limit: +process.env.DOCS_PER_PAGE },
-      { $project: { jobs: 0, createdAt: 0, updatedAt: 0, __v: 0, password: 0, applicants: 0, refreshToken: 0 } },
-      { $lookup: {
-        from: "jobs",
-        let: { companyId: "$_id" },
-        pipeline: [
-          { $match: { $expr: { $eq: [ "$company", "$$companyId" ] } } },
-          { $lookup: {
-            from: "companies",
-            localField: "company",
-            foreignField: "_id",
-            as: "company" }
-          },
-          { $unwind: "$company" },
-          { $project: {
-            "__v": 0,
-            "company.jobs": 0,
-            "company.refreshToken": 0,
-            "company.applicants": 0,
-            "company.imagesPath": 0,
-            "company.profileImagePath": 0,
-            "company.password": 0,
-            "company.createdAt": 0,
-            "company.website": 0,
-            "company.updatedAt": 0,
-            "company.description": 0,
-            "company.__v": 0,
-            "company.email": 0, }
-          }
-        ],
-        as: "jobs" }
-      }
+      { $project: { createdAt: 0, updatedAt: 0, __v: 0, password: 0, applicants: 0, refreshToken: 0 } },
     ]);
-    
-    const total = await Company.aggregate([
-      { $match: { _id: { $ne: req.query._id } } },
+        
+    let total = await Company.aggregate([
+      lookupJobs,
+      { $match: companyQuery },
       { $count: 'email' }
     ]);
-
+    total = total[0] ? total[0].email : 0;
     res.status(200).json({
       type: 'success',
       companies,
-      total: req.query.kind === 'company' ? total[0].email - 1 : total[0].email
+      total: req.query.kind === 'company' ? total- 1 : total
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "There was an error fetching the companies."));

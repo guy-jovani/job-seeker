@@ -23,21 +23,66 @@ exports.fetchSingle = async (req, res, next) => {
 
 exports.fetchEmployees = async (req, res, next) => {
   try {
-    const employees = await Employee
-    .find({_id: {$ne: req.query._id}})
-    .skip(skippedDocuments(req.query.page))
-    .limit(+process.env.DOCS_PER_PAGE)
-    .select('_id email firstName lastName profileImagePath work');
+    const routeErrors = validation.handleValidationRoutesErrors(req);
+    if(routeErrors.type === 'failure') {
+      return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
+    }
+    
+    let employeeQuery = { _id: { $ne: req.query._id } };
+    if (req.query.searchQuery) {
+      const search = JSON.parse(req.query.searchQuery);
+      if(search.company) {
+        employeeQuery['work.company'] = search.company;
+      }
+      if(search.work) {
+        employeeQuery['work.title'] = search.work;
+      }
+      if(search.name) {
+        employeeQuery['name'] = search.name;
+      }
+    }
 
-    const total = await Employee.aggregate([
-      { $match: { _id: { $ne: req.query._id } } },
-      { $count: 'email' }
+    const addFields = { $addFields: {
+        firstName: { $ifNull: ['$firstName', ''] },
+        lastName: { $ifNull: ['$lastName', ''] }
+      }
+    };
+
+    const projectWantedFields = { $project: {
+        name: {
+          $trim: {
+            input: {
+              $concat: ['$firstName', ' ', '$lastName']
+            }
+          }
+        },
+        _id: 1,
+        email: 1,
+        firstName: 1,
+        lastName: 1,
+        profileImagePath: 1,
+        work: 1,
+      }
+    };
+
+    const match = { $match: employeeQuery };
+    const skipDocuments = { $skip: skippedDocuments(req.query.page) };
+    const projectRemoveUnwantedFields = { $project: { name: 0 } };
+    const limitResults = {  $limit: +process.env.DB_LIMIT_RES };
+    const countField = { $count: 'email' };
+
+    const employees = await Employee.aggregate([
+      addFields, projectWantedFields, match, skipDocuments, projectRemoveUnwantedFields, limitResults
     ]);
 
+    let total = await Employee.aggregate([
+      addFields, projectWantedFields, match, countField
+    ]);
+    total = total[0] ? total[0].email : 0;
     res.status(200).json({
       type: 'success',
       employees,
-      total: req.query.kind === 'employee' ? total[0].email - 1 : total[0].email
+      total: req.query.kind === 'employee' ? total- 1 : total
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "There was an error fetching the employee."));

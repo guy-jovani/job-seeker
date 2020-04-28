@@ -62,4 +62,15 @@ export class UserStorageService {
 
     this.setUserStorage(user, 'employee');
   }
+
+  setUserSearchQueries = (searchQuery: string, state: 'employee' | 'company' | 'job') => {
+    localStorage.setItem(state + 'SearchQuery', searchQuery);
+  }
+
+  getUserSearchQueries = (state: 'employee' | 'company' | 'job') => {
+    const searchQuery = JSON.parse(localStorage.getItem(state + 'SearchQuery'));
+    return searchQuery;
+  }
+
+
 }

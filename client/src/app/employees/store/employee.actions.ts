@@ -3,6 +3,7 @@
 import { Action } from '@ngrx/store';
 import { Employee } from '../employee.model';
 
+export const SET_SEARCH_QUERY_EMPLOYEE = '[Employee] SET_SEARCH_QUERY_EMPLOYEE';
 
 export const SET_SINGLE_EMPLOYEE = '[Employee] Set single Employee';
 export const FETCH_SINGLE_EMPLOYEE = '[Employee] single One Employee';
@@ -20,12 +21,19 @@ export type EmployeeActions = SetSingleEmployee
                             | Logout
                             | SetEmployees
                             | EmployeeOpFailure
+                            | SetSearchQueryEmployee
                             | ClearError;
 
 export class FetchEmployees implements Action {
   readonly type = FETCH_EMPLOYEES;
 
-  constructor(public payload: { page: number } ) {}
+  constructor(public payload?: { search: { name?: string, company?: string, work?: string } } ) {}
+}
+
+export class SetSearchQueryEmployee implements Action {
+  readonly type = SET_SEARCH_QUERY_EMPLOYEE;
+
+  constructor(public search: { name?: string, company?: string, work?: string } ) {}
 }
 
 export class SetEmployees implements Action {
