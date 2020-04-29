@@ -61,8 +61,8 @@
     <hr>
 
     <div *ngIf="allowApply" class="status-buttons-container">
-      <button class="btn btn-primary" (click)="onApplySave('saved')" *ngIf='status !== "saved"'>Save for Later</button>
-      <button class="btn btn-success"
+      <button class="btn btn-primary btn-sm" (click)="onApplySave('saved')" *ngIf='status !== "saved"'>Save for Later</button>
+      <button class="btn btn-success btn-sm"
         (click)="onApplySave('applied')"
         *ngIf='status !== "accepted" && status !== "applied"'>
         Apply Now

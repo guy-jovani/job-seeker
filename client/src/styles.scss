@@ -49,6 +49,10 @@ input.ng-invalid.ng-touched {
   display: none;
 }
 
+.invisible {
+  visibility: hidden;
+}
+
 .flex-row-center {
   display: flex;
   justify-content: center;

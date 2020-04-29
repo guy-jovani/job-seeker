@@ -107,7 +107,7 @@
     <div class="auth-buttons">
       <button
         type="submit"
-        class="btn btn-primary"
+        class="btn btn-primary btn-sm"
         [disabled]="!authForm.valid"
         >
           {{ authAction === 'login'  ? "Login" : "Signup"}}
@@ -115,7 +115,7 @@
         <button *ngIf="authAction !== 'login'"
           style="margin-left: 2em;"
           type="button"
-          class="btn btn-info"
+          class="btn btn-info btn-sm"
           [routerLink]="authAction === 'companySignup' ? ['/signup'] : ['company']"
         >
         {{ authAction === 'companySignup'  ? "Not a Company?" : "Sign a Company"}}

@@ -38,7 +38,10 @@
 
 
 <article class="crop-container hide" #cropContainer>
-  <section class="cropper">
+
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+  <section class="cropper {{ isLoading ? 'invisible' : '' }}">
     <div class="cropper-start-buttons">
       <button
         type="button"
@@ -67,7 +70,7 @@
     </image-cropper>
   </section>
 
-  <div class="cropped-container-start">
+  <div class="cropped-container-start {{ isLoading ? 'invisible' : '' }}">
     <img [src]="croppedImage" alt="Preview of the cropped image." class="{{roundCropper ? 'preview-cropper round' : 'preview-cropper'}}" />
   </div>
 </article>

@@ -103,7 +103,7 @@
           <span class="help-block">Images that best show the company and work place.</span>
         </div>
         <div>
-          <button type="button" class="btn btn-primary" (click)="onAddImage()">Add Image </button>
+          <button type="button" class="btn btn-primary btn-sm" (click)="onAddImage()">Add Image </button>
           <span class="help-block">(Up to 6).</span>
         </div>
       </header>
@@ -129,13 +129,13 @@
     <div class="edit-buttons-container">
       <button
         type="submit"
-        class="btn btn-success"
+        class="btn btn-success btn-sm"
         [disabled]="!companyForm.valid">
         Update
       </button>
       <button
         type="button"
-        class="btn btn-danger"
+        class="btn btn-danger btn-sm"
         (click)="onCancel()">
         Cancel
       </button>

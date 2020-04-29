@@ -13,6 +13,7 @@ export class ImageCropperComponent {
   confirmedImage = false;
   failUpload = false;
   fileSizeError = false;
+  isLoading = false;
 
   @Input() roundCropper: boolean;
   @Input() imagePreview = '';
@@ -25,6 +26,7 @@ export class ImageCropperComponent {
 
 
   fileChangeEvent(event: any): void {
+    this.isLoading = true;
     this.imageChangedEvent = event;
     if (event.target.files.length) {
       this.confirmedImage = false;
@@ -42,6 +44,7 @@ export class ImageCropperComponent {
   }
 
   imageCropped(event: ImageCroppedEvent) {
+    this.isLoading = false;
     this.croppedImage = event.base64;
     this.imagePreview = event.base64;
   }
