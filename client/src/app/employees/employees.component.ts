@@ -55,6 +55,11 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
           this.applicantsList = true;
           this.employees = currState['user'] ? currState['user'].applicants : null;
         } else { // /employees
+          if ((currState['searchQuery'].name && this.searchQuery.name !== currState['searchQuery'].name) ||
+              (currState['searchQuery'].company && this.searchQuery.company !== currState['searchQuery'].company) ||
+              (currState['searchQuery'].work && this.searchQuery.work !== currState['searchQuery'].work)) {
+            this.toggleAdvanceSearchShow = true;
+          }
           this.searchQuery = { ...currState['searchQuery'] };
           this.page = currState['page'];
           this.isLoading = currState['loadingAll'];

@@ -82,13 +82,13 @@ export class UpdateSingleJobCompany implements Action {
 export class FetchJobs implements Action {
   readonly type = FETCH_JOBS;
 
-  constructor(public payload?: { search: { title?: string, company?: string, published?: string } } ) {}
+  constructor(public payload?: { search: { title?: string, company?: string, published: string } } ) {}
 }
 
 export class SetSearchQueryJob implements Action {
   readonly type = SET_SEARCH_QUERY_JOB;
 
-  constructor(public search: { title?: string, company?: string, published?: string } ) {}
+  constructor(public search: { title?: string, company?: string, published: string } ) {}
 }
 
 export class FetchSingleJob implements Action {

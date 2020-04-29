@@ -48,6 +48,12 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewChecked {
             this.messages = [];
           }
         }
+
+        if ((companyState['searchQuery'].name && this.searchQuery.name !== companyState['searchQuery'].name) ||
+            (companyState['searchQuery'].job && this.searchQuery.job !== companyState['searchQuery'].job) ||
+            (companyState['searchQuery'].published && this.searchQuery.published !== companyState['searchQuery'].published)) {
+          this.toggleAdvanceSearchShow = true;
+        }
         this.searchQuery = { ...companyState['searchQuery'] };
         this.companies = companyState.companies;
         this.lastCompany = this.companies.length >= companyState.total;
