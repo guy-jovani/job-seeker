@@ -70,7 +70,8 @@
         <h4>Company Images</h4>
       </header>
       <ul class="images-container__list">
-        <li *ngFor="let imagePath of company.imagesPath" class="images-container__list-item">
+        <li *ngFor="let imagePath of company.imagesPath; let i=index" class="images-container__list-item"
+            (click)="onShowSlides(i)">
           <img class="company-image" alt="Company image." [src]='imagePath'/>
         </li>
         <li *ngIf="!company.imagesPath.length">You have to images to present.</li>
@@ -88,6 +89,27 @@
 
 </div>
 
+<div class="backdrop" *ngIf="showSlides" (click)="onShowSlides(-1, $event.target)">
+	<section id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+	  <ol class="carousel-indicators">
+	    <li
+	    class="{{ i === slideNum ? 'active' : '' }}"
+	    *ngFor="let imagePath of company.imagesPath; let i=index"
+	    data-target="#carousel-example-generic" [attr.data-slide-to]="i"></li>
+	  </ol>
+	  <div class="carousel-inner">
+	    <div class="item {{ slideNum === i ? 'active' : '' }}" *ngFor="let imagePath of company.imagesPath; let i=index">
+	      <img src="{{imagePath}}" alt="#{{i}} slide">
+	    </div>
+	  </div>
+	  <a class="left carousel-control" (click)="onChangeCarouselSlide(false)" role="button" data-slide="prev">
+	    <span class="glyphicon glyphicon-chevron-left"></span>
+	  </a>
+	  <a class="right carousel-control" (click)="onChangeCarouselSlide(true)" role="button" data-slide="next">
+	    <span class="glyphicon glyphicon-chevron-right"></span>
+	  </a>
+	</section>
+</div>
 
 
 <div class="backdrop {{ changePassword ? '' : 'hide' }}">

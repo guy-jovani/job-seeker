@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -11,7 +11,6 @@ import { Store } from '@ngrx/store';
 import { switchMap } from 'rxjs/operators';
 import { Job } from 'app/job/job.model';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-details-company',
@@ -26,6 +25,9 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy  {
   currUrl: string[] = null;
   messages: string[] = [];
   companyJobs: Job[] = null;
+
+  slideNum = 0;
+  showSlides = false;
 
   showNewPasswords = false;
   showCurrPassword = false;
@@ -132,6 +134,33 @@ export class DetailsCompanyComponent implements OnInit, OnDestroy  {
     this.changePasswordForm.reset();
     if (this.messages.length) {
       this.store.dispatch(new UserActions.ClearError());
+    }
+  }
+
+  onShowSlides(ind: number = 0, element: ElementRef = null) {
+    if (element && element['className'] === 'backdrop') {
+      this.showSlides = false;
+    } else {
+      if (ind > -1) {
+        this.slideNum = ind;
+      }
+      this.showSlides = true;
+    }
+  }
+
+  onChangeCarouselSlide(direction: boolean) {
+    if (direction) { // right
+      if (this.slideNum < this.company.imagesPath.length - 1) {
+        this.slideNum++;
+      } else {
+        this.slideNum = 0;
+      }
+    } else { // left
+      if (this.slideNum === 0) {
+        this.slideNum = this.company.imagesPath.length - 1;
+      } else {
+        this.slideNum--;
+      }
     }
   }
 

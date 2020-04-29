@@ -181,7 +181,7 @@ const getNonProfileImages = (req, files) => {
       newUrls.push(...req.body.firebaseImagesUrl.split(process.env.SPLIT_COMPANY_OLD_IMAGES_BY));
     } else {
       files.imagesPath.forEach(file => {
-        const url = req.protocol + '://' + req.get('host');
+        let url = req.protocol + '://' + req.get('host');
         url = url + '/images/' + file.filename;
         newUrls.push(url);
       });

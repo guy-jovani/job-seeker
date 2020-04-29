@@ -75,6 +75,7 @@ a {
   width: 100%;
   overflow: hidden;
   background-color: black;
+  cursor: pointer;
 
   &:first-child {
     &:nth-last-child(-n+4) {
@@ -134,3 +135,15 @@ a {
   }
 }
 
+.carousel {
+  max-width: 70%;
+  min-width: 70%;
+}
+
+.carousel-inner {
+  max-width: 1024px;
+
+  img {
+    width: 100%;
+  }
+}
