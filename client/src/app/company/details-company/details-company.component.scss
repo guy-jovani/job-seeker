@@ -137,7 +137,7 @@ a {
 
 .carousel {
   max-width: 70%;
-  min-width: 70%;
+  min-width: min(70%, 1024px);
 }
 
 .carousel-inner {
