@@ -94,7 +94,8 @@
         <div class="experience-list-container">
           <ul class="list-group">
             <li
-              class="list-group-item"
+              class="list-group-item
+                  {{ i == 0 || toggleExperienceShow ? 'transition-display' : 'transition-hide' }}"
               *ngFor="let work of employee.work; let i=index">
                 <div class="work-header">
                   <h4>{{ work.title }}</h4> <span>@</span> <h5>{{ work.company }}</h5>
@@ -117,6 +118,11 @@
                 <span *ngIf="currUrl[0] === 'my-details'" class="glyphicon glyphicon-pencil" (click)="onToggleWork(i)"></span>
             </li>
           </ul>
+          <div class="show-experience-btn-container" *ngIf="employee.work.length > 1">
+            <button class="btn btn-info" (click)="onToggleExperienceShow()">
+              Show {{ toggleExperienceShow ? 'less' : 'more' }}
+            </button>
+          </div>
         </div>
 
       </section>

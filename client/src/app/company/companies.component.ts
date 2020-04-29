@@ -26,7 +26,7 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewChecked {
   page: number;
   lastCompany: boolean; // if there are more companies to fetch
   searchQuery: { name?: string, job?: string, published: string } = { published: 'all' };
-
+  toggleAdvanceSearchShow = false;
 
   @ViewChild('containerFluid') containerFluid: ElementRef;
 
@@ -72,6 +72,10 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   @HostListener('window:scroll', ['$event']) doSomething(event) {
     this.fetchNextPage();
+  }
+
+  onAdvanceSearch() {
+    this.toggleAdvanceSearchShow = !this.toggleAdvanceSearchShow;
   }
 
   onSearchField(searchMap: Map<string, {

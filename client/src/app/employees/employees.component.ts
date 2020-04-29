@@ -24,6 +24,7 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
   lastEmployee: boolean; // if there are more employees to fetch
   page: number;
   searchQuery: { name?: string, company?: string, work?: string } = {};
+  toggleAdvanceSearchShow = false;
 
   @ViewChild('containerFluid') containerFluid: ElementRef;
 
@@ -83,6 +84,10 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   @HostListener('window:scroll', ['$event']) doSomething(event) {
     this.fetchNextPage();
+  }
+
+  onAdvanceSearch() {
+    this.toggleAdvanceSearchShow = !this.toggleAdvanceSearchShow;
   }
 
   onSearchField(searchMap: Map<string, {

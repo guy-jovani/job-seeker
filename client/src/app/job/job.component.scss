@@ -9,7 +9,13 @@ header {
   margin-bottom: 1rem;
 }
 
+.advance-search {
+  opacity: 0.8;
+}
+
 .search-job-container {
+  position: relative;
+  z-index: 50;
   display: flex;
   align-items: center;
   flex-direction: column;

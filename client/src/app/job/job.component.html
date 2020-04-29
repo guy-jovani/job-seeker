@@ -23,9 +23,10 @@
           <option *ngFor="let status of availableStatus" value="{{status}}">{{ status | titlecase }}</option>
         </select>
       </div>
+      <button class="btn btn-info btn-sm advance-search" (click)="onAdvanceSearch()" *ngIf="currUrl[0] === 'jobs'">Advance Search</button>
     </header>
 
-    <section class="search-job-container" *ngIf="currUrl[0] === 'jobs'">
+    <section class="search-job-container {{ toggleAdvanceSearchShow ? 'transition-display' : 'transition-hide' }}" *ngIf="currUrl[0] === 'jobs'">
 
       <div class="search-fields">
         <div class="search-for-field">
@@ -71,7 +72,7 @@
         </div>
       </div>
 
-      <button class="btn btn-info" (click)="onSearch()">
+      <button class="btn btn-info btn-sm" (click)="onSearch()">
         Search
       </button>
 

@@ -1,4 +1,4 @@
-
+const mongoose = require('mongoose');
 
 const Employee = require('../models/employee');
 const validation = require('../utils/validation');
@@ -28,7 +28,7 @@ exports.fetchEmployees = async (req, res, next) => {
       return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
     }
     
-    let employeeQuery = { _id: { $ne: req.query._id } };
+    let employeeQuery = { _id: { $ne: mongoose.Types.ObjectId(req.query._id) } };
     if (req.query.searchQuery) {
       const search = JSON.parse(req.query.searchQuery);
       if(search.company) {
@@ -64,7 +64,7 @@ exports.fetchEmployees = async (req, res, next) => {
         work: 1,
       }
     };
-
+    console.log(employeeQuery)
     const match = { $match: employeeQuery };
     const skipDocuments = { $skip: skippedDocuments(req.query.page) };
     const projectRemoveUnwantedFields = { $project: { name: 0 } };

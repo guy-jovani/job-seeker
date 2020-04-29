@@ -10,7 +10,7 @@ import * as EmployeeActions from '../store/employee.actions';
 import { Company, ApplicantJob, ApplicantStatus } from 'app/company/company.model';
 import * as UserActions from '../../user/store/user.actions';
 import { ChatService } from 'app/chat/chat-socket.service';
-import { NgForm, FormGroup, FormControl, Validators, AbstractControl, FormBuilder } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-details-employee',
@@ -30,6 +30,7 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
   submitAcceptReject = false;
   availableStatus = Object.keys(ApplicantStatus).filter(key => isNaN(+key));
   closedMessages = false;
+  toggleExperienceShow = false;
 
   years = Array(new Date().getFullYear() - 1970 + 1).fill(0).map((val, i) => new Date().getFullYear() - i);
   monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -49,7 +50,6 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
     private store: Store<fromApp.AppState>,
     private route: ActivatedRoute,
     private chatService: ChatService,
-    private formBuilder: FormBuilder,
     private router: Router) { }
 
   ngOnInit() {
@@ -186,6 +186,10 @@ export class DetailsEmployeeComponent implements OnInit, OnDestroy {
     } else {
       this.store.dispatch(new EmployeeActions.ClearError());
     }
+  }
+
+  onToggleExperienceShow() {
+    this.toggleExperienceShow = !this.toggleExperienceShow;
   }
 
   onSubmitWork() {

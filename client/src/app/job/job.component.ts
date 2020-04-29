@@ -29,6 +29,7 @@ export class JobComponent implements OnInit, OnDestroy, AfterViewChecked {
   lastJob: boolean; // if there are more jobs to fetch
   page: number;
   searchQuery: { title?: string, company?: string, published: string } = { published: 'all' };
+  toggleAdvanceSearchShow = false;
 
   @ViewChild('container') container: ElementRef;
 
@@ -112,6 +113,10 @@ export class JobComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.jobs = jobState['jobs'];
     this.page = jobState['page'];
     this.lastJob = this.jobs.length >= jobState['total'];
+  }
+
+  onAdvanceSearch() {
+    this.toggleAdvanceSearchShow = !this.toggleAdvanceSearchShow;
   }
 
   onSearchField(searchMap: Map<string, {
