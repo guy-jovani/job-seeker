@@ -9,6 +9,7 @@ import { Company } from '../company.model';
 export class ListCompaniesComponent {
 
   @Input() companies: Company[];
+  @Input() userId: string = null;
 
   trackCompanies(index: number, company: Company) {
     return company._id;

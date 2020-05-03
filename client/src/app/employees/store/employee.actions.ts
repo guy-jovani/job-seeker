@@ -27,13 +27,13 @@ export type EmployeeActions = SetSingleEmployee
 export class FetchEmployees implements Action {
   readonly type = FETCH_EMPLOYEES;
 
-  constructor(public payload?: { search: { name?: string, company?: string, work?: string } } ) {}
+  constructor(public payload?: { search: { name?: string, email?: string, company?: string, work?: string } } ) {}
 }
 
 export class SetSearchQueryEmployee implements Action {
   readonly type = SET_SEARCH_QUERY_EMPLOYEE;
 
-  constructor(public search: { name?: string, company?: string, work?: string } ) {}
+  constructor(public search: { name?: string, email?: string, company?: string, work?: string } ) {}
 }
 
 export class SetEmployees implements Action {

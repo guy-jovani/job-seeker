@@ -24,16 +24,16 @@
         <div class="search-for-field">
           <h5>Name: </h5>
           <app-search-bar
-            *ngIf="!searchQuery.name"
+            *ngIf="!searchQuery.name && !searchQuery.email"
             [placeholder]="'Ex: Joe Frazier, frazier@gmail.com'"
             [searchDBs]="['employee']"
             [searchFields]="['name', 'email']"
             (wantedResultsEmitter)="onSearchField($event)">
           </app-search-bar>
-          <p *ngIf="searchQuery.name" class="search-for-field-result">
-            {{ searchQuery.name }}
+          <p *ngIf="searchQuery.name || searchQuery.email" class="search-for-field-result">
+            {{ searchQuery.name || searchQuery.email}}
           </p>
-          <i *ngIf="searchQuery.name" class="glyphicon glyphicon-remove" (click)="onRemoveSearchField('name')"></i>
+          <i *ngIf="searchQuery.name || searchQuery.email" class="glyphicon glyphicon-remove" (click)="onRemoveSearchField('name')"></i>
         </div>
 
         <div class="search-for-field">
@@ -76,7 +76,7 @@
 
     </section>
 
-    <app-list-employees [employees]="employees" [applicantsList]="applicantsList"></app-list-employees>
+    <app-list-employees [userId]="userId" [employees]="employees" [applicantsList]="applicantsList"></app-list-employees>
 
     <div *ngIf="isLoading" class="flex-row-center">
       <app-loading-spinner></app-loading-spinner>

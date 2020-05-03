@@ -291,7 +291,7 @@ exports.search = async (req, res, next) => {
             });
     }
 
-    const regex = new RegExp('^' + req.query.query + '.*');
+    const regex = new RegExp('^' + req.query.query + '.*', 'i');
     const query = [];
     req.query.searchFields
       .split(process.env.SPLIT_SEARCH_QUERY)

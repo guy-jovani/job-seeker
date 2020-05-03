@@ -28,7 +28,7 @@ exports.fetchEmployees = async (req, res, next) => {
       return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
     }
     
-    let employeeQuery = { _id: { $ne: mongoose.Types.ObjectId(req.query._id) } };
+    let employeeQuery = {};
     if (req.query.searchQuery) {
       const search = JSON.parse(req.query.searchQuery);
       if(search.company) {
@@ -37,8 +37,11 @@ exports.fetchEmployees = async (req, res, next) => {
       if(search.work) {
         employeeQuery['work.title'] = search.work;
       }
-      if(search.name) {
-        employeeQuery['name'] = search.name;
+      if(search.name || search.email) {
+        employeeQuery['$or'] = [
+          { name: search.name },
+          { email: search.email },
+        ]
       }
     }
 
@@ -64,7 +67,7 @@ exports.fetchEmployees = async (req, res, next) => {
         work: 1,
       }
     };
-    console.log(employeeQuery)
+    
     const match = { $match: employeeQuery };
     const skipDocuments = { $skip: skippedDocuments(req.query.page) };
     const projectRemoveUnwantedFields = { $project: { name: 0 } };
@@ -121,6 +124,7 @@ exports.updateEmployee = async (req, res, next) => {
       return sendMessagesResponse(res, 422, emailExist.messages, 'failure');
     }
 
+    req.body = req.body.map(val => val.toLowerCase());
     const bulkRes = await Employee.bulkWrite(await getUpdateQuery(req));
     if(!bulkRes.result.nMatched){
       throw new Error("Trying to update a non existing employee.");
@@ -158,7 +162,7 @@ exports.createWork = async (req, res, next) => {
       { _id: req.body._id }, 
       { $push: {
           'work' : { 
-            title: req.body.title,
+            title: req.body.title.toLowerCase(),
             company: req.body.company,
             employmentType: req.body.employmentType,
             startDate: new Date(req.body.startDate),
@@ -192,7 +196,7 @@ exports.updateWork = async (req, res, next) => {
 
     const updatedWork = employeeToUpdate.work[workToUpdateInd] = { 
       _id: req.body.workId,
-      title: req.body.title,
+      title: req.body.title.toLowerCase(),
       company: req.body.company,
       employmentType: req.body.employmentType,
       startDate: new Date(req.body.startDate),

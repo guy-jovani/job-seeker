@@ -54,12 +54,13 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       return this.renderer2.addClass(this.listRes.nativeElement, 'hide');
     }
 
-    // usedIds are for the server to know which documents he should ignore since it already retrieved them.
-    // In case of a request for a distinct request the field will be the values of the field that was retrieved
+    // usedIds are for the server to know which documents it should ignore since it already retrieved them.
+    // In case of a request for a distinct request the field will be the values of the field that was
+    // retrieved (otherwise it will be the object id)
     const usedIds = Array.from( this.wantedResults.keys() );
-    if (!this.distinctResults) {
-      usedIds.push(this.user._id);
-    }
+    // if (!this.distinctResults) {
+    //   usedIds.push(this.user._id);
+    // }
 
     this.http
       .get(nodeServer, {
@@ -96,9 +97,17 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
   showSearchResult() {
     return this.searchRes ? this.searchRes.map(res => {
-      return res[this.searchFields.find(sf => {
+      const resultsFields = this.searchFields.filter(sf => {
         return res[sf];
-      })];
+      }).map(sfRes => {
+        return res[sfRes];
+      });
+      const show = resultsFields[0];
+      if (resultsFields.length === 1) {
+        return this.user._id === res._id ? show + ' (you)' : show;
+      } else {
+        return this.user._id === res._id ? show + ' (you)' : show + ' (' + resultsFields[1] + ')';
+      }
     }) : [];
   }
 

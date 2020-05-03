@@ -13,7 +13,7 @@ export interface State {
   lastFetch: Date;
   page: number;
   total: number;
-  searchQuery: { name?: string, company?: string, work?: string };
+  searchQuery: { name?: string, email?: string, company?: string, work?: string };
 }
 
 const initialState: State = {
@@ -64,9 +64,12 @@ export function employeeReducer(state = initialState, action: EmployeeActions.Em
       let employees = [ ...state.employees ];
       let fetchPage = state.page;
       if (action.payload) {
-        employees = action.payload.search.name !== searchQuery.name ? [] : employees;
-        fetchPage = action.payload.search.name !== searchQuery.name ? 1 : fetchPage;
+        employees = action.payload.search.name !== searchQuery.name ||
+                    action.payload.search.email !== searchQuery.email ? [] : employees;
+        fetchPage = action.payload.search.name !== searchQuery.name ||
+                    action.payload.search.email !== searchQuery.email ? 1 : fetchPage;
         searchQuery['name'] = action.payload.search.name;
+        searchQuery['email'] = action.payload.search.email;
 
         employees = action.payload.search.company !== searchQuery.company ? [] : employees;
         fetchPage = action.payload.search.company !== searchQuery.company ? 1 : fetchPage;

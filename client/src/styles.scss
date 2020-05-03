@@ -192,6 +192,7 @@ input[type="password"] {
   border-radius: 50%;
   max-width: 15rem;
   max-height: 15rem;
+  margin-right: 0.5rem;
 }
 
 @mixin center-with-border() {
@@ -207,6 +208,7 @@ input[type="password"] {
   height: 15rem;
   font-size: 6rem;
   border-radius: 50%;
+  margin-right: 0.5rem;
 }
 
 .company-no-profile-image {
@@ -215,12 +217,14 @@ input[type="password"] {
   height: 9rem;
   border-radius: 15px;
   font-size: 4rem;
+  margin-right: 0.5rem;
 }
 
 .company-profile-image {
   max-width: 16rem;
   max-height: 9rem;
   border-radius: 15px;
+  margin-right: 0.5rem;
 }
 
 app-back-button {
@@ -316,22 +320,26 @@ app-back-button {
       width: 12.8rem;
       height: 7.2rem;
       font-size: 3rem;
+      margin-right: 0.5rem;
     }
 
     .company-no-profile-image {
       width: 12.8rem;
       height: 7.2rem;
+      margin-right: 0.5rem;
     }
 
     .employee-profile-image {
       width: 10rem;
       height: 10rem;
+      margin-right: 0.5rem;
     }
 
     .employee-no-profile-image {
       width: 10rem;
       height: 10rem;
       font-size: 5rem;
+      margin-right: 0.5rem;
     }
   }
 }

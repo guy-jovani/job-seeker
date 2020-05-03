@@ -20,7 +20,7 @@
       <div class="company-no-profile-image" *ngIf="!company.profileImagePath">
         <span class="glyphicon glyphicon-user"></span>
       </div>
-      <h4>{{ company.name | titlecase }}</h4>
+      <h4>{{ userId === company._id ? ('(you)' | titlecase) : company.name | titlecase }}</h4>
   </li>
 </ul>
 

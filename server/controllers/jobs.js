@@ -30,7 +30,7 @@ exports.create = async (req, res, next) => {
       return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
     }
 
-    title = req.body.title.trim();
+    title = req.body.title.trim().toLowerCase();
     const titleExist = await validation.jobTitleExistForCompanyValidation(
       title, req.body.company._id, req.body._id );
     if(titleExist.type === 'failure'){

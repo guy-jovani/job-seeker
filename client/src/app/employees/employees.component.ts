@@ -23,8 +23,9 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
   currUrl: string[] = null;
   lastEmployee: boolean; // if there are more employees to fetch
   page: number;
-  searchQuery: { name?: string, company?: string, work?: string } = {};
+  searchQuery: { name?: string, company?: string, email?: string, work?: string } = {};
   toggleAdvanceSearchShow = false;
+  userId: string = null;
 
   @ViewChild('containerFluid') containerFluid: ElementRef;
 
@@ -37,12 +38,17 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.subscription = this.route.params.pipe(
       switchMap(() => {
         this.currUrl = this.router.url.substring(1).split('/');
+        return this.store.select('user');
+      }),
+      switchMap(userState => {
+        this.userId = userState.user._id;
         if (this.currUrl[0] === 'my-applicants') {
           return this.store.select('user');
         } else {
           return this.store.select('employee');
         }
-      })
+      }),
+
       ).subscribe(currState => {
         this.currUrl = this.router.url.substring(1).split('/');
         if (currState.messages) {
@@ -105,6 +111,8 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.searchQuery.name = value.name;
     } else if (value['work.title']) {
       this.searchQuery.work = value['work.title'];
+    } else if (value.email) {
+      this.searchQuery.email = value.email;
     } else {
       this.searchQuery.company = value['work.company'];
     }
@@ -113,6 +121,7 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
   onRemoveSearchField(field: string) {
     if (field === 'name') {
       this.searchQuery.name = null;
+      this.searchQuery.email = null;
     } else if (field === 'company') {
       this.searchQuery.company = null;
     } else {

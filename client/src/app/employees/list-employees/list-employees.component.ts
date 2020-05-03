@@ -11,10 +11,14 @@ export class ListEmployeesComponent {
 
   @Input() employees: Employee[] | Applicant[];
   @Input() applicantsList = false;
+  @Input() userId: string = null;
 
 
   getEmployeeName(emp: Employee | Applicant) {
     let name: string;
+    if (!this.applicantsList && this.userId === (emp as Employee)._id) {
+      return '(you)';
+    }
     if (emp['email']) {
       emp = emp as Employee;
       name = (emp.firstName ? emp.firstName : '') + ' ' +

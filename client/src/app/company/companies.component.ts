@@ -9,6 +9,7 @@ import { Company } from './company.model';
 import { Employee } from 'app/employees/employee.model';
 import * as CompanyActions from './store/company.actions';
 import * as fromApp from '../store/app.reducer';
+import { switchMap } from 'rxjs/operators';
 
 
 @Component({
@@ -19,11 +20,11 @@ import * as fromApp from '../store/app.reducer';
 export class CompaniesComponent implements OnInit, OnDestroy, AfterViewChecked {
   companies: Company[];
   subscription: Subscription;
-  activeEmployee: Employee;
   isLoading = false;
   messages: string[] = [];
   currUrl: string[] = null;
   page: number;
+  userId: string = null;
   lastCompany: boolean; // if there are more companies to fetch
   searchQuery: { name?: string, job?: string, published: string } = { published: 'all' };
   toggleAdvanceSearchShow = false;
@@ -36,8 +37,12 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   ngOnInit() {
 
-    this.subscription = this.store.select('company')
-      .subscribe(companyState => {
+    this.subscription = this.store.select('user').pipe(
+      switchMap(userState => {
+        this.userId = userState.user._id;
+        return this.store.select('company');
+      })
+    ).subscribe(companyState => {
         this.currUrl = this.router.url.substring(1).split('/');
         this.isLoading = companyState.loadingAll;
         this.page = companyState.page;

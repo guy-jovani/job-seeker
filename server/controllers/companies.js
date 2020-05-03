@@ -1,5 +1,5 @@
 
-const mongoose = require('mongoose');
+
 
 const Company = require('../models/company');
 const validation = require('../utils/validation');
@@ -64,8 +64,8 @@ exports.fetchCompanies = async (req, res, next) => {
     if(routeErrors.type === 'failure') {
       return sendMessagesResponse(res, 422, routeErrors.messages, 'failure');
     }
-    console.log(req.query)
-    let companyQuery = { _id: { $ne: mongoose.Types.ObjectId(req.query._id) } };
+    
+    let companyQuery = {};
     if (req.query.searchQuery) {
       const search = JSON.parse(req.query.searchQuery);
       if(search.name) {
@@ -224,7 +224,7 @@ const getUpdateQuery = async req => {
   Reflect.deleteProperty(req.body, 'imagesPath');
   updateReqImages(req);
   // get an object with keys to delete from the company document (all keys that are null)
-  const companyRemovableKeys = ['name', 'website', 'description'];
+  const companyRemovableKeys = ['website', 'description'];
   const nullKeys = getNullKeysForUpdate(req, companyRemovableKeys);
 
   if (req.body.profileImagePath === '') nullKeys['profileImagePath'] = '';
@@ -243,6 +243,8 @@ exports.updateCompany = async (req, res, next) => {
     if(companyValid.type === 'failure'){
       return sendMessagesResponse(res, 422, companyValid.messages, 'failure');
     }
+
+    req.body = req.body.map(val => val.toLowerCase());
 
     const bulkRes = await Company.bulkWrite(await getUpdateQuery(req));
     if(!bulkRes.result.nMatched){
