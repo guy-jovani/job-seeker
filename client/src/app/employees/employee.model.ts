@@ -18,16 +18,18 @@ export class Work {
   }
 }
 
+export class EmployeeJob {
+  job: Job;
+  status: EmployeeJobStatus;
+  date: Date;
+}
+
 export class Employee {
   // tslint:disable-next-line: variable-name
   public _id: string; // the underscore is because the database named it like that
   public email: string;
   public profileImagePath?: string | File;
-  public jobs?: {
-    job: Job,
-    status: EmployeeJobStatus,
-    date: Date
-  }[];
+  public jobs?: EmployeeJob[];
   public firstName?: string;
   public lastName?: string;
   public work: Work[];

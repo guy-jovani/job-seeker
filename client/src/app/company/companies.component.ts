@@ -39,7 +39,7 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     this.subscription = this.store.select('user').pipe(
       switchMap(userState => {
-        this.userId = userState.user._id;
+        this.userId = userState.user ? userState.user._id : null;
         return this.store.select('company');
       })
     ).subscribe(companyState => {

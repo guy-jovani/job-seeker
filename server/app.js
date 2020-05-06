@@ -41,11 +41,11 @@ app.use((req, res, next) => {
 });
 
 app.use('/auth', authRoutes);
-app.use('/employees', checkAuth, employeesRoutes);
-app.use('/companies', checkAuth, companiesRoutes);
-app.use('/search', checkAuth, searchRoutes);
+app.use('/employees', employeesRoutes);
+app.use('/companies', companiesRoutes);
+app.use('/search', searchRoutes);
 app.use('/chat', checkAuth, chatRoutes);
-app.use('/jobs', checkAuth, jobsRoutes);
+app.use('/jobs', jobsRoutes);
 
 app.use((req, res, next) => {
   console.log('general url in app.js');

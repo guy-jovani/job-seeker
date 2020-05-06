@@ -15,25 +15,24 @@ const routes: Routes = [
   {
     path: 'jobs',
     component: JobComponent,
-    canActivate: [AuthGuard],
     resolve: [JobResolverService]
   },
   {
     path: 'jobs/:index',
     component: DetailsJobComponent,
-    canActivate: [AuthGuard, DetailsJobGuard],
+    canActivate: [DetailsJobGuard],
     resolve: [JobResolverService]
   },
   {
     path: 'jobs/:index/company',
     component: DetailsCompanyComponent,
-    canActivate: [AuthGuard, DetailsCompanyGuard],
+    canActivate: [DetailsCompanyGuard],
     resolve: [JobResolverService]
   },
   {
     path: 'jobs/:index/company/job',
     component: DetailsJobComponent,
-    canActivate: [AuthGuard, DetailsJobGuard],
+    canActivate: [DetailsJobGuard],
     resolve: [JobResolverService]
   },
 ];

@@ -53,8 +53,6 @@ getPrevDays = days => {
  * In case of an error - moving the error handling to the express error handling middleware
  * with a error code of 500, and an error message
  * @param {express request object} req - the req need to have query params: 
- *                                        {string} _id - the id of the user.
- *                                        {string} kind - the kind of the user ('employee' | 'company').
  *                                        {string} page - the page the user is in.
  * @param {express respond object} res
  */
@@ -137,7 +135,7 @@ exports.fetchCompanies = async (req, res, next) => {
     res.status(200).json({
       type: 'success',
       companies,
-      total: req.query.kind === 'company' ? total- 1 : total
+      total
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "There was an error fetching the companies."));

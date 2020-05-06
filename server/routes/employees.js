@@ -3,26 +3,16 @@
 const express = require('express')
 const router = express.Router();
 const { body, query } = require('express-validator');
+const checkAuth = require('../middleware/check-auth');
 const extractProfileImage = require('../middleware/image-upload').extractProfileImage;
 
 
 const employeeController = require('../controllers/employees');
 
 router.get('/fetchEmployees', [
-  query('_id')
-    .exists()
-    .not()
-    .isEmpty()
-    .withMessage('Something went wrong while trying to get the wanted people. Please try again later.'),
   query('page')
     .isInt({ gt: 0 })
     .withMessage('The "page" field should be a positive number.'),
-  query('kind').custom((value, { req }) => {
-    if (value !== 'employee' && value !== 'company') {
-      throw new Error('Invalid value of \'kind\' field.');
-    }
-    return true;
-  })
 ], employeeController.fetchEmployees);
 
 router.get('/fetchSingle', [
@@ -33,7 +23,7 @@ router.get('/fetchSingle', [
     .withMessage('Something went wrong while trying to get the wanted person. Please try again later.'),
 ],  employeeController.fetchSingle);
 
-router.post('/update', extractProfileImage, [
+router.post('/update', checkAuth, extractProfileImage, [
   body('email')
     .isEmail()
     .withMessage('Please provide a valid email.'),
@@ -62,7 +52,7 @@ router.post('/update', extractProfileImage, [
     .withMessage('Something went wrong with the edit process.')
 ], employeeController.updateEmployee);
 
-router.post('/createWork', [
+router.post('/createWork', checkAuth, [
   body('title')
     .exists()
     .notEmpty()
@@ -94,7 +84,7 @@ router.post('/createWork', [
     .withMessage('Something went wrong while trying to create the experience.')
 ], employeeController.createWork);
 
-router.post('/updateWork', [
+router.post('/updateWork', checkAuth, [
   body('title')
     .exists()
     .notEmpty()
@@ -130,7 +120,7 @@ router.post('/updateWork', [
     .withMessage('Something went wrong while trying to update the experience.')
 ], employeeController.updateWork);
 
-router.delete('/deleteWork', [
+router.delete('/deleteWork', checkAuth, [
   query('_id')
     .exists()
     .withMessage('Something went wrong while trying to delete the experience.'),

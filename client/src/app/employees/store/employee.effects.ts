@@ -31,9 +31,7 @@ export class EmployeeEffects {
     withLatestFrom(this.store.select('user'), this.store.select('employee')),
     switchMap(([actionData, userState, employeeState]) => {
       const body = {
-        page: employeeState['page'].toString(),
-        _id: userState.user._id,
-        kind: userState.kind
+        page: employeeState['page'].toString()
       };
       if (employeeState['searchQuery']) {
         body['searchQuery'] = JSON.stringify(employeeState['searchQuery']);

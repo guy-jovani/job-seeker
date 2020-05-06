@@ -11,13 +11,13 @@
     <div class="navbar-collapse collapse" [class.collapse]="collapsed" (window:resize)="collapsed = true">
 
       <ul class="nav navbar-nav">
-        <li routerLinkActive="active" *ngIf="isAuthenticated">
+        <li routerLinkActive="active">
           <a routerLink='/people' >People</a>
         </li>
-        <li routerLinkActive="active" *ngIf="isAuthenticated">
+        <li routerLinkActive="active">
           <a routerLink='/companies' >Companies</a>
         </li>
-        <li routerLinkActive="active" *ngIf="isAuthenticated">
+        <li routerLinkActive="active">
           <a routerLink='/jobs' >Jobs</a>
         </li>
       </ul>

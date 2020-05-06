@@ -2,11 +2,12 @@
 const { body, query } = require('express-validator');
 const express = require('express')
 const router = express.Router();
+const checkAuth = require('../middleware/check-auth');
 
 
 const jobController = require('../controllers/jobs');
 
-router.put('/create', [
+router.put('/create', checkAuth, [
     body('company')
       .exists()
       .not()
@@ -50,7 +51,7 @@ router.get('/fetchSingle', [
     .withMessage('There was an error fetching the job.'),
 ], jobController.fetchSingle);
 
-router.post('/update', [
+router.post('/update', checkAuth, [
   body('_id')
     .exists()
     .not()

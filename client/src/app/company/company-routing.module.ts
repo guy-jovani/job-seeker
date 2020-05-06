@@ -16,19 +16,18 @@ const routes: Routes = [
   {
     path: 'companies',
     component: CompaniesComponent,
-    canActivate: [AuthGuard],
     resolve: [CompanyResolverService],
   },
   {
     path: 'companies/:index',
     component: DetailsCompanyComponent,
-    canActivate: [AuthGuard, DetailsCompanyGuard],
+    canActivate: [DetailsCompanyGuard],
     resolve: [CompanyResolverService],
   },
   {
     path: 'companies/:companyInx/job',
     component: DetailsJobComponent,
-    canActivate: [AuthGuard, DetailsCompanyGuard],
+    canActivate: [DetailsCompanyGuard],
     resolve: [CompanyResolverService],
   },
 ];

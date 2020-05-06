@@ -1,4 +1,4 @@
-import { Employee, Work } from 'app/employees/employee.model';
+import { Employee, Work, EmployeeJob } from 'app/employees/employee.model';
 
 
 import * as UserActions from './user.actions';
@@ -78,6 +78,14 @@ const sortWorkByEndDate = (a: Work, b: Work) => {
   }
 
   if (!b.endDate || a.endDate < b.endDate) {
+    return 1;
+  }
+
+  return -1;
+};
+
+const sortEmployeeJobsByLastStatus = (a: EmployeeJob, b: EmployeeJob) => {
+  if (a.date < b.date) {
     return 1;
   }
 
@@ -245,7 +253,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
           messages: action.payload,
         };
     case UserActions.UPDATE_ACTIVE_USER:
-      let user;
+      let user: Employee | Company;
       if (state.user) {
         user = action.payload.kind === 'employee' ?
           {
@@ -272,6 +280,13 @@ export function userReducer(state = initialState, action: UserActions.UserAction
           return newWork;
         });
         user['work'].sort(sortWorkByEndDate);
+
+        user.jobs = (user as Employee).jobs.map((job: EmployeeJob) => {
+          const newJob = { ...job };
+          newJob.date = new Date(newJob.date);
+          return newJob;
+        });
+        user['jobs'].sort(sortEmployeeJobsByLastStatus);
       } else {
         user['applicants'] =
           user['applicants'].map((applicant: Applicant) => {

@@ -29,6 +29,7 @@ export class DetailsJobComponent implements OnInit, OnDestroy {
   currUrl: string[] = null;
   companyLink = true;
   messages: string[] = [];
+  alertMessages: string[] = [];
   user: Employee | Company = null;
   allowApply: boolean;
   status: string = null;
@@ -161,6 +162,10 @@ export class DetailsJobComponent implements OnInit, OnDestroy {
   }
 
   onApplySave(status: string) { // employee actions
+    if (!this.allowApply) {
+      return this.alertMessages = ['You need to log in to do that.'];
+    }
+
     if (this.currUrl[0] === 'companies') {
       this.store.dispatch(new CompanyActions.CompanyStateLoadSingle());
     } else if (this.currUrl[0] === 'jobs') {
@@ -197,6 +202,7 @@ export class DetailsJobComponent implements OnInit, OnDestroy {
   onClose() {
     this.closedErrors = true;
     this.messages = [];
+    this.alertMessages = [];
     if (this.fetchedCompany) { return; } // in that case the effect of the apply op will handle the errors
     if (this.currUrl[0] === 'companies') {
       this.store.dispatch(new CompanyActions.ClearError());

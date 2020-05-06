@@ -85,7 +85,7 @@ exports.fetchEmployees = async (req, res, next) => {
     res.status(200).json({
       type: 'success',
       employees,
-      total: req.query.kind === 'employee' ? total- 1 : total
+      total: total
     });
   } catch (error) {
     next(errorHandling.handleServerErrors(error, 500, "There was an error fetching the employee."));

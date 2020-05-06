@@ -58,9 +58,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     // In case of a request for a distinct request the field will be the values of the field that was
     // retrieved (otherwise it will be the object id)
     const usedIds = Array.from( this.wantedResults.keys() );
-    // if (!this.distinctResults) {
-    //   usedIds.push(this.user._id);
-    // }
 
     this.http
       .get(nodeServer, {
@@ -104,9 +101,9 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       });
       const show = resultsFields[0];
       if (resultsFields.length === 1) {
-        return this.user._id === res._id ? show + ' (you)' : show;
+        return this.user && this.user._id === res._id ? show + ' (you)' : show;
       } else {
-        return this.user._id === res._id ? show + ' (you)' : show + ' (' + resultsFields[1] + ')';
+        return this.user && this.user._id === res._id ? show + ' (you)' : show + ' (' + resultsFields[1] + ')';
       }
     }) : [];
   }

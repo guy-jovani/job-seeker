@@ -29,9 +29,7 @@ export class CompanyEffects {
     withLatestFrom(this.store.select('user'), this.store.select('company')),
     switchMap(([actionData, userState, companyState]) => {
       const body = {
-        page: companyState['page'].toString(),
-        _id: userState.user._id,
-        kind: userState.kind
+        page: companyState['page'].toString()
       };
       if (companyState['searchQuery']) {
         body['searchQuery'] = JSON.stringify(companyState['searchQuery']);

@@ -6,6 +6,12 @@
   <app-loading-spinner></app-loading-spinner>
 </div>
 
+<app-alert
+  *ngIf="alertMessages.length"
+  [messages]="alertMessages"
+  (closeAlert)="onClose()">
+</app-alert>
+
 <div class="container" *ngIf="!isLoading">
   <app-message-box
     *ngIf="messages.length"
@@ -60,7 +66,7 @@
 
     <hr>
 
-    <div *ngIf="allowApply" class="status-buttons-container">
+    <div *ngIf="allowApply || !user" class="status-buttons-container">
       <button class="btn btn-primary btn-sm" (click)="onApplySave('saved')" *ngIf='status !== "saved"'>Save for Later</button>
       <button class="btn btn-success btn-sm"
         (click)="onApplySave('applied')"
