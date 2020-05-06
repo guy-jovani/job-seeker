@@ -6,10 +6,10 @@
     <h4 *ngIf="applicantJobs || !!detailsJobUrl === showStatus && !generalCompany">
       {{ applicantJobs ? 'Status' : 'Company' }}
     </h4>
-    <h4>Published</h4>
+    <h4>Last Update</h4>
     <h4 *ngIf="applicantJobs || showStatus">{{ applicantJobs ? 'Status' : 'Actions' }}</h4>
   </li>
-  <li class="list-group-item {{ applicantJobs ? 'applicant-job' : 'general-job' }}"
+  <li class="list-group-item {{ applicantJobs ? 'applicant-job' : '' }}"
       *ngFor="let jobInfo of jobs; let i=index; trackBy: jobsTracker">
 
     <ng-container *ngIf="applicantJobs; else jobsList">
@@ -17,7 +17,7 @@
       <p class="job-status job-status-{{ jobInfo.status }}">{{ jobInfo.status | titlecase }}</p>
       <time
         class="job-date"
-        [dateTime]="getJobDate(jobInfo.date).split('/').reverse().join('-')">
+        [dateTime]="getJobDateHtmlElem(jobInfo.date)">
         {{ getJobDate(jobInfo.date) }}
       </time>
       <div class="status-action-buttons">
@@ -37,11 +37,20 @@
         <time
           *ngIf="jobInfo.date"
           class="job-date"
-          [dateTime]="getJobDate(jobInfo.date).split('/').reverse().join('-')">
-          {{ getJobDate(jobInfo.date) }}
+          [dateTime]="jobInfo['job'] ? getJobDateHtmlElem(jobInfo['job'].date) : getJobDateHtmlElem(jobInfo.date)">
+          {{ jobInfo['job'] ? getJobDate(jobInfo['job'].date) : getJobDate(jobInfo.date) }}
         </time>
 
-        <p class="job-status job-status-{{ jobInfo.status }}" *ngIf="showStatus">{{ jobInfo.status | titlecase }}</p>
+        <div class="status-container">
+          <p class="job-status job-status-{{ jobInfo.status }}" *ngIf="showStatus">
+            {{ jobInfo.status | titlecase }}
+          </p>
+          <time
+            class="job-date"
+            [dateTime]="getJobDateHtmlElem(jobInfo.date)">
+            {{ getJobDate(jobInfo.date) }}
+          </time>
+        </div>
       </a>
     </ng-template>
 

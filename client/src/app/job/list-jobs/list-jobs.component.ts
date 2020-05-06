@@ -31,4 +31,8 @@ export class ListJobsComponent {
     this.acceptRejectEmitter.emit({ status, jobInd });
   }
 
+  getJobDateHtmlElem(dateStr: string) {
+    return this.getJobDate(dateStr).split('/').reverse().join('-');
+  }
+
 }

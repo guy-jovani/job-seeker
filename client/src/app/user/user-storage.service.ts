@@ -12,7 +12,6 @@ export class UserStorageService {
 
   setUserStorage = (user: Company | Employee, kind: string) => {
     const storedUser = JSON.parse(localStorage.getItem('userData'));
-
     const work = storedUser ? storedUser['work'] : null;
     const jobs = storedUser ? storedUser['jobs'] : null;
     const applicants = storedUser ? storedUser['applicants'] : null;

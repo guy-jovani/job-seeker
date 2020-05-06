@@ -23,15 +23,14 @@ const initialState: State = {
 
 
 
-const setUserTokensStorage = (
-                             token: string = null,
-                             expiresInSeconds: number = null,
-                             refreshToken: string = null) => {
+const setUserTokensStorage = (token: string = null,
+                              expiresInSeconds: number = null,
+                              refreshToken: string = null) => {
   if (token) { localStorage.setItem('token', JSON.stringify(token)); }
   if (refreshToken) { localStorage.setItem('refreshToken', JSON.stringify(refreshToken)); }
   if (expiresInSeconds) {
-  localStorage.setItem('expirationDate',
-  JSON.stringify(new Date((new Date().getTime() + expiresInSeconds)).toISOString()));
+    localStorage.setItem('expirationDate',
+    JSON.stringify(new Date((new Date().getTime() + expiresInSeconds)).toISOString()));
   }
 };
 

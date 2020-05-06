@@ -255,7 +255,6 @@ export class ChatComponent implements OnInit, OnDestroy {
 
       task.percentageChanges().subscribe(pre => {
         this.uploadFilePercent = pre;
-        console.log(pre)
       });
 
       await task.snapshotChanges().toPromise();

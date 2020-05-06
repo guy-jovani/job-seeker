@@ -87,6 +87,8 @@ export class AuthEffects {
 
       this.store.dispatch(new EmployeeActions.SetSearchQueryEmployee(
         this.userStorageService.getUserSearchQueries('employee')));
+      this.store.dispatch(new CompanyActions.SetSearchQueryCompany(
+        this.userStorageService.getUserSearchQueries('company')));
       this.store.dispatch(new JobActions.SetSearchQueryJob(
         this.userStorageService.getUserSearchQueries('job')));
 

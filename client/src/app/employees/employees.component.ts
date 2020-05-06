@@ -41,7 +41,7 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
         return this.store.select('user');
       }),
       switchMap(userState => {
-        this.userId = userState.user._id;
+        this.userId = userState.user ? userState.user._id : null;
         if (this.currUrl[0] === 'my-applicants') {
           return this.store.select('user');
         } else {
@@ -62,6 +62,7 @@ export class EmployeesComponent implements OnInit, OnDestroy, AfterViewChecked {
           this.employees = currState['user'] ? currState['user'].applicants : null;
         } else { // /employees
           if ((currState['searchQuery'].name && this.searchQuery.name !== currState['searchQuery'].name) ||
+            (currState['searchQuery'].email && this.searchQuery.email !== currState['searchQuery'].email) ||
               (currState['searchQuery'].company && this.searchQuery.company !== currState['searchQuery'].company) ||
               (currState['searchQuery'].work && this.searchQuery.work !== currState['searchQuery'].work)) {
             this.toggleAdvanceSearchShow = true;

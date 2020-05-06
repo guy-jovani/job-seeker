@@ -41,7 +41,7 @@
       <ng-template #companyNoLink><p>Company: {{ (companyId.name | titlecase) }}</p></ng-template>
 
       <p>Description: {{ job.description || job['job'].description }}</p>
-      <p>Date: <time [dateTime]="(getJobDate(job.date) || getJobDate(job['job'].date)).split('/').reverse().join('-')"> {{ getJobDate(job.date) || getJobDate(job['job'].date) }} </time></p>
+      <p>Last Update: <time [dateTime]="(getJobDate(job.date) || getJobDate(job['job'].date)).split('/').reverse().join('-')"> {{ getJobDate(job.date) || getJobDate(job['job'].date) }} </time></p>
     </section>
 
     <section>

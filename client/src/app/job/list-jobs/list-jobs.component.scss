@@ -76,3 +76,9 @@ li {
     flex-direction: row;
   }
 }
+
+.status-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
