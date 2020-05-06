@@ -41,8 +41,8 @@
           {{ jobInfo['job'] ? getJobDate(jobInfo['job'].date) : getJobDate(jobInfo.date) }}
         </time>
 
-        <div class="status-container">
-          <p class="job-status job-status-{{ jobInfo.status }}" *ngIf="showStatus">
+        <div class="status-container" *ngIf="showStatus">
+          <p class="job-status job-status-{{ jobInfo.status }}">
             {{ jobInfo.status | titlecase }}
           </p>
           <time
