@@ -23,13 +23,13 @@
 
         <div class="search-for-field">
           <h5>Name: </h5>
-          <app-search-bar
+          <app-auto-complete
             *ngIf="!searchQuery.name && !searchQuery.email"
             [placeholder]="'Ex: Joe Frazier, frazier@gmail.com'"
             [searchDBs]="['employee']"
             [searchFields]="['name', 'email']"
             (wantedResultsEmitter)="onSearchField($event)">
-          </app-search-bar>
+          </app-auto-complete>
           <p *ngIf="searchQuery.name || searchQuery.email" class="search-for-field-result">
             {{ searchQuery.name || searchQuery.email}}
           </p>
@@ -38,14 +38,14 @@
 
         <div class="search-for-field">
           <h5>Company: </h5>
-          <app-search-bar
+          <app-auto-complete
             *ngIf="!searchQuery.company"
             [placeholder]="'Company name employing person'"
             [searchDBs]="['employee']"
             [distinctResults]="true"
             [searchFields]="['work.company']"
             (wantedResultsEmitter)="onSearchField($event)">
-          </app-search-bar>
+          </app-auto-complete>
           <p *ngIf="searchQuery.company" class="search-for-field-result">
             {{ searchQuery.company }}
           </p>
@@ -54,14 +54,14 @@
 
         <div class="search-for-field">
           <h5>Experience: </h5>
-          <app-search-bar
+          <app-auto-complete
             *ngIf="!searchQuery.work"
             [placeholder]="'Ex: Web Developer '"
             [searchDBs]="['employee']"
             [searchFields]="['work.title']"
             [distinctResults]="true"
             (wantedResultsEmitter)="onSearchField($event)">
-          </app-search-bar>
+          </app-auto-complete>
           <p *ngIf="searchQuery.work" class="search-for-field-result">
             {{ searchQuery.work }}
           </p>

@@ -196,13 +196,20 @@ const populateConversationParticipants = async conversations => {
  *        the message object, the conversation object, true if its a new conversation, false if not.
   */
 const createUpdateConversation = async (recipients, content, senderId, senderType, bufferFile, fileName, fileNumBytes) => {
+
   const participants = recipients.map(recipient => {
     return { user: mongoose.Types.ObjectId(recipient._id), type: recipient.type };
   });
   participants.push({ user: mongoose.Types.ObjectId(senderId), type: senderType });
 
-  const participantsIds = participants.map(part => part.user);
-
+  let participantsIds = participants.reduce((prev, curr) => {
+    return prev.indexOf(curr.user.toString()) === -1 ? [...prev, curr.user.toString()] : prev;
+  }, [])
+  if (participantsIds.length < 2) {
+    throw "Invalid number of different recipients";
+  }
+  participantsIds = participants.map(part => part.user);
+  
   // 1. check if conversation exists
   let conversation = await getConversationBasedOnParticipants(participantsIds);
   let newCon = true;

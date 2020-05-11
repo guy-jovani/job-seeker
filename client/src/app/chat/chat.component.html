@@ -59,12 +59,13 @@
     </header>
 
     <section class="new-message__add-item">
-      <app-search-bar
+      <app-auto-complete
         [placeholder]="'Type one or more names'"
         [searchDBs]="['employee','company']"
         [searchFields]="['name','email']"
+        [includeSelfUser]="false"
         (wantedResultsEmitter)="onGetNames($event)">
-      </app-search-bar>
+      </app-auto-complete>
     </section>
 
     <ng-container

@@ -10,11 +10,11 @@ import { take } from 'rxjs/operators';
 
 
 @Component({
-  selector: 'app-search-bar',
-  templateUrl: './search-bar.component.html',
-  styleUrls: ['./search-bar.component.scss']
+  selector: 'app-auto-complete',
+  templateUrl: './auto-complete.component.html',
+  styleUrls: ['./auto-complete.component.scss']
 })
-export class SearchBarComponent implements OnInit, OnDestroy {
+export class AutoCompleteComponent implements OnInit, OnDestroy {
   subscription: Subscription;
   user: Employee | Company = null;
   searchRes: {
@@ -32,6 +32,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   @Input() searchDBs: string[] = null;
   @Input() searchFields: string[] = null;
   @Input() distinctResults = false;
+  @Input() includeSelfUser = true;
 
   @Output() wantedResultsEmitter = new EventEmitter<Map<string, {}>>();
 
@@ -49,7 +50,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   onSearchChange(value: string) {
-    const nodeServer = environment.nodeServer + 'search/';
+    const nodeServer = environment.nodeServer + 'auto-complete/';
     if (!value) {
       return this.renderer2.addClass(this.listRes.nativeElement, 'hide');
     }
@@ -58,6 +59,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     // In case of a request for a distinct request the field will be the values of the field that was
     // retrieved (otherwise it will be the object id)
     const usedIds = Array.from( this.wantedResults.keys() );
+
+    if (!this.includeSelfUser) {
+      usedIds.push(this.user._id);
+    }
 
     this.http
       .get(nodeServer, {

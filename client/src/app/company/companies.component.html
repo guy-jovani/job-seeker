@@ -18,13 +18,13 @@
 
         <div class="search-for-field">
           <h5>Name: </h5>
-          <app-search-bar
+          <app-auto-complete
             *ngIf="!searchQuery.name"
             [placeholder]="'Ex: Joe Frazier'"
             [searchDBs]="['company']"
             [searchFields]="['name']"
             (wantedResultsEmitter)="onSearchField($event)">
-          </app-search-bar>
+          </app-auto-complete>
           <p *ngIf="searchQuery.name" class="search-for-field-result">
             {{ searchQuery.name }}
           </p>
@@ -33,14 +33,14 @@
 
         <div class="search-for-field">
           <h5>Job: </h5>
-          <app-search-bar
+          <app-auto-complete
             *ngIf="!searchQuery.job"
             [placeholder]="'Ex: Web Developer'"
             [searchDBs]="['company']"
             [distinctResults]="true"
             [searchFields]="['jobs.title']"
             (wantedResultsEmitter)="onSearchField($event)">
-          </app-search-bar>
+          </app-auto-complete>
           <p *ngIf="searchQuery.job" class="search-for-field-result">
             {{ searchQuery.job }}
           </p>

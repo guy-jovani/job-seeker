@@ -8,7 +8,7 @@ const compression = require('compression');
 const helmet = require('helmet');
 
 const employeesRoutes = require('./routes/employees');
-const searchRoutes = require('./routes/search');
+const autoCompleteRoutes = require('./routes/auto-complete');
 const authRoutes = require('./routes/auth');
 const companiesRoutes = require('./routes/companies');
 const chatRoutes = require('./routes/chat');
@@ -43,7 +43,7 @@ app.use((req, res, next) => {
 app.use('/auth', authRoutes);
 app.use('/employees', employeesRoutes);
 app.use('/companies', companiesRoutes);
-app.use('/search', searchRoutes);
+app.use('/auto-complete', autoCompleteRoutes);
 app.use('/chat', checkAuth, chatRoutes);
 app.use('/jobs', jobsRoutes);
 

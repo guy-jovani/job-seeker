@@ -274,7 +274,7 @@ const dbMap = {
   }
 };
 
-exports.search = async (req, res, next) => {
+exports.autoComplete = async (req, res, next) => {
   try {
     const routeErrors = validation.handleValidationRoutesErrors(req);
     if (routeErrors.type === 'failure') {

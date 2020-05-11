@@ -5,7 +5,7 @@ const router = express.Router();
 const { query } = require('express-validator');
 
 
-const searchController = require('../controllers/search');
+const autoCompleteController = require('../controllers/auto-complete');
 
 router.get('/', [
   query('usedIds')
@@ -20,7 +20,7 @@ router.get('/', [
   query('searchFields')
     .exists()
     .withMessage('Something went wrong while auto complete. Please try again later.'),
-], searchController.search);
+], autoCompleteController.autoComplete);
 
 
 module.exports = router;

@@ -5,7 +5,7 @@ import { ImageCropperModule } from 'ngx-image-cropper';
 import { DropdownDirective } from './dropdown.directive';
 import { AlertComponent } from './alert/alert.component';
 import { LoadingSpinnerComponent } from './loading-spinner/loading-spinner.component';
-import { SearchBarComponent } from './search-bar/search-bar.component';
+import { AutoCompleteComponent } from './auto-complete/auto-complete.component';
 import { TrimPipe } from './trim.pipe';
 import { CutPipe } from './cut.pipe';
 import { ScrollToBottomDirective } from './scroll-to-bottom.directive';
@@ -20,7 +20,7 @@ import { ImageCropperComponent } from './image-cropper/image-cropper.component';
     DropdownDirective,
     AlertComponent,
     LoadingSpinnerComponent,
-    SearchBarComponent,
+    AutoCompleteComponent,
     TrimPipe,
     CutPipe,
     ScrollToBottomDirective,
@@ -34,7 +34,7 @@ import { ImageCropperComponent } from './image-cropper/image-cropper.component';
     AlertComponent,
     LoadingSpinnerComponent,
     CommonModule,
-    SearchBarComponent,
+    AutoCompleteComponent,
     TrimPipe,
     CutPipe,
     ScrollToBottomDirective,
