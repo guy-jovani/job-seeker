@@ -27,8 +27,10 @@
     </header>
 
     <section class="search-job-container {{ toggleAdvanceSearchShow ? 'transition-display' : 'transition-hide' }}" *ngIf="currUrl[0] === 'jobs'">
-
-      <div class="search-fields">
+      <div class="flex-row-center" *ngIf="!user">
+        This feature is only allowed for logged in users.
+      </div>
+      <div class="search-fields" *ngIf="user">
         <div class="search-for-field">
           <h5>Title: </h5>
           <app-auto-complete
@@ -72,7 +74,7 @@
         </div>
       </div>
 
-      <button class="btn btn-info btn-sm" (click)="onSearch()">
+      <button class="btn btn-info btn-sm" (click)="onSearch()" *ngIf="user">
         Search
       </button>
 

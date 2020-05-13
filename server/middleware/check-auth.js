@@ -10,7 +10,7 @@ const handleServerErrors = require('../utils/errorHandling').handleServerErrors;
  * In case of an error - moving the error handling to the express error handling middleware
  * with a error code of 500, and an error message
  * @param {express request object} req - the req headers need to have an authorization
- *                                       property with the token in the template of "Bearer 'TOKEN_VALUE'"
+ *                                 property with the token in the template of "Bearer <%TOKEN_VALUE%>"
  * @param {express respond object} res
  */
 module.exports = (req, res, next) => {

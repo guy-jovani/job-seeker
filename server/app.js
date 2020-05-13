@@ -43,7 +43,7 @@ app.use((req, res, next) => {
 app.use('/auth', authRoutes);
 app.use('/employees', employeesRoutes);
 app.use('/companies', companiesRoutes);
-app.use('/auto-complete', autoCompleteRoutes);
+app.use('/auto-complete', checkAuth, autoCompleteRoutes);
 app.use('/chat', checkAuth, chatRoutes);
 app.use('/jobs', jobsRoutes);
 
