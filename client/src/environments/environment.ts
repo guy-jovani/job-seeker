@@ -15,6 +15,7 @@ export const environment = {
   firebaseProjectId: 'jobseeker-68c66',
   imagesFolder: 'images/',
   filesFolder: 'files/',
+  docsPerPage: 10,
   uploadFileSizeLimitBytes: 2 * 1024 * 1024 // 2 * 1024 KB * 1024 Bytes
 };
 

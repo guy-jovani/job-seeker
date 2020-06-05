@@ -71,7 +71,7 @@ exports.fetchEmployees = async (req, res, next) => {
     const match = { $match: employeeQuery };
     const skipDocuments = { $skip: skippedDocuments(req.query.page) };
     const projectRemoveUnwantedFields = { $project: { name: 0 } };
-    const limitResults = {  $limit: +process.env.DB_LIMIT_RES };
+    const limitResults = {  $limit: +process.env.DOCS_PER_PAGE };
     const countField = { $count: 'email' };
 
     const employees = await Employee.aggregate([

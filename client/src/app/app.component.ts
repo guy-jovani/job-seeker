@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { Router, NavigationEnd } from '@angular/router';
@@ -67,7 +67,7 @@ export class AppComponent implements OnInit, OnDestroy {
         }
       } catch (error) {
         this.messages =
-            ['There was a problem sending the message, please refresh your page and try again'];
+            ['There was a problem sending the message, please refresh your page and try again.'];
       }
     });
 

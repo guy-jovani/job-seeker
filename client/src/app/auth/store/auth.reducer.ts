@@ -13,7 +13,7 @@ export interface State {
 }
 
 const initialState: State = {
-  messages: null,
+  messages: [],
   loading: false,
   refreshing: false,
   token: null,
@@ -49,7 +49,7 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
     case AuthActions.RESET_PASS_ATTEMPT:
       return {
         ...state,
-        messages: null,
+        messages: [],
         loading: true,
       };
     case AuthActions.AUTH_FAILURE:
@@ -66,7 +66,7 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
         ...state,
         loading: false,
         refreshing: false,
-        messages: null,
+        messages: [],
         token: action.payload['token'] ? action.payload['token'] : state.token,
         refreshToken: action.payload['refreshToken'] ? action.payload['refreshToken'] : state.refreshToken,
       };
@@ -76,14 +76,14 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
       return {
         ...state,
         loading: false,
-        messages: null,
+        messages: [],
       };
     case AuthActions.LOGOUT:
       return {
         ...state,
         loading: false,
         refreshing: false,
-        messages: null,
+        messages: [],
         token: null,
         refreshToken: null
       };

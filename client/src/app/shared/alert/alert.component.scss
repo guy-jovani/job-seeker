@@ -1,23 +1,4 @@
 
-.alert-box {
-  position: fixed;
-  width: 60vw;
-  height: 60vh;
-  padding: 16px;
-  z-index: 100;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .26);
-
-  p {
-    &:first-child {
-      padding-right: 5.5rem;
-    }
-  }
-}
-
-.alert-box-action-box {
-  text-align: right;
-}
 
 .close-btn {
   position: absolute;

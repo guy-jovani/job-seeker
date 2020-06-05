@@ -2,16 +2,115 @@
 
 
 
+<div class="container flex-column-center">
+  <app-alert
+    *ngIf="messages && messages.length"
+    [messages]="messages"
+    (closeAlert)="onClose()">
+  </app-alert>
+
+  <header class="flex-row-center">
+    <h4 class="title" *ngIf="!user">Welcome to Job Seeker</h4>
+    <div class="post-creator flex-row-center" *ngIf="user">
+      <form class="my-form" #postForm="ngForm" (ngSubmit)="onSubmit(postForm)">
+        <div class="form-group">
+          <label for="postContent"></label>
+          <textarea
+            ngModel
+            class="form-control input-form-tag"
+            #textarea
+            required
+            name="postContent"
+            placeholder="What do you want to share?"></textarea>
+        </div>
+        <button
+          class="btn btn-primary btn-sm"
+          [disabled]="postForm.invalid">
+          Post
+        </button>
+      </form>
+    </div>
+  </header>
 
 
-<header class="flex-row center">
-  <h4 class="title">Welcome to Job Seeker</h4>
-</header>
+  <main #main>
+    <ul class="flex-column-center" *ngIf="user && posts.length">
+      <li
+        class="list-group-item"
+        *ngFor="let post of posts; let i=index">
+          <div class="post-info">
+            <img
+              alt="Profile image of {{ getFullName(post.author) | titlecase }}"
+              [src]="post.author.profileImagePath"
+              class="{{ post.onModel === 'Employee' ? 'employee' : 'company' }}-profile-image"
+              *ngIf="post.author.profileImagePath" />
+            <div class="{{ post.onModel === 'Employee' ? 'employee' : 'company' }}-no-profile-image" *ngIf="!post.author.profileImagePath">
+              <span class="glyphicon glyphicon-user"></span>
+            </div>
+
+            <div>
+              <h5 class="author-name">{{ getFullName(post.author) | titlecase }}</h5>
+              <p class="help-block"><time [dateTime]="getPostDateTime(post.createdAt)">{{ getPostDate(post.createdAt) }}</time></p>
+            </div>
+
+          </div>
+          <div class="post-content">
+            <p>{{ post.content }}</p>
+          </div>
+
+          <div class="post-actions">
+            <div class="post-actions__values" *ngIf="post.likes.total || (post.comments && post.comments.length)">
+              <p *ngIf="post.likes.total" (click)="onViewLikes(i)">
+                {{ post.likes.total }} <i class="glyphicon glyphicon-thumbs-up"></i>
+              </p>
+              <p *ngIf="post.comments && post.comments.length">{{ post.comments.length }}</p>
+            </div>
+
+            <div class="post-actions__buttons">
+              <button class="btn btn-sm btn-info" (click)="onLikePost(post._id)">
+                <i class="glyphicon glyphicon-thumbs-up"></i>
+              </button>
+              <button class="btn btn-sm btn-info">Comment</button>
+            </div>
+          </div>
+      </li>
+    </ul>
+    <div *ngIf='lastPost && !isLoading' class="flex-row-center">
+      <p>There are no more posts.</p>
+    </div>
+    <app-loading-spinner class="flex-row-center" *ngIf="isLoading"></app-loading-spinner>
+  </main>
+
+</div>
 
 
+<div class="backdrop" class="{{ viewLikesPost ? '' : 'invisible' }}" (click)="onCloseLikes($event)">
 
-<app-message-box
-  *ngIf="messages && messages.length"
-  [messages]="messages"
-  (closeMessages)="onClose()">
-</app-message-box>
+  <div class="alert-box" (scroll)="onScrollLikes()" #likes>
+    <div *ngIf="viewLikesPost">
+      <div *ngFor="let userLike of viewLikesPost.likes.users" class="like-item">
+        <div>
+          <img
+            alt="Profile image of {{ getFullName(userLike.user) | titlecase }}"
+            [src]="userLike.user.profileImagePath"
+            class="{{ userLike.onModel === 'Employee' ? 'employee' : 'company' }}-profile-image"
+            *ngIf="userLike.user.profileImagePath" />
+          <div class="{{ userLike.onModel === 'Employee' ? 'employee' : 'company' }}-no-profile-image" *ngIf="!userLike.user.profileImagePath">
+            <span class="glyphicon glyphicon-user"></span>
+          </div>
+        </div>
+
+        <h4>
+          {{ getFullName(userLike.user) }}
+        </h4>
+      </div>
+      <div *ngIf='viewLikesPost.likes.users.length === viewLikesPost.likes.total && !isLoadingLikes' class="flex-row-center">
+        <p>There are no more likes.</p>
+      </div>
+      <app-loading-spinner class="flex-row-center" *ngIf="isLoadingLikes"></app-loading-spinner>
+      <button class="close-button glyphicon glyphicon-remove" (click)="onCloseLikes($event)"></button>
+    </div>
+  </div>
+
+</div>
+

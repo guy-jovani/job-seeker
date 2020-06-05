@@ -136,7 +136,7 @@ export class UserEffects {
     withLatestFrom(this.store.select('user')),
     switchMap(([actionData, userState]) => {
       return this.http.post(environment.nodeServer  + 'employees/createWork',
-                          { ...actionData['payload'] as object, _id: userState.user._id })
+              { ...actionData['payload'] as object, _id: userState.user._id })
         .pipe(
           map(res => {
             if (res['type'] === 'success') {

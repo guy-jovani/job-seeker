@@ -18,7 +18,7 @@ export interface State {
 
 const initialState: State = {
   companies: [],
-  messages: null,
+  messages: [],
   loadingAll: false,
   loadingSingle: false,
   lastFetch: null,
@@ -36,7 +36,7 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
         ...state,
         companies: [...state.companies, ...action.payload.companies],
         loadingAll: false,
-        messages: null,
+        messages: [],
         page: setPage,
         total: action.payload.total,
         lastFetch: new Date()
@@ -95,20 +95,20 @@ export function companyReducer(state = initialState, action: CompanyActions.Comp
       return {
         ...state,
         companies: [ ...updatedCompanies ],
-        messages: null,
+        messages: [],
         loadingSingle: false
       };
     case CompanyActions.CLEAR_ERROR:
       return {
         ...state,
-        messages: null,
+        messages: [],
         loadingAll: false,
         loadingSingle: false
       };
     case CompanyActions.LOGOUT:
       return {
         ...state,
-        messages: null,
+        messages: [],
         companies: [],
         loadingAll: false,
         loadingSingle: false,

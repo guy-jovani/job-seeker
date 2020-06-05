@@ -20,7 +20,7 @@ export interface State {
 
 const initialState: State = {
   user: null,
-  messages: null,
+  messages: [],
   loading: false,
   kind: null,
   notifications: [],
@@ -162,7 +162,6 @@ export function userReducer(state = initialState, action: UserActions.UserAction
         const newMessages = [ ...oldCon.messages ];
         newMessages.push(...conMsgs);
         updatedCon.messages = newMessages;
-        // updatedCon.participants = [...action.payload.conversation.participants];
         updatedCons[oldConInd] = updatedCon;
       }
       updatedCons.sort(sortConByLastMsgDate);
@@ -180,7 +179,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
       return {
         ...state,
         loading: false,
-        messages: null,
+        messages: [],
         user: updatedUser,
       };
     case UserActions.COMPANY_UPDATED_JOB: // ONLY FOR A COMPANY - ON UPDATE JOB
@@ -193,7 +192,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
       };
       return {
         ...state,
-        messages: null,
+        messages: [],
         user: upToDateCompanyUser,
       };
     case UserActions.CREATED_WORK_EMPLOYEE: // ONLY FOR AN EMPLOYEE - ON CREATE WORK
@@ -208,7 +207,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
 
       return {
         ...state,
-        messages: null,
+        messages: [],
         loading: false,
         user: createEmployeeUser,
       };
@@ -225,7 +224,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
 
       return {
         ...state,
-        messages: null,
+        messages: [],
         loading: false,
         user: updateEmployeeUser,
       };
@@ -242,7 +241,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
 
       return {
         ...state,
-        messages: null,
+        messages: [],
         loading: false,
         user: deletedWorkEmployeeUser,
       };
@@ -306,7 +305,7 @@ export function userReducer(state = initialState, action: UserActions.UserAction
       return {
         ...state,
         loading: false,
-        messages: null,
+        messages: [],
         kind: action.payload.kind,
         user
       };
@@ -314,13 +313,13 @@ export function userReducer(state = initialState, action: UserActions.UserAction
       return {
         ...state,
         loading: false,
-        messages: null,
+        messages: [],
       };
     case UserActions.LOGOUT:
       return {
         ...state,
         loading: false,
-        messages: null,
+        messages: [],
         user: null,
         kind: null,
         notifications: [],

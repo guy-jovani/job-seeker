@@ -47,11 +47,7 @@ export class CompaniesComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.isLoading = companyState.loadingAll;
         this.page = companyState.page;
         if (this.currUrl[this.currUrl.length - 1] === 'companies') {
-          if (companyState.messages) {
-            this.messages = [ ...companyState.messages ];
-          } else {
-            this.messages = [];
-          }
+          this.messages = companyState.messages;
         }
 
         if ((companyState['searchQuery'].name && this.searchQuery.name !== companyState['searchQuery'].name) ||

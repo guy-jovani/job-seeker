@@ -33,7 +33,7 @@ exports.fetchSingle = async (req, res, next) => {
       company: company
     });
   } catch (error) {
-    next(errorHandling.handleServerErrors(error, 500, "there was an error fetching the company"));
+    next(errorHandling.handleServerErrors(error, 500, "There was an error fetching the company."));
   }
 };
 

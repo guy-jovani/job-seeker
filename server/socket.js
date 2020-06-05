@@ -2,6 +2,7 @@
 
 
 const chatController = require('./controllers/chat');
+const postsController = require('./controllers/posts');
 const changeStatusOfAUserJob = require('./utils/shared').changeStatusOfAUserJob;
 
 let io, hostName;
@@ -44,6 +45,7 @@ exports.socketHandler = (socket) => {
   socket.on('postAMsg', postAMsg);
   socket.on('readAMsg', readAMsg);
   socket.on('updateStatus', updateStatus);
+  socket.on('likeAPost', likeAPost);
 
 };
 
@@ -126,5 +128,19 @@ const updateStatus = async data => {
 }
 
 
-
+const likeAPost = async data => {
+  try {
+    const post = await postsController.likeAPost(data.userId, data.postId, data.kind);
+    io.emit('postLiked', { 
+      post,
+      type: 'success'
+    });
+  } catch (error) {
+    console.log(error);
+    io.to(data.userId).emit('postLiked', { // sending the error to the sender of the message
+      messages: error.messages || ['There was a problem liking the post.. Please try again later.'],
+      type: 'failure'
+    });
+  }
+}
 

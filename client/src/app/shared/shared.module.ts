@@ -12,6 +12,7 @@ import { ScrollToBottomDirective } from './scroll-to-bottom.directive';
 import { BackButtonComponent } from './back-button/back-button.component';
 import { MessageBoxComponent } from './message-box/message-box.component';
 import { ImageCropperComponent } from './image-cropper/image-cropper.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 
 
@@ -28,7 +29,7 @@ import { ImageCropperComponent } from './image-cropper/image-cropper.component';
     MessageBoxComponent,
     ImageCropperComponent,
   ],
-  imports: [CommonModule, ImageCropperModule],
+  imports: [CommonModule, ImageCropperModule, ReactiveFormsModule, FormsModule],
   exports: [
     DropdownDirective,
     AlertComponent,
@@ -36,6 +37,8 @@ import { ImageCropperComponent } from './image-cropper/image-cropper.component';
     CommonModule,
     AutoCompleteComponent,
     TrimPipe,
+    ReactiveFormsModule,
+    FormsModule,
     CutPipe,
     ScrollToBottomDirective,
     BackButtonComponent,

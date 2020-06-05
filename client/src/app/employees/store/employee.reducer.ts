@@ -18,7 +18,7 @@ export interface State {
 
 const initialState: State = {
   employees: [],
-  messages: null,
+  messages: [],
   loadingAll: false,
   loadingSingle: false,
   lastFetch: null,
@@ -35,7 +35,7 @@ export function employeeReducer(state = initialState, action: EmployeeActions.Em
       return {
         ...state,
         employees: [ ...state.employees, ...action.payload.employees ],
-        messages: null,
+        messages: [],
         loadingAll: false,
         page: setPage,
         total: action.payload.total,
@@ -90,7 +90,7 @@ export function employeeReducer(state = initialState, action: EmployeeActions.Em
     case EmployeeActions.CLEAR_ERROR:
       return {
         ...state,
-        messages: null,
+        messages: [],
         loadingAll: false,
         loadingSingle: false
       };
@@ -104,14 +104,14 @@ export function employeeReducer(state = initialState, action: EmployeeActions.Em
       return {
         ...state,
         employees: [...updatedEmployees],
-        messages: null,
+        messages: [],
         loadingAll: false,
         loadingSingle: false
       };
     case EmployeeActions.LOGOUT:
       return {
         ...state,
-        messages: null,
+        messages: [],
         employees: [],
         loadingAll: false,
         loadingSingle: false,

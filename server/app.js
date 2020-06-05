@@ -12,6 +12,7 @@ const autoCompleteRoutes = require('./routes/auto-complete');
 const authRoutes = require('./routes/auth');
 const companiesRoutes = require('./routes/companies');
 const chatRoutes = require('./routes/chat');
+const postsRoutes = require('./routes/posts');
 const jobsRoutes = require('./routes/jobs');
 const checkAuth = require('./middleware/check-auth');
 
@@ -27,6 +28,7 @@ app.use(bodyParser.json());
 app.use((req, res, next) => {
   console.log(req.url);
   console.log(req.body);
+  console.log(req.query);
   next();
 });
 
@@ -43,6 +45,7 @@ app.use((req, res, next) => {
 app.use('/auth', authRoutes);
 app.use('/employees', employeesRoutes);
 app.use('/companies', companiesRoutes);
+app.use('/posts', postsRoutes);
 app.use('/auto-complete', checkAuth, autoCompleteRoutes);
 app.use('/chat', checkAuth, chatRoutes);
 app.use('/jobs', jobsRoutes);

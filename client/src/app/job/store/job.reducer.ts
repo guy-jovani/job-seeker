@@ -20,7 +20,7 @@ export interface State {
 
 const initialState: State = {
   jobs: [],
-  messages: null,
+  messages: [],
   loadingAll: false,
   loadingSingle: false,
   lastFetch: null,
@@ -76,14 +76,14 @@ export function jobReducer(state = initialState, action: JobActions.JobActions) 
       return {
         ...state,
         loadingSingle: false,
-        messages: null,
+        messages: [],
         loadingAll: false,
       };
     case JobActions.LOGOUT:
       return {
         ...state,
         loadingSingle: false,
-        messages: null,
+        messages: [],
         loadingAll: false,
         jobs: [],
         page: 1,
@@ -101,7 +101,7 @@ export function jobReducer(state = initialState, action: JobActions.JobActions) 
         total: action.payload.total,
         jobs: [ ...state.jobs, ...action.payload.jobs ],
         loadingAll: false,
-        messages: null,
+        messages: [],
         lastFetch: new Date()
       };
     case JobActions.JOB_OP_FAILURE:
@@ -120,7 +120,7 @@ export function jobReducer(state = initialState, action: JobActions.JobActions) 
       upToDateJobs[action.payload.jobInd] = jobWithCompany;
       return {
         ...state,
-        messages: null,
+        messages: [],
         loadingSingle: false,
         jobs: upToDateJobs
       };
@@ -137,7 +137,7 @@ export function jobReducer(state = initialState, action: JobActions.JobActions) 
       }
       return {
         ...state,
-        messages: null,
+        messages: [],
         jobs: [ ...updatedJobs],
         loadingAll: false,
         loadingSingle: false,

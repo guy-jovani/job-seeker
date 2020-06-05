@@ -30,7 +30,7 @@ const dbMap = {
           }
         },
         { $sort: { _id: 1 } },
-        { $limit: +process.env.DB_LIMIT_RES },
+        { $limit: +process.env.DOCS_PER_PAGE },
         {
           $project: {
             [field]: '$_id'
@@ -68,7 +68,7 @@ const dbMap = {
             $or: query
           }
         },
-        { $limit: +process.env.DB_LIMIT_RES }
+        { $limit: +process.env.DOCS_PER_PAGE }
       ]);
       return employees.map(emp => {
         return { ...emp, type: 'Employee' };
@@ -113,7 +113,7 @@ const dbMap = {
             }
           },
           { $sort: { _id: 1 } },
-          { $limit: +process.env.DB_LIMIT_RES },
+          { $limit: +process.env.DOCS_PER_PAGE },
         ]);
       } else if (field === 'applicants.employee.name') {
         companies = await Company.aggregate([
@@ -147,7 +147,7 @@ const dbMap = {
             }
           },
           { $sort: { _id: 1 } },
-          { $limit: +process.env.DB_LIMIT_RES },
+          { $limit: +process.env.DOCS_PER_PAGE },
         ]);
       } else if (field === 'jobs.title') {
         companies = await Company.aggregate([
@@ -183,12 +183,12 @@ const dbMap = {
             }
           },
           { $sort: { _id: 1 } },
-          { $limit: +process.env.DB_LIMIT_RES },
+          { $limit: +process.env.DOCS_PER_PAGE },
         ]);
       } else {
         companies = await Company.aggregate([
           { $match: distinctQuery },
-          { $limit: +process.env.DB_LIMIT_RES },
+          { $limit: +process.env.DOCS_PER_PAGE },
           { $group: { _id: field } }
         ]);
       }
@@ -208,7 +208,7 @@ const dbMap = {
           }
         },
         {
-          $limit: +process.env.DB_LIMIT_RES
+          $limit: +process.env.DOCS_PER_PAGE
         }
       ]);
       return companies.map(comp => {
@@ -238,7 +238,7 @@ const dbMap = {
           }
         },
         { $sort: { _id: 1 } },
-        { $limit: +process.env.DB_LIMIT_RES },
+        { $limit: +process.env.DOCS_PER_PAGE },
         {
           $project: {
             [field]: '$_id'
@@ -264,7 +264,7 @@ const dbMap = {
           }
         },
         {
-          $limit: +process.env.DB_LIMIT_RES
+          $limit: +process.env.DOCS_PER_PAGE
         }
       ]);
       return jobs.map(job => {
@@ -304,7 +304,7 @@ exports.autoComplete = async (req, res, next) => {
     let resultList = [];
     const searchDBs = req.query.searchDBs.split(process.env.SPLIT_SEARCH_QUERY);
     for (db of searchDBs) {
-      if (dbMap[db] && resultList.length < process.env.DB_LIMIT_RES) {
+      if (dbMap[db] && resultList.length < process.env.DOCS_PER_PAGE) {
         resultList.push(
           ...(await dbMap[db](query, usedIds, req.query.distinct))
         );

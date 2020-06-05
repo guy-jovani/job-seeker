@@ -1,8 +1,123 @@
 
+app-message-box {
+  min-width: 20rem;
+  width: 60vw;
+  max-width: 550px;
 
+  @media (max-width: 767px) {
+    width: 60vw;
+  }
+}
 
+/*********
+  HEADER
+**************/
+
+header {
+  width: 70vw;
+  min-width: 20rem;
+}
 
 .title {
   text-align: center;
   padding-top: 3rem;
+}
+
+.post-creator {
+  width: 100%;
+
+  button {
+    min-width: 20rem;
+  }
+}
+
+textarea {
+  resize: none;
+  height: 8rem;
+}
+
+/*********
+  MAIN
+**************/
+
+
+main {
+  margin: 3rem 0;
+  width: 70vw;
+  min-width: 20rem;
+}
+
+ul {
+  padding: 0;
+}
+
+li {
+  margin-bottom: 3rem;
+  width: 100%;
+
+  &:hover {
+    background-color: initial;
+  }
+
+  button {
+    margin: 0 1rem;
+  }
+}
+
+.post-info {
+  display: flex;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px #80808045 solid;
+}
+
+.author-name {
+  font-weight: bold;
+}
+
+.employee-no-profile-image,
+.employee-profile-image {
+  width: 8rem;
+  height: 8rem;
+  font-size: 3rem;
+}
+
+.company-no-profile-image,
+.company-profile-image {
+  height: 6rem;
+  width: 8.3rem;
+  font-size: 3rem;
+}
+
+.post-content {
+  border-bottom: 1px #80808045 solid;
+}
+
+.post-actions {
+  margin-top: 1rem;
+
+  p {
+    cursor: pointer;
+    display: inline-block;
+
+    &:hover {
+      color: blue;
+      text-decoration: underline;
+    }
+  }
+}
+
+
+.like-item {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #efefef;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+
+  div {
+    &:first-child {
+      margin-right: 1rem;
+    }
+  }
 }

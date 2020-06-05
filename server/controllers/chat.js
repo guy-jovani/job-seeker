@@ -170,10 +170,11 @@ const getConversationBasedOnParticipants = async participantsIds => {
 
 /**
  * Populate the participants of a conversation with the names of the users.
- * @param {Array} conversations - an array if conversations.
+ * @param {Array} conversations - an array of conversations.
  * @returns {array} - an array of Conversation object.
  */
 const populateConversationParticipants = async conversations => {
+  console.log(conversations[2].participants)
   return await Conversation.populate(conversations, 
     {
       path: 'participants.user',
@@ -217,7 +218,7 @@ const createUpdateConversation = async (recipients, content, senderId, senderTyp
     conversation = conversation[0]; // only one conversation should be found
     newCon = false;
   } else { // 3. doesn't exists - create conversation
-    conversation = await Conversation.create({participants: participants, onModel: senderType});
+    conversation = await Conversation.create({participants: participants});
   }
   let message;
   [message, conversation] = await addMessageToConversation(conversation, content, senderId, senderType, bufferFile, fileName, fileNumBytes);
