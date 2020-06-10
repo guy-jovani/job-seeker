@@ -15,7 +15,28 @@ const likesSchema = new Schema(
       required: true,
       enum: ['Employee', 'Company']
     },
-  }
+  },
+  { timestamps: true }
+);
+
+const commentSchema = new Schema(
+  {
+    author: {
+      type: Schema.Types.ObjectId, 
+      refPath: 'comments.onModel',
+      required: true
+    },
+    content: {
+      type: String,
+      required: true
+    },
+    onModel: {
+      type: String,
+      required: true,
+      enum: ['Employee', 'Company']
+    }
+  },
+  { timestamps: true }
 );
 
 
@@ -39,22 +60,7 @@ const postSchema = new Schema(
       type: Boolean,
       default: true
     },
-    comments: new Schema(
-      [
-        {
-          author: {
-            type: Schema.Types.ObjectId, 
-            refPath: 'onModel',
-            required: true
-          },
-          content: {
-            type: String,
-            required: true
-          },
-        },
-      ],
-      { timestamps: true }
-    ),
+    comments: [commentSchema],
     likes: [likesSchema]
   },
   { timestamps: true }

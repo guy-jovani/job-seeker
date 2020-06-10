@@ -44,9 +44,15 @@ exports.fetchPosts = async (req, res, next) => {
               else: 0 
             }
           },
+          numComments: { 
+            $cond: { 
+              if: { $isArray: "$comments" },
+              then: { $size: "$comments" }, 
+              else: 0 
+            }
+          },
           author: 1, 
-          content: 1, 
-          comments: 1, 
+          content: 1,  
           createdAt: 1,
           onModel: 1,
           updatedAt: 1,
@@ -85,7 +91,6 @@ exports.likeAPost = async (userId, postId, kind) => {
       },
       { new: true }
     );
-    
 
     if(!post) { // unlike
       post = await Post.findOneAndUpdate(
@@ -111,20 +116,19 @@ exports.likeAPost = async (userId, postId, kind) => {
   }
 };
 
-
-
 exports.fetchLikes = async (req, res, next) => {
   try {
     let post = await Post.findById(
       { _id: req.query.postId },
-      { 
+      {
         likes: {
           $slice: [skippedDocuments(req.query.page), +process.env.DOCS_PER_PAGE]
         }
       }
     );
-    post = await Post.populate(post, { path: 'likes.user', select: 'profileImagePath name firstName lastName email' });
 
+    post = await Post.populate(post, { path: 'likes.user', select: 'profileImagePath name firstName lastName email' });
+    
     res.status(200).json({
       type: 'success',
       likes: post['likes']
@@ -135,4 +139,69 @@ exports.fetchLikes = async (req, res, next) => {
   }
 };
 
+getPrev10Min = () => {
+  const today = new Date();
+  const last10Min = new Date(today.getFullYear(), today.getMonth(), today.getDate(), today.getHours(), today.getMinutes() - 10);
+  return last10Min;
+};
 
+exports.commentAPost = async (userId, postId, kind, comment) => {
+  try {
+    console.log(userId, postId, kind, comment)
+    let post = await Post.findOneAndUpdate(
+      { _id: postId }, 
+      { $push: {
+          'comments': { 
+            author: userId,
+            onModel: kind,
+            content: comment
+          } 
+        }
+      },
+      { new: true }
+    ).select('-likes -__v');
+
+    post = post.toObject();
+    post['numComments'] = post.comments.length;
+    post['commentedUser'] = userId;
+    for (let i=post.comments.length - 1; i>=0; i--) {
+      if (post.comments[i].createdAt < getPrev10Min()) { // check if comment from now or we gone too far
+        post['comment'] = null;
+        break;
+      } else if (post.comments[i].author.toString() === userId.toString()) {
+        post['comment'] = post.comments[i];
+        break;
+      }
+    }
+    
+    Reflect.deleteProperty(post, 'comments');
+    return post;
+    
+  } catch (error) {
+    throw errorHandling.handleServerErrors(error, 500, 'There was a problem commenting the post.');
+  }
+};
+
+exports.fetchComments = async (req, res, next) => {
+  try {
+    let post = await Post.findById(
+      { _id: req.query.postId },
+      {
+        comments: {
+          $slice: [skippedDocuments(req.query.page), +process.env.DOCS_PER_PAGE]
+        }
+      }
+    ).select('-likes -__v');
+    
+    post = await Post.populate(post, { path: 'comments.author', select: 'profileImagePath name firstName lastName email' });
+    console.log(post)
+    
+    res.status(200).json({
+      type: 'success',
+      comments: post['comments']
+    });
+    
+  } catch (error) {
+    throw errorHandling.handleServerErrors(error, 500, 'There was a problem fetching the likes of the post.');
+  }
+};

@@ -85,7 +85,7 @@ li {
 .company-no-profile-image,
 .company-profile-image {
   height: 6rem;
-  width: 8.3rem;
+  width: 10.6rem;
   font-size: 3rem;
 }
 
@@ -99,12 +99,93 @@ li {
   p {
     cursor: pointer;
     display: inline-block;
+    margin-right: 1rem;
 
     &:hover {
       color: blue;
       text-decoration: underline;
     }
   }
+}
+
+.post-actions__comment-text {
+  margin-top: 1rem;
+  display: flex;
+
+  input {
+    border-radius: 15px;
+  }
+
+  button {
+    border-radius: 50%;
+  }
+}
+
+.post-actions__comments {
+  margin-top: 2rem;
+
+  li {
+    margin-bottom: 1rem;
+    list-style: none;
+    display: flex;
+
+    > div:first-child {
+      padding-top: 0.5rem;
+      min-width: 5.5rem;
+      margin-right: 0.5rem;
+    }
+
+    a {
+      cursor: pointer;
+    }
+  }
+
+  .company-no-profile-image,
+  .company-profile-image {
+    height: 3rem;
+    width: 5.3rem;
+    font-size: 1.5rem;
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  .employee-no-profile-image,
+  .employee-profile-image {
+    height: 4rem;
+    width: 4rem;
+    font-size: 1.5rem;
+    margin-left: auto;
+    margin-right: 0;
+  }
+}
+
+.post-actions__comments-info {
+  width: 100%;
+  background-color: #d9d9d93d;
+  border-radius: 10px;
+  border-top-left-radius: 0px;
+  padding-left: 1rem;
+}
+
+.post-actions__comments-header {
+  display: flex;
+  align-items: center;
+
+  span {
+    margin: 0 0.5rem;
+  }
+
+  time {
+    font-size: smaller;
+  }
+}
+
+.dot {
+  height: 3px;
+  width: 3px;
+  background-color: black;
+  border-radius: 50%;
+  display: inline-block;
 }
 
 

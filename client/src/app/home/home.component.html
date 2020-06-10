@@ -12,7 +12,7 @@
   <header class="flex-row-center">
     <h4 class="title" *ngIf="!user">Welcome to Job Seeker</h4>
     <div class="post-creator flex-row-center" *ngIf="user">
-      <form class="my-form" #postForm="ngForm" (ngSubmit)="onSubmit(postForm)">
+      <form class="my-form" #postForm="ngForm" (ngSubmit)="onSubmitPost(postForm)">
         <div class="form-group">
           <label for="postContent"></label>
           <textarea
@@ -59,18 +59,65 @@
           </div>
 
           <div class="post-actions">
-            <div class="post-actions__values" *ngIf="post.likes.total || (post.comments && post.comments.length)">
+            <div class="post-actions__values" *ngIf="post.likes.total || (post.comments && post.comments.total)">
               <p *ngIf="post.likes.total" (click)="onViewLikes(i)">
                 {{ post.likes.total }} <i class="glyphicon glyphicon-thumbs-up"></i>
               </p>
-              <p *ngIf="post.comments && post.comments.length">{{ post.comments.length }}</p>
+              <p *ngIf="post.comments && post.comments.total" (click)="showComments(i)">{{ post.comments.total }} Comments</p>
             </div>
 
             <div class="post-actions__buttons">
               <button class="btn btn-sm btn-info" (click)="onLikePost(post._id)">
                 <i class="glyphicon glyphicon-thumbs-up"></i>
               </button>
-              <button class="btn btn-sm btn-info">Comment</button>
+              <button class="btn btn-sm btn-info" (click)="onCommentPost(i)">Comment</button>
+            </div>
+
+            <div *ngIf="commentPostInd === i || posts[i].comments.comments.length">
+
+              <div class="post-actions__comment-text" *ngIf="commentPostInd === i">
+                <input type="text" placeholder="Enter your comment.." class="form-control input-form-tag" #comment>
+                <button class="btn btn-sm btn-default" (click)="onSubmitComment(post._id)">
+                  <i class="glyphicon glyphicon-menu-right"></i>
+                </button>
+              </div>
+
+              <div class="post-actions__comments">
+                <ul class="list-group" *ngIf="posts[i].comments.comments.length">
+                  <li *ngFor="let comment of posts[i].comments.comments">
+                    <div>
+                      <img
+                        alt="Profile image of {{ getFullName(comment.author) | titlecase }}"
+                        [src]="comment.author.profileImagePath"
+                        class="{{ comment.onModel === 'Employee' ? 'employee' : 'company' }}-profile-image"
+                        *ngIf="comment.author.profileImagePath" />
+                      <div class="{{ comment.onModel === 'Employee' ? 'employee' : 'company' }}-no-profile-image" *ngIf="!comment.author.profileImagePath">
+                        <span class="glyphicon glyphicon-user"></span>
+                      </div>
+                    </div>
+
+                    <div class="post-actions__comments-info">
+                      <div class="post-actions__comments-header">
+                        <h5>
+                          {{ getFullName(comment.author) }}
+                        </h5>
+                        <span class="dot"></span>
+                        <time [dateTime]="getPostDateTime(comment.createdAt)">{{ getPostDate(comment.createdAt) }}</time>
+                      </div>
+
+                      <p>{{ comment.content }}</p>
+                    </div>
+
+                  </li>
+                  <li *ngIf='posts[i].comments.total === posts[i].comments.comments.length && !isLoadingComments' class="flex-row-center">There are no more comments.</li>
+                  <li *ngIf='posts[i].comments.total > posts[i].comments.comments.length && !isLoadingComments' class="flex-row-center" (click)="fetchNextCommentsPage(i)"><a>Load more comments..</a></li>
+                </ul>
+                <app-loading-spinner
+                  class="flex-row-center"
+                  *ngIf="isLoadingComments && commentPostInd === i">
+                </app-loading-spinner>
+              </div>
+
             </div>
           </div>
       </li>
@@ -87,8 +134,8 @@
 <div class="backdrop" class="{{ viewLikesPost ? '' : 'invisible' }}" (click)="onCloseLikes($event)">
 
   <div class="alert-box" (scroll)="onScrollLikes()" #likes>
-    <div *ngIf="viewLikesPost">
-      <div *ngFor="let userLike of viewLikesPost.likes.users" class="like-item">
+    <ul *ngIf="viewLikesPost">
+      <li *ngFor="let userLike of viewLikesPost.likes.users" class="like-item">
         <div>
           <img
             alt="Profile image of {{ getFullName(userLike.user) | titlecase }}"
@@ -103,13 +150,11 @@
         <h4>
           {{ getFullName(userLike.user) }}
         </h4>
-      </div>
-      <div *ngIf='viewLikesPost.likes.users.length === viewLikesPost.likes.total && !isLoadingLikes' class="flex-row-center">
-        <p>There are no more likes.</p>
-      </div>
-      <app-loading-spinner class="flex-row-center" *ngIf="isLoadingLikes"></app-loading-spinner>
-      <button class="close-button glyphicon glyphicon-remove" (click)="onCloseLikes($event)"></button>
-    </div>
+      </li>
+      <li *ngIf='viewLikesPost.likes.users.length === viewLikesPost.likes.total && !isLoadingLikes' class="flex-row-center">There are no more likes.</li>
+    </ul>
+    <app-loading-spinner class="flex-row-center" *ngIf="isLoadingLikes"></app-loading-spinner>
+    <button class="close-button glyphicon glyphicon-remove" (click)="onCloseLikes($event)"></button>
   </div>
 
 </div>

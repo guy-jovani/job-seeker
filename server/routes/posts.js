@@ -47,5 +47,16 @@ router.get('/fetchLikes', [
     .withMessage('The "page" field should be a positive number.'),
 ], postsController.fetchLikes);
 
+router.get('/fetchComments', [
+  query('postId')
+    .exists()
+    .not()
+    .isEmpty()
+    .withMessage('Missing the post ID.'),
+  query('page')
+    .isInt({ gt: 0 })
+    .withMessage('The "page" field should be a positive number.'),
+], postsController.fetchComments);
+
 module.exports = router;
 

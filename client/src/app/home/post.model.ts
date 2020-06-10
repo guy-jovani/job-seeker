@@ -5,6 +5,9 @@ import { Company } from 'app/company/company.model';
 class Comment {
   author: Employee | Company;
   content: string;
+  onModel: 'Employee' | 'Company';
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 
@@ -15,7 +18,11 @@ export class Post {
   public createdAt: Date;
   public updatedAt: Date;
   public allowComments: boolean;
-  public comments: Comment[];
+  public comments: {
+    total: number,
+    page: number,
+    comments: Comment[]
+  };
   public likes: {
     total: number,
     users: {

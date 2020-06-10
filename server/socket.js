@@ -46,6 +46,7 @@ exports.socketHandler = (socket) => {
   socket.on('readAMsg', readAMsg);
   socket.on('updateStatus', updateStatus);
   socket.on('likeAPost', likeAPost);
+  socket.on('commentAPost', commentAPost);
 
 };
 
@@ -139,6 +140,22 @@ const likeAPost = async data => {
     console.log(error);
     io.to(data.userId).emit('postLiked', { // sending the error to the sender of the message
       messages: error.messages || ['There was a problem liking the post.. Please try again later.'],
+      type: 'failure'
+    });
+  }
+}
+
+const commentAPost = async data => {
+  try {
+    const post = await postsController.commentAPost(data.userId, data.postId, data.kind, data.comment);
+    io.emit('commentedPost', { 
+      post,
+      type: 'success'
+    });
+  } catch (error) {
+    console.log(error);
+    io.to(data.userId).emit('commentedPost', { // sending the error to the sender of the message
+      messages: error.messages || ['There was a problem commenting the post.. Please try again later.'],
       type: 'failure'
     });
   }
