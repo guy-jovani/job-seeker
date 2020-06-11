@@ -124,7 +124,10 @@ exports.updateEmployee = async (req, res, next) => {
       return sendMessagesResponse(res, 422, emailExist.messages, 'failure');
     }
 
-    req.body = req.body.map(val => val.toLowerCase());
+    for (let [key, value] of Object.entries(req.body)) {
+      req.body[key] = typeof value === 'string' ? value.toLowerCase() : value;
+    }
+    
     const bulkRes = await Employee.bulkWrite(await getUpdateQuery(req));
     if(!bulkRes.result.nMatched){
       throw new Error("Trying to update a non existing employee.");

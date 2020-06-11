@@ -241,8 +241,10 @@ exports.updateCompany = async (req, res, next) => {
     if(companyValid.type === 'failure'){
       return sendMessagesResponse(res, 422, companyValid.messages, 'failure');
     }
-
-    req.body = req.body.map(val => val.toLowerCase());
+    
+    for (let [key, value] of Object.entries(req.body)) {
+      req.body[key] = typeof value === 'string' ? value.toLowerCase() : value;
+    }
 
     const bulkRes = await Company.bulkWrite(await getUpdateQuery(req));
     if(!bulkRes.result.nMatched){
