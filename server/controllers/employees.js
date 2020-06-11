@@ -125,7 +125,7 @@ exports.updateEmployee = async (req, res, next) => {
     }
 
     for (let [key, value] of Object.entries(req.body)) {
-      req.body[key] = typeof value === 'string' ? value.toLowerCase() : value;
+      req.body[key] = typeof value === 'string' && key !== 'profileImagePath' ? value.toLowerCase() : value;
     }
     
     const bulkRes = await Employee.bulkWrite(await getUpdateQuery(req));
