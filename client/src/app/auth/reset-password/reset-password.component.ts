@@ -24,13 +24,10 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
     this.errorSub = this.store.select('auth')
       .subscribe(
         authState => {
-          if (authState.messages) {
-            for (const msg of authState.messages) {
-              this.messages.push(msg);
-            }
+          if (authState.messages.length) {
+            this.messages = [...authState.messages];
           } else {
-            this.messages = [];
-            if (this.isLoading && !authState.loading) {
+            if (!this.isLoading) {
               this.messages.push('An email with a link to the reset page has been sent to you.');
             }
           }
@@ -45,6 +42,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
 
   onSubmit() {
     const email = this.authForm.value.email;
+    this.messages = [];
     this.store.dispatch(new AuthActions.ResetPassEmailAttempt(email));
   }
 
@@ -57,6 +55,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
 
   onClose() {
     this.store.dispatch(new AuthActions.ClearError());
+    this.messages = [];
   }
 
 }

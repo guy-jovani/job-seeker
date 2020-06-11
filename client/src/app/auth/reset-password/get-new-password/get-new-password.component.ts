@@ -33,10 +33,8 @@ export class GetNewPasswordComponent implements OnInit, OnDestroy {
     )
     .subscribe(authState => {
       this.isLoading = authState.loading;
-      if (authState.messages) {
-        for (const msg of authState.messages) {
-          this.messages.push(msg);
-        }
+      if (authState.messages.length) {
+        this.messages = [...authState.messages];
       } else {
         this.messages = [];
       }
@@ -61,6 +59,7 @@ export class GetNewPasswordComponent implements OnInit, OnDestroy {
     const password = this.authForm.value.passwords.password;
     const confirmPassword = this.authForm.value.passwords.confirmPassword;
     this.store.dispatch(new AuthActions.ResetPassAttempt({ password, confirmPassword, token: this.token }));
+    this.messages = [];
   }
 
   onTogglePasswords() {
@@ -76,6 +75,7 @@ export class GetNewPasswordComponent implements OnInit, OnDestroy {
 
   onClose() {
     this.store.dispatch(new AuthActions.ClearError());
+    this.messages = [];
   }
 
 }
