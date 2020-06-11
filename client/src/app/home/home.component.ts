@@ -172,15 +172,19 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   getFullName(user: { _id: string; email?: string; name?: string; firstName?: string; lastName?: string; }) {
-    if (user._id === this.user._id) {
-      return 'Me';
-    }
+    let fullName = '';
     if (user['name']) {
-      return user['name'];
+      fullName = user['name'];
     } else if (user['firstName'] || user['lastName']) {
-      return ((user['firstName'] || '') + ' ' + (user['lastName'] || '')).trim();
+      fullName = ((user['firstName'] || '') + ' ' + (user['lastName'] || '')).trim();
+    } else {
+      fullName = user.email;
     }
-    return user.email;
+
+    if (user._id === this.user._id) {
+      fullName = 'Me (' + fullName + ')';
+    }
+    return fullName;
   }
 
   private fetchNextPostsPage(onInit = false) {
