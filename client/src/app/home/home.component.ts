@@ -161,6 +161,11 @@ export class HomeComponent implements OnInit, OnDestroy {
             total: 0,
             users: []
           };
+
+          res['post'].comments = {
+            total: 0,
+            comments: []
+          };
           this.posts.unshift(res['post']);
         }
       },
@@ -216,7 +221,6 @@ export class HomeComponent implements OnInit, OnDestroy {
               };
               post['comments'] = {
                 total: post.numComments,
-                page: 1,
                 comments: []
               };
 
