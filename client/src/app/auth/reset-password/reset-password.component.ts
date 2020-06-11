@@ -17,6 +17,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
   errorSub: Subscription;
   messages: string[] = [];
   isLoading = false;
+  submitted = false;
 
   constructor(private store: Store<fromApp.AppState>) { }
 
@@ -27,7 +28,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
           if (authState.messages.length) {
             this.messages = [...authState.messages];
           } else {
-            if (!this.isLoading) {
+            if (!this.isLoading && this.submitted) {
               this.messages.push('An email with a link to the reset page has been sent to you.');
             }
           }
@@ -43,6 +44,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
   onSubmit() {
     const email = this.authForm.value.email;
     this.messages = [];
+    this.submitted = true;
     this.store.dispatch(new AuthActions.ResetPassEmailAttempt(email));
   }
 
