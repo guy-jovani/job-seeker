@@ -133,7 +133,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       quantity = 'mo';
     }
 
-    return Math.floor(time) <= 0 ? Math.floor(time).toString() + quantity : 'now';
+    return Math.floor(time) > 0 ? Math.floor(time).toString() + quantity : 'now';
   }
 
   onSubmitPost(form: NgForm) {
