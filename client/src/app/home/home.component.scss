@@ -51,8 +51,31 @@ ul {
   padding: 0;
 }
 
+.unauthenticated-links {
+  width: 50%;
+  min-width: max-content;
+
+  li {
+    cursor: pointer;
+    box-shadow: 1px 2px 5px;
+    transform: perspective(50px) translateZ(-1px);
+    background: linear-gradient(to right, #d9d9d93d 50%, white 50%);
+    background-size: 200% 100%;
+    background-position: right;
+    transition: all .5s ease-out;
+
+    &:hover {
+      transform: perspective(50px) translateZ(0px);
+      background-position: left;
+    }
+    a {
+      text-decoration: none;
+    }
+  }
+}
+
 li {
-  margin-bottom: 3rem;
+  margin-bottom: 1rem;
   width: 100%;
 
   &:hover {

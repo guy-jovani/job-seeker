@@ -33,7 +33,22 @@
   </header>
 
 
-  <main #main>
+  <main class="flex-row-center" #main>
+
+    <ul class="flex-column-center unauthenticated-links" *ngIf="!user">
+      <li class="list-group-item" routerLink='/jobs'>
+        <a>Find a Job</a>
+      </li>
+      <li class="list-group-item" routerLink='/people'>
+        <a>Find a Friend</a>
+      </li>
+      <li class="list-group-item" routerLink='/companies'>
+        <a>Find a Company</a>
+      </li>
+    </ul>
+
+
+
     <ul class="flex-column-center" *ngIf="user && posts.length">
       <li
         class="list-group-item"
@@ -121,10 +136,8 @@
             </div>
           </div>
       </li>
+      <li *ngIf='lastPost && !isLoading' class="flex-row-center">There are no more posts.</li>
     </ul>
-    <div *ngIf='lastPost && !isLoading' class="flex-row-center">
-      <p>There are no more posts.</p>
-    </div>
     <app-loading-spinner class="flex-row-center" *ngIf="isLoading"></app-loading-spinner>
   </main>
 
