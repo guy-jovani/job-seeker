@@ -174,7 +174,6 @@ const getConversationBasedOnParticipants = async participantsIds => {
  * @returns {array} - an array of Conversation object.
  */
 const populateConversationParticipants = async conversations => {
-  console.log(conversations[2].participants)
   return await Conversation.populate(conversations, 
     {
       path: 'participants.user',
