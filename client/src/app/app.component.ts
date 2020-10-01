@@ -11,6 +11,9 @@ import * as JobActions from './job/store/job.actions';
 import * as CompanyActions from './company/store/company.actions';
 import { ChatService } from './chat/chat-socket.service';
 
+
+declare let gtag: Function;
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -31,7 +34,18 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(private store: Store<fromApp.AppState>,
               private chatService: ChatService,
-              private router: Router) {}
+              private router: Router) {
+    // google analytics
+    this.router.events.subscribe(event => {
+      if ( event instanceof NavigationEnd ) {
+        gtag('config', 'UA-178409109-2',
+          {
+            'page_path': event.urlAfterRedirects
+          }
+        );
+      }
+    });
+  }
 
 
   ngOnInit() {
